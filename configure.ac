@@ -20,5 +20,6 @@ AX_APPEND_COMPILE_FLAGS([-pedantic -Wall -Wextra])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
     Makefile
+    src/Makefile
 ])
 AC_OUTPUT
