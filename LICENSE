@@ -3,6 +3,11 @@ GNU General Public License. However, the distribution of the software
 may include software and/or documentation that are covered by other
 licenses.
 
+The distribution of Sesh includes Catch, a unit test framework whose
+all functionality is implemented as a C++ header file. It is licensed
+under the Boost Software License. The full text of the license is
+found at external/Catch/LICENSE_1_0.txt.
+
 ======================================================================
 
                     GNU GENERAL PUBLIC LICENSE
