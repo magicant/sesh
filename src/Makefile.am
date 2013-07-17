@@ -1,3 +1,3 @@
 bin_PROGRAMS = sesh
 
-sesh_SOURCES = main.cc
+sesh_SOURCES = common.hh main.cc

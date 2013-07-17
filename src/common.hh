@@ -15,9 +15,13 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "common.hh"
+#ifndef INCLUDED_common_hh
+#define INCLUDED_common_hh
 
-int main(int, char *[]) {
-}
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#endif // #ifndef INCLUDED_common_hh
 
 /* vim: set et sw=4 sts=4 tw=79: */
