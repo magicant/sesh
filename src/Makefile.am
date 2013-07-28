@@ -1,6 +1,7 @@
 bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
+	language/CommandTest \
 	language/PrinterTest \
 	language/RawStringTest \
 	language/SourceLocationTest \
@@ -12,6 +13,7 @@ catch_include = -I$(top_srcdir)/external/Catch/single_include
 AM_CPPFLAGS = $(catch_include)
 
 sesh_SOURCES = common.hh main.cc \
+	language/Command.hh \
 	language/Printable.hh \
 	language/Printer.cc language/Printer.hh \
 	language/RawString.cc language/RawString.hh \
@@ -19,6 +21,8 @@ sesh_SOURCES = common.hh main.cc \
 	language/Word.cc language/Word.hh \
 	language/WordComponent.hh
 
+language_CommandTest_SOURCES = language/CommandTest.cc \
+	language/SourceLocation.cc
 language_PrinterTest_SOURCES = language/PrinterTest.cc \
 	language/Printer.cc \
 	language/PrinterTestHelper.hh
