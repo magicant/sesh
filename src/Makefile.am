@@ -3,6 +3,7 @@ bin_PROGRAMS = sesh
 check_PROGRAMS = \
 	language/PrinterTest \
 	language/RawStringTest \
+	language/SourceLocationTest \
 	language/WordTest
 
 TESTS = $(check_PROGRAMS)
@@ -14,6 +15,7 @@ sesh_SOURCES = common.hh main.cc \
 	language/Printable.hh \
 	language/Printer.cc language/Printer.hh \
 	language/RawString.cc language/RawString.hh \
+	language/SourceLocation.cc language/SourceLocation.hh \
 	language/Word.cc language/Word.hh \
 	language/WordComponent.hh
 
@@ -27,3 +29,6 @@ language_WordTest_SOURCES = language/WordTest.cc \
 	language/Printer.cc \
 	language/RawString.cc \
 	language/Word.cc
+language_SourceLocationTest_SOURCES = language/SourceLocationTest.cc \
+	language/SourceLocation.cc \
+	language/SourceLocationTestHelper.hh
