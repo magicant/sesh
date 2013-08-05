@@ -5,6 +5,7 @@ check_PROGRAMS = \
 	language/CommandTest \
 	language/PrinterTest \
 	language/RawStringTest \
+	language/SimpleCommandTest \
 	language/SourceLocationTest \
 	language/WordTest
 
@@ -19,6 +20,7 @@ sesh_SOURCES = common.hh main.cc \
 	language/Printable.hh \
 	language/Printer.cc language/Printer.hh \
 	language/RawString.cc language/RawString.hh \
+	language/SimpleCommand.cc language/SimpleCommand.hh \
 	language/SourceLocation.cc language/SourceLocation.hh \
 	language/Word.cc language/Word.hh \
 	language/WordComponent.hh
@@ -36,6 +38,13 @@ language_PrinterTest_SOURCES = language/PrinterTest.cc \
 language_RawStringTest_SOURCES = language/RawStringTest.cc \
 	language/Printer.cc \
 	language/RawString.cc
+language_SimpleCommandTest_SOURCES = language/SimpleCommandTest.cc \
+	language/Assignment.cc \
+	language/Printer.cc \
+	language/RawString.cc \
+	language/SimpleCommand.cc \
+	language/SourceLocation.cc \
+	language/Word.cc
 language_WordTest_SOURCES = language/WordTest.cc \
 	language/Printer.cc \
 	language/RawString.cc \
