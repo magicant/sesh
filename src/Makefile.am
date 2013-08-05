@@ -3,6 +3,7 @@ bin_PROGRAMS = sesh
 check_PROGRAMS = \
 	language/AssignmentTest \
 	language/CommandTest \
+	language/PipelineTest \
 	language/PrinterTest \
 	language/RawStringTest \
 	language/SimpleCommandTest \
@@ -17,6 +18,7 @@ AM_CPPFLAGS = $(catch_include)
 sesh_SOURCES = common.hh main.cc \
 	language/Assignment.cc language/Assignment.hh \
 	language/Command.hh \
+	language/Pipeline.cc language/Pipeline.hh \
 	language/Printable.hh \
 	language/Printer.cc language/Printer.hh \
 	language/RawString.cc language/RawString.hh \
@@ -31,6 +33,10 @@ language_AssignmentTest_SOURCES = language/AssignmentTest.cc \
 	language/RawString.cc \
 	language/Word.cc
 language_CommandTest_SOURCES = language/CommandTest.cc \
+	language/SourceLocation.cc
+language_PipelineTest_SOURCES = language/PipelineTest.cc \
+	language/Pipeline.cc \
+	language/Printer.cc \
 	language/SourceLocation.cc
 language_PrinterTest_SOURCES = language/PrinterTest.cc \
 	language/Printer.cc \
