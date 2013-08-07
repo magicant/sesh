@@ -1,7 +1,8 @@
 bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
-	language/PrinterTest
+	language/PrinterTest \
+	language/RawStringTest
 
 TESTS = $(check_PROGRAMS)
 
@@ -10,8 +11,13 @@ AM_CPPFLAGS = $(catch_include)
 
 sesh_SOURCES = common.hh main.cc \
 	language/Printable.hh \
-	language/Printer.cc language/Printer.hh
+	language/Printer.cc language/Printer.hh \
+	language/RawString.cc language/RawString.hh \
+	language/WordComponent.hh
 
 language_PrinterTest_SOURCES = language/PrinterTest.cc \
 	language/Printer.cc \
 	language/PrinterTestHelper.hh
+language_RawStringTest_SOURCES = language/RawStringTest.cc \
+	language/Printer.cc \
+	language/RawString.cc
