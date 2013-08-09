@@ -1,6 +1,7 @@
 bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
+	language/AndOrListTest \
 	language/AssignmentTest \
 	language/CommandTest \
 	language/ConditionalPipelineTest \
@@ -17,6 +18,7 @@ catch_include = -I$(top_srcdir)/external/Catch/single_include
 AM_CPPFLAGS = $(catch_include)
 
 sesh_SOURCES = common.hh main.cc \
+	language/AndOrList.cc language/AndOrList.hh \
 	language/Assignment.cc language/Assignment.hh \
 	language/Command.hh \
 	language/ConditionalPipeline.cc language/ConditionalPipeline.hh \
@@ -29,6 +31,12 @@ sesh_SOURCES = common.hh main.cc \
 	language/Word.cc language/Word.hh \
 	language/WordComponent.hh
 
+language_AndOrListTest_SOURCES = language/AndOrListTest.cc \
+	language/AndOrList.cc \
+	language/ConditionalPipeline.cc \
+	language/Pipeline.cc \
+	language/Printer.cc \
+	language/SourceLocation.cc
 language_AssignmentTest_SOURCES = language/AssignmentTest.cc \
 	language/Assignment.cc \
 	language/Printer.cc \
