@@ -8,6 +8,7 @@ check_PROGRAMS = \
 	language/PipelineTest \
 	language/PrinterTest \
 	language/RawStringTest \
+	language/SequenceTest \
 	language/SimpleCommandTest \
 	language/SourceLocationTest \
 	language/WordTest
@@ -26,6 +27,7 @@ sesh_SOURCES = common.hh main.cc \
 	language/Printable.hh \
 	language/Printer.cc language/Printer.hh \
 	language/RawString.cc language/RawString.hh \
+	language/Sequence.cc language/Sequence.hh \
 	language/SimpleCommand.cc language/SimpleCommand.hh \
 	language/SourceLocation.cc language/SourceLocation.hh \
 	language/Word.cc language/Word.hh \
@@ -59,6 +61,13 @@ language_PrinterTest_SOURCES = language/PrinterTest.cc \
 language_RawStringTest_SOURCES = language/RawStringTest.cc \
 	language/Printer.cc \
 	language/RawString.cc
+language_SequenceTest_SOURCES = language/SequenceTest.cc \
+	language/AndOrList.cc \
+	language/ConditionalPipeline.cc \
+	language/Pipeline.cc \
+	language/Printer.cc \
+	language/Sequence.cc \
+	language/SourceLocation.cc
 language_SimpleCommandTest_SOURCES = language/SimpleCommandTest.cc \
 	language/Assignment.cc \
 	language/Printer.cc \
