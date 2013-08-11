@@ -15,7 +15,7 @@ AM_INIT_AUTOMAKE([
 AC_LANG([C++])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
-AX_APPEND_COMPILE_FLAGS([-pedantic -Wall -Wextra])
+AX_APPEND_COMPILE_FLAGS([-pedantic -Wall -Wextra -Wdocumentation])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
