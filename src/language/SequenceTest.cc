@@ -104,4 +104,4 @@ TEST_CASE_METHOD(PrintFixture, "Sequence print multi-line") {
             L"XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5; ");
 }
 
-/* vim: set et sw=4 sts=4 tw=79: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

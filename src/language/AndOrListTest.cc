@@ -177,4 +177,4 @@ TEST_CASE("And-or list print w/ rest") {
             L"X! command &&\nY\n    ! command ||\n    ! command& ");
 }
 
-/* vim: set et sw=4 sts=4 tw=79: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
