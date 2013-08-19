@@ -24,7 +24,7 @@ namespace sesh {
 namespace language {
 
 AndOrList::AndOrList(Pipeline &&first, Synchronicity s) :
-    mFirst(std::move(first)), mRest(), mSynchronicity(s) { }
+        mFirst(std::move(first)), mRest(), mSynchronicity(s) { }
 
 namespace {
 
