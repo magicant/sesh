@@ -93,4 +93,4 @@ TEST_CASE("Pipeline print") {
     checkForEachLineMode(pl, L"! Command 1 | Command 2 | The last command");
 }
 
-/* vim: set et sw=4 sts=4 tw=79: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

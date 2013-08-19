@@ -24,7 +24,7 @@ namespace sesh {
 namespace language {
 
 AndOrList::AndOrList(Pipeline &&first, Synchronicity s) :
-    mFirst(std::move(first)), mRest(), mSynchronicity(s) { }
+        mFirst(std::move(first)), mRest(), mSynchronicity(s) { }
 
 namespace {
 
@@ -53,4 +53,4 @@ void AndOrList::print(Printer &p) const {
 } // namespace language
 } // namespace sesh
 
-/* vim: set et sw=4 sts=4 tw=79: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
