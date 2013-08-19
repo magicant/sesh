@@ -43,4 +43,4 @@ public:
 
 #endif // #ifndef INCLUDED_language_WordComponent_hh
 
-/* vim: set et sw=4 sts=4 tw=79: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

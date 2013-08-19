@@ -43,4 +43,4 @@ inline void forEachLineMode(std::function<void(Printer &)> f) {
 
 #endif // #ifndef INCLUDED_language_PrinterTestHelper_hh
 
-/* vim: set et sw=4 sts=4 tw=79: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
