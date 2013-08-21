@@ -32,9 +32,9 @@ private:
 
     /** Not necessarily a filename. */
     std::shared_ptr<const std::wstring> mName;
-    /** Counted from 1. */
+    /** Counted from 0. */
     std::size_t mLine;
-    /** Counted from 1. */
+    /** Counted from 0. */
     std::size_t mColumn;
 
 public:
