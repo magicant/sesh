@@ -69,6 +69,29 @@ TEST_CASE("Source location constructor null pointer exception") {
             std::invalid_argument);
 }
 
+TEST_CASE("Source location comparison") {
+    SourceLocation sl1 = dummySourceLocation(L"apple", 0, 0);
+    SourceLocation sl2 = dummySourceLocation(L"apple", 0, 0);
+    SourceLocation sl3 = dummySourceLocation(L"banana", 0, 0);
+    SourceLocation sl4 = dummySourceLocation(L"apple", 1, 0);
+    SourceLocation sl5 = dummySourceLocation(L"apple", 0, 1);
+
+    CHECK(sl1 == sl1);
+    CHECK_FALSE(!(sl1 == sl1));
+    CHECK(sl1 == sl2);
+    CHECK_FALSE(!(sl1 == sl2));
+    CHECK_FALSE(sl1 == sl3);
+    CHECK(!(sl1 == sl3));
+    CHECK_FALSE(sl1 == sl4);
+    CHECK(!(sl1 == sl4));
+    CHECK_FALSE(sl1 == sl5);
+    CHECK(!(sl1 == sl5));
+    CHECK_FALSE(sl3 == sl4);
+    CHECK(!(sl3 == sl4));
+    CHECK_FALSE(sl3 == sl5);
+    CHECK(!(sl3 == sl5));
+}
+
 TEST_CASE("Dummy source location") {
     SourceLocation sl1 = dummySourceLocation();
     SourceLocation sl2 = dummySourceLocation(L"foo");

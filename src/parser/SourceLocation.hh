@@ -64,6 +64,12 @@ public:
 
 }; // class SourceLocation
 
+bool operator==(const SourceLocation &l, const SourceLocation &r);
+
+inline bool operator!=(const SourceLocation &l, const SourceLocation &r) {
+    return !(l == r);
+}
+
 } // namespace parser
 } // namespace sesh
 

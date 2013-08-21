@@ -45,6 +45,10 @@ SourceLocation::SourceLocation(
         mNameAndLine(std::move(name), line),
         mColumn(column) { }
 
+bool operator==(const SourceLocation &l, const SourceLocation &r) {
+    return l.nameAndLine() == r.nameAndLine() && l.column() == r.column();
+}
+
 } // namespace parser
 } // namespace sesh
 
