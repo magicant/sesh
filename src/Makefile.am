@@ -11,7 +11,8 @@ check_PROGRAMS = \
 	language/SequenceTest \
 	language/SimpleCommandTest \
 	language/SourceLocationTest \
-	language/WordTest
+	language/WordTest \
+	parser/SourceLineLocationTest
 
 TESTS = $(check_PROGRAMS)
 
@@ -31,7 +32,8 @@ sesh_SOURCES = common.hh main.cc \
 	language/SimpleCommand.cc language/SimpleCommand.hh \
 	language/SourceLocation.cc language/SourceLocation.hh \
 	language/Word.cc language/Word.hh \
-	language/WordComponent.hh
+	language/WordComponent.hh \
+	parser/SourceLineLocation.cc parser/SourceLineLocation.hh
 
 language_AndOrListTest_SOURCES = language/AndOrListTest.cc \
 	language/AndOrList.cc \
@@ -82,3 +84,6 @@ language_WordTest_SOURCES = language/WordTest.cc \
 language_SourceLocationTest_SOURCES = language/SourceLocationTest.cc \
 	language/SourceLocation.cc \
 	language/SourceLocationTestHelper.hh
+parser_SourceLineLocationTest_SOURCES = parser/SourceLineLocationTest.cc \
+	parser/SourceLineLocation.cc \
+	parser/SourceLineLocationTestHelper.hh
