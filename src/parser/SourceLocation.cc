@@ -21,7 +21,7 @@
 #include <utility>
 
 namespace sesh {
-namespace language {
+namespace parser {
 
 SourceLocation::SourceLocation(
         std::shared_ptr<const std::wstring> &name,
@@ -45,7 +45,7 @@ SourceLocation::SourceLocation(
         throw std::invalid_argument("null name");
 }
 
-} // namespace language
+} // namespace parser
 } // namespace sesh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

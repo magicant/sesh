@@ -23,10 +23,10 @@
 namespace sesh {
 namespace language {
 
-SimpleCommand::SimpleCommand(const SourceLocation &sl) :
+SimpleCommand::SimpleCommand(const parser::SourceLocation &sl) :
         Command(sl), mWords(), mAssignments() { }
 
-SimpleCommand::SimpleCommand(SourceLocation &&sl) :
+SimpleCommand::SimpleCommand(parser::SourceLocation &&sl) :
         Command(std::move(sl)), mWords(), mAssignments() { }
 
 void SimpleCommand::print(Printer &p) const {

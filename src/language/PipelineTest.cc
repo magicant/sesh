@@ -25,13 +25,13 @@
 #include "language/Pipeline.hh"
 #include "language/Printer.hh"
 #include "language/PrinterTestHelper.hh"
-#include "language/SourceLocationTestHelper.hh"
+#include "parser/SourceLocationTestHelper.hh"
 
 using sesh::language::Command;
 using sesh::language::Pipeline;
 using sesh::language::Printer;
-using sesh::language::dummySourceLocation;
 using sesh::language::forEachLineMode;
+using sesh::parser::dummySourceLocation;
 
 namespace {
 

@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_SourceLocationTestHelper_hh
-#define INCLUDED_language_SourceLocationTestHelper_hh
+#ifndef INCLUDED_parser_SourceLocationTestHelper_hh
+#define INCLUDED_parser_SourceLocationTestHelper_hh
 
 #include <cstddef>
 #include <memory>
 #include <string>
-#include "language/SourceLocation.hh"
+#include "parser/SourceLocation.hh"
 
 namespace sesh {
-namespace language {
+namespace parser {
 
 /** For testing only. */
 inline SourceLocation dummySourceLocation(
@@ -37,9 +37,9 @@ inline SourceLocation dummySourceLocation(
             column);
 }
 
-} // namespace language
+} // namespace parser
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_SourceLocationTestHelper_hh
+#endif // #ifndef INCLUDED_parser_SourceLocationTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

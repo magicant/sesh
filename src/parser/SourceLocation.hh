@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_SourceLocation_hh
-#define INCLUDED_language_SourceLocation_hh
+#ifndef INCLUDED_parser_SourceLocation_hh
+#define INCLUDED_parser_SourceLocation_hh
 
 #include <cstddef>
 #include <memory>
 #include <string>
 
 namespace sesh {
-namespace language {
+namespace parser {
 
 /** A source location is a location in a shell script source file. */
 class SourceLocation {
@@ -60,9 +60,9 @@ public:
 
 }; // class SourceLocation
 
-} // namespace language
+} // namespace parser
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_SourceLocation_hh
+#endif // #ifndef INCLUDED_parser_SourceLocation_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
