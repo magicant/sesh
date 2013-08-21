@@ -24,26 +24,26 @@ namespace sesh {
 namespace parser {
 
 SourceLocation::SourceLocation(
+        const SourceLineLocation &nameAndLine, std::size_t column) :
+        mNameAndLine(nameAndLine), mColumn(column) { }
+
+SourceLocation::SourceLocation(
+        SourceLineLocation &&nameAndLine, std::size_t column) :
+        mNameAndLine(std::move(nameAndLine)), mColumn(column) { }
+
+SourceLocation::SourceLocation(
         std::shared_ptr<const std::wstring> &name,
         std::size_t line,
         std::size_t column) :
-        mName(name),
-        mLine(line),
-        mColumn(column) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
-}
+        mNameAndLine(name, line),
+        mColumn(column) { }
 
 SourceLocation::SourceLocation(
         std::shared_ptr<const std::wstring> &&name,
         std::size_t line,
         std::size_t column) :
-        mName(std::move(name)),
-        mLine(line),
-        mColumn(column) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
-}
+        mNameAndLine(std::move(name), line),
+        mColumn(column) { }
 
 } // namespace parser
 } // namespace sesh

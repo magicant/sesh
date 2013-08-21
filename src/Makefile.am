@@ -40,6 +40,7 @@ language_AndOrListTest_SOURCES = language/AndOrListTest.cc \
 	language/ConditionalPipeline.cc \
 	language/Pipeline.cc \
 	language/Printer.cc \
+	parser/SourceLineLocation.cc \
 	parser/SourceLocation.cc
 language_AssignmentTest_SOURCES = language/AssignmentTest.cc \
 	language/Assignment.cc \
@@ -47,15 +48,18 @@ language_AssignmentTest_SOURCES = language/AssignmentTest.cc \
 	language/RawString.cc \
 	language/Word.cc
 language_CommandTest_SOURCES = language/CommandTest.cc \
+	parser/SourceLineLocation.cc \
 	parser/SourceLocation.cc
 language_ConditionalPipelineTest_SOURCES = language/ConditionalPipelineTest.cc\
 	language/ConditionalPipeline.cc \
 	language/Pipeline.cc \
 	language/Printer.cc \
+	parser/SourceLineLocation.cc \
 	parser/SourceLocation.cc
 language_PipelineTest_SOURCES = language/PipelineTest.cc \
 	language/Pipeline.cc \
 	language/Printer.cc \
+	parser/SourceLineLocation.cc \
 	parser/SourceLocation.cc
 language_PrinterTest_SOURCES = language/PrinterTest.cc \
 	language/Printer.cc \
@@ -69,6 +73,7 @@ language_SequenceTest_SOURCES = language/SequenceTest.cc \
 	language/Pipeline.cc \
 	language/Printer.cc \
 	language/Sequence.cc \
+	parser/SourceLineLocation.cc \
 	parser/SourceLocation.cc
 language_SimpleCommandTest_SOURCES = language/SimpleCommandTest.cc \
 	language/Assignment.cc \
@@ -76,6 +81,7 @@ language_SimpleCommandTest_SOURCES = language/SimpleCommandTest.cc \
 	language/RawString.cc \
 	language/SimpleCommand.cc \
 	language/Word.cc \
+	parser/SourceLineLocation.cc \
 	parser/SourceLocation.cc
 language_WordTest_SOURCES = language/WordTest.cc \
 	language/Printer.cc \
@@ -85,5 +91,6 @@ parser_SourceLineLocationTest_SOURCES = parser/SourceLineLocationTest.cc \
 	parser/SourceLineLocation.cc \
 	parser/SourceLineLocationTestHelper.hh
 parser_SourceLocationTest_SOURCES = parser/SourceLocationTest.cc \
+	parser/SourceLineLocation.cc \
 	parser/SourceLocation.cc \
 	parser/SourceLocationTestHelper.hh

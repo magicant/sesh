@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include "parser/SourceLineLocation.hh"
 
 namespace sesh {
 namespace parser {
@@ -30,14 +31,14 @@ class SourceLocation {
 
 private:
 
-    /** Not necessarily a filename. */
-    std::shared_ptr<const std::wstring> mName;
-    /** Counted from 0. */
-    std::size_t mLine;
+    SourceLineLocation mNameAndLine;
     /** Counted from 0. */
     std::size_t mColumn;
 
 public:
+
+    SourceLocation(const SourceLineLocation &nameAndLine, std::size_t column);
+    SourceLocation(SourceLineLocation &&nameAndLine, std::size_t column);
 
     SourceLocation(
             std::shared_ptr<const std::wstring> &name,
@@ -54,8 +55,11 @@ public:
     SourceLocation &operator=(SourceLocation &&) = default;
     ~SourceLocation() = default;
 
-    const std::wstring &name() const noexcept { return *mName; }
-    std::size_t line() const noexcept { return mLine; }
+    const SourceLineLocation &nameAndLine() const noexcept {
+        return mNameAndLine;
+    }
+    const std::wstring &name() const noexcept { return mNameAndLine.name(); }
+    std::size_t line() const noexcept { return mNameAndLine.line(); }
     std::size_t column() const noexcept { return mColumn; }
 
 }; // class SourceLocation
