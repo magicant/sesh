@@ -11,6 +11,7 @@ check_PROGRAMS = \
 	language/SequenceTest \
 	language/SimpleCommandTest \
 	language/WordTest \
+	parser/LineAppendedSourceTest \
 	parser/SourceLineLocationTest \
 	parser/SourceLocationTest \
 	parser/SourceTest
@@ -33,6 +34,7 @@ sesh_SOURCES = common.hh main.cc \
 	language/SimpleCommand.cc language/SimpleCommand.hh \
 	language/Word.cc language/Word.hh \
 	language/WordComponent.hh \
+	parser/LineAppendedSource.cc parser/LineAppendedSource.hh \
 	parser/Source.cc parser/Source.hh \
 	parser/SourceLineLocation.cc parser/SourceLineLocation.hh \
 	parser/SourceLocation.cc parser/SourceLocation.hh
@@ -89,6 +91,11 @@ language_WordTest_SOURCES = language/WordTest.cc \
 	language/Printer.cc \
 	language/RawString.cc \
 	language/Word.cc
+parser_LineAppendedSourceTest_SOURCES = parser/LineAppendedSourceTest.cc \
+	parser/LineAppendedSource.cc \
+	parser/Source.cc \
+	parser/SourceLineLocation.cc \
+	parser/SourceLocation.cc
 parser_SourceLineLocationTest_SOURCES = parser/SourceLineLocationTest.cc \
 	parser/SourceLineLocation.cc \
 	parser/SourceLineLocationTestHelper.hh
