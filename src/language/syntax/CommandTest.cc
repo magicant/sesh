@@ -22,13 +22,13 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include "language/source/SourceLocation.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Printer.hh"
-#include "parser/SourceLocation.hh"
 
+using sesh::language::source::SourceLocation;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Printer;
-using sesh::parser::SourceLocation;
 
 namespace {
 

@@ -22,7 +22,8 @@
 #include "LineAppendedSource.hh"
 
 namespace sesh {
-namespace parser {
+namespace language {
+namespace source {
 
 LineAppendedSource::LineAppendedSource(
         Pointer &&original,
@@ -68,7 +69,8 @@ SourceLocation LineAppendedSource::locationInAlternate(Size position) const {
     return SourceLocation(mLineLocation, position);
 }
 
-} // namespace parser
+} // namespace source
+} // namespace language
 } // namespace sesh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

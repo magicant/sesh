@@ -21,7 +21,8 @@
 #include <utility>
 
 namespace sesh {
-namespace parser {
+namespace language {
+namespace source {
 
 SourceLocation::SourceLocation(
         const SourceLineLocation &nameAndLine, std::size_t column) :
@@ -49,7 +50,8 @@ bool operator==(const SourceLocation &l, const SourceLocation &r) {
     return l.nameAndLine() == r.nameAndLine() && l.column() == r.column();
 }
 
-} // namespace parser
+} // namespace source
+} // namespace language
 } // namespace sesh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

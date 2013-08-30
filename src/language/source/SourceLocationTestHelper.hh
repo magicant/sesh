@@ -15,27 +15,33 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_parser_SourceLineLocationTestHelper_hh
-#define INCLUDED_parser_SourceLineLocationTestHelper_hh
+#ifndef INCLUDED_language_source_SourceLocationTestHelper_hh
+#define INCLUDED_language_source_SourceLocationTestHelper_hh
 
 #include <cstddef>
 #include <memory>
 #include <string>
-#include "parser/SourceLineLocation.hh"
+#include "language/source/SourceLocation.hh"
 
 namespace sesh {
-namespace parser {
+namespace language {
+namespace source {
 
 /** For testing only. */
-inline SourceLineLocation dummySourceLineLocation(
+inline SourceLocation dummySourceLocation(
         const wchar_t *name = L"dummy",
-        std::size_t line = 0) {
-    return SourceLineLocation(std::make_shared<std::wstring>(name), line);
+        std::size_t line = 1,
+        std::size_t column = 1) {
+    return SourceLocation(
+            std::make_shared<std::wstring>(name),
+            line,
+            column);
 }
 
-} // namespace parser
+} // namespace source
+} // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_parser_SourceLineLocationTestHelper_hh
+#endif // #ifndef INCLUDED_language_source_SourceLocationTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

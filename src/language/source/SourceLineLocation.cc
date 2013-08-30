@@ -16,32 +16,36 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "common.hh"
-#include "SimpleCommand.hh"
+#include "SourceLineLocation.hh"
 #include <utility>
-#include "language/syntax/Printer.hh"
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace source {
 
-SimpleCommand::SimpleCommand(const source::SourceLocation &sl) :
-        Command(sl), mWords(), mAssignments() { }
-
-SimpleCommand::SimpleCommand(source::SourceLocation &&sl) :
-        Command(std::move(sl)), mWords(), mAssignments() { }
-
-void SimpleCommand::print(Printer &p) const {
-    for (const AssignmentPointer &a : assignments()) {
-        p << *a;
-        p.delayedCharacters() << L' ';
-    }
-    for (const WordPointer &w : words()) {
-        p << *w;
-        p.delayedCharacters() << L' ';
-    }
+SourceLineLocation::SourceLineLocation(
+        const std::shared_ptr<const std::wstring> &name,
+        std::size_t line) :
+        mName(name),
+        mLine(line) {
+    if (mName == nullptr)
+        throw std::invalid_argument("null name");
 }
 
-} // namespace syntax
+SourceLineLocation::SourceLineLocation(
+        std::shared_ptr<const std::wstring> &&name,
+        std::size_t line) :
+        mName(std::move(name)),
+        mLine(line) {
+    if (mName == nullptr)
+        throw std::invalid_argument("null name");
+}
+
+bool operator==(const SourceLineLocation &l, const SourceLineLocation &r) {
+    return l.name() == r.name() && l.line() == r.line();
+}
+
+} // namespace source
 } // namespace language
 } // namespace sesh
 

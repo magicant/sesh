@@ -22,11 +22,11 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include "parser/SourceLocation.hh"
-#include "parser/SourceLocationTestHelper.hh"
+#include "language/source/SourceLocation.hh"
+#include "language/source/SourceLocationTestHelper.hh"
 
-using sesh::parser::SourceLocation;
-using sesh::parser::dummySourceLocation;
+using sesh::language::source::SourceLocation;
+using sesh::language::source::dummySourceLocation;
 
 TEST_CASE("Source location construction") {
     std::shared_ptr<const std::wstring> name =

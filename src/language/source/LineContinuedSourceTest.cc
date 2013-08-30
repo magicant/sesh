@@ -20,12 +20,12 @@
 
 #include "common.hh"
 #include <stdexcept>
-#include "parser/LineContinuedSource.hh"
-#include "parser/SourceTestHelper.hh"
+#include "language/source/LineContinuedSource.hh"
+#include "language/source/SourceTestHelper.hh"
 
-using sesh::parser::LineContinuedSource;
-using sesh::parser::Source;
-using sesh::parser::SourceStub;
+using sesh::language::source::LineContinuedSource;
+using sesh::language::source::Source;
+using sesh::language::source::SourceStub;
 
 TEST_CASE("Line-continued source construction") {
     Source::Pointer s;

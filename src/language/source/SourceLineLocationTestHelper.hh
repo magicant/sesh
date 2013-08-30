@@ -15,36 +15,29 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "common.hh"
-#include "SourceLineLocation.hh"
-#include <utility>
+#ifndef INCLUDED_language_source_SourceLineLocationTestHelper_hh
+#define INCLUDED_language_source_SourceLineLocationTestHelper_hh
+
+#include <cstddef>
+#include <memory>
+#include <string>
+#include "language/source/SourceLineLocation.hh"
 
 namespace sesh {
-namespace parser {
+namespace language {
+namespace source {
 
-SourceLineLocation::SourceLineLocation(
-        const std::shared_ptr<const std::wstring> &name,
-        std::size_t line) :
-        mName(name),
-        mLine(line) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
+/** For testing only. */
+inline SourceLineLocation dummySourceLineLocation(
+        const wchar_t *name = L"dummy",
+        std::size_t line = 0) {
+    return SourceLineLocation(std::make_shared<std::wstring>(name), line);
 }
 
-SourceLineLocation::SourceLineLocation(
-        std::shared_ptr<const std::wstring> &&name,
-        std::size_t line) :
-        mName(std::move(name)),
-        mLine(line) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
-}
-
-bool operator==(const SourceLineLocation &l, const SourceLineLocation &r) {
-    return l.name() == r.name() && l.line() == r.line();
-}
-
-} // namespace parser
+} // namespace source
+} // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_source_SourceLineLocationTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

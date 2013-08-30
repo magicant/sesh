@@ -20,23 +20,23 @@
 
 #include "common.hh"
 #include <utility>
-#include "parser/LineAppendedSource.hh"
-#include "parser/SourceLineLocationTestHelper.hh"
-#include "parser/SourceTestHelper.hh"
+#include "language/source/LineAppendedSource.hh"
+#include "language/source/SourceLineLocationTestHelper.hh"
+#include "language/source/SourceTestHelper.hh"
 
-using sesh::parser::LineAppendedSource;
-using sesh::parser::Source;
-using sesh::parser::SourceLineLocation;
-using sesh::parser::SourceLocation;
-using sesh::parser::SourceStub;
-using sesh::parser::checkSourceLineBegin;
-using sesh::parser::checkSourceLineEnd;
-using sesh::parser::checkSourceLocation;
-using sesh::parser::checkSourceString;
-using sesh::parser::dummySourceLineLocation;
+using sesh::language::source::LineAppendedSource;
+using sesh::language::source::Source;
+using sesh::language::source::SourceLineLocation;
+using sesh::language::source::SourceLocation;
+using sesh::language::source::SourceStub;
+using sesh::language::source::checkSourceLineBegin;
+using sesh::language::source::checkSourceLineEnd;
+using sesh::language::source::checkSourceLocation;
+using sesh::language::source::checkSourceString;
+using sesh::language::source::dummySourceLineLocation;
 
-using Pointer = sesh::parser::LineAppendedSource::Pointer;
-using String = sesh::parser::LineAppendedSource::String;
+using Pointer = sesh::language::source::LineAppendedSource::Pointer;
+using String = sesh::language::source::LineAppendedSource::String;
 
 namespace {
 

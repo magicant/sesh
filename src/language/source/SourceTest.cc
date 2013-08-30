@@ -21,15 +21,15 @@
 #include "common.hh"
 #include <memory>
 #include <stdexcept>
-#include "parser/Source.hh"
-#include "parser/SourceTestHelper.hh"
+#include "language/source/Source.hh"
+#include "language/source/SourceTestHelper.hh"
 
-using sesh::parser::Source;
-using sesh::parser::SourceLocation;
-using sesh::parser::SourceStub;
-using sesh::parser::checkSourceLineBegin;
-using sesh::parser::checkSourceLineEnd;
-using sesh::parser::checkSourceString;
+using sesh::language::source::Source;
+using sesh::language::source::SourceLocation;
+using sesh::language::source::SourceStub;
+using sesh::language::source::checkSourceLineBegin;
+using sesh::language::source::checkSourceLineEnd;
+using sesh::language::source::checkSourceString;
 
 TEST_CASE("Source construction") {
     Source::Pointer s;

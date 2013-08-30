@@ -21,21 +21,21 @@
 #include "common.hh"
 #include <string>
 #include <utility>
+#include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 #include "language/syntax/RawString.hh"
 #include "language/syntax/SimpleCommand.hh"
 #include "language/syntax/Word.hh"
-#include "parser/SourceLocationTestHelper.hh"
 
+using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::Assignment;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::SimpleCommand;
 using sesh::language::syntax::Word;
 using sesh::language::syntax::forEachLineMode;
-using sesh::parser::dummySourceLocation;
 
 namespace {
 

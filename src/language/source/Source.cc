@@ -22,7 +22,8 @@
 #include <utility>
 
 namespace sesh {
-namespace parser {
+namespace language {
+namespace source {
 
 auto Source::positionAfterAlternate() const noexcept -> Size {
     return begin() + alternate().length();
@@ -159,7 +160,8 @@ SourceLocation Source::location(Size position) const {
     return original()->location(position - lengthDifference());
 }
 
-} // namespace parser
+} // namespace source
+} // namespace language
 } // namespace sesh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

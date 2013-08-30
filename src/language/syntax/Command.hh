@@ -19,8 +19,8 @@
 #define INCLUDED_language_syntax_Command_hh
 
 #include <utility>
+#include "language/source/SourceLocation.hh"
 #include "language/syntax/Printable.hh"
-#include "parser/SourceLocation.hh"
 
 namespace sesh {
 namespace language {
@@ -33,15 +33,15 @@ class Command : public Printable {
 
 private:
 
-    parser::SourceLocation mSourceLocation;
+    source::SourceLocation mSourceLocation;
 
     // TODO Redirection
 
 public:
 
-    explicit Command(const parser::SourceLocation &sl) :
+    explicit Command(const source::SourceLocation &sl) :
             mSourceLocation(sl) { }
-    explicit Command(parser::SourceLocation &&sl) :
+    explicit Command(source::SourceLocation &&sl) :
             mSourceLocation(std::move(sl)) { }
 
     Command(const Command &) = default;
@@ -50,10 +50,10 @@ public:
     Command &operator=(Command &&) = default;
     ~Command() override = default;
 
-    parser::SourceLocation &sourceLocation() noexcept {
+    source::SourceLocation &sourceLocation() noexcept {
         return mSourceLocation;
     }
-    const parser::SourceLocation &sourceLocation() const noexcept {
+    const source::SourceLocation &sourceLocation() const noexcept {
         return mSourceLocation;
     }
 

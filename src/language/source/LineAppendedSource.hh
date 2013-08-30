@@ -15,14 +15,15 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_parser_LineAppendedSource_hh
-#define INCLUDED_parser_LineAppendedSource_hh
+#ifndef INCLUDED_language_source_LineAppendedSource_hh
+#define INCLUDED_language_source_LineAppendedSource_hh
 
-#include "parser/Source.hh"
-#include "parser/SourceLineLocation.hh"
+#include "language/source/Source.hh"
+#include "language/source/SourceLineLocation.hh"
 
 namespace sesh {
-namespace parser {
+namespace language {
+namespace source {
 
 /**
  * Line-appended source represents a source string that is created by appending
@@ -63,9 +64,10 @@ private:
 
 };
 
-} // namespace parser
+} // namespace source
+} // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_parser_LineAppendedSource_hh
+#endif // #ifndef INCLUDED_language_source_LineAppendedSource_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

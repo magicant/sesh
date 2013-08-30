@@ -20,21 +20,21 @@
 
 #include "common.hh"
 #include <string>
+#include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/AndOrList.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/ConditionalPipeline.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Sequence.hh"
-#include "parser/SourceLocationTestHelper.hh"
 
+using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::AndOrList;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::Sequence;
-using sesh::parser::dummySourceLocation;
 
 namespace {
 

@@ -15,13 +15,14 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_parser_LineContinuedSource_hh
-#define INCLUDED_parser_LineContinuedSource_hh
+#ifndef INCLUDED_language_source_LineContinuedSource_hh
+#define INCLUDED_language_source_LineContinuedSource_hh
 
-#include "parser/Source.hh"
+#include "language/source/Source.hh"
 
 namespace sesh {
-namespace parser {
+namespace language {
+namespace source {
 
 /**
  * Line-continued source is a source wrapper that removes a line continuation
@@ -51,9 +52,10 @@ private:
 
 };
 
-} // namespace parser
+} // namespace source
+} // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_parser_LineContinuedSource_hh
+#endif // #ifndef INCLUDED_language_source_LineContinuedSource_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

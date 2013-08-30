@@ -21,11 +21,11 @@
 #include "common.hh"
 #include <memory>
 #include <utility>
-#include "parser/SourceLineLocation.hh"
-#include "parser/SourceLineLocationTestHelper.hh"
+#include "language/source/SourceLineLocation.hh"
+#include "language/source/SourceLineLocationTestHelper.hh"
 
-using sesh::parser::SourceLineLocation;
-using sesh::parser::dummySourceLineLocation;
+using sesh::language::source::SourceLineLocation;
+using sesh::language::source::dummySourceLineLocation;
 
 TEST_CASE("Source line location construction") {
     std::shared_ptr<const std::wstring> name =
