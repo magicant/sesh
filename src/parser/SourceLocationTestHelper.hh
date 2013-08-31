@@ -15,32 +15,31 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "common.hh"
-#include "SimpleCommand.hh"
-#include <utility>
-#include "language/Printer.hh"
+#ifndef INCLUDED_parser_SourceLocationTestHelper_hh
+#define INCLUDED_parser_SourceLocationTestHelper_hh
+
+#include <cstddef>
+#include <memory>
+#include <string>
+#include "parser/SourceLocation.hh"
 
 namespace sesh {
-namespace language {
+namespace parser {
 
-SimpleCommand::SimpleCommand(const parser::SourceLocation &sl) :
-        Command(sl), mWords(), mAssignments() { }
-
-SimpleCommand::SimpleCommand(parser::SourceLocation &&sl) :
-        Command(std::move(sl)), mWords(), mAssignments() { }
-
-void SimpleCommand::print(Printer &p) const {
-    for (const AssignmentPointer &a : assignments()) {
-        p << *a;
-        p.delayedCharacters() << L' ';
-    }
-    for (const WordPointer &w : words()) {
-        p << *w;
-        p.delayedCharacters() << L' ';
-    }
+/** For testing only. */
+inline SourceLocation dummySourceLocation(
+        const wchar_t *name = L"dummy",
+        std::size_t line = 1,
+        std::size_t column = 1) {
+    return SourceLocation(
+            std::make_shared<std::wstring>(name),
+            line,
+            column);
 }
 
-} // namespace language
+} // namespace parser
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_parser_SourceLocationTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

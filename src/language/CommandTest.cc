@@ -24,11 +24,11 @@
 #include <string>
 #include "language/Command.hh"
 #include "language/Printer.hh"
-#include "language/SourceLocation.hh"
+#include "parser/SourceLocation.hh"
 
 using sesh::language::Command;
 using sesh::language::Printer;
-using sesh::language::SourceLocation;
+using sesh::parser::SourceLocation;
 
 namespace {
 

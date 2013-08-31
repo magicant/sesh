@@ -47,8 +47,8 @@ private:
 
 public:
 
-    explicit SimpleCommand(const SourceLocation &sl);
-    explicit SimpleCommand(SourceLocation &&sl);
+    explicit SimpleCommand(const parser::SourceLocation &sl);
+    explicit SimpleCommand(parser::SourceLocation &&sl);
 
     SimpleCommand(const SimpleCommand &) = delete;
     SimpleCommand(SimpleCommand &&) = default;

@@ -21,31 +21,35 @@
 #include <utility>
 
 namespace sesh {
-namespace language {
+namespace parser {
+
+SourceLocation::SourceLocation(
+        const SourceLineLocation &nameAndLine, std::size_t column) :
+        mNameAndLine(nameAndLine), mColumn(column) { }
+
+SourceLocation::SourceLocation(
+        SourceLineLocation &&nameAndLine, std::size_t column) :
+        mNameAndLine(std::move(nameAndLine)), mColumn(column) { }
 
 SourceLocation::SourceLocation(
         std::shared_ptr<const std::wstring> &name,
         std::size_t line,
         std::size_t column) :
-        mName(name),
-        mLine(line),
-        mColumn(column) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
-}
+        mNameAndLine(name, line),
+        mColumn(column) { }
 
 SourceLocation::SourceLocation(
         std::shared_ptr<const std::wstring> &&name,
         std::size_t line,
         std::size_t column) :
-        mName(std::move(name)),
-        mLine(line),
-        mColumn(column) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
+        mNameAndLine(std::move(name), line),
+        mColumn(column) { }
+
+bool operator==(const SourceLocation &l, const SourceLocation &r) {
+    return l.nameAndLine() == r.nameAndLine() && l.column() == r.column();
 }
 
-} // namespace language
+} // namespace parser
 } // namespace sesh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
