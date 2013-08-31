@@ -13,34 +13,33 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
+ * Sesh.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include "common.hh"
-#include "SimpleCommand.hh"
+#include "LineContinuedSource.hh"
+
+#include <exception>
+#include <stdexcept>
 #include <utility>
-#include "language/Printer.hh"
 
 namespace sesh {
-namespace language {
+namespace parser {
 
-SimpleCommand::SimpleCommand(const parser::SourceLocation &sl) :
-        Command(sl), mWords(), mAssignments() { }
-
-SimpleCommand::SimpleCommand(parser::SourceLocation &&sl) :
-        Command(std::move(sl)), mWords(), mAssignments() { }
-
-void SimpleCommand::print(Printer &p) const {
-    for (const AssignmentPointer &a : assignments()) {
-        p << *a;
-        p.delayedCharacters() << L' ';
-    }
-    for (const WordPointer &w : words()) {
-        p << *w;
-        p.delayedCharacters() << L' ';
-    }
+LineContinuedSource::LineContinuedSource(
+        Pointer &&original, Size position) :
+        Source(std::move(original), position, position + 2, String()) {
+    const Source &o = *this->original();
+    if (o[position] != L'\\' || o[position + 1] != NEWLINE)
+        throw std::invalid_argument("no line continuation");
 }
 
-} // namespace language
+SourceLocation LineContinuedSource::locationInAlternate(Size) const {
+    // The length of the alternate is always zero in this class, so this
+    // function is never called.
+    std::terminate();
+}
+
+} // namespace parser
 } // namespace sesh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

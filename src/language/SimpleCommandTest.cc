@@ -26,17 +26,17 @@
 #include "language/PrinterTestHelper.hh"
 #include "language/RawString.hh"
 #include "language/SimpleCommand.hh"
-#include "language/SourceLocationTestHelper.hh"
 #include "language/Word.hh"
 #include "language/WordComponent.hh"
+#include "parser/SourceLocationTestHelper.hh"
 
 using sesh::language::Assignment;
 using sesh::language::Printer;
 using sesh::language::RawString;
 using sesh::language::SimpleCommand;
 using sesh::language::Word;
-using sesh::language::dummySourceLocation;
 using sesh::language::forEachLineMode;
+using sesh::parser::dummySourceLocation;
 
 namespace {
 

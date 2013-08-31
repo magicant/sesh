@@ -26,7 +26,7 @@
 #include "language/Pipeline.hh"
 #include "language/Printer.hh"
 #include "language/Sequence.hh"
-#include "language/SourceLocationTestHelper.hh"
+#include "parser/SourceLocationTestHelper.hh"
 
 using sesh::language::AndOrList;
 using sesh::language::Command;
@@ -34,7 +34,7 @@ using sesh::language::ConditionalPipeline;
 using sesh::language::Pipeline;
 using sesh::language::Printer;
 using sesh::language::Sequence;
-using sesh::language::dummySourceLocation;
+using sesh::parser::dummySourceLocation;
 
 namespace {
 

@@ -20,7 +20,7 @@
 
 #include <utility>
 #include "language/Printable.hh"
-#include "language/SourceLocation.hh"
+#include "parser/SourceLocation.hh"
 
 namespace sesh {
 namespace language {
@@ -32,14 +32,16 @@ class Command : public Printable {
 
 private:
 
-    SourceLocation mSourceLocation;
+    parser::SourceLocation mSourceLocation;
 
     // TODO Redirection
 
 public:
 
-    explicit Command(const SourceLocation &sl) : mSourceLocation(sl) { }
-    explicit Command(SourceLocation &&sl) : mSourceLocation(std::move(sl)) { }
+    explicit Command(const parser::SourceLocation &sl) :
+            mSourceLocation(sl) { }
+    explicit Command(parser::SourceLocation &&sl) :
+            mSourceLocation(std::move(sl)) { }
 
     Command(const Command &) = default;
     Command(Command &&) = default;
@@ -47,10 +49,10 @@ public:
     Command &operator=(Command &&) = default;
     ~Command() override = default;
 
-    SourceLocation &sourceLocation() noexcept {
+    parser::SourceLocation &sourceLocation() noexcept {
         return mSourceLocation;
     }
-    const SourceLocation &sourceLocation() const noexcept {
+    const parser::SourceLocation &sourceLocation() const noexcept {
         return mSourceLocation;
     }
 
