@@ -55,6 +55,7 @@ sesh_SOURCES = common.hh main.cc \
 	language/syntax/Word.hh \
 	language/syntax/WordComponent.hh
 
+# Header files that are contained in sesh_SOURCES are not listed below.
 language_source_LineAppendedSourceTest_SOURCES = \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSourceTest.cc \
