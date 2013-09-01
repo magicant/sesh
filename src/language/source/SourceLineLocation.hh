@@ -20,7 +20,7 @@
 
 #include <cstddef>
 #include <memory>
-#include <string>
+#include "common/String.hh"
 
 namespace sesh {
 namespace language {
@@ -32,17 +32,17 @@ class SourceLineLocation {
 private:
 
     /** Not necessarily a filename. */
-    std::shared_ptr<const std::wstring> mName;
+    std::shared_ptr<const common::String> mName;
     /** Counted from 0. */
     std::size_t mLine;
 
 public:
 
     SourceLineLocation(
-            const std::shared_ptr<const std::wstring> &,
+            const std::shared_ptr<const common::String> &,
             std::size_t);
     SourceLineLocation(
-            std::shared_ptr<const std::wstring> &&,
+            std::shared_ptr<const common::String> &&,
             std::size_t);
 
     SourceLineLocation(const SourceLineLocation &) = default;
@@ -51,7 +51,7 @@ public:
     SourceLineLocation &operator=(SourceLineLocation &&) = default;
     ~SourceLineLocation() = default;
 
-    const std::wstring &name() const noexcept { return *mName; }
+    const common::String &name() const noexcept { return *mName; }
     const std::size_t &line() const noexcept { return mLine; }
 
 };

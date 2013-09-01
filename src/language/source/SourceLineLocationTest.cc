@@ -18,23 +18,24 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common.hh"
 #include <memory>
 #include <utility>
+#include "common/String.hh"
 #include "language/source/SourceLineLocation.hh"
 #include "language/source/SourceLineLocationTestHelper.hh"
 
+using sesh::common::String;
 using sesh::language::source::SourceLineLocation;
 using sesh::language::source::dummySourceLineLocation;
 
 TEST_CASE("Source line location construction") {
-    std::shared_ptr<const std::wstring> name =
-            std::make_shared<std::wstring>(L"test*name");
+    std::shared_ptr<const String> name =
+            std::make_shared<String>(L"test*name");
 
     SourceLineLocation sll1(name, 0);
     SourceLineLocation sll2(decltype(name)(name), 1);
 
-    name = std::make_shared<std::wstring>(L"another name");
+    name = std::make_shared<String>(L"another name");
 
     SourceLineLocation sll3(name, 123);
     SourceLineLocation sll4(decltype(name)(name), 987);
@@ -58,7 +59,7 @@ TEST_CASE("Source line location construction") {
 }
 
 TEST_CASE("Source line location constructor null pointer exception") {
-    std::shared_ptr<const std::wstring> name(nullptr);
+    std::shared_ptr<const String> name(nullptr);
     CHECK_THROWS_AS(
             SourceLineLocation(name, 0),
             std::invalid_argument);

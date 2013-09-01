@@ -18,14 +18,15 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common.hh"
 #include <cstddef>
 #include <memory>
-#include <string>
+#include "common/String.hh"
 #include "language/source/SourceLocation.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Printer.hh"
 
+using sesh::common::Char;
+using sesh::common::String;
 using sesh::language::source::SourceLocation;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Printer;
@@ -43,10 +44,10 @@ void CommandStub::print(Printer &) const {
 }
 
 void testSourceLocation(
-        const wchar_t *name,
+        const Char *name,
         std::size_t line,
         std::size_t column) {
-    SourceLocation sl(std::make_shared<std::wstring>(name), line, column);
+    SourceLocation sl(std::make_shared<String>(name), line, column);
     CommandStub dl(sl);
     CHECK(dl.sourceLocation().name() == sl.name());
     CHECK(dl.sourceLocation().line() == sl.line());

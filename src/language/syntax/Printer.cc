@@ -15,12 +15,17 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "common.hh"
 #include "Printer.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
+
+namespace {
+
+using String = common::String;
+
+} // namespace
 
 Printer::Printer(LineMode lineMode) :
         mLineMode(lineMode),
@@ -30,12 +35,12 @@ Printer::Printer(LineMode lineMode) :
         mIndentLevel() {
 }
 
-std::wstring Printer::toWstring() const {
+String Printer::toString() const {
     return mMainBuffer.str();
 }
 
 void Printer::clearDelayedCharacters() {
-    mDelayedCharacters.str(std::wstring());
+    mDelayedCharacters.str(String());
 }
 
 void Printer::commitDelayedCharacters(){
@@ -64,7 +69,7 @@ void Printer::breakLine() {
         break;
     }
 
-    mDelayedLines.str(std::wstring());
+    mDelayedLines.str(String());
 }
 
 /**
@@ -77,7 +82,7 @@ void Printer::printIndent() {
     case LineMode::SINGLE_LINE:
         return;
     case LineMode::MULTI_LINE:
-        mMainBuffer << std::wstring(4 * mIndentLevel, L' ');
+        mMainBuffer << String(4 * mIndentLevel, L' ');
         return;
     }
 }

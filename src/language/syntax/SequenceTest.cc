@@ -18,8 +18,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common.hh"
-#include <string>
+#include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/AndOrList.hh"
 #include "language/syntax/Command.hh"
@@ -28,6 +27,7 @@
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Sequence.hh"
 
+using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::AndOrList;
 using sesh::language::syntax::Command;
@@ -39,8 +39,8 @@ using sesh::language::syntax::Sequence;
 namespace {
 
 struct CommandStub : public Command {
-    std::wstring s;
-    CommandStub(std::wstring s) : Command(dummySourceLocation()), s(s) { }
+    String s;
+    CommandStub(String s) : Command(dummySourceLocation()), s(s) { }
     void print(Printer &p) const override {
         p << s;
         p.delayedCharacters() << L' ';
@@ -86,9 +86,9 @@ TEST_CASE_METHOD(PrintFixture, "Sequence print single-line") {
     p.delayedLines() << L"Y\n";
     p.indentLevel() = 2;
     p << s;
-    CHECK(p.toWstring() == L"XC1 && C2; ! C3 | C4& C5");
+    CHECK(p.toString() == L"XC1 && C2; ! C3 | C4& C5");
     p.commitDelayedCharacters();
-    CHECK(p.toWstring() == L"XC1 && C2; ! C3 | C4& C5; ");
+    CHECK(p.toString() == L"XC1 && C2; ! C3 | C4& C5; ");
 }
 
 TEST_CASE_METHOD(PrintFixture, "Sequence print multi-line") {
@@ -97,10 +97,10 @@ TEST_CASE_METHOD(PrintFixture, "Sequence print multi-line") {
     p.delayedLines() << L"Y\n";
     p.indentLevel() = 2;
     p << s;
-    CHECK(p.toWstring() ==
+    CHECK(p.toString() ==
             L"XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5");
     p.commitDelayedCharacters();
-    CHECK(p.toWstring() ==
+    CHECK(p.toString() ==
             L"XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5; ");
 }
 

@@ -18,8 +18,8 @@
 #ifndef INCLUDED_language_syntax_RawString_hh
 #define INCLUDED_language_syntax_RawString_hh
 
-#include <string>
 #include <utility>
+#include "common/String.hh"
 #include "language/syntax/WordComponent.hh"
 
 namespace sesh {
@@ -40,13 +40,13 @@ class RawString : public WordComponent {
 
 private:
 
-    std::wstring mValue;
+    common::String mValue;
 
 public:
 
     RawString() : mValue() { }
-    explicit RawString(const std::wstring &s) : mValue(s) { }
-    explicit RawString(std::wstring &&s) noexcept : mValue(std::move(s)) { }
+    explicit RawString(const common::String &s) : mValue(s) { }
+    explicit RawString(common::String &&s) noexcept : mValue(std::move(s)) { }
 
     RawString(const RawString &) = default;
     RawString(RawString &&) = default;
@@ -54,8 +54,8 @@ public:
     RawString &operator=(RawString &&) = default;
     ~RawString() override = default;
 
-    std::wstring &value() { return mValue; }
-    const std::wstring &value() const { return mValue; }
+    common::String &value() { return mValue; }
+    const common::String &value() const { return mValue; }
 
     void print(Printer &) const override;
 
