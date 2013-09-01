@@ -19,11 +19,11 @@
 #define INCLUDED_language_syntax_Printer_hh
 
 #include <cstddef>
-#include <ostream>
-#include <sstream>
 #include <type_traits>
 #include <utility>
+#include "common/OutputStream.hh"
 #include "common/String.hh"
+#include "common/StringStream.hh"
 
 namespace sesh {
 namespace language {
@@ -33,8 +33,8 @@ class Printable;
 
 /**
  * Printer is an intermediate object that is used while converting a command
- * into a string. Printer is essentially a wrapper of wostringstream, but it
- * has two auxiliary buffers called the delayed character buffer and the
+ * into a string. Printer is essentially a wrapper of output string stream, but
+ * it has two auxiliary buffers called the delayed character buffer and the
  * delayed line buffer in addition to the main buffer.
  *
  * Words may be separated by spaces when printed, but no space is required
@@ -68,9 +68,9 @@ public:
 private:
 
     const LineMode mLineMode;
-    std::wostringstream mMainBuffer;
-    std::wostringstream mDelayedCharacters;
-    std::wostringstream mDelayedLines;
+    common::OutputStringStream mMainBuffer;
+    common::OutputStringStream mDelayedCharacters;
+    common::OutputStringStream mDelayedLines;
     std::size_t mIndentLevel;
 
 public:
@@ -89,11 +89,11 @@ public:
 
     common::String toString() const;
 
-    std::wostream &delayedCharacters() noexcept {
+    common::OutputStream &delayedCharacters() noexcept {
         return mDelayedCharacters;
     }
 
-    std::wostream &delayedLines() noexcept {
+    common::OutputStream &delayedLines() noexcept {
         return mDelayedLines;
     }
 
