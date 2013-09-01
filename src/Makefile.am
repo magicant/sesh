@@ -24,7 +24,9 @@ AM_CPPFLAGS = $(catch_include)
 
 sesh_SOURCES = main.cc \
 	common/Char.hh \
+	common/OutputStream.hh \
 	common/String.hh \
+	common/StringStream.hh \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
