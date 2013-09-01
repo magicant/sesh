@@ -19,7 +19,7 @@
 #define INCLUDED_language_syntax_Assignment_hh
 
 #include <memory>
-#include <string>
+#include "common/String.hh"
 #include "language/syntax/Printable.hh"
 #include "language/syntax/Word.hh"
 
@@ -38,14 +38,14 @@ public:
 
 private:
 
-    std::wstring mVariableName;
+    common::String mVariableName;
     WordPointer mValue;
 
 public:
 
     Assignment();
-    Assignment(const std::wstring &variableName, WordPointer &&value);
-    Assignment(std::wstring &&variableName, WordPointer &&value);
+    Assignment(const common::String &variableName, WordPointer &&value);
+    Assignment(common::String &&variableName, WordPointer &&value);
 
     Assignment(const Assignment &) = delete;
     Assignment(Assignment &&) = default;
@@ -53,8 +53,12 @@ public:
     Assignment &operator=(Assignment &&) = default;
     ~Assignment() override = default;
 
-    std::wstring &variableName() noexcept { return mVariableName; }
-    const std::wstring &variableName() const noexcept { return mVariableName; }
+    common::String &variableName() noexcept {
+        return mVariableName;
+    }
+    const common::String &variableName() const noexcept {
+        return mVariableName;
+    }
 
     Word &value() noexcept { return *mValue; }
     const Word &value() const noexcept { return *mValue; }

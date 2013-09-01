@@ -79,7 +79,7 @@ void checkSourceLineEnd(
 void checkSourceLocation(
         const Source &source,
         Source::Size position,
-        const Source::String &name,
+        const common::String &name,
         Source::Size line,
         Source::Size column) {
     SourceLocation sl = source.location(position);

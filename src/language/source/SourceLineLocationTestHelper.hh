@@ -20,7 +20,7 @@
 
 #include <cstddef>
 #include <memory>
-#include <string>
+#include "common/String.hh"
 #include "language/source/SourceLineLocation.hh"
 
 namespace sesh {
@@ -29,9 +29,9 @@ namespace source {
 
 /** For testing only. */
 inline SourceLineLocation dummySourceLineLocation(
-        const wchar_t *name = L"dummy",
+        const common::Char *name = L"dummy",
         std::size_t line = 0) {
-    return SourceLineLocation(std::make_shared<std::wstring>(name), line);
+    return SourceLineLocation(std::make_shared<common::String>(name), line);
 }
 
 } // namespace source

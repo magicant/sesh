@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "common.hh"
 #include "Assignment.hh"
 #include <stdexcept>
 #include <utility>
@@ -28,6 +27,8 @@ namespace syntax {
 
 namespace {
 
+using String = common::String;
+
 void createWordIfNull(Assignment::WordPointer &w) {
     if (w == nullptr)
         w.reset(new Word);
@@ -37,12 +38,12 @@ void createWordIfNull(Assignment::WordPointer &w) {
 
 Assignment::Assignment() : mVariableName(), mValue(new Word) { }
 
-Assignment::Assignment(const std::wstring &variableName, WordPointer &&value) :
+Assignment::Assignment(const String &variableName, WordPointer &&value) :
         mVariableName(variableName), mValue(std::move(value)) {
     createWordIfNull(mValue);
 }
 
-Assignment::Assignment(std::wstring &&variableName, WordPointer &&value) :
+Assignment::Assignment(String &&variableName, WordPointer &&value) :
         mVariableName(std::move(variableName)), mValue(std::move(value)) {
     createWordIfNull(mValue);
 }

@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "common.hh"
 #include "SourceLineLocation.hh"
 #include <utility>
 
@@ -24,7 +23,7 @@ namespace language {
 namespace source {
 
 SourceLineLocation::SourceLineLocation(
-        const std::shared_ptr<const std::wstring> &name,
+        const std::shared_ptr<const common::String> &name,
         std::size_t line) :
         mName(name),
         mLine(line) {
@@ -33,7 +32,7 @@ SourceLineLocation::SourceLineLocation(
 }
 
 SourceLineLocation::SourceLineLocation(
-        std::shared_ptr<const std::wstring> &&name,
+        std::shared_ptr<const common::String> &&name,
         std::size_t line) :
         mName(std::move(name)),
         mLine(line) {

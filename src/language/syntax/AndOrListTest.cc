@@ -18,9 +18,9 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common.hh"
 #include <memory>
 #include <stdexcept>
+#include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/AndOrList.hh"
 #include "language/syntax/Command.hh"
@@ -28,6 +28,7 @@
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 
+using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::AndOrList;
 using sesh::language::syntax::Command;
@@ -54,8 +55,8 @@ Pipeline pipelineStub() {
 void testAndOrListWithoutRest(
         Printer::LineMode lineMode,
         AndOrList::Synchronicity synchronicity,
-        const std::wstring withoutDelayed,
-        const std::wstring withDelayed) {
+        const String withoutDelayed,
+        const String withDelayed) {
     AndOrList aol(pipelineStub(), synchronicity);
     Printer p(lineMode);
 
@@ -64,17 +65,17 @@ void testAndOrListWithoutRest(
     p.delayedLines() << L"Y\n";
 
     p << aol;
-    CHECK(p.toWstring() == withoutDelayed);
+    CHECK(p.toString() == withoutDelayed);
 
     p << L"";
-    CHECK(p.toWstring() == withDelayed);
+    CHECK(p.toString() == withDelayed);
 }
 
 void testAndOrListWithRest(
         Printer::LineMode lineMode,
         AndOrList::Synchronicity synchronicity,
-        const std::wstring withoutDelayed,
-        const std::wstring withDelayed) {
+        const String withoutDelayed,
+        const String withDelayed) {
     AndOrList aol(pipelineStub(), synchronicity);
     aol.rest().emplace_back(
             ConditionalPipeline::Condition::AND_THEN,
@@ -91,10 +92,10 @@ void testAndOrListWithRest(
     p.delayedLines() << L"Y\n";
 
     p << aol;
-    CHECK(p.toWstring() == withoutDelayed);
+    CHECK(p.toString() == withoutDelayed);
 
     p << L"";
-    CHECK(p.toWstring() == withDelayed);
+    CHECK(p.toString() == withDelayed);
 }
 
 } // namespace

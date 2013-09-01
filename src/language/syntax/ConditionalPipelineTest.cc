@@ -18,15 +18,17 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common.hh"
 #include <memory>
 #include <stdexcept>
+#include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/ConditionalPipeline.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 
+using sesh::common::Char;
+using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
@@ -37,9 +39,9 @@ namespace {
 
 class CommandStub : public Command {
 private:
-    std::wstring mString;
+    String mString;
 public:
-    explicit CommandStub(const wchar_t *s) :
+    explicit CommandStub(const Char *s) :
             Command(dummySourceLocation()), mString(s) { }
     void print(Printer &) const override;
 };
@@ -49,11 +51,11 @@ void CommandStub::print(Printer &p) const {
     p.delayedCharacters() << L' ';
 }
 
-void addCommand(Pipeline &p, const wchar_t *s) {
+void addCommand(Pipeline &p, const Char *s) {
     p.commands().push_back(Pipeline::CommandPointer(new CommandStub(s)));
 }
 
-std::unique_ptr<Pipeline> newPipeline(const wchar_t *s) {
+std::unique_ptr<Pipeline> newPipeline(const Char *s) {
     std::unique_ptr<Pipeline> p(
             new Pipeline(Pipeline::ExitStatusType::NEGATED));
     addCommand(*p, s);
@@ -103,8 +105,8 @@ TEST_CASE("Conditional pipeline print") {
     pm.indentLevel() = 1;
     ps << cp1;
     pm << cp1;
-    CHECK(ps.toWstring() == L"&& ! pipeline 1");
-    CHECK(pm.toWstring() == L"&&\n    ! pipeline 1");
+    CHECK(ps.toString() == L"&& ! pipeline 1");
+    CHECK(pm.toString() == L"&&\n    ! pipeline 1");
 
     ConditionalPipeline cp2(
             ConditionalPipeline::Condition::OR_ELSE,
@@ -114,8 +116,8 @@ TEST_CASE("Conditional pipeline print") {
     pm.indentLevel() = 2;
     ps << cp2;
     pm << cp2;
-    CHECK(ps.toWstring() == L"&& ! pipeline 1 || ! pipeline 2");
-    CHECK(pm.toWstring() == L"&&\n    ! pipeline 1 ||\n        ! pipeline 2");
+    CHECK(ps.toString() == L"&& ! pipeline 1 || ! pipeline 2");
+    CHECK(pm.toString() == L"&&\n    ! pipeline 1 ||\n        ! pipeline 2");
 }
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

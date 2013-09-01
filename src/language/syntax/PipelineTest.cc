@@ -18,15 +18,16 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common.hh"
 #include <memory>
-#include <string>
+#include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 
+using sesh::common::Char;
+using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Pipeline;
@@ -37,9 +38,9 @@ namespace {
 
 class CommandStub : public Command {
 private:
-    std::wstring mString;
+    String mString;
 public:
-    explicit CommandStub(const wchar_t *s) :
+    explicit CommandStub(const Char *s) :
             Command(dummySourceLocation()), mString(s) { }
     void print(Printer &p) const override {
         p << mString;
@@ -47,14 +48,14 @@ public:
     }
 };
 
-void addCommand(Pipeline &p, const wchar_t *s) {
+void addCommand(Pipeline &p, const Char *s) {
     p.commands().push_back(Pipeline::CommandPointer(new CommandStub(s)));
 }
 
-void checkForEachLineMode(const Pipeline &pl, const std::wstring &expected) {
+void checkForEachLineMode(const Pipeline &pl, const String &expected) {
     forEachLineMode([&pl, &expected](Printer &p) {
         p << pl;
-        CHECK(p.toWstring() == expected);
+        CHECK(p.toString() == expected);
     });
 }
 
