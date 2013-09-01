@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include "LineAppendedSource.hh"
 #include <algorithm>
 #include <stdexcept>
 #include <utility>
-#include "LineAppendedSource.hh"
 
 namespace sesh {
 namespace language {
