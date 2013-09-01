@@ -23,6 +23,8 @@ catch_include = -I$(top_srcdir)/external/Catch/single_include
 AM_CPPFLAGS = $(catch_include)
 
 sesh_SOURCES = main.cc \
+	common/Char.hh \
+	common/String.hh \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
