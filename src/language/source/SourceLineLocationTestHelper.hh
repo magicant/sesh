@@ -29,7 +29,7 @@ namespace source {
 
 /** For testing only. */
 inline SourceLineLocation dummySourceLineLocation(
-        const wchar_t *name = L"dummy",
+        const common::Char *name = L"dummy",
         std::size_t line = 0) {
     return SourceLineLocation(std::make_shared<common::String>(name), line);
 }

@@ -25,6 +25,7 @@
 #include "language/syntax/Command.hh"
 #include "language/syntax/Printer.hh"
 
+using sesh::common::Char;
 using sesh::common::String;
 using sesh::language::source::SourceLocation;
 using sesh::language::syntax::Command;
@@ -43,7 +44,7 @@ void CommandStub::print(Printer &) const {
 }
 
 void testSourceLocation(
-        const wchar_t *name,
+        const Char *name,
         std::size_t line,
         std::size_t column) {
     SourceLocation sl(std::make_shared<String>(name), line, column);

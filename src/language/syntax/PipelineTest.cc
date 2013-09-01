@@ -26,6 +26,7 @@
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 
+using sesh::common::Char;
 using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::Command;
@@ -39,7 +40,7 @@ class CommandStub : public Command {
 private:
     String mString;
 public:
-    explicit CommandStub(const wchar_t *s) :
+    explicit CommandStub(const Char *s) :
             Command(dummySourceLocation()), mString(s) { }
     void print(Printer &p) const override {
         p << mString;
@@ -47,7 +48,7 @@ public:
     }
 };
 
-void addCommand(Pipeline &p, const wchar_t *s) {
+void addCommand(Pipeline &p, const Char *s) {
     p.commands().push_back(Pipeline::CommandPointer(new CommandStub(s)));
 }
 

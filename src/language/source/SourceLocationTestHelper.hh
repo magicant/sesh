@@ -29,7 +29,7 @@ namespace source {
 
 /** For testing only. */
 inline SourceLocation dummySourceLocation(
-        const wchar_t *name = L"dummy",
+        const common::Char *name = L"dummy",
         std::size_t line = 1,
         std::size_t column = 1) {
     return SourceLocation(

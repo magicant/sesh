@@ -27,6 +27,7 @@
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 
+using sesh::common::Char;
 using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::Command;
@@ -40,7 +41,7 @@ class CommandStub : public Command {
 private:
     String mString;
 public:
-    explicit CommandStub(const wchar_t *s) :
+    explicit CommandStub(const Char *s) :
             Command(dummySourceLocation()), mString(s) { }
     void print(Printer &) const override;
 };
@@ -50,11 +51,11 @@ void CommandStub::print(Printer &p) const {
     p.delayedCharacters() << L' ';
 }
 
-void addCommand(Pipeline &p, const wchar_t *s) {
+void addCommand(Pipeline &p, const Char *s) {
     p.commands().push_back(Pipeline::CommandPointer(new CommandStub(s)));
 }
 
-std::unique_ptr<Pipeline> newPipeline(const wchar_t *s) {
+std::unique_ptr<Pipeline> newPipeline(const Char *s) {
     std::unique_ptr<Pipeline> p(
             new Pipeline(Pipeline::ExitStatusType::NEGATED));
     addCommand(*p, s);
