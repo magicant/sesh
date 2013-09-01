@@ -34,16 +34,16 @@ TEST_CASE("Word print") {
         Word w;
 
         p << w;
-        CHECK(p.toWstring() == L"");
+        CHECK(p.toString() == L"");
 
         w.components().push_back(Word::ComponentPointer(new RawString(L"1")));
         w.components().push_back(Word::ComponentPointer(new RawString(L"2")));
         w.components().push_back(Word::ComponentPointer(new RawString(L"3")));
         p << w;
-        CHECK(p.toWstring() == L"123");
+        CHECK(p.toString() == L"123");
 
         p << L'X';
-        CHECK(p.toWstring() == L"123X"); // no delayed characters
+        CHECK(p.toString() == L"123X"); // no delayed characters
     });
 }
 

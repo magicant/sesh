@@ -63,7 +63,7 @@ void addWord(SimpleCommand &sc, String s) {
 TEST_CASE("Empty simple command print") {
     forEachLineMode([](Printer &p) {
         p << SimpleCommand(dummySourceLocation());
-        CHECK(p.toWstring() == L"");
+        CHECK(p.toString() == L"");
     });
 }
 
@@ -77,7 +77,7 @@ TEST_CASE("Simple command print") {
 
     forEachLineMode([&sc](Printer &p) {
         p << sc;
-        CHECK(p.toWstring() == L"foo=Foo.value bar=Bar-value Hello world");
+        CHECK(p.toString() == L"foo=Foo.value bar=Bar-value Hello world");
     });
 }
 

@@ -27,34 +27,34 @@ using sesh::language::syntax::forEachLineMode;
 
 TEST_CASE("Initial printer yields empty string") {
     forEachLineMode([](Printer &p) {
-        CHECK(p.toWstring() == L"");
+        CHECK(p.toString() == L"");
     });
 }
 
 TEST_CASE("Printer << operator") {
     forEachLineMode([](Printer &p) {
-        CHECK((p << 123).toWstring() == L"123");
+        CHECK((p << 123).toString() == L"123");
     });
     forEachLineMode([](Printer &p) {
-        CHECK((p << L'a').toWstring() == L"a");
+        CHECK((p << L'a').toString() == L"a");
     });
     forEachLineMode([](Printer &p) {
-        CHECK((p << 'a').toWstring() == L"a");
+        CHECK((p << 'a').toString() == L"a");
     });
     forEachLineMode([](Printer &p) {
-        CHECK((p << L"abc").toWstring() == L"abc");
+        CHECK((p << L"abc").toString() == L"abc");
     });
     forEachLineMode([](Printer &p) {
-        CHECK((p << "abc").toWstring() == L"abc");
+        CHECK((p << "abc").toString() == L"abc");
     });
 }
 
 TEST_CASE("Printer << operator concatenation") {
     forEachLineMode([](Printer &p) {
         p << L'1';
-        CHECK(p.toWstring() == L"1");
+        CHECK(p.toString() == L"1");
         p << 2 << L"34";
-        CHECK(p.toWstring() == L"1234");
+        CHECK(p.toString() == L"1234");
     });
 }
 
@@ -72,7 +72,7 @@ TEST_CASE("Printer delayed character buffer") {
         p.clearDelayedCharacters();
         p.delayedCharacters() << L'd';
         p << L'5';
-        CHECK(p.toWstring() == L"1a2bc34d5");
+        CHECK(p.toString() == L"1a2bc34d5");
     });
 }
 
@@ -80,53 +80,53 @@ TEST_CASE("Printer breakLine SINGLE_LINE") {
     Printer p(Printer::LineMode::SINGLE_LINE);
     p << L'1';
     p.breakLine();
-    CHECK(p.toWstring() == L"1");
+    CHECK(p.toString() == L"1");
     p << L'2';
-    CHECK(p.toWstring() == L"1 2");
+    CHECK(p.toString() == L"1 2");
     p.delayedLines() << L"ignored1";
-    CHECK(p.toWstring() == L"1 2");
+    CHECK(p.toString() == L"1 2");
     p << L'3';
-    CHECK(p.toWstring() == L"1 23");
+    CHECK(p.toString() == L"1 23");
     p.breakLine();
-    CHECK(p.toWstring() == L"1 23");
+    CHECK(p.toString() == L"1 23");
     p << L'4';
     p.delayedLines() << L"ignored2";
     p << L'5';
     p.delayedLines() << L"ignored3";
     p << L'6';
-    CHECK(p.toWstring() == L"1 23 456");
+    CHECK(p.toString() == L"1 23 456");
     p.breakLine();
     p.breakLine();
     p.delayedCharacters() << L"ignored4";
     p.breakLine();
-    CHECK(p.toWstring() == L"1 23 456");
+    CHECK(p.toString() == L"1 23 456");
     p << L'7';
-    CHECK(p.toWstring() == L"1 23 456 7");
+    CHECK(p.toString() == L"1 23 456 7");
 }
 
 TEST_CASE("Printer breakLine MULTI_LINE") {
     Printer p(Printer::LineMode::MULTI_LINE);
     p << L'1';
     p.breakLine();
-    CHECK(p.toWstring() == L"1\n");
+    CHECK(p.toString() == L"1\n");
     p << L'2';
-    CHECK(p.toWstring() == L"1\n2");
+    CHECK(p.toString() == L"1\n2");
     p.delayedLines() << L"R\n";
-    CHECK(p.toWstring() == L"1\n2");
+    CHECK(p.toString() == L"1\n2");
     p << L'3';
-    CHECK(p.toWstring() == L"1\n23");
+    CHECK(p.toString() == L"1\n23");
     p.breakLine();
-    CHECK(p.toWstring() == L"1\n23\nR\n");
+    CHECK(p.toString() == L"1\n23\nR\n");
     p << L'4';
     p.delayedLines() << L"R1";
     p << L'5';
     p.delayedLines() << L"R2";
     p << L'6';
-    CHECK(p.toWstring() == L"1\n23\nR\n456");
+    CHECK(p.toString() == L"1\n23\nR\n456");
     p.breakLine();
-    CHECK(p.toWstring() == L"1\n23\nR\n456\nR1R2");
+    CHECK(p.toString() == L"1\n23\nR\n456\nR1R2");
     p.breakLine();
-    CHECK(p.toWstring() == L"1\n23\nR\n456\nR1R2\n");
+    CHECK(p.toString() == L"1\n23\nR\n456\nR1R2\n");
 }
 
 TEST_CASE("Printer delayed characters and lines") {
@@ -134,19 +134,19 @@ TEST_CASE("Printer delayed characters and lines") {
     p << L'1';
     p.delayedCharacters() << L';';
     p.breakLine();
-    CHECK(p.toWstring() == L"1\n");
+    CHECK(p.toString() == L"1\n");
     p << L'2';
     p.delayedCharacters() << L' ';
     p.delayedLines() << L"R1\n";
     p.delayedCharacters() << L' ';
-    CHECK(p.toWstring() == L"1\n2");
+    CHECK(p.toString() == L"1\n2");
     p << L'3';
-    CHECK(p.toWstring() == L"1\n2  3");
+    CHECK(p.toString() == L"1\n2  3");
     p.delayedCharacters() << L' ';
     p.delayedLines() << L"R2\n";
     p.delayedCharacters() << L' ';
     p.breakLine();
-    CHECK(p.toWstring() == L"1\n2  3\nR1\nR2\n");
+    CHECK(p.toString() == L"1\n2  3\nR1\nR2\n");
 }
 
 TEST_CASE("Printer indentation SINGLE_LINE") {
@@ -154,41 +154,41 @@ TEST_CASE("Printer indentation SINGLE_LINE") {
     CHECK(p.indentLevel() == 0);
     p.printIndent();
     CHECK(p.indentLevel() == 0);
-    CHECK(p.toWstring() == L"");
+    CHECK(p.toString() == L"");
     p.indentLevel() = 5;
     CHECK(p.indentLevel() == 5);
     p.printIndent();
-    CHECK(p.toWstring() == L"");
+    CHECK(p.toString() == L"");
     p << L"foo";
     CHECK(p.indentLevel() == 5);
     p.printIndent();
-    CHECK(p.toWstring() == L"foo");
+    CHECK(p.toString() == L"foo");
     p.indentLevel() = 0;
     p.printIndent();
-    CHECK(p.toWstring() == L"foo");
+    CHECK(p.toString() == L"foo");
 }
 
 TEST_CASE("Printer indentation MULTI_LINE") {
     Printer p(Printer::LineMode::MULTI_LINE);
     p.printIndent();
     CHECK(p.indentLevel() == 0);
-    CHECK(p.toWstring() == L"");
+    CHECK(p.toString() == L"");
     p.indentLevel() = 2;
     CHECK(p.indentLevel() == 2);
     p.printIndent();
-    CHECK(p.toWstring() == L"        ");
+    CHECK(p.toString() == L"        ");
     p << L"foo";
     CHECK(p.indentLevel() == 2);
-    CHECK(p.toWstring() == L"        foo");
+    CHECK(p.toString() == L"        foo");
     p.indentLevel() = 1;
     p.printIndent();
-    CHECK(p.toWstring() == L"        foo    ");
+    CHECK(p.toString() == L"        foo    ");
     p.printIndent();
-    CHECK(p.toWstring() == L"        foo        ");
+    CHECK(p.toString() == L"        foo        ");
     p << L"bar";
     p.indentLevel() = 5;
     p.printIndent();
-    CHECK(p.toWstring() == L"        foo        bar                    ");
+    CHECK(p.toString() == L"        foo        bar                    ");
 }
 
 TEST_CASE("Printer indent guard") {

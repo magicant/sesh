@@ -96,7 +96,7 @@ TEST_CASE("Assignment data 2") {
 TEST_CASE_METHOD(Fixture, "Assignment print") {
     forEachLineMode([this](Printer &p) {
         p << a;
-        CHECK(p.toWstring() == L"varName=assignedValue");
+        CHECK(p.toString() == L"varName=assignedValue");
     });
 }
 

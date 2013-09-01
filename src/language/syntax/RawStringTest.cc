@@ -45,7 +45,7 @@ TEST_CASE("Raw string print") {
     forEachLineMode([](Printer &p) {
         p << RawString(L"1") << RawString(L"");
         p << RawString(L"23");
-        CHECK(p.toWstring() == L"123");
+        CHECK(p.toString() == L"123");
     });
 }
 

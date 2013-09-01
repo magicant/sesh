@@ -105,8 +105,8 @@ TEST_CASE("Conditional pipeline print") {
     pm.indentLevel() = 1;
     ps << cp1;
     pm << cp1;
-    CHECK(ps.toWstring() == L"&& ! pipeline 1");
-    CHECK(pm.toWstring() == L"&&\n    ! pipeline 1");
+    CHECK(ps.toString() == L"&& ! pipeline 1");
+    CHECK(pm.toString() == L"&&\n    ! pipeline 1");
 
     ConditionalPipeline cp2(
             ConditionalPipeline::Condition::OR_ELSE,
@@ -116,8 +116,8 @@ TEST_CASE("Conditional pipeline print") {
     pm.indentLevel() = 2;
     ps << cp2;
     pm << cp2;
-    CHECK(ps.toWstring() == L"&& ! pipeline 1 || ! pipeline 2");
-    CHECK(pm.toWstring() == L"&&\n    ! pipeline 1 ||\n        ! pipeline 2");
+    CHECK(ps.toString() == L"&& ! pipeline 1 || ! pipeline 2");
+    CHECK(pm.toString() == L"&&\n    ! pipeline 1 ||\n        ! pipeline 2");
 }
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

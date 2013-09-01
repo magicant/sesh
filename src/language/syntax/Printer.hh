@@ -87,7 +87,7 @@ public:
         return mLineMode;
     }
 
-    common::String toWstring() const;
+    common::String toString() const;
 
     std::wostream &delayedCharacters() noexcept {
         return mDelayedCharacters;

@@ -86,9 +86,9 @@ TEST_CASE_METHOD(PrintFixture, "Sequence print single-line") {
     p.delayedLines() << L"Y\n";
     p.indentLevel() = 2;
     p << s;
-    CHECK(p.toWstring() == L"XC1 && C2; ! C3 | C4& C5");
+    CHECK(p.toString() == L"XC1 && C2; ! C3 | C4& C5");
     p.commitDelayedCharacters();
-    CHECK(p.toWstring() == L"XC1 && C2; ! C3 | C4& C5; ");
+    CHECK(p.toString() == L"XC1 && C2; ! C3 | C4& C5; ");
 }
 
 TEST_CASE_METHOD(PrintFixture, "Sequence print multi-line") {
@@ -97,10 +97,10 @@ TEST_CASE_METHOD(PrintFixture, "Sequence print multi-line") {
     p.delayedLines() << L"Y\n";
     p.indentLevel() = 2;
     p << s;
-    CHECK(p.toWstring() ==
+    CHECK(p.toString() ==
             L"XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5");
     p.commitDelayedCharacters();
-    CHECK(p.toWstring() ==
+    CHECK(p.toString() ==
             L"XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5; ");
 }
 

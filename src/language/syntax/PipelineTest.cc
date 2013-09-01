@@ -55,7 +55,7 @@ void addCommand(Pipeline &p, const Char *s) {
 void checkForEachLineMode(const Pipeline &pl, const String &expected) {
     forEachLineMode([&pl, &expected](Printer &p) {
         p << pl;
-        CHECK(p.toWstring() == expected);
+        CHECK(p.toString() == expected);
     });
 }
 

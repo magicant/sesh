@@ -35,7 +35,7 @@ Printer::Printer(LineMode lineMode) :
         mIndentLevel() {
 }
 
-String Printer::toWstring() const {
+String Printer::toString() const {
     return mMainBuffer.str();
 }
 

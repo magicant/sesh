@@ -65,10 +65,10 @@ void testAndOrListWithoutRest(
     p.delayedLines() << L"Y\n";
 
     p << aol;
-    CHECK(p.toWstring() == withoutDelayed);
+    CHECK(p.toString() == withoutDelayed);
 
     p << L"";
-    CHECK(p.toWstring() == withDelayed);
+    CHECK(p.toString() == withDelayed);
 }
 
 void testAndOrListWithRest(
@@ -92,10 +92,10 @@ void testAndOrListWithRest(
     p.delayedLines() << L"Y\n";
 
     p << aol;
-    CHECK(p.toWstring() == withoutDelayed);
+    CHECK(p.toString() == withoutDelayed);
 
     p << L"";
-    CHECK(p.toWstring() == withDelayed);
+    CHECK(p.toString() == withDelayed);
 }
 
 } // namespace
