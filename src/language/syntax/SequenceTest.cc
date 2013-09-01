@@ -18,7 +18,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include <string>
+#include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/AndOrList.hh"
 #include "language/syntax/Command.hh"
@@ -27,6 +27,7 @@
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Sequence.hh"
 
+using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::AndOrList;
 using sesh::language::syntax::Command;
@@ -38,8 +39,8 @@ using sesh::language::syntax::Sequence;
 namespace {
 
 struct CommandStub : public Command {
-    std::wstring s;
-    CommandStub(std::wstring s) : Command(dummySourceLocation()), s(s) { }
+    String s;
+    CommandStub(String s) : Command(dummySourceLocation()), s(s) { }
     void print(Printer &p) const override {
         p << s;
         p.delayedCharacters() << L' ';

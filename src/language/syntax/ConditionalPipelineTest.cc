@@ -20,12 +20,14 @@
 
 #include <memory>
 #include <stdexcept>
+#include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/ConditionalPipeline.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 
+using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
@@ -36,7 +38,7 @@ namespace {
 
 class CommandStub : public Command {
 private:
-    std::wstring mString;
+    String mString;
 public:
     explicit CommandStub(const wchar_t *s) :
             Command(dummySourceLocation()), mString(s) { }

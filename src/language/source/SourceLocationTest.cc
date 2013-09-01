@@ -21,20 +21,21 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
+#include "common/String.hh"
 #include "language/source/SourceLocation.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 
+using sesh::common::String;
 using sesh::language::source::SourceLocation;
 using sesh::language::source::dummySourceLocation;
 
 TEST_CASE("Source location construction") {
-    std::shared_ptr<const std::wstring> name =
-            std::make_shared<std::wstring>(L"12");
+    std::shared_ptr<const String> name = std::make_shared<String>(L"12");
 
     SourceLocation sl1(name, 0, 0);
     SourceLocation sl2(decltype(name)(name), 1, 1);
 
-    name = std::make_shared<std::wstring>(L"34");
+    name = std::make_shared<String>(L"34");
 
     SourceLocation sl3(name, 3, 4);
     SourceLocation sl4(decltype(name)(name), 1234, 9876);
@@ -59,7 +60,7 @@ TEST_CASE("Source location construction") {
 }
 
 TEST_CASE("Source location constructor null pointer exception") {
-    std::shared_ptr<const std::wstring> name(nullptr);
+    std::shared_ptr<const String> name(nullptr);
     CHECK_THROWS_AS(
             SourceLocation(name, 0, 0),
             std::invalid_argument);

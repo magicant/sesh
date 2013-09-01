@@ -19,7 +19,7 @@
 #define INCLUDED_language_source_Source_hh
 
 #include <memory>
-#include <string>
+#include "common/String.hh"
 #include "language/source/SourceLocation.hh"
 
 namespace sesh {
@@ -35,7 +35,7 @@ class Source {
 
 public:
 
-    using String = std::wstring;
+    using String = common::String;
     using Char = String::value_type;
     using Size = String::size_type;
     using Difference = String::difference_type;

@@ -23,7 +23,7 @@ namespace language {
 namespace source {
 
 SourceLineLocation::SourceLineLocation(
-        const std::shared_ptr<const std::wstring> &name,
+        const std::shared_ptr<const common::String> &name,
         std::size_t line) :
         mName(name),
         mLine(line) {
@@ -32,7 +32,7 @@ SourceLineLocation::SourceLineLocation(
 }
 
 SourceLineLocation::SourceLineLocation(
-        std::shared_ptr<const std::wstring> &&name,
+        std::shared_ptr<const common::String> &&name,
         std::size_t line) :
         mName(std::move(name)),
         mLine(line) {

@@ -21,9 +21,9 @@
 #include <cstddef>
 #include <ostream>
 #include <sstream>
-#include <string>
 #include <type_traits>
 #include <utility>
+#include "common/String.hh"
 
 namespace sesh {
 namespace language {
@@ -87,7 +87,7 @@ public:
         return mLineMode;
     }
 
-    std::wstring toWstring() const;
+    common::String toWstring() const;
 
     std::wostream &delayedCharacters() noexcept {
         return mDelayedCharacters;

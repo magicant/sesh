@@ -20,13 +20,14 @@
 
 #include <cstddef>
 #include <stdexcept>
-#include <string>
+#include "common/String.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 #include "language/syntax/RawString.hh"
 #include "language/syntax/Word.hh"
 
+using sesh::common::String;
 using sesh::language::syntax::Assignment;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::RawString;
@@ -53,12 +54,12 @@ TEST_CASE("Assignment constructors") {
     CHECK(a1.variableName() == L"");
     CHECK(a1.value().components().size() == 0);
 
-    std::wstring name(L"name");
+    String name(L"name");
     Assignment a2(name, nullptr);
     CHECK(a2.variableName() == name);
     CHECK(a2.value().components().size() == 0);
 
-    Assignment a3(std::wstring(name), nullptr);
+    Assignment a3(String(name), nullptr);
     CHECK(a3.variableName() == name);
     CHECK(a3.value().components().size() == 0);
 
@@ -66,7 +67,7 @@ TEST_CASE("Assignment constructors") {
     CHECK(a4.variableName() == name);
     CHECK(a4.value().components().size() == 0);
 
-    Assignment a5((std::wstring(name)), Assignment::WordPointer(new Word));
+    Assignment a5(String(name), Assignment::WordPointer(new Word));
     CHECK(a5.variableName() == name);
     CHECK(a5.value().components().size() == 0);
 }
@@ -76,7 +77,7 @@ TEST_CASE_METHOD(Fixture, "Assignment data 1") {
 }
 
 TEST_CASE("Assignment data 2") {
-    std::wstring name(L"name");
+    String name(L"name");
     Assignment a1(name, Assignment::WordPointer(new Word));
     a1.value().components().push_back(
             Word::ComponentPointer(new RawString(L"value")));
@@ -87,7 +88,7 @@ TEST_CASE("Assignment data 2") {
     CHECK(a1.variableName() == name);
     CHECK(a1.value().components().size() == 3);
 
-    Assignment a2(std::wstring(name), Assignment::WordPointer(new Word));
+    Assignment a2(String(name), Assignment::WordPointer(new Word));
     CHECK(a2.variableName() == name);
     CHECK(a2.value().components().size() == 0);
 }

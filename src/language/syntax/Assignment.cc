@@ -27,6 +27,8 @@ namespace syntax {
 
 namespace {
 
+using String = common::String;
+
 void createWordIfNull(Assignment::WordPointer &w) {
     if (w == nullptr)
         w.reset(new Word);
@@ -36,12 +38,12 @@ void createWordIfNull(Assignment::WordPointer &w) {
 
 Assignment::Assignment() : mVariableName(), mValue(new Word) { }
 
-Assignment::Assignment(const std::wstring &variableName, WordPointer &&value) :
+Assignment::Assignment(const String &variableName, WordPointer &&value) :
         mVariableName(variableName), mValue(std::move(value)) {
     createWordIfNull(mValue);
 }
 
-Assignment::Assignment(std::wstring &&variableName, WordPointer &&value) :
+Assignment::Assignment(String &&variableName, WordPointer &&value) :
         mVariableName(std::move(variableName)), mValue(std::move(value)) {
     createWordIfNull(mValue);
 }

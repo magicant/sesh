@@ -20,7 +20,7 @@
 
 #include <cstddef>
 #include <memory>
-#include <string>
+#include "common/String.hh"
 #include "language/source/SourceLineLocation.hh"
 
 namespace sesh {
@@ -42,11 +42,11 @@ public:
     SourceLocation(SourceLineLocation &&nameAndLine, std::size_t column);
 
     SourceLocation(
-            std::shared_ptr<const std::wstring> &name,
+            std::shared_ptr<const common::String> &name,
             std::size_t line,
             std::size_t column);
     SourceLocation(
-            std::shared_ptr<const std::wstring> &&name,
+            std::shared_ptr<const common::String> &&name,
             std::size_t line,
             std::size_t column);
 
@@ -59,7 +59,7 @@ public:
     const SourceLineLocation &nameAndLine() const noexcept {
         return mNameAndLine;
     }
-    const std::wstring &name() const noexcept { return mNameAndLine.name(); }
+    const common::String &name() const noexcept { return mNameAndLine.name(); }
     std::size_t line() const noexcept { return mNameAndLine.line(); }
     std::size_t column() const noexcept { return mColumn; }
 

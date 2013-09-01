@@ -20,7 +20,7 @@
 
 #include <cstddef>
 #include <memory>
-#include <string>
+#include "common/String.hh"
 #include "language/source/SourceLocation.hh"
 
 namespace sesh {
@@ -33,9 +33,7 @@ inline SourceLocation dummySourceLocation(
         std::size_t line = 1,
         std::size_t column = 1) {
     return SourceLocation(
-            std::make_shared<std::wstring>(name),
-            line,
-            column);
+            std::make_shared<common::String>(name), line, column);
 }
 
 } // namespace source

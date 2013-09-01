@@ -18,8 +18,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include <string>
 #include <utility>
+#include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Printer.hh"
@@ -28,6 +28,7 @@
 #include "language/syntax/SimpleCommand.hh"
 #include "language/syntax/Word.hh"
 
+using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::Assignment;
 using sesh::language::syntax::Printer;
@@ -38,23 +39,22 @@ using sesh::language::syntax::forEachLineMode;
 
 namespace {
 
-Assignment::WordPointer newWord(std::wstring s) {
+Assignment::WordPointer newWord(String s) {
     Assignment::WordPointer w(new Word);
     w->components().push_back(Word::ComponentPointer(new RawString(s)));
     return std::move(w);
 }
 
-SimpleCommand::AssignmentPointer newAssignment(
-        std::wstring name, std::wstring value) {
+SimpleCommand::AssignmentPointer newAssignment(String name, String value) {
     return SimpleCommand::AssignmentPointer(
             new Assignment(name, newWord(value)));
 }
 
-void addAssignment(SimpleCommand &sc, std::wstring name, std::wstring value) {
+void addAssignment(SimpleCommand &sc, String name, String value) {
     sc.assignments().push_back(newAssignment(name, value));
 }
 
-void addWord(SimpleCommand &sc, std::wstring s) {
+void addWord(SimpleCommand &sc, String s) {
     sc.words().push_back(newWord(s));
 }
 
