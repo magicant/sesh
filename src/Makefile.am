@@ -22,7 +22,7 @@ TESTS = $(check_PROGRAMS)
 catch_include = -I$(top_srcdir)/external/Catch/single_include
 AM_CPPFLAGS = $(catch_include)
 
-sesh_SOURCES = common.hh main.cc \
+sesh_SOURCES = main.cc \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \

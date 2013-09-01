@@ -18,7 +18,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common.hh"
 #include <memory>
 #include <stdexcept>
 #include "language/source/Source.hh"

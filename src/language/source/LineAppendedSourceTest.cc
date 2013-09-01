@@ -18,7 +18,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common.hh"
 #include <utility>
 #include "language/source/LineAppendedSource.hh"
 #include "language/source/SourceLineLocationTestHelper.hh"

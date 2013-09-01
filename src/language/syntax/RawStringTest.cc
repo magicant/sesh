@@ -18,7 +18,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 #include "language/syntax/RawString.hh"
