@@ -36,9 +36,9 @@ TEST_CASE("Word print") {
         p << w;
         CHECK(p.toString() == L"");
 
-        w.components().push_back(Word::ComponentPointer(new RawString(L"1")));
-        w.components().push_back(Word::ComponentPointer(new RawString(L"2")));
-        w.components().push_back(Word::ComponentPointer(new RawString(L"3")));
+        w.components().emplace_back(new RawString(L"1"));
+        w.components().emplace_back(new RawString(L"2"));
+        w.components().emplace_back(new RawString(L"3"));
         p << w;
         CHECK(p.toString() == L"123");
 
