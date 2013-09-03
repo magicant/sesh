@@ -17,6 +17,7 @@
 
 #include "SimpleCommand.hh"
 #include <utility>
+#include "common/Char.hh"
 #include "language/syntax/Printer.hh"
 
 namespace sesh {
@@ -32,11 +33,11 @@ SimpleCommand::SimpleCommand(source::SourceLocation &&sl) :
 void SimpleCommand::print(Printer &p) const {
     for (const AssignmentPointer &a : assignments()) {
         p << *a;
-        p.delayedCharacters() << L' ';
+        p.delayedCharacters() << L(' ');
     }
     for (const WordPointer &w : words()) {
         p << *w;
-        p.delayedCharacters() << L' ';
+        p.delayedCharacters() << L(' ');
     }
 }
 

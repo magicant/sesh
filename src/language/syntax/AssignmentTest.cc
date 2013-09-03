@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Printer.hh"
@@ -39,11 +40,11 @@ namespace {
 struct Fixture {
     Assignment a;
     Fixture() : a() {
-        a.variableName() = L"varName";
+        a.variableName() = L("varName");
         a.value().components().push_back(Word::ComponentPointer(
-                new RawString(L"assigned")));
+                new RawString(L("assigned"))));
         a.value().components().push_back(Word::ComponentPointer(
-                new RawString(L"Value")));
+                new RawString(L("Value"))));
     }
 };
 
@@ -51,10 +52,10 @@ struct Fixture {
 
 TEST_CASE("Assignment constructors") {
     Assignment a1;
-    CHECK(a1.variableName() == L"");
+    CHECK(a1.variableName() == L(""));
     CHECK(a1.value().components().size() == 0);
 
-    String name(L"name");
+    String name(L("name"));
     Assignment a2(name, nullptr);
     CHECK(a2.variableName() == name);
     CHECK(a2.value().components().size() == 0);
@@ -73,18 +74,18 @@ TEST_CASE("Assignment constructors") {
 }
 
 TEST_CASE_METHOD(Fixture, "Assignment data 1") {
-    CHECK(a.variableName() == L"varName");
+    CHECK(a.variableName() == L("varName"));
 }
 
 TEST_CASE("Assignment data 2") {
-    String name(L"name");
+    String name(L("name"));
     Assignment a1(name, Assignment::WordPointer(new Word));
     a1.value().components().push_back(
-            Word::ComponentPointer(new RawString(L"value")));
+            Word::ComponentPointer(new RawString(L("value"))));
     a1.value().components().push_back(
-            Word::ComponentPointer(new RawString(L" ")));
+            Word::ComponentPointer(new RawString(L(" "))));
     a1.value().components().push_back(
-            Word::ComponentPointer(new RawString(L"string")));
+            Word::ComponentPointer(new RawString(L("string"))));
     CHECK(a1.variableName() == name);
     CHECK(a1.value().components().size() == 3);
 
@@ -96,7 +97,7 @@ TEST_CASE("Assignment data 2") {
 TEST_CASE_METHOD(Fixture, "Assignment print") {
     forEachLineMode([this](Printer &p) {
         p << a;
-        CHECK(p.toString() == L"varName=assignedValue");
+        CHECK(p.toString() == L("varName=assignedValue"));
     });
 }
 

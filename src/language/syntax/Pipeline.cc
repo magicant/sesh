@@ -18,6 +18,7 @@
 #include "Pipeline.hh"
 #include <utility>
 #include <vector>
+#include "common/Char.hh"
 #include "language/syntax/Printer.hh"
 
 namespace sesh {
@@ -31,14 +32,14 @@ void Pipeline::print(Printer &p) const {
     case ExitStatusType::STRAIGHT:
         break;
     case ExitStatusType::NEGATED:
-        p << L"! ";
+        p << L("! ");
         break;
     }
 
     bool isFirst = true;
     for (const CommandPointer &c : commands()) {
         if (!isFirst)
-            p << L"| ";
+            p << L("| ");
         p << *c;
         isFirst = false;
     }

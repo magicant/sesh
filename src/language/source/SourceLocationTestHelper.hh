@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <memory>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLocation.hh"
 
@@ -29,7 +30,7 @@ namespace source {
 
 /** For testing only. */
 inline SourceLocation dummySourceLocation(
-        const common::Char *name = L"dummy",
+        const common::Char *name = L("dummy"),
         std::size_t line = 1,
         std::size_t column = 1) {
     return SourceLocation(

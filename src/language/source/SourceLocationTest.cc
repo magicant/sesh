@@ -21,6 +21,7 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLocation.hh"
 #include "language/source/SourceLocationTestHelper.hh"
@@ -30,26 +31,26 @@ using sesh::language::source::SourceLocation;
 using sesh::language::source::dummySourceLocation;
 
 TEST_CASE("Source location construction") {
-    std::shared_ptr<const String> name = std::make_shared<String>(L"12");
+    std::shared_ptr<const String> name = std::make_shared<String>(L("12"));
 
     SourceLocation sl1(name, 0, 0);
     SourceLocation sl2(decltype(name)(name), 1, 1);
 
-    name = std::make_shared<String>(L"34");
+    name = std::make_shared<String>(L("34"));
 
     SourceLocation sl3(name, 3, 4);
     SourceLocation sl4(decltype(name)(name), 1234, 9876);
 
-    CHECK(sl1.name() == L"12");
+    CHECK(sl1.name() == L("12"));
     CHECK(sl1.line() == 0);
     CHECK(sl1.column() == 0);
-    CHECK(sl2.name() == L"12");
+    CHECK(sl2.name() == L("12"));
     CHECK(sl2.line() == 1);
     CHECK(sl2.column() == 1);
-    CHECK(sl3.name() == L"34");
+    CHECK(sl3.name() == L("34"));
     CHECK(sl3.line() == 3);
     CHECK(sl3.column() == 4);
-    CHECK(sl4.name() == L"34");
+    CHECK(sl4.name() == L("34"));
     CHECK(sl4.line() == 1234);
     CHECK(sl4.column() == 9876);
 
@@ -70,11 +71,11 @@ TEST_CASE("Source location constructor null pointer exception") {
 }
 
 TEST_CASE("Source location comparison") {
-    SourceLocation sl1 = dummySourceLocation(L"apple", 0, 0);
-    SourceLocation sl2 = dummySourceLocation(L"apple", 0, 0);
-    SourceLocation sl3 = dummySourceLocation(L"banana", 0, 0);
-    SourceLocation sl4 = dummySourceLocation(L"apple", 1, 0);
-    SourceLocation sl5 = dummySourceLocation(L"apple", 0, 1);
+    SourceLocation sl1 = dummySourceLocation(L("apple"), 0, 0);
+    SourceLocation sl2 = dummySourceLocation(L("apple"), 0, 0);
+    SourceLocation sl3 = dummySourceLocation(L("banana"), 0, 0);
+    SourceLocation sl4 = dummySourceLocation(L("apple"), 1, 0);
+    SourceLocation sl5 = dummySourceLocation(L("apple"), 0, 1);
 
     CHECK(sl1 == sl1);
     CHECK_FALSE(!(sl1 == sl1));
@@ -94,20 +95,20 @@ TEST_CASE("Source location comparison") {
 
 TEST_CASE("Dummy source location") {
     SourceLocation sl1 = dummySourceLocation();
-    SourceLocation sl2 = dummySourceLocation(L"foo");
-    SourceLocation sl3 = dummySourceLocation(L"foo", 123);
-    SourceLocation sl4 = dummySourceLocation(L"foo", 123, 456);
+    SourceLocation sl2 = dummySourceLocation(L("foo"));
+    SourceLocation sl3 = dummySourceLocation(L("foo"), 123);
+    SourceLocation sl4 = dummySourceLocation(L("foo"), 123, 456);
 
-    CHECK(sl1.name() == L"dummy");
+    CHECK(sl1.name() == L("dummy"));
     CHECK(sl1.line() == 1);
     CHECK(sl1.column() == 1);
-    CHECK(sl2.name() == L"foo");
+    CHECK(sl2.name() == L("foo"));
     CHECK(sl2.line() == 1);
     CHECK(sl2.column() == 1);
-    CHECK(sl3.name() == L"foo");
+    CHECK(sl3.name() == L("foo"));
     CHECK(sl3.line() == 123);
     CHECK(sl3.column() == 1);
-    CHECK(sl4.name() == L"foo");
+    CHECK(sl4.name() == L("foo"));
     CHECK(sl4.line() == 123);
     CHECK(sl4.column() == 456);
 }
