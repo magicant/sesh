@@ -19,6 +19,7 @@
 #define INCLUDED_language_source_Source_hh
 
 #include <memory>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLocation.hh"
 
@@ -40,7 +41,7 @@ public:
     using Size = String::size_type;
     using Difference = String::difference_type;
     using ConstReference = String::const_reference;
-    constexpr static Char NEWLINE = L'\n';
+    constexpr static Char NEWLINE = L('\n');
 
     using Pointer = std::unique_ptr<const Source>;
 

@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <stdexcept>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/AndOrList.hh"
@@ -41,8 +42,8 @@ namespace {
 struct CommandStub : public Command {
     CommandStub() : Command(dummySourceLocation()) { }
     void print(Printer &p) const override {
-        p << L"command";
-        p.delayedCharacters() << L' ';
+        p << L("command");
+        p.delayedCharacters() << L(' ');
     }
 }; // struct CommandStub
 
@@ -61,13 +62,13 @@ void testAndOrListWithoutRest(
     Printer p(lineMode);
 
     p.indentLevel() = 1;
-    p.delayedCharacters() << L"X";
-    p.delayedLines() << L"Y\n";
+    p.delayedCharacters() << L("X");
+    p.delayedLines() << L("Y\n");
 
     p << aol;
     CHECK(p.toString() == withoutDelayed);
 
-    p << L"";
+    p << L("");
     CHECK(p.toString() == withDelayed);
 }
 
@@ -88,13 +89,13 @@ void testAndOrListWithRest(
 
     Printer p(lineMode);
     p.indentLevel() = 1;
-    p.delayedCharacters() << L"X";
-    p.delayedLines() << L"Y\n";
+    p.delayedCharacters() << L("X");
+    p.delayedLines() << L("Y\n");
 
     p << aol;
     CHECK(p.toString() == withoutDelayed);
 
-    p << L"";
+    p << L("");
     CHECK(p.toString() == withDelayed);
 }
 
@@ -136,46 +137,46 @@ TEST_CASE("And-or list print w/o rest") {
     testAndOrListWithoutRest(
             Printer::LineMode::SINGLE_LINE,
             AndOrList::Synchronicity::SEQUENTIAL,
-            L"X! command",
-            L"X! command; ");
+            L("X! command"),
+            L("X! command; "));
     testAndOrListWithoutRest(
             Printer::LineMode::MULTI_LINE,
             AndOrList::Synchronicity::SEQUENTIAL,
-            L"X! command",
-            L"X! command; ");
+            L("X! command"),
+            L("X! command; "));
     testAndOrListWithoutRest(
             Printer::LineMode::SINGLE_LINE,
             AndOrList::Synchronicity::ASYNCHRONOUS,
-            L"X! command&",
-            L"X! command& ");
+            L("X! command&"),
+            L("X! command& "));
     testAndOrListWithoutRest(
             Printer::LineMode::MULTI_LINE,
             AndOrList::Synchronicity::ASYNCHRONOUS,
-            L"X! command&",
-            L"X! command& ");
+            L("X! command&"),
+            L("X! command& "));
 }
 
 TEST_CASE("And-or list print w/ rest") {
     testAndOrListWithRest(
             Printer::LineMode::SINGLE_LINE,
             AndOrList::Synchronicity::SEQUENTIAL,
-            L"X! command && ! command || ! command",
-            L"X! command && ! command || ! command; ");
+            L("X! command && ! command || ! command"),
+            L("X! command && ! command || ! command; "));
     testAndOrListWithRest(
             Printer::LineMode::MULTI_LINE,
             AndOrList::Synchronicity::SEQUENTIAL,
-            L"X! command &&\nY\n    ! command ||\n    ! command",
-            L"X! command &&\nY\n    ! command ||\n    ! command; ");
+            L("X! command &&\nY\n    ! command ||\n    ! command"),
+            L("X! command &&\nY\n    ! command ||\n    ! command; "));
     testAndOrListWithRest(
             Printer::LineMode::SINGLE_LINE,
             AndOrList::Synchronicity::ASYNCHRONOUS,
-            L"X! command && ! command || ! command&",
-            L"X! command && ! command || ! command& ");
+            L("X! command && ! command || ! command&"),
+            L("X! command && ! command || ! command& "));
     testAndOrListWithRest(
             Printer::LineMode::MULTI_LINE,
             AndOrList::Synchronicity::ASYNCHRONOUS,
-            L"X! command &&\nY\n    ! command ||\n    ! command&",
-            L"X! command &&\nY\n    ! command ||\n    ! command& ");
+            L("X! command &&\nY\n    ! command ||\n    ! command&"),
+            L("X! command &&\nY\n    ! command ||\n    ! command& "));
 }
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

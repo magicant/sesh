@@ -19,6 +19,7 @@
 #include <exception>
 #include <stdexcept>
 #include <utility>
+#include "common/Char.hh"
 
 namespace sesh {
 namespace language {
@@ -28,7 +29,7 @@ LineContinuedSource::LineContinuedSource(
         Pointer &&original, Size position) :
         Source(std::move(original), position, position + 2, String()) {
     const Source &o = *this->original();
-    if (o[position] != L'\\' || o[position + 1] != NEWLINE)
+    if (o[position] != L('\\') || o[position + 1] != NEWLINE)
         throw std::invalid_argument("no line continuation");
 }
 

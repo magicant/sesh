@@ -19,6 +19,7 @@
 #include "catch.hpp"
 
 #include <utility>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/Assignment.hh"
@@ -63,21 +64,21 @@ void addWord(SimpleCommand &sc, String s) {
 TEST_CASE("Empty simple command print") {
     forEachLineMode([](Printer &p) {
         p << SimpleCommand(dummySourceLocation());
-        CHECK(p.toString() == L"");
+        CHECK(p.toString() == L(""));
     });
 }
 
 TEST_CASE("Simple command print") {
     SimpleCommand sc(dummySourceLocation());
 
-    addAssignment(sc, L"foo", L"Foo.value");
-    addWord(sc, L"Hello");
-    addAssignment(sc, L"bar", L"Bar-value");
-    addWord(sc, L"world");
+    addAssignment(sc, L("foo"), L("Foo.value"));
+    addWord(sc, L("Hello"));
+    addAssignment(sc, L("bar"), L("Bar-value"));
+    addWord(sc, L("world"));
 
     forEachLineMode([&sc](Printer &p) {
         p << sc;
-        CHECK(p.toString() == L"foo=Foo.value bar=Bar-value Hello world");
+        CHECK(p.toString() == L("foo=Foo.value bar=Bar-value Hello world"));
     });
 }
 

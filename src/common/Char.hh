@@ -27,6 +27,12 @@ namespace common {
  */
 using Char = wchar_t;
 
+/**
+ * This macro converts a character or string literal of the char type to an
+ * equivalent literal of the Char type.
+ */
+#define L(x) L##x
+
 } // namespace common
 } // namespace sesh
 

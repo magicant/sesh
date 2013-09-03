@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <stdexcept>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/Command.hh"
@@ -48,7 +49,7 @@ public:
 
 void CommandStub::print(Printer &p) const {
     p << mString;
-    p.delayedCharacters() << L' ';
+    p.delayedCharacters() << L(' ');
 }
 
 void addCommand(Pipeline &p, const Char *s) {
@@ -66,29 +67,29 @@ std::unique_ptr<Pipeline> newPipeline(const Char *s) {
 
 TEST_CASE("Conditional pipeline constructors") {
     ConditionalPipeline cp1(ConditionalPipeline::Condition::AND_THEN);
-    addCommand(cp1.pipeline(), L"pipeline 1");
+    addCommand(cp1.pipeline(), L("pipeline 1"));
     CHECK(cp1.condition() == ConditionalPipeline::Condition::AND_THEN);
     CHECK(cp1.pipeline().commands().size() == 1);
 
     ConditionalPipeline cp2(ConditionalPipeline::Condition::OR_ELSE);
-    addCommand(cp2.pipeline(), L"pipeline 2");
-    addCommand(cp2.pipeline(), L"pipeline 3");
-    addCommand(cp2.pipeline(), L"pipeline 4");
+    addCommand(cp2.pipeline(), L("pipeline 2"));
+    addCommand(cp2.pipeline(), L("pipeline 3"));
+    addCommand(cp2.pipeline(), L("pipeline 4"));
     CHECK(cp2.condition() == ConditionalPipeline::Condition::OR_ELSE);
     CHECK(cp2.pipeline().commands().size() == 3);
 
     ConditionalPipeline cp3(
             ConditionalPipeline::Condition::AND_THEN,
             nullptr);
-    addCommand(cp3.pipeline(), L"pipeline 5");
+    addCommand(cp3.pipeline(), L("pipeline 5"));
     CHECK(cp3.condition() == ConditionalPipeline::Condition::AND_THEN);
     CHECK(cp3.pipeline().commands().size() == 1);
 
     ConditionalPipeline cp4(
             ConditionalPipeline::Condition::OR_ELSE,
             nullptr);
-    addCommand(cp4.pipeline(), L"pipeline 6");
-    addCommand(cp4.pipeline(), L"pipeline 7");
+    addCommand(cp4.pipeline(), L("pipeline 6"));
+    addCommand(cp4.pipeline(), L("pipeline 7"));
     CHECK(cp4.condition() == ConditionalPipeline::Condition::OR_ELSE);
     CHECK(cp4.pipeline().commands().size() == 2);
 }
@@ -99,25 +100,25 @@ TEST_CASE("Conditional pipeline print") {
 
     ConditionalPipeline cp1(
             ConditionalPipeline::Condition::AND_THEN,
-            newPipeline(L"pipeline 1"));
+            newPipeline(L("pipeline 1")));
 
     ps.indentLevel() = 1;
     pm.indentLevel() = 1;
     ps << cp1;
     pm << cp1;
-    CHECK(ps.toString() == L"&& ! pipeline 1");
-    CHECK(pm.toString() == L"&&\n    ! pipeline 1");
+    CHECK(ps.toString() == L("&& ! pipeline 1"));
+    CHECK(pm.toString() == L("&&\n    ! pipeline 1"));
 
     ConditionalPipeline cp2(
             ConditionalPipeline::Condition::OR_ELSE,
-            newPipeline(L"pipeline 2"));
+            newPipeline(L("pipeline 2")));
 
     ps.indentLevel() = 2;
     pm.indentLevel() = 2;
     ps << cp2;
     pm << cp2;
-    CHECK(ps.toString() == L"&& ! pipeline 1 || ! pipeline 2");
-    CHECK(pm.toString() == L"&&\n    ! pipeline 1 ||\n        ! pipeline 2");
+    CHECK(ps.toString() == L("&& ! pipeline 1 || ! pipeline 2"));
+    CHECK(pm.toString() == L("&&\n    ! pipeline 1 ||\n        ! pipeline 2"));
 }
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

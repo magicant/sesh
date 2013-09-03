@@ -17,6 +17,7 @@
 
 #include "AndOrList.hh"
 #include <utility>
+#include "common/Char.hh"
 #include "language/syntax/Printer.hh"
 
 namespace sesh {
@@ -32,13 +33,13 @@ inline void printSeparator(AndOrList::Synchronicity s, Printer &p) {
     p.clearDelayedCharacters();
     switch (s) {
     case AndOrList::Synchronicity::SEQUENTIAL:
-        p.delayedCharacters() << L';';
+        p.delayedCharacters() << L(';');
         break;
     case AndOrList::Synchronicity::ASYNCHRONOUS:
-        p << L'&';
+        p << L('&');
         break;
     }
-    p.delayedCharacters() << L' ';
+    p.delayedCharacters() << L(' ');
 }
 
 } // namespace

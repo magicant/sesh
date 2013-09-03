@@ -19,6 +19,7 @@
 #include "catch.hpp"
 
 #include <memory>
+#include "common/Char.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 #include "language/syntax/RawString.hh"
@@ -34,16 +35,16 @@ TEST_CASE("Word print") {
         Word w;
 
         p << w;
-        CHECK(p.toString() == L"");
+        CHECK(p.toString() == L(""));
 
-        w.components().push_back(Word::ComponentPointer(new RawString(L"1")));
-        w.components().push_back(Word::ComponentPointer(new RawString(L"2")));
-        w.components().push_back(Word::ComponentPointer(new RawString(L"3")));
+        w.components().emplace_back(new RawString(L("1")));
+        w.components().emplace_back(new RawString(L("2")));
+        w.components().emplace_back(new RawString(L("3")));
         p << w;
-        CHECK(p.toString() == L"123");
+        CHECK(p.toString() == L("123"));
 
-        p << L'X';
-        CHECK(p.toString() == L"123X"); // no delayed characters
+        p << L('X');
+        CHECK(p.toString() == L("123X")); // no delayed characters
     });
 }
 
