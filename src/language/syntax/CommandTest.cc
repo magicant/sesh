@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <memory>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLocation.hh"
 #include "language/syntax/Command.hh"
@@ -62,9 +63,9 @@ void testSourceLocation(
 } // namespace
 
 TEST_CASE("Command source location") {
-    testSourceLocation(L"", 0, 0);
-    testSourceLocation(L"foo", 1, 1);
-    testSourceLocation(L"foobar", 1234, 9876);
+    testSourceLocation(L(""), 0, 0);
+    testSourceLocation(L("foo"), 1, 1);
+    testSourceLocation(L("foobar"), 1234, 9876);
 }
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

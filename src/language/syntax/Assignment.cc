@@ -18,6 +18,7 @@
 #include "Assignment.hh"
 #include <stdexcept>
 #include <utility>
+#include "common/Char.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Word.hh"
 
@@ -49,7 +50,7 @@ Assignment::Assignment(String &&variableName, WordPointer &&value) :
 }
 
 void Assignment::print(Printer &p) const {
-    p << variableName() << L'=' << value();
+    p << variableName() << L('=') << value();
 }
 
 } // namespace syntax

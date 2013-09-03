@@ -19,6 +19,7 @@
 #include "catch.hpp"
 
 #include <memory>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/Command.hh"
@@ -44,7 +45,7 @@ public:
             Command(dummySourceLocation()), mString(s) { }
     void print(Printer &p) const override {
         p << mString;
-        p.delayedCharacters() << L' ';
+        p.delayedCharacters() << L(' ');
     }
 };
 
@@ -64,34 +65,34 @@ void checkForEachLineMode(const Pipeline &pl, const String &expected) {
 TEST_CASE("Pipeline print") {
     Pipeline pl;
 
-    addCommand(pl, L"Command 1");
+    addCommand(pl, L("Command 1"));
 
-    checkForEachLineMode(pl, L"Command 1");
+    checkForEachLineMode(pl, L("Command 1"));
 
     CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
     pl.exitStatusType() = Pipeline::ExitStatusType::NEGATED;
 
-    checkForEachLineMode(pl, L"! Command 1");
+    checkForEachLineMode(pl, L("! Command 1"));
 
     CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::NEGATED);
-    addCommand(pl, L"Command 2");
+    addCommand(pl, L("Command 2"));
 
-    checkForEachLineMode(pl, L"! Command 1 | Command 2");
+    checkForEachLineMode(pl, L("! Command 1 | Command 2"));
 
     CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::NEGATED);
     pl.exitStatusType() = Pipeline::ExitStatusType::STRAIGHT;
 
-    checkForEachLineMode(pl, L"Command 1 | Command 2");
+    checkForEachLineMode(pl, L("Command 1 | Command 2"));
 
     CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
-    addCommand(pl, L"The last command");
+    addCommand(pl, L("The last command"));
 
-    checkForEachLineMode(pl, L"Command 1 | Command 2 | The last command");
+    checkForEachLineMode(pl, L("Command 1 | Command 2 | The last command"));
 
     CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
     pl.exitStatusType() = Pipeline::ExitStatusType::NEGATED;
 
-    checkForEachLineMode(pl, L"! Command 1 | Command 2 | The last command");
+    checkForEachLineMode(pl, L("! Command 1 | Command 2 | The last command"));
 }
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

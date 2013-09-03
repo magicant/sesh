@@ -18,6 +18,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#include "common/Char.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 #include "language/syntax/RawString.hh"
@@ -28,24 +29,24 @@ using sesh::language::syntax::forEachLineMode;
 
 TEST_CASE("Raw string constructors and value") {
     RawString rs1;
-    CHECK(rs1.value() == L"");
-    rs1.value() = L"test";
-    CHECK(rs1.value() == L"test");
+    CHECK(rs1.value() == L(""));
+    rs1.value() = L("test");
+    CHECK(rs1.value() == L("test"));
 
     const RawString rs2(rs1.value());
-    CHECK(rs2.value() == L"test");
+    CHECK(rs2.value() == L("test"));
 
     RawString rs3(rs2.value());
-    CHECK(rs3.value() == L"test");
-    rs3.value() += L" string";
-    CHECK(rs3.value() == L"test string");
+    CHECK(rs3.value() == L("test"));
+    rs3.value() += L(" string");
+    CHECK(rs3.value() == L("test string"));
 }
 
 TEST_CASE("Raw string print") {
     forEachLineMode([](Printer &p) {
-        p << RawString(L"1") << RawString(L"");
-        p << RawString(L"23");
-        CHECK(p.toString() == L"123");
+        p << RawString(L("1")) << RawString(L(""));
+        p << RawString(L("23"));
+        CHECK(p.toString() == L("123"));
     });
 }
 

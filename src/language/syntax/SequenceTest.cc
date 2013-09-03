@@ -18,6 +18,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/AndOrList.hh"
@@ -43,7 +44,7 @@ struct CommandStub : public Command {
     CommandStub(String s) : Command(dummySourceLocation()), s(s) { }
     void print(Printer &p) const override {
         p << s;
-        p.delayedCharacters() << L' ';
+        p.delayedCharacters() << L(' ');
     }
 };
 
@@ -54,11 +55,11 @@ struct PrintFixture {
         s.andOrLists().emplace_back(
                 Sequence::AndOrListPointer(new AndOrList(Pipeline())));
         s.andOrLists()[0]->first().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L"C1")));
+                Pipeline::CommandPointer(new CommandStub(L("C1"))));
         s.andOrLists()[0]->rest().emplace_back(
                 ConditionalPipeline::Condition::AND_THEN);
         s.andOrLists()[0]->rest()[0].pipeline().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L"C2")));
+                Pipeline::CommandPointer(new CommandStub(L("C2"))));
 
         s.andOrLists().emplace_back(
                 Sequence::AndOrListPointer(new AndOrList(Pipeline())));
@@ -67,14 +68,14 @@ struct PrintFixture {
         s.andOrLists()[1]->first().exitStatusType() =
                 Pipeline::ExitStatusType::NEGATED;
         s.andOrLists()[1]->first().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L"C3")));
+                Pipeline::CommandPointer(new CommandStub(L("C3"))));
         s.andOrLists()[1]->first().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L"C4")));
+                Pipeline::CommandPointer(new CommandStub(L("C4"))));
 
         s.andOrLists().emplace_back(
                 Sequence::AndOrListPointer(new AndOrList(Pipeline())));
         s.andOrLists()[2]->first().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L"C5")));
+                Pipeline::CommandPointer(new CommandStub(L("C5"))));
     }
 };
 
@@ -82,26 +83,26 @@ struct PrintFixture {
 
 TEST_CASE_METHOD(PrintFixture, "Sequence print single-line") {
     Printer p(Printer::LineMode::SINGLE_LINE);
-    p.delayedCharacters() << L'X';
-    p.delayedLines() << L"Y\n";
+    p.delayedCharacters() << L('X');
+    p.delayedLines() << L("Y\n");
     p.indentLevel() = 2;
     p << s;
-    CHECK(p.toString() == L"XC1 && C2; ! C3 | C4& C5");
+    CHECK(p.toString() == L("XC1 && C2; ! C3 | C4& C5"));
     p.commitDelayedCharacters();
-    CHECK(p.toString() == L"XC1 && C2; ! C3 | C4& C5; ");
+    CHECK(p.toString() == L("XC1 && C2; ! C3 | C4& C5; "));
 }
 
 TEST_CASE_METHOD(PrintFixture, "Sequence print multi-line") {
     Printer p(Printer::LineMode::MULTI_LINE);
-    p.delayedCharacters() << L'X';
-    p.delayedLines() << L"Y\n";
+    p.delayedCharacters() << L('X');
+    p.delayedLines() << L("Y\n");
     p.indentLevel() = 2;
     p << s;
     CHECK(p.toString() ==
-            L"XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5");
+            L("XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5"));
     p.commitDelayedCharacters();
     CHECK(p.toString() ==
-            L"XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5; ");
+            L("XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5; "));
 }
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

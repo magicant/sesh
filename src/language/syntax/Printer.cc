@@ -16,6 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "Printer.hh"
+#include "common/Char.hh"
 
 namespace sesh {
 namespace language {
@@ -61,11 +62,11 @@ void Printer::commitDelayedCharacters(){
 void Printer::breakLine() {
     switch (mLineMode) {
     case LineMode::SINGLE_LINE:
-        mDelayedCharacters.str(L" ");
+        mDelayedCharacters.str(L(" "));
         break;
     case LineMode::MULTI_LINE:
         clearDelayedCharacters();
-        mMainBuffer << L'\n' << mDelayedLines.str();
+        mMainBuffer << L('\n') << mDelayedLines.str();
         break;
     }
 
@@ -82,7 +83,7 @@ void Printer::printIndent() {
     case LineMode::SINGLE_LINE:
         return;
     case LineMode::MULTI_LINE:
-        mMainBuffer << String(4 * mIndentLevel, L' ');
+        mMainBuffer << String(4 * mIndentLevel, L(' '));
         return;
     }
 }

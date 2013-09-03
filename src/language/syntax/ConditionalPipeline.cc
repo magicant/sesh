@@ -18,6 +18,7 @@
 #include "ConditionalPipeline.hh"
 #include <stdexcept>
 #include <utility>
+#include "common/Char.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 
@@ -36,8 +37,8 @@ ConditionalPipeline::ConditionalPipeline(Condition c, PipelinePointer &&p) :
 
 void ConditionalPipeline::print(Printer &p) const {
     switch (condition()) {
-    case Condition::AND_THEN:  p << L"&&";  break;
-    case Condition::OR_ELSE:   p << L"||";  break;
+    case Condition::AND_THEN:  p << L("&&");  break;
+    case Condition::OR_ELSE:   p << L("||");  break;
     }
     p.breakLine();
     p.printIndent();

@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <utility>
+#include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/SourceLineLocation.hh"
 #include "language/source/SourceLineLocationTestHelper.hh"
@@ -30,31 +31,31 @@ using sesh::language::source::dummySourceLineLocation;
 
 TEST_CASE("Source line location construction") {
     std::shared_ptr<const String> name =
-            std::make_shared<String>(L"test*name");
+            std::make_shared<String>(L("test*name"));
 
     SourceLineLocation sll1(name, 0);
     SourceLineLocation sll2(decltype(name)(name), 1);
 
-    name = std::make_shared<String>(L"another name");
+    name = std::make_shared<String>(L("another name"));
 
     SourceLineLocation sll3(name, 123);
     SourceLineLocation sll4(decltype(name)(name), 987);
 
-    CHECK(sll1.name() == L"test*name");
+    CHECK(sll1.name() == L("test*name"));
     CHECK(sll1.line() == 0);
-    CHECK(sll2.name() == L"test*name");
+    CHECK(sll2.name() == L("test*name"));
     CHECK(sll2.line() == 1);
-    CHECK(sll3.name() == L"another name");
+    CHECK(sll3.name() == L("another name"));
     CHECK(sll3.line() == 123);
-    CHECK(sll4.name() == L"another name");
+    CHECK(sll4.name() == L("another name"));
     CHECK(sll4.line() == 987);
 
     sll1 = sll3;
     sll2 = std::move(sll4);
 
-    CHECK(sll1.name() == L"another name");
+    CHECK(sll1.name() == L("another name"));
     CHECK(sll1.line() == 123);
-    CHECK(sll2.name() == L"another name");
+    CHECK(sll2.name() == L("another name"));
     CHECK(sll2.line() == 987);
 }
 
@@ -69,10 +70,10 @@ TEST_CASE("Source line location constructor null pointer exception") {
 }
 
 TEST_CASE("Source line location comparison") {
-    SourceLineLocation sll1 = dummySourceLineLocation(L"apple", 0);
-    SourceLineLocation sll2 = dummySourceLineLocation(L"apple", 0);
-    SourceLineLocation sll3 = dummySourceLineLocation(L"banana", 0);
-    SourceLineLocation sll4 = dummySourceLineLocation(L"apple", 1);
+    SourceLineLocation sll1 = dummySourceLineLocation(L("apple"), 0);
+    SourceLineLocation sll2 = dummySourceLineLocation(L("apple"), 0);
+    SourceLineLocation sll3 = dummySourceLineLocation(L("banana"), 0);
+    SourceLineLocation sll4 = dummySourceLineLocation(L("apple"), 1);
 
     CHECK(sll1 == sll1);
     CHECK_FALSE(!(sll1 == sll1));
@@ -88,14 +89,14 @@ TEST_CASE("Source line location comparison") {
 
 TEST_CASE("Dummy source line location") {
     SourceLineLocation sll1 = dummySourceLineLocation();
-    SourceLineLocation sll2 = dummySourceLineLocation(L"test");
-    SourceLineLocation sll3 = dummySourceLineLocation(L"test", 777);
+    SourceLineLocation sll2 = dummySourceLineLocation(L("test"));
+    SourceLineLocation sll3 = dummySourceLineLocation(L("test"), 777);
 
-    CHECK(sll1.name() == L"dummy");
+    CHECK(sll1.name() == L("dummy"));
     CHECK(sll1.line() == 0);
-    CHECK(sll2.name() == L"test");
+    CHECK(sll2.name() == L("test"));
     CHECK(sll2.line() == 0);
-    CHECK(sll3.name() == L"test");
+    CHECK(sll3.name() == L("test"));
     CHECK(sll3.line() == 777);
 }
 
