@@ -30,6 +30,7 @@ sesh_SOURCES = main.cc \
 	common/String.hh \
 	common/StringStream.hh \
 	language/parser/NeedMoreSource.hh \
+	language/parser/Reparse.hh \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
