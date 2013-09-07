@@ -29,6 +29,8 @@
 #include "language/syntax/SimpleCommand.hh"
 #include "language/syntax/Word.hh"
 
+namespace {
+
 using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::Assignment;
@@ -37,8 +39,6 @@ using sesh::language::syntax::RawString;
 using sesh::language::syntax::SimpleCommand;
 using sesh::language::syntax::Word;
 using sesh::language::syntax::forEachLineMode;
-
-namespace {
 
 Assignment::WordPointer newWord(String s) {
     Assignment::WordPointer w(new Word);
@@ -58,8 +58,6 @@ void addAssignment(SimpleCommand &sc, String name, String value) {
 void addWord(SimpleCommand &sc, String s) {
     sc.words().push_back(newWord(s));
 }
-
-} // namespace
 
 TEST_CASE("Empty simple command print") {
     forEachLineMode([](Printer &p) {
@@ -81,5 +79,7 @@ TEST_CASE("Simple command print") {
         CHECK(p.toString() == L("foo=Foo.value bar=Bar-value Hello world"));
     });
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

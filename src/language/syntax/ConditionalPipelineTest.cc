@@ -28,6 +28,8 @@
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 
+namespace {
+
 using sesh::common::Char;
 using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
@@ -35,8 +37,6 @@ using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
-
-namespace {
 
 class CommandStub : public Command {
 private:
@@ -62,8 +62,6 @@ std::unique_ptr<Pipeline> newPipeline(const Char *s) {
     addCommand(*p, s);
     return p;
 }
-
-} // namespace
 
 TEST_CASE("Conditional pipeline constructors") {
     ConditionalPipeline cp1(ConditionalPipeline::Condition::AND_THEN);
@@ -120,5 +118,7 @@ TEST_CASE("Conditional pipeline print") {
     CHECK(ps.toString() == L("&& ! pipeline 1 || ! pipeline 2"));
     CHECK(pm.toString() == L("&&\n    ! pipeline 1 ||\n        ! pipeline 2"));
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

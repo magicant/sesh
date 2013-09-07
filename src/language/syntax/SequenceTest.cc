@@ -28,6 +28,8 @@
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Sequence.hh"
 
+namespace {
+
 using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::AndOrList;
@@ -36,8 +38,6 @@ using sesh::language::syntax::ConditionalPipeline;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::Sequence;
-
-namespace {
 
 struct CommandStub : public Command {
     String s;
@@ -79,8 +79,6 @@ struct PrintFixture {
     }
 };
 
-} // namespace
-
 TEST_CASE_METHOD(PrintFixture, "Sequence print single-line") {
     Printer p(Printer::LineMode::SINGLE_LINE);
     p.delayedCharacters() << L('X');
@@ -104,5 +102,7 @@ TEST_CASE_METHOD(PrintFixture, "Sequence print multi-line") {
     CHECK(p.toString() ==
             L("XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5; "));
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

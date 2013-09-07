@@ -23,6 +23,8 @@
 #include "language/source/LineContinuedSource.hh"
 #include "language/source/SourceTestHelper.hh"
 
+namespace {
+
 using sesh::language::source::LineContinuedSource;
 using sesh::language::source::Source;
 using sesh::language::source::SourceStub;
@@ -126,5 +128,7 @@ TEST_CASE("Line-continued source value") {
     INFO("source='' (2)");
     checkSourceString(*s, L(""));
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

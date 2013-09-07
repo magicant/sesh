@@ -27,6 +27,8 @@
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 
+namespace {
+
 using sesh::common::Char;
 using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
@@ -34,8 +36,6 @@ using sesh::language::syntax::Command;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::forEachLineMode;
-
-namespace {
 
 class CommandStub : public Command {
 private:
@@ -59,8 +59,6 @@ void checkForEachLineMode(const Pipeline &pl, const String &expected) {
         CHECK(p.toString() == expected);
     });
 }
-
-} // namespace
 
 TEST_CASE("Pipeline print") {
     Pipeline pl;
@@ -94,5 +92,7 @@ TEST_CASE("Pipeline print") {
 
     checkForEachLineMode(pl, L("! Command 1 | Command 2 | The last command"));
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

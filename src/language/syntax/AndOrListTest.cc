@@ -29,6 +29,8 @@
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 
+namespace {
+
 using sesh::common::String;
 using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::AndOrList;
@@ -36,8 +38,6 @@ using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
-
-namespace {
 
 struct CommandStub : public Command {
     CommandStub() : Command(dummySourceLocation()) { }
@@ -98,8 +98,6 @@ void testAndOrListWithRest(
     p << L("");
     CHECK(p.toString() == withDelayed);
 }
-
-} // namespace
 
 TEST_CASE("And-or list constructor 1") {
     AndOrList aol(pipelineStub());
@@ -178,5 +176,7 @@ TEST_CASE("And-or list print w/ rest") {
             L("X! command &&\nY\n    ! command ||\n    ! command&"),
             L("X! command &&\nY\n    ! command ||\n    ! command& "));
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
