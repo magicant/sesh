@@ -25,6 +25,8 @@
 #include "language/source/SourceLineLocation.hh"
 #include "language/source/SourceLineLocationTestHelper.hh"
 
+namespace {
+
 using sesh::common::String;
 using sesh::language::source::SourceLineLocation;
 using sesh::language::source::dummySourceLineLocation;
@@ -99,5 +101,7 @@ TEST_CASE("Dummy source line location") {
     CHECK(sll3.name() == L("test"));
     CHECK(sll3.line() == 777);
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

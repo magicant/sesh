@@ -25,6 +25,8 @@
 #include "language/syntax/RawString.hh"
 #include "language/syntax/Word.hh"
 
+namespace {
+
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::Word;
@@ -47,5 +49,7 @@ TEST_CASE("Word print") {
         CHECK(p.toString() == L("123X")); // no delayed characters
     });
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

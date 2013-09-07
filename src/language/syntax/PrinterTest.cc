@@ -23,6 +23,8 @@
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 
+namespace {
+
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::forEachLineMode;
 
@@ -217,5 +219,7 @@ TEST_CASE("Printer indent guard") {
         CHECK(p.indentLevel() == 0);
     });
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

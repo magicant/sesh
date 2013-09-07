@@ -32,7 +32,7 @@ SourceLocation::SourceLocation(
         mNameAndLine(std::move(nameAndLine)), mColumn(column) { }
 
 SourceLocation::SourceLocation(
-        std::shared_ptr<const common::String> &name,
+        const std::shared_ptr<const common::String> &name,
         std::size_t line,
         std::size_t column) :
         mNameAndLine(name, line),

@@ -24,6 +24,8 @@
 #include "language/source/SourceLineLocationTestHelper.hh"
 #include "language/source/SourceTestHelper.hh"
 
+namespace {
+
 using sesh::language::source::LineAppendedSource;
 using sesh::language::source::Source;
 using sesh::language::source::SourceLineLocation;
@@ -38,15 +40,11 @@ using sesh::language::source::dummySourceLineLocation;
 using Pointer = sesh::language::source::LineAppendedSource::Pointer;
 using String = sesh::language::source::LineAppendedSource::String;
 
-namespace {
-
 LineAppendedSource *create(
         Pointer &&original, String &&line, SourceLineLocation &&location) {
     return new LineAppendedSource(LineAppendedSource::create(
                 std::move(original), std::move(line), std::move(location)));
 }
-
-} // namespace
 
 TEST_CASE("Line-appended source construction no throw") {
     Source::Pointer s;
@@ -185,5 +183,7 @@ TEST_CASE("Line-appended source location") {
     checkSourceLocation(*s, 5, L("source 3"), 5, 1);
     checkSourceLocation(*s, 6, L("source 3"), 5, 2);
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
