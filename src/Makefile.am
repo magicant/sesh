@@ -3,6 +3,7 @@ bin_PROGRAMS = sesh
 check_PROGRAMS = \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
+	language/source/SourceBufferTest \
 	language/source/SourceLineLocationTest \
 	language/source/SourceLocationTest \
 	language/source/SourceTest \
@@ -33,6 +34,8 @@ sesh_SOURCES = main.cc \
 	language/source/LineContinuedSource.hh \
 	language/source/Source.cc \
 	language/source/Source.hh \
+	language/source/SourceBuffer.cc \
+	language/source/SourceBuffer.hh \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLineLocation.hh \
 	language/source/SourceLocation.cc \
@@ -72,6 +75,10 @@ language_source_LineContinuedSourceTest_SOURCES = \
 	language/source/Source.cc \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLocation.cc
+language_source_SourceBufferTest_SOURCES = \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/source/SourceBufferTest.cc
 language_source_SourceLineLocationTest_SOURCES = \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLineLocationTest.cc \
