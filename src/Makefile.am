@@ -29,6 +29,7 @@ sesh_SOURCES = main.cc \
 	common/OutputStream.hh \
 	common/String.hh \
 	common/StringStream.hh \
+	language/parser/NeedMoreSource.hh \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
