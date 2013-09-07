@@ -47,27 +47,29 @@ public:
 
 private:
 
+    Pointer mOriginal;
+    Size mBegin, mEnd;
+    String mAlternate;
+
+protected:
+
     /**
      * Original source string whose part is to be altered by this source
      * instance. The original may be null, in which case it is treated as an
      * empty string.
      */
-    Pointer mOriginal;
-
-    /**
-     * Range of the original source string that is altered by this source
-     * instance. (begin <= end <= length of the original)
-     */
-    Size mBegin, mEnd;
-
-    /** String that alternates part of the original. */
-    String mAlternate;
-
-protected:
-
     const Pointer &original() const noexcept { return mOriginal; }
+    /**
+     * Beginning position of the range in the original to be replaced.
+     * Inclusive. The position cannot exceed the length of the original.
+     */
     Size begin() const noexcept { return mBegin; }
+    /**
+     * Ending position of the range in the original to be replaced. Exclusive.
+     * The position cannot exceed the length of the original.
+     */
     Size end() const noexcept { return mEnd; }
+    /** String that alternates part of the original. */
     const String &alternate() const noexcept { return mAlternate; }
 
     Size positionAfterAlternate() const noexcept;

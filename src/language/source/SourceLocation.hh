@@ -42,7 +42,7 @@ public:
     SourceLocation(SourceLineLocation &&nameAndLine, std::size_t column);
 
     SourceLocation(
-            std::shared_ptr<const common::String> &name,
+            const std::shared_ptr<const common::String> &name,
             std::size_t line,
             std::size_t column);
     SourceLocation(

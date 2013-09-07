@@ -28,14 +28,14 @@
 #include "language/syntax/RawString.hh"
 #include "language/syntax/Word.hh"
 
+namespace {
+
 using sesh::common::String;
 using sesh::language::syntax::Assignment;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::Word;
 using sesh::language::syntax::forEachLineMode;
-
-namespace {
 
 struct Fixture {
     Assignment a;
@@ -47,8 +47,6 @@ struct Fixture {
                 new RawString(L("Value"))));
     }
 };
-
-} // namespace
 
 TEST_CASE("Assignment constructors") {
     Assignment a1;
@@ -100,5 +98,7 @@ TEST_CASE_METHOD(Fixture, "Assignment print") {
         CHECK(p.toString() == L("varName=assignedValue"));
     });
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

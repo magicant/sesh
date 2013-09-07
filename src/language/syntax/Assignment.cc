@@ -19,6 +19,7 @@
 #include <stdexcept>
 #include <utility>
 #include "common/Char.hh"
+#include "common/String.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Word.hh"
 

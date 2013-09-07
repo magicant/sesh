@@ -17,6 +17,7 @@
 
 #include "Printer.hh"
 #include "common/Char.hh"
+#include "common/String.hh"
 
 namespace sesh {
 namespace language {

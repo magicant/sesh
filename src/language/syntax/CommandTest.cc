@@ -26,13 +26,13 @@
 #include "language/syntax/Command.hh"
 #include "language/syntax/Printer.hh"
 
+namespace {
+
 using sesh::common::Char;
 using sesh::common::String;
 using sesh::language::source::SourceLocation;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Printer;
-
-namespace {
 
 class CommandStub : public Command {
 public:
@@ -60,12 +60,12 @@ void testSourceLocation(
     CHECK(dl.sourceLocation().column() == sl.column());
 }
 
-} // namespace
-
 TEST_CASE("Command source location") {
     testSourceLocation(L(""), 0, 0);
     testSourceLocation(L("foo"), 1, 1);
     testSourceLocation(L("foobar"), 1234, 9876);
 }
+
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
