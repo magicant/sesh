@@ -31,8 +31,8 @@ namespace syntax {
 class Printer;
 
 /**
- * A valid simple command contains at least one word or assignment. Each word
- * must contain at least one word component.
+ * A valid simple command contains at least one word, assignment, or
+ * redirection. Each word must contain at least one word component.
  */
 class SimpleCommand : public Command {
 
