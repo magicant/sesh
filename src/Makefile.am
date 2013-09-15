@@ -37,6 +37,7 @@ sesh_SOURCES = main.cc \
 	language/parser/Environment.hh \
 	language/parser/NeedMoreSource.hh \
 	language/parser/Parser.hh \
+	language/parser/Predicate.hh \
 	language/parser/Reparse.hh \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
