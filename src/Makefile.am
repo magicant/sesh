@@ -48,6 +48,8 @@ sesh_SOURCES = main.cc \
 	language/parser/Skipper.cc \
 	language/parser/Skipper.hh \
 	language/parser/WordComponentParser.hh \
+	language/parser/WordParser.cc \
+	language/parser/WordParser.hh \
 	language/parser/WordParserImpl.hh \
 	language/parser/WordParserImpl.tcc \
 	language/source/LineAppendedSource.cc \
