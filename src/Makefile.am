@@ -5,6 +5,7 @@ check_PROGRAMS = \
 	language/parser/EnvironmentTest \
 	language/parser/RawStringParserTest \
 	language/parser/SkipperTest \
+	language/parser/WordParserImplTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
 	language/source/SourceBufferTest \
@@ -47,6 +48,8 @@ sesh_SOURCES = main.cc \
 	language/parser/Skipper.cc \
 	language/parser/Skipper.hh \
 	language/parser/WordComponentParser.hh \
+	language/parser/WordParserImpl.hh \
+	language/parser/WordParserImpl.tcc \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
@@ -112,6 +115,14 @@ language_parser_SkipperTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_WordParserImplTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/Environment.cc \
+	language/parser/WordParserImplTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Word.cc
 language_source_LineAppendedSourceTest_SOURCES = \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSourceTest.cc \
