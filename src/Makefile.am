@@ -1,6 +1,7 @@
 bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
+	language/parser/BasicEnvironmentTest \
 	language/parser/EnvironmentTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
@@ -30,6 +31,8 @@ sesh_SOURCES = main.cc \
 	common/OutputStream.hh \
 	common/String.hh \
 	common/StringStream.hh \
+	language/parser/BasicEnvironment.cc \
+	language/parser/BasicEnvironment.hh \
 	language/parser/Environment.cc \
 	language/parser/Environment.hh \
 	language/parser/NeedMoreSource.hh \
@@ -69,6 +72,12 @@ sesh_SOURCES = main.cc \
 	language/syntax/WordComponent.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
+language_parser_BasicEnvironmentTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/BasicEnvironmentTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_parser_EnvironmentTest_SOURCES = \
 	language/parser/Environment.cc \
 	language/parser/EnvironmentTest.cc \
