@@ -3,6 +3,7 @@ bin_PROGRAMS = sesh
 check_PROGRAMS = \
 	language/parser/BasicEnvironmentTest \
 	language/parser/EnvironmentTest \
+	language/parser/RawStringParserTest \
 	language/parser/SkipperTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
@@ -40,6 +41,8 @@ sesh_SOURCES = main.cc \
 	language/parser/NeedMoreSource.hh \
 	language/parser/Parser.hh \
 	language/parser/Predicate.hh \
+	language/parser/RawStringParser.cc \
+	language/parser/RawStringParser.hh \
 	language/parser/Reparse.hh \
 	language/parser/Skipper.cc \
 	language/parser/Skipper.hh \
@@ -90,6 +93,17 @@ language_parser_EnvironmentTest_SOURCES = \
 	language/parser/EnvironmentTest.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_RawStringParserTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/Environment.cc \
+	language/parser/RawStringParser.cc \
+	language/parser/RawStringParserTest.cc \
+	language/parser/Skipper.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Printer.cc \
+	language/syntax/RawString.cc
 language_parser_SkipperTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/Environment.cc \
