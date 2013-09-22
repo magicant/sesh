@@ -1,8 +1,14 @@
 bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
+	language/parser/BasicEnvironmentTest \
+	language/parser/EnvironmentTest \
+	language/parser/RawStringParserTest \
+	language/parser/SkipperTest \
+	language/parser/WordParserImplTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
+	language/source/SourceBufferTest \
 	language/source/SourceLineLocationTest \
 	language/source/SourceLocationTest \
 	language/source/SourceTest \
@@ -24,15 +30,36 @@ AM_CPPFLAGS = $(catch_include)
 
 sesh_SOURCES = main.cc \
 	common/Char.hh \
+	common/ErrorLevel.hh \
 	common/OutputStream.hh \
 	common/String.hh \
 	common/StringStream.hh \
+	language/parser/BasicEnvironment.cc \
+	language/parser/BasicEnvironment.hh \
+	language/parser/Environment.cc \
+	language/parser/Environment.hh \
+	language/parser/LineContinuationTreatment.hh \
+	language/parser/NeedMoreSource.hh \
+	language/parser/Parser.hh \
+	language/parser/Predicate.hh \
+	language/parser/RawStringParser.cc \
+	language/parser/RawStringParser.hh \
+	language/parser/Reparse.hh \
+	language/parser/Skipper.cc \
+	language/parser/Skipper.hh \
+	language/parser/WordComponentParser.hh \
+	language/parser/WordParser.cc \
+	language/parser/WordParser.hh \
+	language/parser/WordParserImpl.hh \
+	language/parser/WordParserImpl.tcc \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/LineContinuedSource.hh \
 	language/source/Source.cc \
 	language/source/Source.hh \
+	language/source/SourceBuffer.cc \
+	language/source/SourceBuffer.hh \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLineLocation.hh \
 	language/source/SourceLocation.cc \
@@ -60,6 +87,44 @@ sesh_SOURCES = main.cc \
 	language/syntax/WordComponent.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
+language_parser_BasicEnvironmentTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/BasicEnvironmentTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_EnvironmentTest_SOURCES = \
+	language/parser/Environment.cc \
+	language/parser/EnvironmentTest.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_RawStringParserTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/Environment.cc \
+	language/parser/RawStringParser.cc \
+	language/parser/RawStringParserTest.cc \
+	language/parser/Skipper.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Printer.cc \
+	language/syntax/RawString.cc
+language_parser_SkipperTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/Environment.cc \
+	language/parser/Skipper.cc \
+	language/parser/SkipperTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_WordParserImplTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/Environment.cc \
+	language/parser/WordParserImplTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Word.cc
 language_source_LineAppendedSourceTest_SOURCES = \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSourceTest.cc \
@@ -72,6 +137,10 @@ language_source_LineContinuedSourceTest_SOURCES = \
 	language/source/Source.cc \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLocation.cc
+language_source_SourceBufferTest_SOURCES = \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/source/SourceBufferTest.cc
 language_source_SourceLineLocationTest_SOURCES = \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLineLocationTest.cc \
