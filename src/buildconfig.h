@@ -25,6 +25,11 @@
 
 #define CATCH_CONFIG_SFINAE
 
+#ifdef __CYGWIN__
+/* We need POSIX API functions that are not covered by ANSI. */
+#undef __STRICT_ANSI__
+#endif // #ifdef __CYGWIN__
+
 #endif // #ifndef INCLUDED_buildconfig_h
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
