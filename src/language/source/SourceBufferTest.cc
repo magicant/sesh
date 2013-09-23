@@ -86,7 +86,7 @@ TEST_CASE("Source buffer substitution, at and operator[]") {
 
     checkSourceBufferString(sb, L(""));
     sb.substitute([](SourcePointer &&p) -> SourcePointer {
-        CHECK((p == nullptr));
+        CHECK(p == nullptr);
         return prepend(std::move(p), L("Test"));
     });
     checkSourceBufferString(sb, L("Test"));
@@ -96,9 +96,8 @@ TEST_CASE("Source buffer substitution, at and operator[]") {
     });
     checkSourceBufferString(sb, L("Test"));
     sb.substitute([](SourcePointer &&p) -> SourcePointer {
-        REQUIRE((p != nullptr));
-        CHECK((dynamic_cast<const StringPrependedSource *>(p.get()) !=
-                nullptr));
+        REQUIRE(p != nullptr);
+        CHECK(dynamic_cast<const StringPrependedSource *>(p.get()) != nullptr);
         checkSourceString(*p, L("Test"));
         // XXX: GCC 4.8.1 and Clang 3.3 want explicit move.
         return std::move(p);
@@ -192,69 +191,69 @@ TEST_CASE("Source buffer iterator equality") {
     SBCI ci = b->cbegin(), i = b->begin();
     SBCI cend = b->cend(), end = b->end();
 
-    CHECK((ci == ci));
-    CHECK((ci == i));
-    CHECK((i == ci));
-    CHECK((i == i));
-    CHECK((cend == cend));
-    CHECK((cend == end));
-    CHECK((end == cend));
-    CHECK((end == end));
-    CHECK((ci != cend));
-    CHECK((i != end));
+    CHECK(ci == ci);
+    CHECK(ci == i);
+    CHECK(i == ci);
+    CHECK(i == i);
+    CHECK(cend == cend);
+    CHECK(cend == end);
+    CHECK(end == cend);
+    CHECK(end == end);
+    CHECK(ci != cend);
+    CHECK(i != end);
 
-    CHECK_FALSE((ci != ci));
-    CHECK_FALSE((ci != i));
-    CHECK_FALSE((i != ci));
-    CHECK_FALSE((i != i));
-    CHECK_FALSE((cend != cend));
-    CHECK_FALSE((cend != end));
-    CHECK_FALSE((end != cend));
-    CHECK_FALSE((end != end));
-    CHECK_FALSE((ci == cend));
-    CHECK_FALSE((i == end));
-
-    ++ci;
-    CHECK((ci != i));
-    CHECK((ci != cend));
-    CHECK_FALSE((ci == i));
-    CHECK_FALSE((ci == cend));
-
-    ++i;
-    CHECK((ci == i));
-    CHECK((i != cend));
-    CHECK_FALSE((ci != i));
-    CHECK_FALSE((i == cend));
-
-    ++i;
-    ++i;
-    CHECK((ci != i));
-    CHECK((i == cend));
-    CHECK((i == end));
-    CHECK_FALSE((ci == i));
-    CHECK_FALSE((i != cend));
-    CHECK_FALSE((i != end));
+    CHECK_FALSE(ci != ci);
+    CHECK_FALSE(ci != i);
+    CHECK_FALSE(i != ci);
+    CHECK_FALSE(i != i);
+    CHECK_FALSE(cend != cend);
+    CHECK_FALSE(cend != end);
+    CHECK_FALSE(end != cend);
+    CHECK_FALSE(end != end);
+    CHECK_FALSE(ci == cend);
+    CHECK_FALSE(i == end);
 
     ++ci;
-    ++ci;
-    CHECK((ci == i));
-    CHECK((ci == cend));
-    CHECK((ci == end));
-    CHECK_FALSE((ci != i));
-    CHECK_FALSE((ci != cend));
-    CHECK_FALSE((ci != end));
+    CHECK(ci != i);
+    CHECK(ci != cend);
+    CHECK_FALSE(ci == i);
+    CHECK_FALSE(ci == cend);
 
-    CHECK((SBCI() == SBCI()));
-    CHECK_FALSE((SBCI() != SBCI()));
+    ++i;
+    CHECK(ci == i);
+    CHECK(i != cend);
+    CHECK_FALSE(ci != i);
+    CHECK_FALSE(i == cend);
+
+    ++i;
+    ++i;
+    CHECK(ci != i);
+    CHECK(i == cend);
+    CHECK(i == end);
+    CHECK_FALSE(ci == i);
+    CHECK_FALSE(i != cend);
+    CHECK_FALSE(i != end);
+
+    ++ci;
+    ++ci;
+    CHECK(ci == i);
+    CHECK(ci == cend);
+    CHECK(ci == end);
+    CHECK_FALSE(ci != i);
+    CHECK_FALSE(ci != cend);
+    CHECK_FALSE(ci != end);
+
+    CHECK(SBCI() == SBCI());
+    CHECK_FALSE(SBCI() != SBCI());
 }
 
 TEST_CASE("Source buffer iterator multi-pass guarantee 1") {
     BufferPointer b = createBuffer(L("ABC"));
     SBCI ci = b->cbegin(), i = b->begin();
     // ci == i
-    CHECK((++ci == ++i));
-    CHECK((++ci == ++i));
-    CHECK((++ci == ++i));
+    CHECK(++ci == ++i);
+    CHECK(++ci == ++i);
+    CHECK(++ci == ++i);
 }
 
 TEST_CASE("Source buffer iterator multi-pass guarantee 2") {
@@ -271,71 +270,71 @@ TEST_CASE("Source buffer iterator random access") {
     SBCI i = begin;
 
     CHECK_NOTHROW(i += 1);
-    CHECK((i == begin + 1));
-    CHECK((i == 1 + begin));
-    CHECK((i == end + -3));
-    CHECK((i == -3 + end));
+    CHECK(i == begin + 1);
+    CHECK(i == 1 + begin);
+    CHECK(i == end + -3);
+    CHECK(i == -3 + end);
     CHECK(*i == L('e'));
     CHECK_NOTHROW(i += 2);
-    CHECK((i == b->cbegin() + 3));
-    CHECK((i == 3 + b->cbegin()));
-    CHECK((i == b->cend() + -1));
-    CHECK((i == -1 + b->cend()));
+    CHECK(i == b->cbegin() + 3);
+    CHECK(i == 3 + b->cbegin());
+    CHECK(i == b->cend() + -1);
+    CHECK(i == -1 + b->cend());
     CHECK(*i == L('t'));
     CHECK_NOTHROW(i += -3);
-    CHECK((i == begin + 0));
-    CHECK((i == 0 + begin));
-    CHECK((i == end + -4));
-    CHECK((i == -4 + end));
+    CHECK(i == begin + 0);
+    CHECK(i == 0 + begin);
+    CHECK(i == end + -4);
+    CHECK(i == -4 + end);
     CHECK(*i == L('T'));
     CHECK_NOTHROW(i += 4);
-    CHECK((i == b->cbegin() + 4));
-    CHECK((i == 4 + b->cbegin()));
-    CHECK((i == b->cend() + 0));
-    CHECK((i == 0 + b->cend()));
+    CHECK(i == b->cbegin() + 4);
+    CHECK(i == 4 + b->cbegin());
+    CHECK(i == b->cend() + 0);
+    CHECK(i == 0 + b->cend());
     CHECK_NOTHROW(i += -2);
-    CHECK((i == begin + 2));
-    CHECK((i == 2 + begin));
-    CHECK((i == end + -2));
-    CHECK((i == -2 + end));
+    CHECK(i == begin + 2);
+    CHECK(i == 2 + begin);
+    CHECK(i == end + -2);
+    CHECK(i == -2 + end);
     CHECK(*i == L('s'));
 
     CHECK_NOTHROW(i -= -2);
-    CHECK((i == begin - -4));
+    CHECK(i == begin - -4);
     CHECK((i - begin == 4));
     CHECK((begin - i == -4));
-    CHECK((i == end - 0));
+    CHECK(i == end - 0);
     CHECK((i - end == 0));
     CHECK((end - i == 0));
     CHECK_NOTHROW(i -= 4);
-    CHECK((i == b->cbegin() - 0));
+    CHECK(i == b->cbegin() - 0);
     CHECK((i - b->cbegin() == 0));
     CHECK((b->cbegin() - i == 0));
-    CHECK((i == b->cend() - 4));
+    CHECK(i == b->cend() - 4);
     CHECK((i - b->cend() == -4));
     CHECK((b->cend() - i == 4));
     CHECK(*i == L('T'));
     CHECK_NOTHROW(i -= -3);
-    CHECK((i == begin - -3));
+    CHECK(i == begin - -3);
     CHECK((i - begin == 3));
     CHECK((begin - i == -3));
-    CHECK((i == end - 1));
+    CHECK(i == end - 1);
     CHECK((i - end == -1));
     CHECK((end - i == 1));
     CHECK(*i == L('t'));
     CHECK_NOTHROW(i -= 2);
-    CHECK((i == b->cbegin() - -1));
+    CHECK(i == b->cbegin() - -1);
     CHECK((i - b->cbegin() == 1));
     CHECK((b->cbegin() - i == -1));
-    CHECK((i == b->cend() - 3));
+    CHECK(i == b->cend() - 3);
     CHECK((i - b->cend() == -3));
     CHECK((b->cend() - i == 3));
     CHECK(*i == L('e'));
     CHECK_NOTHROW(i -= 1);
-    CHECK((i == begin - 0));
+    CHECK(i == begin - 0);
     CHECK((i - begin == 0));
     CHECK((begin - i == 0));
-    CHECK((i == end - 4));
+    CHECK(i == end - 4);
     CHECK((i - end == -4));
     CHECK((end - i == 4));
     CHECK(*i == L('T'));
