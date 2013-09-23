@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_parser_BasicEnvironment_hh
 #define INCLUDED_language_parser_BasicEnvironment_hh
 
+#include "buildconfig.h"
+
 #include "language/parser/Environment.hh"
 #include "language/source/Source.hh"
 #include "language/source/SourceBuffer.hh"

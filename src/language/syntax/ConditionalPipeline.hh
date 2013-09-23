@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_syntax_ConditionalPipeline_hh
 #define INCLUDED_language_syntax_ConditionalPipeline_hh
 
+#include "buildconfig.h"
+
 #include <memory>
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printable.hh"

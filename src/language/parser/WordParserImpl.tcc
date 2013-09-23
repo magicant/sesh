@@ -18,7 +18,9 @@
 #ifndef INCLUDED_language_parser_WordParserImpl_tcc
 #define INCLUDED_language_parser_WordParserImpl_tcc
 
+#include "buildconfig.h"
 #include "WordParserImpl.hh"
+
 #include <functional>
 #include <utility>
 #include "common/Char.hh"

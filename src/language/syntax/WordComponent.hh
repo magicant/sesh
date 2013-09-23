@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_syntax_WordComponent_hh
 #define INCLUDED_language_syntax_WordComponent_hh
 
+#include "buildconfig.h"
+
 #include "language/syntax/Printable.hh"
 
 namespace sesh {

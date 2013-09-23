@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include "buildconfig.h"
 #include "Environment.hh"
+
 #include "common/String.hh"
 #include "language/parser/NeedMoreSource.hh"
 

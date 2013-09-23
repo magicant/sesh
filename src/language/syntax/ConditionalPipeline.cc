@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#include "buildconfig.h"
 #include "ConditionalPipeline.hh"
+
 #include <stdexcept>
 #include <utility>
 #include "common/Char.hh"

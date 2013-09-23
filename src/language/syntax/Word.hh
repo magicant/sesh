@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_syntax_Word_hh
 #define INCLUDED_language_syntax_Word_hh
 
+#include "buildconfig.h"
+
 #include <memory>
 #include <vector>
 #include "language/syntax/Printable.hh"

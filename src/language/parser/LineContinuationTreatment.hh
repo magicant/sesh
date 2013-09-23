@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_parser_LineContinuationTreatment_hh
 #define INCLUDED_language_parser_LineContinuationTreatment_hh
 
+#include "buildconfig.h"
+
 #include <exception>
 
 namespace sesh {

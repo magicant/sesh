@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include "buildconfig.h"
+
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -108,7 +110,7 @@ TEST_CASE("Raw string parser, 0 append") {
     e.appendSource(String(L("AB\0C$XYZ"), 8));
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == String(L("AB\0C"), 4));
     CHECK(e.current() == e.begin() + 4);
 }
@@ -125,7 +127,7 @@ TEST_CASE("Raw string parser, 1 append") {
     e.appendSource(L("$123-+"));
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == L("XYZ$123"));
     CHECK(e.current() == e.end() - 2);
 }
@@ -137,7 +139,7 @@ TEST_CASE("Raw string parser, 0 append, to end") {
     e.setIsEof();
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == L("apple"));
     CHECK(e.current() == e.end());
 }
@@ -156,7 +158,7 @@ TEST_CASE("Raw string parser, 1 append, to end") {
     e.setIsEof();
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == L("dog"));
     CHECK(e.current() == e.end());
 }
@@ -173,7 +175,7 @@ TEST_CASE("Raw string parser, 1 append, empty result") {
     e.appendSource(L("***"));
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == L(""));
     CHECK(e.current() == e.end() - 3);
 }
@@ -196,7 +198,7 @@ TEST_CASE("Raw string parser, null delimiter") {
     e.setIsEof();
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == L("Hello, world!"));
     CHECK(e.current() == e.end());
 }
@@ -208,7 +210,7 @@ TEST_CASE("Raw string parser, no remove line continuations 1") {
     e.appendSource(L("AB\\\nC@"));
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == L("AB\\\nC"));
     CHECK(e.current() == e.end() - 1);
 }
@@ -220,7 +222,7 @@ TEST_CASE("Raw string parser, no remove line continuations 2") {
     e.appendSource(L("AB\\\nC@"));
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == L("AB"));
     CHECK(e.current() == e.begin() + 2);
 }
@@ -235,7 +237,7 @@ TEST_CASE("Raw string parser, remove line continuations 1") {
     e.appendSource(L("\nGHI@"));
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == L("ABC\\\nDEFGHI"));
     CHECK(e.current() == e.end() - 1);
 }
@@ -250,7 +252,7 @@ TEST_CASE("Raw string parser remove line continuations 2") {
     e.setIsEof();
 
     auto result = p.parseRawString();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->value() == L("ABCDEF"));
     CHECK(e.current() == e.end() - 1);
 }

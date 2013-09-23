@@ -18,6 +18,8 @@
 #ifndef INCLUDED_common_String_hh
 #define INCLUDED_common_String_hh
 
+#include "buildconfig.h"
+
 #include <string>
 #include "common/Char.hh"
 

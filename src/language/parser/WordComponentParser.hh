@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_parser_WordComponentParser_hh
 #define INCLUDED_language_parser_WordComponentParser_hh
 
+#include "buildconfig.h"
+
 #include <memory>
 
 namespace sesh {

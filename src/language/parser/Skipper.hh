@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_parser_Skipper_hh
 #define INCLUDED_language_parser_Skipper_hh
 
+#include "buildconfig.h"
+
 #include "common/Char.hh"
 #include "language/parser/LineContinuationTreatment.hh"
 #include "language/parser/Parser.hh"

@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_parser_WordParserImpl_hh
 #define INCLUDED_language_parser_WordParserImpl_hh
 
+#include "buildconfig.h"
+
 #include <functional>
 #include <memory>
 #include "common/Char.hh"

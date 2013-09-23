@@ -28,7 +28,7 @@ TESTS = $(check_PROGRAMS)
 catch_include = -I$(top_srcdir)/external/Catch/single_include
 AM_CPPFLAGS = $(catch_include)
 
-sesh_SOURCES = main.cc \
+sesh_SOURCES = buildconfig.h main.cc \
 	common/Char.hh \
 	common/ErrorLevel.hh \
 	common/OutputStream.hh \
