@@ -15,26 +15,14 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_Predicate_hh
-#define INCLUDED_language_parser_Predicate_hh
+/**
+ * This header file is included by all other header/source files to (un)define
+ * some feature test macros.
+ */
 
-#include "buildconfig.h"
+#ifndef INCLUDED_buildconfig_h
+#define INCLUDED_buildconfig_h
 
-#include <functional>
-
-namespace sesh {
-namespace language {
-namespace parser {
-
-class Environment;
-
-template<typename T>
-using Predicate = std::function<bool(Environment &, T)>;
-
-} // namespace parser
-} // namespace language
-} // namespace sesh
-
-#endif // #ifndef INCLUDED_language_parser_Predicate_hh
+#endif // #ifndef INCLUDED_buildconfig_h
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_parser_Environment_hh
 #define INCLUDED_language_parser_Environment_hh
 
+#include "buildconfig.h"
+
 #include "common/ErrorLevel.hh"
 #include "common/String.hh"
 #include "language/source/SourceBuffer.hh"

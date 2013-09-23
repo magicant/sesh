@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_parser_WordParser_hh
 #define INCLUDED_language_parser_WordParser_hh
 
+#include "buildconfig.h"
+
 #include "language/parser/WordParserImpl.hh"
 
 namespace sesh {

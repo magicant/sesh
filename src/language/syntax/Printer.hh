@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_syntax_Printer_hh
 #define INCLUDED_language_syntax_Printer_hh
 
+#include "buildconfig.h"
+
 #include <cstddef>
 #include <type_traits>
 #include <utility>

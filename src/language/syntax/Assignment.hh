@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_syntax_Assignment_hh
 #define INCLUDED_language_syntax_Assignment_hh
 
+#include "buildconfig.h"
+
 #include <memory>
 #include "common/String.hh"
 #include "language/syntax/Printable.hh"

@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_syntax_Command_hh
 #define INCLUDED_language_syntax_Command_hh
 
+#include "buildconfig.h"
+
 #include <utility>
 #include "language/source/SourceLocation.hh"
 #include "language/syntax/Printable.hh"

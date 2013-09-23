@@ -18,6 +18,8 @@
 #ifndef INCLUDED_common_StringStream_hh
 #define INCLUDED_common_StringStream_hh
 
+#include "buildconfig.h"
+
 #include <sstream>
 #include "common/Char.hh"
 

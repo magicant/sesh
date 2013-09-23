@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_source_SourceTestHelper_hh
 #define INCLUDED_language_source_SourceTestHelper_hh
 
+#include "buildconfig.h"
+
 #include <vector>
 #include "catch.hpp"
 #include "language/source/Source.hh"

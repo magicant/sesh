@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#include "buildconfig.h"
 #include "Sequence.hh"
+
 #include "language/syntax/AndOrList.hh"
 #include "language/syntax/Printer.hh"
 

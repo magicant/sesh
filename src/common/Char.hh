@@ -18,6 +18,8 @@
 #ifndef INCLUDED_common_Char_hh
 #define INCLUDED_common_Char_hh
 
+#include "buildconfig.h"
+
 namespace sesh {
 namespace common {
 

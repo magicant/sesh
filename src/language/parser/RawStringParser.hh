@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_parser_RawStringParser_hh
 #define INCLUDED_language_parser_RawStringParser_hh
 
+#include "buildconfig.h"
+
 #include <functional>
 #include "common/Char.hh"
 #include "language/parser/LineContinuationTreatment.hh"

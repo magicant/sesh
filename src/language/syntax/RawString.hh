@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_syntax_RawString_hh
 #define INCLUDED_language_syntax_RawString_hh
 
+#include "buildconfig.h"
+
 #include <utility>
 #include "common/String.hh"
 #include "language/syntax/WordComponent.hh"

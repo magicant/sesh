@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_source_LineContinuedSource_hh
 #define INCLUDED_language_source_LineContinuedSource_hh
 
+#include "buildconfig.h"
+
 #include "language/source/Source.hh"
 
 namespace sesh {
