@@ -13,7 +13,7 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * Sesh.  If not, see <http://www.gnu.org/licenses/>. */
+ * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #ifndef INCLUDED_language_syntax_Printer_hh
 #define INCLUDED_language_syntax_Printer_hh
