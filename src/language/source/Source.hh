@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_source_Source_hh
 #define INCLUDED_language_source_Source_hh
 
+#include "buildconfig.h"
+
 #include <memory>
 #include "common/Char.hh"
 #include "common/String.hh"

@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_source_LineAppendedSource_hh
 #define INCLUDED_language_source_LineAppendedSource_hh
 
+#include "buildconfig.h"
+
 #include "language/source/Source.hh"
 #include "language/source/SourceLineLocation.hh"
 

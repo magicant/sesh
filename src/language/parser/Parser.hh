@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_parser_Parser_hh
 #define INCLUDED_language_parser_Parser_hh
 
+#include "buildconfig.h"
+
 #include <memory>
 #include <utility>
 #include "common/String.hh"

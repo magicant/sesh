@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_syntax_PrinterTestHelper_hh
 #define INCLUDED_language_syntax_PrinterTestHelper_hh
 
+#include "buildconfig.h"
+
 #include <functional>
 #include "language/syntax/Printer.hh"
 

@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_syntax_Printable_hh
 #define INCLUDED_language_syntax_Printable_hh
 
+#include "buildconfig.h"
+
 namespace sesh {
 namespace language {
 namespace syntax {

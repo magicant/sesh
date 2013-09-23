@@ -18,6 +18,8 @@
 #ifndef INCLUDED_language_source_SourceLocationTestHelper_hh
 #define INCLUDED_language_source_SourceLocationTestHelper_hh
 
+#include "buildconfig.h"
+
 #include <cstddef>
 #include <memory>
 #include "common/Char.hh"

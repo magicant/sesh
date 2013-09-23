@@ -18,6 +18,8 @@
 #ifndef INCLUDED_common_OutputStream_hh
 #define INCLUDED_common_OutputStream_hh
 
+#include "buildconfig.h"
+
 #include <ostream>
 #include "common/Char.hh"
 

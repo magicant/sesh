@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include "buildconfig.h"
+
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -118,7 +120,7 @@ public:
             noexcept :
             WordComponentParser(),
             Parser(e) {
-        CHECK((isDelimiter != nullptr));
+        CHECK(isDelimiter != nullptr);
         CHECK(removeLineContinuations);
     }
 
@@ -160,7 +162,7 @@ TEST_CASE("Word parser empty word") {
     WordParser p(e, fail);
     auto result = p.parse();
 
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->components().empty());
     CHECK(e.current() == e.end());
 }
@@ -172,12 +174,12 @@ TEST_CASE("Word parser raw string") {
     WordParser p(e, is<L('!')>);
     auto result = p.parse();
 
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->components().size() == 1);
     CHECK(e.current() == e.begin() + 2);
     RawStringStub *rss =
             dynamic_cast<RawStringStub *>(result->components()[0].get());
-    CHECK((rss != nullptr));
+    CHECK(rss != nullptr);
 }
 
 TEST_CASE("Word parser re-parse") {
@@ -192,12 +194,12 @@ TEST_CASE("Word parser re-parse") {
 
     e.appendSource(L("X"));
     auto result = p.parse();
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->components().size() == 1);
     CHECK(e.current() == e.begin() + 2);
     RawStringStub *rss =
             dynamic_cast<RawStringStub *>(result->components()[0].get());
-    CHECK((rss != nullptr));
+    CHECK(rss != nullptr);
 }
 
 TEST_CASE("Word parser line continuation") {
@@ -208,12 +210,12 @@ TEST_CASE("Word parser line continuation") {
     auto result = p.parse();
 
     e.checkSource(L("AA!"));
-    REQUIRE((result != nullptr));
+    REQUIRE(result != nullptr);
     CHECK(result->components().size() == 1);
     CHECK(e.current() == e.begin() + 2);
     RawStringStub *rss =
             dynamic_cast<RawStringStub *>(result->components()[0].get());
-    CHECK((rss != nullptr));
+    CHECK(rss != nullptr);
 }
 
 // TODO other word component parser types

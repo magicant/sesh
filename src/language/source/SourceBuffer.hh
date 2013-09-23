@@ -18,6 +18,8 @@
 #ifndef INCLUDED_source_SourceBuffer_hh
 #define INCLUDED_source_SourceBuffer_hh
 
+#include "buildconfig.h"
+
 #include <functional>
 #include <iterator>
 #include <memory>
