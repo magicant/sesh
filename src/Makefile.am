@@ -23,7 +23,13 @@ check_PROGRAMS = \
 	language/syntax/SimpleCommandTest \
 	language/syntax/WordTest
 
-TESTS = $(check_PROGRAMS)
+TESTSCRIPTS = \
+	checkheaderinclude.sh
+
+TESTS = $(check_PROGRAMS) $(TESTSCRIPTS)
+
+TEST_EXTENSIONS = .sh
+SH_LOG_COMPILER = $(SHELL)
 
 catch_include = -I$(top_srcdir)/external/Catch/single_include
 AM_CPPFLAGS = $(catch_include)
@@ -216,3 +222,7 @@ language_syntax_WordTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/Word.cc \
 	language/syntax/WordTest.cc
+
+checkheaderinclude.log: checkheaderinclude.sh $(SOURCES)
+
+EXTRA_DIST = $(TESTSCRIPTS)
