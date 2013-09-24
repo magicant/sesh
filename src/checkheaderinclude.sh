@@ -33,7 +33,7 @@ checkdirectives() {
     [ "${3}" = "#endif // #ifndef ${macroname}" ] || return
 }
 
-find . -name '*.h' -o -name '*.hh' |
+find . -name '*.h' -o -name '*.hh' -o -name '*.tcc' |
 {
     IFS='
 '
