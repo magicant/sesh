@@ -21,16 +21,10 @@
 #include "buildconfig.h"
 
 #include <memory>
+#include "language/syntax/WordComponent.hh"
 
 namespace sesh {
 namespace language {
-
-namespace syntax {
-
-class WordComponent;
-
-} // namespace syntax
-
 namespace parser {
 
 /** Abstract base class for word component parsers. */

@@ -25,16 +25,10 @@
 #include "common/Char.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
+#include "language/syntax/Word.hh"
 
 namespace sesh {
 namespace language {
-
-namespace syntax {
-
-class Word;
-
-} // namespace syntax
-
 namespace parser {
 
 class WordComponentParser;
@@ -101,7 +95,6 @@ public:
 };
 
 } // namespace parser
-
 } // namespace language
 } // namespace sesh
 
