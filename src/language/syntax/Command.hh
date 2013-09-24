@@ -28,8 +28,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 /** A command is either a simple or compound command. */
 class Command : public Printable {
 

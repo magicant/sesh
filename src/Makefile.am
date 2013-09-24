@@ -24,7 +24,8 @@ check_PROGRAMS = \
 	language/syntax/WordTest
 
 TESTSCRIPTS = \
-	checkheaderinclude.sh
+	checkheaderinclude.sh \
+	checkincludebuildconfig.sh
 
 TESTS = $(check_PROGRAMS) $(TESTSCRIPTS)
 
@@ -96,6 +97,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 language_parser_BasicEnvironmentTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironmentTest.cc \
+	language/parser/BasicEnvironmentTestHelper.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
@@ -224,5 +226,6 @@ language_syntax_WordTest_SOURCES = \
 	language/syntax/WordTest.cc
 
 checkheaderinclude.log: checkheaderinclude.sh $(SOURCES)
+checkincludebuildconfig.log: checkincludebuildconfig.sh $(SOURCES)
 
 EXTRA_DIST = $(TESTSCRIPTS)
