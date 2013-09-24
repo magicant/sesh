@@ -22,70 +22,22 @@
 
 #include <utility>
 #include "common/Char.hh"
-#include "common/ErrorLevel.hh"
 #include "common/String.hh"
-#include "language/parser/BasicEnvironment.hh"
+#include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/LineContinuationTreatment.hh"
 #include "language/parser/NeedMoreSource.hh"
 #include "language/parser/Skipper.hh"
-#include "language/source/Source.hh"
-#include "language/source/SourceBuffer.hh"
-#include "language/source/SourceTestHelper.hh"
 
 namespace {
 
 using sesh::common::Char;
-using sesh::common::ErrorLevel;
 using sesh::common::String;
-using sesh::language::parser::BasicEnvironment;
+using sesh::language::parser::BasicEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::LineContinuationTreatment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Skipper;
-using sesh::language::source::Source;
-using sesh::language::source::SourceStub;
-
-using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
-
-class EnvironmentStub : public BasicEnvironment {
-
-    using BasicEnvironment::BasicEnvironment;
-
-    bool mIsEof = false;
-
-    bool isEof() const noexcept override {
-        return mIsEof;
-    }
-
-    bool substituteAlias(const Iterator &, const Iterator &) override {
-        throw "unexpected";
-    }
-
-    void addDiagnosticMessage(const Iterator &, String &&, ErrorLevel)
-            override {
-        throw "unexpected";
-    }
-
-public:
-
-    void setIsEof(bool isEof = true) {
-        mIsEof = isEof;
-    }
-
-    Iterator begin() const {
-        return sourceBuffer().begin();
-    }
-
-    void appendSource(String &&s) {
-        substituteSource([&s](Source::Pointer &&orig) -> Source::Pointer {
-            auto length = (orig == nullptr) ? 0 : orig->length();
-            return Source::Pointer(new SourceStub(
-                    std::move(orig), length, length, std::move(s)));
-        });
-    }
-
-};
 
 template<Char c>
 bool is(Environment &, Char c2) {
@@ -93,14 +45,14 @@ bool is(Environment &, Char c2) {
 }
 
 TEST_CASE("Skipper construction") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     Skipper s(e, is<L('\0')>);
     Skipper s2(s);
     Skipper(std::move(s2));
 }
 
 TEST_CASE("Skipper, 0 append") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     Skipper s(e, is<L('$')>);
 
     REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
@@ -112,7 +64,7 @@ TEST_CASE("Skipper, 0 append") {
 }
 
 TEST_CASE("Skipper, 1 append") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     e.appendSource(L("ABC+XYZ"));
     e.current() += 4;
 
@@ -127,7 +79,7 @@ TEST_CASE("Skipper, 1 append") {
 }
 
 TEST_CASE("Skipper, 0 append, to end") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     Skipper s(e, is<L('x')>);
     e.appendSource(L("apple"));
     e.setIsEof();
@@ -137,7 +89,7 @@ TEST_CASE("Skipper, 0 append, to end") {
 }
 
 TEST_CASE("Skipper, 1 append, to end") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     e.appendSource(L("hot do"));
     e.current() += 4;
 
@@ -154,7 +106,7 @@ TEST_CASE("Skipper, 1 append, to end") {
 }
 
 TEST_CASE("Skipper, 1 append, empty result") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     e.appendSource(L("X"));
     e.current() += 1;
 
@@ -169,7 +121,7 @@ TEST_CASE("Skipper, 1 append, empty result") {
 }
 
 TEST_CASE("Skipper, null stopper") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     Skipper s(e, nullptr);
 
     REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
@@ -190,7 +142,7 @@ TEST_CASE("Skipper, null stopper") {
 }
 
 TEST_CASE("Skipper, no remove line continuations 1") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     Skipper s(e, is<L('@')>, LineContinuationTreatment::LITERAL);
 
     e.appendSource(L("AB\\\nC@"));
@@ -200,7 +152,7 @@ TEST_CASE("Skipper, no remove line continuations 1") {
 }
 
 TEST_CASE("Skipper, no remove line continuations 2") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     Skipper s(e, is<L('\\')>, LineContinuationTreatment::LITERAL);
 
     e.appendSource(L("AB\\\nC@"));
@@ -210,7 +162,7 @@ TEST_CASE("Skipper, no remove line continuations 2") {
 }
 
 TEST_CASE("Skipper, remove line continuations 1") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     Skipper s(e, is<L('@')>, LineContinuationTreatment::REMOVE);
 
     e.appendSource(L("ABC\\\\\n\nDEF\\"));
@@ -223,7 +175,7 @@ TEST_CASE("Skipper, remove line continuations 1") {
 }
 
 TEST_CASE("Skipper, remove line continuations 2") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     Skipper s(e, is<L('\\')>, LineContinuationTreatment::REMOVE);
 
     e.appendSource(L("ABC\\\nDEF\\"));
@@ -236,7 +188,7 @@ TEST_CASE("Skipper, remove line continuations 2") {
 }
 
 TEST_CASE("Skipper, reuse") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     Skipper s(e, is<L('|')>);
 
     e.appendSource(L("-|--||----|"));

@@ -23,18 +23,14 @@
 #include <functional>
 #include <utility>
 #include "common/Char.hh"
-#include "common/ErrorLevel.hh"
 #include "common/String.hh"
-#include "language/parser/BasicEnvironment.hh"
+#include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/WordComponentParser.hh"
 #include "language/parser/WordParserImpl.tcc"
-#include "language/source/Source.hh"
-#include "language/source/SourceBuffer.hh"
-#include "language/source/SourceTestHelper.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Word.hh"
 #include "language/syntax/WordComponent.hh"
@@ -42,66 +38,16 @@
 namespace {
 
 using sesh::common::Char;
-using sesh::common::ErrorLevel;
 using sesh::common::String;
-using sesh::language::parser::BasicEnvironment;
+using sesh::language::parser::BasicEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Parser;
 using sesh::language::parser::Predicate;
 using sesh::language::parser::WordComponentParser;
 using sesh::language::parser::WordParserImpl;
-using sesh::language::source::Source;
-using sesh::language::source::SourceStub;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::WordComponent;
-
-using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
-
-class EnvironmentStub : public BasicEnvironment {
-
-    using BasicEnvironment::BasicEnvironment;
-
-    bool mIsEof = false;
-
-    bool isEof() const noexcept override {
-        return mIsEof;
-    }
-
-    bool substituteAlias(const Iterator &, const Iterator &) override {
-        throw "unexpected";
-    }
-
-    void addDiagnosticMessage(const Iterator &, String &&, ErrorLevel)
-            override {
-        throw "unexpected";
-    }
-
-public:
-
-    void setIsEof(bool isEof = true) {
-        mIsEof = isEof;
-    }
-
-    Iterator begin() const {
-        return sourceBuffer().begin();
-    }
-
-    void appendSource(String &&s) {
-        substituteSource([&s](Source::Pointer &&orig) -> Source::Pointer {
-            auto length = (orig == nullptr) ? 0 : orig->length();
-            return Source::Pointer(new SourceStub(
-                    std::move(orig), length, length, std::move(s)));
-        });
-    }
-
-    void checkSource(const String &string) {
-        for (String::size_type i = 0; i < string.length(); ++i)
-            CHECK(sourceBuffer().at(i) == string.at(i));
-        CHECK_THROWS_AS(sourceBuffer().at(string.length()), std::out_of_range);
-    }
-
-};
 
 class RawStringStub : public WordComponent {
 
@@ -150,13 +96,13 @@ bool fail(Environment &, Char) {
 }
 
 TEST_CASE("Word parser construction") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     WordParser p(e, [](Environment &, Char) { return false; });
     WordParser(std::move(p));
 }
 
 TEST_CASE("Word parser empty word") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     e.setIsEof();
 
     WordParser p(e, fail);
@@ -168,7 +114,7 @@ TEST_CASE("Word parser empty word") {
 }
 
 TEST_CASE("Word parser raw string") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     e.appendSource(L("AA!"));
 
     WordParser p(e, is<L('!')>);
@@ -183,7 +129,7 @@ TEST_CASE("Word parser raw string") {
 }
 
 TEST_CASE("Word parser re-parse") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     WordParser p(e, is<L('X')>);
 
     e.appendSource(L("!"));
@@ -203,7 +149,7 @@ TEST_CASE("Word parser re-parse") {
 }
 
 TEST_CASE("Word parser line continuation") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     e.appendSource(L("\\\nAA\\\n!"));
 
     WordParser p(e, is<L('!')>);

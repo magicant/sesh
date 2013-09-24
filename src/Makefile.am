@@ -97,6 +97,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 language_parser_BasicEnvironmentTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironmentTest.cc \
+	language/parser/BasicEnvironmentTestHelper.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
