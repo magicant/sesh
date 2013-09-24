@@ -24,7 +24,8 @@ check_PROGRAMS = \
 	language/syntax/WordTest
 
 TESTSCRIPTS = \
-	checkheaderinclude.sh
+	checkheaderinclude.sh \
+	checkincludebuildconfig.sh
 
 TESTS = $(check_PROGRAMS) $(TESTSCRIPTS)
 
@@ -224,5 +225,6 @@ language_syntax_WordTest_SOURCES = \
 	language/syntax/WordTest.cc
 
 checkheaderinclude.log: checkheaderinclude.sh $(SOURCES)
+checkincludebuildconfig.log: checkincludebuildconfig.sh $(SOURCES)
 
 EXTRA_DIST = $(TESTSCRIPTS)
