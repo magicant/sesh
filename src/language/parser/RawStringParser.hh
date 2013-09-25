@@ -27,16 +27,10 @@
 #include "language/parser/Predicate.hh"
 #include "language/parser/Skipper.hh"
 #include "language/parser/WordComponentParser.hh"
+#include "language/syntax/RawString.hh"
 
 namespace sesh {
 namespace language {
-
-namespace syntax {
-
-class RawString;
-
-} // namespace syntax
-
 namespace parser {
 
 /** Parser for raw string. */

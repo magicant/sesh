@@ -22,72 +22,22 @@
 
 #include <utility>
 #include "common/Char.hh"
-#include "common/ErrorLevel.hh"
 #include "common/String.hh"
-#include "language/parser/BasicEnvironment.hh"
+#include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/LineContinuationTreatment.hh"
 #include "language/parser/NeedMoreSource.hh"
 #include "language/parser/RawStringParser.hh"
-#include "language/source/Source.hh"
-#include "language/source/SourceBuffer.hh"
-#include "language/source/SourceTestHelper.hh"
-#include "language/syntax/RawString.hh"
 
 namespace {
 
 using sesh::common::Char;
-using sesh::common::ErrorLevel;
 using sesh::common::String;
-using sesh::language::parser::BasicEnvironment;
+using sesh::language::parser::BasicEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::LineContinuationTreatment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::RawStringParser;
-using sesh::language::source::Source;
-using sesh::language::source::SourceStub;
-using sesh::language::syntax::RawString;
-
-using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
-
-class EnvironmentStub : public BasicEnvironment {
-
-    using BasicEnvironment::BasicEnvironment;
-
-    bool mIsEof = false;
-
-    bool isEof() const noexcept override {
-        return mIsEof;
-    }
-
-    bool substituteAlias(const Iterator &, const Iterator &) override {
-        throw "unexpected";
-    }
-
-    void addDiagnosticMessage(const Iterator &, String &&, ErrorLevel)
-            override {
-        throw "unexpected";
-    }
-
-public:
-
-    void setIsEof(bool isEof = true) {
-        mIsEof = isEof;
-    }
-
-    Iterator begin() const {
-        return sourceBuffer().begin();
-    }
-
-    void appendSource(String &&s) {
-        substituteSource([&s](Source::Pointer &&orig) -> Source::Pointer {
-            auto length = (orig == nullptr) ? 0 : orig->length();
-            return Source::Pointer(new SourceStub(
-                    std::move(orig), length, length, std::move(s)));
-        });
-    }
-
-};
 
 template<Char c>
 bool is(Environment &, Char c2) {
@@ -95,14 +45,14 @@ bool is(Environment &, Char c2) {
 }
 
 TEST_CASE("Raw string parser construction") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     RawStringParser p(e, is<L('\0')>);
     RawStringParser p2(p);
     RawStringParser(std::move(p2));
 }
 
 TEST_CASE("Raw string parser, 0 append") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     RawStringParser p(e, is<L('$')>);
 
     REQUIRE_THROWS_AS(p.parseRawString(), NeedMoreSource);
@@ -116,7 +66,7 @@ TEST_CASE("Raw string parser, 0 append") {
 }
 
 TEST_CASE("Raw string parser, 1 append") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     e.appendSource(L("ABC+XYZ"));
     e.current() += 4;
 
@@ -133,7 +83,7 @@ TEST_CASE("Raw string parser, 1 append") {
 }
 
 TEST_CASE("Raw string parser, 0 append, to end") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     RawStringParser p(e, is<L('x')>);
     e.appendSource(L("apple"));
     e.setIsEof();
@@ -145,7 +95,7 @@ TEST_CASE("Raw string parser, 0 append, to end") {
 }
 
 TEST_CASE("Raw string parser, 1 append, to end") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     e.appendSource(L("hot do"));
     e.current() += 4;
 
@@ -164,7 +114,7 @@ TEST_CASE("Raw string parser, 1 append, to end") {
 }
 
 TEST_CASE("Raw string parser, 1 append, empty result") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     e.appendSource(L("X"));
     e.current() += 1;
 
@@ -181,7 +131,7 @@ TEST_CASE("Raw string parser, 1 append, empty result") {
 }
 
 TEST_CASE("Raw string parser, null delimiter") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     RawStringParser p(e, nullptr);
 
     REQUIRE_THROWS_AS(p.parseRawString(), NeedMoreSource);
@@ -204,7 +154,7 @@ TEST_CASE("Raw string parser, null delimiter") {
 }
 
 TEST_CASE("Raw string parser, no remove line continuations 1") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     RawStringParser p(e, is<L('@')>, LineContinuationTreatment::LITERAL);
 
     e.appendSource(L("AB\\\nC@"));
@@ -216,7 +166,7 @@ TEST_CASE("Raw string parser, no remove line continuations 1") {
 }
 
 TEST_CASE("Raw string parser, no remove line continuations 2") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     RawStringParser p(e, is<L('\\')>, LineContinuationTreatment::LITERAL);
 
     e.appendSource(L("AB\\\nC@"));
@@ -228,7 +178,7 @@ TEST_CASE("Raw string parser, no remove line continuations 2") {
 }
 
 TEST_CASE("Raw string parser, remove line continuations 1") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     RawStringParser p(e, is<L('@')>, LineContinuationTreatment::REMOVE);
 
     e.appendSource(L("ABC\\\\\n\nDEF\\"));
@@ -243,7 +193,7 @@ TEST_CASE("Raw string parser, remove line continuations 1") {
 }
 
 TEST_CASE("Raw string parser remove line continuations 2") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
     RawStringParser p(e, is<L('\\')>, LineContinuationTreatment::REMOVE);
 
     e.appendSource(L("ABC\\\nDEF\\"));

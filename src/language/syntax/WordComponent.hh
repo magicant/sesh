@@ -26,8 +26,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 class WordComponent : public Printable {
 
 public:

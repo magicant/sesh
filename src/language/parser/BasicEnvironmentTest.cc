@@ -22,73 +22,16 @@
 
 #include <stdexcept>
 #include <utility>
-#include "common/ErrorLevel.hh"
-#include "common/String.hh"
-#include "language/parser/BasicEnvironment.hh"
+#include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/NeedMoreSource.hh"
-#include "language/source/Source.hh"
-#include "language/source/SourceBuffer.hh"
-#include "language/source/SourceTestHelper.hh"
 
 namespace {
 
-using sesh::common::ErrorLevel;
-using sesh::common::String;
-using sesh::language::parser::BasicEnvironment;
+using sesh::language::parser::BasicEnvironmentStub;
 using sesh::language::parser::NeedMoreSource;
-using sesh::language::source::Source;
-using sesh::language::source::SourceBuffer;
-using sesh::language::source::SourceStub;
-using sesh::language::source::checkSourceString;
-
-using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
-
-class EnvironmentStub : public BasicEnvironment {
-
-    bool mIsEof = false;
-
-    using BasicEnvironment::BasicEnvironment;
-
-    bool isEof() const noexcept override {
-        return mIsEof;
-    }
-
-    bool substituteAlias(const Iterator &, const Iterator &) override {
-        throw "unexpected";
-    }
-
-    void addDiagnosticMessage(const Iterator &, String &&, ErrorLevel)
-            override {
-        throw "unexpected";
-    }
-
-public:
-
-    void setIsEof(bool isEof = true) {
-        mIsEof = isEof;
-    }
-
-    Iterator begin() const {
-        return sourceBuffer().begin();
-    }
-
-    void setSource(String &&s) {
-        substituteSource([&s](Source::Pointer &&) -> Source::Pointer {
-            return Source::Pointer(
-                    new SourceStub(nullptr, 0, 0, std::move(s)));
-        });
-    }
-
-    void checkSource(const String &string) {
-        for (String::size_type i = 0; i < string.length(); ++i)
-            CHECK(sourceBuffer().at(i) == string.at(i));
-        CHECK_THROWS_AS(sourceBuffer().at(string.length()), std::out_of_range);
-    }
-
-};
 
 TEST_CASE("Environment remove line continuation 1") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
 
     INFO("1 empty source");
     e.checkSource(L(""));
@@ -99,7 +42,7 @@ TEST_CASE("Environment remove line continuation 1") {
 }
 
 TEST_CASE("Environment remove line continuation 2") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
 
     e.setSource(L("\\"));
 
@@ -113,7 +56,7 @@ TEST_CASE("Environment remove line continuation 2") {
 }
 
 TEST_CASE("Environment remove line continuation 3") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
 
     e.setSource(L("\n"));
 
@@ -127,7 +70,7 @@ TEST_CASE("Environment remove line continuation 3") {
 }
 
 TEST_CASE("Environment remove line continuation 4") {
-    EnvironmentStub e;
+    BasicEnvironmentStub e;
 
     e.setSource(L("Test\n\\\\\n\n"));
 

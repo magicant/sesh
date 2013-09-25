@@ -16,35 +16,42 @@
 # Sesh.  If not, see <http://www.gnu.org/licenses/>.
 
 # This script scans the directory containing this script (including its
-# subdirectories) and checks if include guards in header files are correctly
-# written.
+# subdirectories) and checks if all source files #include the common header
+# file first.
 
 set -eu
 
 cd -- "$(dirname -- "${0}")"
 
-checkdirectives() {
-    set -- $(grep '^[[:space:]]*#.*INCLUDED_' "${headerfile}")
-    macrofilename="$(printf '%s\n' "${headerfile}" | sed 's/[^[:alnum:]]/_/g')"
-    macroname="INCLUDED_${macrofilename}"
-    [ "${#}" -eq 3 ] || return
-    [ "${1}" = "#ifndef ${macroname}" ] || return
-    [ "${2}" = "#define ${macroname}" ] || return
-    [ "${3}" = "#endif // #ifndef ${macroname}" ] || return
+buildconfig="buildconfig.h"
+
+checkincludebuildconfig() {
+    if [ "${sourcefile}" = "${buildconfig}" ]
+    then
+        return
+    fi
+
+    case "$(grep '^[[:space:]]*#[[:space:]]*include' "${sourcefile}" |
+            head -n 1)" in
+    ("#include \"${buildconfig}\"")
+        return 0;;
+    (*)
+        return 1;;
+    esac
 }
 
-find . -name '*.h' -o -name '*.hh' -o -name '*.tcc' |
+find . -name '*.h' -o -name '*.hh' -o -name '*.tcc' -o \
+        -name '*.c' -o -name '*.cc' |
 {
-    IFS='
-'
     errors=0
-    while read -r headerfile
+    while read -r sourcefile
     do
-        headerfile="${headerfile#./}"
+        sourcefile="${sourcefile#./}"
 
-        if ! checkdirectives
+        if ! checkincludebuildconfig
         then
-            printf '%s: include guard ill-formed\n' "${headerfile}" >&2
+            printf '%s: must include %s first\n' \
+                    "${sourcefile}" "${buildconfig}" >&2
             errors=$((errors+1))
         fi
     done
