@@ -36,9 +36,9 @@ class BasicEnvironment : public Environment {
 
 private:
 
-    source::SourceBuffer::Pointer mBuffer = source::SourceBuffer::create();
-    source::SourceBuffer::ConstIterator mCurrent = mBuffer->begin();
-    source::SourceBuffer::ConstIterator mEnd = mBuffer->end();
+    source::SourceBuffer::Pointer mBuffer;
+    source::SourceBuffer::ConstIterator mCurrent;
+    source::SourceBuffer::ConstIterator mEnd;
 
 public:
 
