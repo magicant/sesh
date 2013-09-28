@@ -33,29 +33,16 @@ class Command : public Printable {
 
 private:
 
-    source::SourceLocation mSourceLocation;
-
     // TODO Redirection
 
 public:
 
-    explicit Command(const source::SourceLocation &sl) :
-            mSourceLocation(sl) { }
-    explicit Command(source::SourceLocation &&sl) :
-            mSourceLocation(std::move(sl)) { }
-
+    Command() = default;
     Command(const Command &) = default;
     Command(Command &&) = default;
     Command &operator=(const Command &) = default;
     Command &operator=(Command &&) = default;
     ~Command() override = default;
-
-    source::SourceLocation &sourceLocation() noexcept {
-        return mSourceLocation;
-    }
-    const source::SourceLocation &sourceLocation() const noexcept {
-        return mSourceLocation;
-    }
 
 }; // class Command
 

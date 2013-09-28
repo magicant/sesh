@@ -23,7 +23,6 @@
 #include <memory>
 #include "common/Char.hh"
 #include "common/String.hh"
-#include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
@@ -33,7 +32,6 @@ namespace {
 
 using sesh::common::Char;
 using sesh::common::String;
-using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
@@ -43,8 +41,7 @@ class CommandStub : public Command {
 private:
     String mString;
 public:
-    explicit CommandStub(const Char *s) :
-            Command(dummySourceLocation()), mString(s) { }
+    explicit CommandStub(const Char *s) : Command(), mString(s) { }
     void print(Printer &p) const override {
         p << mString;
         p.delayedCharacters() << L(' ');

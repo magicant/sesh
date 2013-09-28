@@ -24,7 +24,6 @@
 #include <stdexcept>
 #include "common/Char.hh"
 #include "common/String.hh"
-#include "language/source/SourceLocationTestHelper.hh"
 #include "language/syntax/AndOrList.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/ConditionalPipeline.hh"
@@ -34,7 +33,6 @@
 namespace {
 
 using sesh::common::String;
-using sesh::language::source::dummySourceLocation;
 using sesh::language::syntax::AndOrList;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
@@ -42,7 +40,7 @@ using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
 
 struct CommandStub : public Command {
-    CommandStub() : Command(dummySourceLocation()) { }
+    using Command::Command;
     void print(Printer &p) const override {
         p << L("command");
         p.delayedCharacters() << L(' ');
