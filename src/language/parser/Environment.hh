@@ -20,6 +20,7 @@
 
 #include "buildconfig.h"
 
+#include <locale>
 #include "common/ErrorLevel.hh"
 #include "common/String.hh"
 #include "language/source/SourceBuffer.hh"
@@ -86,6 +87,9 @@ public:
             const source::SourceBuffer::ConstIterator &position,
             common::String &&message,
             common::ErrorLevel) = 0;
+
+    /** Returns the locale that may affect the parsing process. */
+    virtual const std::locale &locale() const = 0;
 
 };
 

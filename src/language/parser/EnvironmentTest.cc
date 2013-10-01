@@ -20,6 +20,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#include <locale>
 #include <utility>
 #include "common/ErrorLevel.hh"
 #include "common/String.hh"
@@ -72,6 +73,10 @@ private:
 
     void addDiagnosticMessage(const Iterator &, String &&, ErrorLevel)
             override {
+        throw "unexpected";
+    }
+
+    const std::locale &locale() const override {
         throw "unexpected";
     }
 
@@ -138,6 +143,10 @@ private:
 
     void addDiagnosticMessage(const Iterator &, String &&, ErrorLevel)
             override {
+        throw "unexpected";
+    }
+
+    const std::locale &locale() const override {
         throw "unexpected";
     }
 

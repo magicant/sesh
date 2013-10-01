@@ -20,6 +20,7 @@
 
 #include "buildconfig.h"
 
+#include <locale>
 #include "common/ErrorLevel.hh"
 #include "common/String.hh"
 #include "language/parser/BasicEnvironment.hh"
@@ -55,6 +56,10 @@ private:
     void addDiagnosticMessage(
             const Iterator &, common::String &&, common::ErrorLevel) override {
         throw "unexpected addDiagnosticMessage";
+    }
+
+    const std::locale &locale() const override {
+        throw "unexpected locale";
     }
 
 public:
