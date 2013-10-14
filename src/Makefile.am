@@ -1,6 +1,7 @@
 bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
+	common/VariantTest \
 	language/parser/BasicEnvironmentTest \
 	language/parser/EnvironmentTest \
 	language/parser/RawStringParserTest \
@@ -41,6 +42,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/OutputStream.hh \
 	common/String.hh \
 	common/StringStream.hh \
+	common/Variant.hh \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironment.hh \
 	language/parser/Environment.cc \
@@ -94,6 +96,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/syntax/WordComponent.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
+common_VariantTest_SOURCES = \
+	common/VariantTest.cc
 language_parser_BasicEnvironmentTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironmentTest.cc \
