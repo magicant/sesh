@@ -22,6 +22,7 @@
 #include "WordParserImpl.hh"
 
 #include <functional>
+#include <stdexcept>
 #include <utility>
 #include "common/Char.hh"
 #include "common/String.hh"
