@@ -1,0 +1,10 @@
+language: cpp
+compiler:
+ - gcc
+ - clang
+script:
+ - autoreconf -i
+ - sh configure
+ - make distcheck
+after_failure:
+ - cat src/test-suite.log
