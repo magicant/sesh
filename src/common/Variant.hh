@@ -81,6 +81,10 @@ public:
 template<Index headIndex, typename Head, typename... Tail>
 union Union<headIndex, Head, Tail...> {
 
+    static_assert(
+            std::is_same<Head, typename std::decay<Head>::type>::value,
+            "Contained type must be decayed");
+
 private:
 
     using TailUnion = Union<headIndex + 1u, Tail...>;
