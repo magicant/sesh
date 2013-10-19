@@ -20,6 +20,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#include <algorithm>
 #include <exception>
 #include <string>
 #include <type_traits>
@@ -124,6 +125,11 @@ struct NonMoveAssignable {
 struct NonDestructible {
     ~NonDestructible() noexcept(false) { }
 };
+
+template<typename Container, typename Value>
+bool contains(const Container &c, const Value &v) {
+    return std::find(c.cbegin(), c.cend(), v) != c.cend();
+}
 
 static_assert(
         sizeof(Variant<>) > 0,
@@ -964,6 +970,21 @@ TEST_CASE("Double variant of") {
     CHECK(v1.value<int *>() == intArray);
     REQUIRE(v2.index() == v2.index<const char *>());
     CHECK(v2.value<const char *>()[0] == 'c');
+
+    std::vector<Action> actions;
+    {
+        auto v3 = Variant<int, Stub>::of(Stub(actions));
+        CHECK(v3.index() == v3.index<Stub>());
+    }
+    CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
+    actions.clear();
+
+    {
+        Stub s(actions);
+        auto v4 = Variant<int, Stub>::of(s);
+        CHECK(v4.index() == v4.index<Stub>());
+    }
+    CHECK(contains(actions, Action::COPY_CONSTRUCTION));
 }
 
 TEST_CASE("Double variant swapping with same type") {

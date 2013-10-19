@@ -1008,7 +1008,7 @@ public:
     static Variant of(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value &&
                     std::is_nothrow_destructible<V>::value) {
-        return Variant(TypeTag<V>(), std::forward<V>(v));
+        return Variant(TypeTag<V>(), std::forward<U>(v));
     }
 
 };
