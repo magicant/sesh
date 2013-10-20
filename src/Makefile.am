@@ -52,6 +52,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/LineContinuationTreatment.hh \
 	language/parser/NeedMoreSource.hh \
 	language/parser/Parser.hh \
+	language/parser/Predicate.cc \
 	language/parser/Predicate.hh \
 	language/parser/RawStringParser.cc \
 	language/parser/RawStringParser.hh \
