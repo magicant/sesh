@@ -586,6 +586,20 @@ TEST_CASE("Double variant emplacement non-movable") {
     CHECK(actions.at(1) == Action::DESTRUCTION);
 }
 
+TEST_CASE("Double variant emplacement with fallback") {
+    Variant<int, MoveThrows> v(TypeTag<int>(), 1);
+    CHECK_NOTHROW((v.emplaceWithFallback<MoveThrows, int>()));
+    CHECK(v.index() == v.index<MoveThrows>());
+    CHECK_NOTHROW((v.emplaceWithFallback<int, int>(2)));
+    REQUIRE(v.index() == v.index<int>());
+    CHECK(v.value<int>() == 2);
+    CHECK_THROWS_AS(
+            (v.emplaceWithFallback<MoveThrows, int>(MoveThrows())),
+            Exception);
+    REQUIRE(v.index() == v.index<int>());
+    CHECK(v.value<int>() == 0);
+}
+
 TEST_CASE("Double variant reset with same type") {
     std::vector<Action> actions1, actions2;
     {

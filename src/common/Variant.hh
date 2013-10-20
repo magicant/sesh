@@ -652,6 +652,21 @@ public:
         std::move(v).apply(constructor(value()));
     }
 
+private:
+
+    /**
+     * Re-constructs this variant by forwarding the argument to the applicable
+     * constructor of <code>U</code>. This function assumes the constructor
+     * never throws. If the constructor did throw something at runtime,
+     * std::terminate is called.
+     */
+    template<typename U, typename... Arg>
+    void reconstructOrTerminate(Arg &&... arg) noexcept {
+        new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
+    }
+
+public:
+
     /**
      * Destructs the currently contained value and creates a new contained
      * value by calling the constructor of type <code>U</code> with the given
@@ -708,6 +723,29 @@ public:
          * called destructor of the temporary copy is very likely to throw the
          * same kind of exception, resulting in a double exception.
          */
+    }
+
+    /**
+     * Destructs the currently contained value and creates a new contained
+     * value by calling the constructor of type <code>U</code> with the given
+     * arguments.
+     *
+     * If the destructor or constructor threw something, the default
+     * constructor of <code>Fallback</code> is called as a fallback and the
+     * exception is re-thrown. If the <code>Fallback</code> default constructor
+     * threw again, std::terminate is called.
+     */
+    template<typename U, typename Fallback, typename... Arg>
+    void emplaceWithFallback(Arg &&... arg)
+            noexcept(IS_NOTHROW_DESTRUCTIBLE &&
+                    std::is_nothrow_constructible<U, Arg &&...>::value) {
+        try {
+            this->~VariantBase();
+            new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
+        } catch (...) {
+            reconstructOrTerminate<Fallback>();
+            throw;
+        }
     }
 
     /**
