@@ -29,7 +29,7 @@ namespace parser {
 class Environment;
 
 template<typename T>
-using Predicate = std::function<bool(Environment &, T)>;
+using Predicate = std::function<bool(const Environment &, T)>;
 
 } // namespace parser
 } // namespace language

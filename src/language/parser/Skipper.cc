@@ -39,7 +39,7 @@ Skipper::Skipper(
         mIsStopper(std::move(isStopper)),
         mLineContinuationTreatment(lct) {
     if (mIsStopper == nullptr)
-        mIsStopper = [](Environment &, Char) { return false; };
+        mIsStopper = [](const Environment &, Char) { return false; };
 }
 
 void Skipper::removeLineContinuation() {

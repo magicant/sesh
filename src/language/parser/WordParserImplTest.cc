@@ -86,18 +86,18 @@ public:
 using WordParser = WordParserImpl<TestTypes>;
 
 template<Char c>
-bool is(Environment &, Char c2) {
+bool is(const Environment &, Char c2) {
     return c == c2;
 }
 
-bool fail(Environment &, Char) {
+bool fail(const Environment &, Char) {
     FAIL("unexpected predicate test");
     return true;
 }
 
 TEST_CASE("Word parser construction") {
     BasicEnvironmentStub e;
-    WordParser p(e, [](Environment &, Char) { return false; });
+    WordParser p(e, [](const Environment &, Char) { return false; });
     WordParser(std::move(p));
 }
 

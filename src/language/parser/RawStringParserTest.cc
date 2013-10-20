@@ -40,7 +40,7 @@ using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::RawStringParser;
 
 template<Char c>
-bool is(Environment &, Char c2) {
+bool is(const Environment &, Char c2) {
     return c == c2;
 }
 
