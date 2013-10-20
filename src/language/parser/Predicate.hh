@@ -37,6 +37,12 @@ using Predicate = std::function<bool(const Environment &, T)>;
  */
 bool isTokenDelimiter(const Environment &, common::Char);
 
+/**
+ * Determines if the argument character can be included in a variable name.
+ * This function may return true for a non-ASCII character.
+ */
+bool isVariableNameChar(const Environment &, common::Char);
+
 } // namespace parser
 } // namespace language
 } // namespace sesh

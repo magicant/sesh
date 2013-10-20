@@ -40,6 +40,10 @@ bool isTokenDelimiter(const Environment &e, Char c) {
             ;
 }
 
+bool isVariableNameChar(const Environment &e, Char c) {
+    return c == L('_') || std::isalnum(c, e.locale());
+}
+
 } // namespace parser
 } // namespace language
 } // namespace sesh
