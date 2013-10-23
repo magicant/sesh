@@ -1,6 +1,7 @@
 bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
+	common/MaybeTest \
 	common/VariantTest \
 	language/parser/BasicEnvironmentTest \
 	language/parser/EnvironmentTest \
@@ -39,6 +40,7 @@ AM_CPPFLAGS = $(catch_include)
 sesh_SOURCES = buildconfig.h main.cc \
 	common/Char.hh \
 	common/ErrorLevel.hh \
+	common/Maybe.hh \
 	common/OutputStream.hh \
 	common/String.hh \
 	common/StringStream.hh \
@@ -96,6 +98,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/syntax/WordComponent.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
+common_MaybeTest_SOURCES = \
+	common/MaybeTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
 language_parser_BasicEnvironmentTest_SOURCES = \
