@@ -97,6 +97,16 @@ public:
 
 };
 
+class CLocaleEnvironmentStub : public BasicEnvironmentStub {
+
+public:
+
+    const std::locale &locale() const override {
+        return std::locale::classic();
+    }
+
+};
+
 } // namespace parser
 } // namespace language
 } // namespace sesh
