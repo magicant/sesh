@@ -81,6 +81,10 @@ public:
 template<Index headIndex, typename Head, typename... Tail>
 union Union<headIndex, Head, Tail...> {
 
+    static_assert(
+            std::is_same<Head, typename std::decay<Head>::type>::value,
+            "Contained type must be decayed");
+
 private:
 
     using TailUnion = Union<headIndex + 1u, Tail...>;
@@ -648,22 +652,35 @@ public:
         std::move(v).apply(constructor(value()));
     }
 
+private:
+
+    /**
+     * Re-constructs this variant by forwarding the argument to the applicable
+     * constructor of <code>U</code>. This function assumes the constructor
+     * never throws. If the constructor did throw something at runtime,
+     * std::terminate is called.
+     */
+    template<typename U, typename... Arg>
+    void reconstructOrTerminate(Arg &&... arg) noexcept {
+        new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
+    }
+
+public:
+
     /**
      * Destructs the currently contained value and creates a new contained
      * value by calling the constructor of type <code>U</code> with the given
      * arguments.
      *
-     * Requirements: All the contained types must be no-throw destructible and
-     * the constructor being used must not throw.
+     * To ensure that a valid object is contained after return from this
+     * function, nothing must be thrown by the destructor that destructs the
+     * currently contained value or the constructor of the new value. If
+     * something is thrown at runtime, std::terminate is called.
      *
-     * If the constructor may throw, a less efficient overload may be
-     * applicable.
+     * @see #emplaceWithFallback
      */
     template<typename U, typename... Arg>
-    typename std::enable_if<
-            std::is_nothrow_constructible<U, Arg...>::value &&
-            IS_NOTHROW_DESTRUCTIBLE>::type
-    emplace(Arg &&... arg) noexcept {
+    void emplace(Arg &&... arg) noexcept {
         this->~VariantBase();
         new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
     }
@@ -673,59 +690,41 @@ public:
      * value by calling the constructor of type <code>U</code> with the given
      * arguments.
      *
-     * This overload is used if the constructor may throw. Before the value of
-     * this variant is destructed, a temporary copy of it is created using the
-     * move constructor so that, if the constructor for the new value throws,
-     * we can restore the variant to the original value.
-     *
-     * Propagates any exception thrown by the constructor.
-     *
-     * Requirements: All the contained types must have a no-throw
-     * move-constructor and no-throw destructor.
+     * If the destructor or constructor threw something, the default
+     * constructor of <code>Fallback</code> is called as a fallback and the
+     * exception is re-thrown. If the <code>Fallback</code> default constructor
+     * threw again, std::terminate is called.
      */
-    template<typename U, typename... Arg>
-    typename std::enable_if<
-            !std::is_nothrow_constructible<U, Arg...>::value &&
-            IS_NOTHROW_MOVE_CONSTRUCTIBLE &&
-            IS_NOTHROW_DESTRUCTIBLE>::type
-    emplace(Arg &&... arg) /* noexcept(false) */ {
-        VariantBase save(std::move(*this));
-        this->~VariantBase();
+    template<typename U, typename Fallback, typename... Arg>
+    void emplaceWithFallback(Arg &&... arg)
+            noexcept(IS_NOTHROW_DESTRUCTIBLE &&
+                    std::is_nothrow_constructible<U, Arg &&...>::value) {
         try {
+            this->~VariantBase();
             new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
         } catch (...) {
-            new (this) VariantBase(std::move(save));
+            reconstructOrTerminate<Fallback>();
             throw;
         }
-        /*
-         * We don't place the explicit destructor call inside the try statement
-         * in an attempt to remove the "no-throw destructible" requirement.
-         * If the destructor for the original value throws, the implicitly
-         * called destructor of the temporary copy is very likely to throw the
-         * same kind of exception, resulting in a double exception.
-         */
     }
 
     /**
      * Sets the value of this variant to the argument by assignment or
-     * emplacement.
+     * emplacement. The assignment operator is used if the currently contained
+     * type is <code>V</code>. Otherwise, the argument is emplaced.
      *
-     * Propagates any exception thrown by the assignment operator or copy
-     * constructor.
+     * Propagates any exception thrown by the assignment operator. If
+     * emplacement fails due to an exception, std::terminate is called.
      *
-     * Requirements: All the contained types must be no-throw destructible. The
-     * argument type <code>U</code> must be copy/move-constructible and
-     * assignable. In addition, if the constructor used for emplacement may
-     * throw, all the contained types must be no-throw move-constructible.
+     * Requirements: The argument type <code>U</code> must be constructible and
+     * assignable from the argument.
      *
      * @tparam U the (usually inferred) type of the new contained value.
      * @tparam V the actual type of the new contained value.
      * @param v a reference to the original value
      */
     template<typename U, typename V = typename std::decay<U>::type>
-    void reset(U &&v)
-            noexcept(std::is_nothrow_assignable<V, U &&>::value &&
-                    std::is_nothrow_constructible<V, U &&>::value) {
+    void reset(U &&v) noexcept(std::is_nothrow_assignable<V, U &&>::value) {
         if (index() == index<V>())
             value<V>() = std::forward<U>(v);
         else
@@ -1008,7 +1007,7 @@ public:
     static Variant of(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value &&
                     std::is_nothrow_destructible<V>::value) {
-        return Variant(TypeTag<V>(), std::forward<V>(v));
+        return Variant(TypeTag<V>(), std::forward<U>(v));
     }
 
 };

@@ -20,6 +20,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#include <algorithm>
 #include <exception>
 #include <string>
 #include <type_traits>
@@ -124,6 +125,11 @@ struct NonMoveAssignable {
 struct NonDestructible {
     ~NonDestructible() noexcept(false) { }
 };
+
+template<typename Container, typename Value>
+bool contains(const Container &c, const Value &v) {
+    return std::find(c.cbegin(), c.cend(), v) != c.cend();
+}
 
 static_assert(
         sizeof(Variant<>) > 0,
@@ -522,62 +528,18 @@ TEST_CASE("Double variant emplacement") {
     CHECK(actions.at(1) == Action::DESTRUCTION);
 }
 
-TEST_CASE("Double variant emplacement with throwing constructor") {
-    std::vector<Action> actions;
-    {
-        Variant<DefaultMayThrow, Stub> v(TypeTag<Stub>(), actions);
-        CHECK(actions.size() == 1);
-
-        CHECK_NOTHROW(v.emplace<DefaultMayThrow>());
-        CHECK(v.index() == v.index<DefaultMayThrow>());
-        CHECK(actions.size() == 4);
-    }
-    CHECK(actions.size() == 4);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of temporary copy
-    CHECK(actions.at(2) == Action::DESTRUCTION); // of original
-    CHECK(actions.at(3) == Action::DESTRUCTION); // of temporary copy
-}
-
-TEST_CASE("Double variant emplacement with exception") {
-    struct E { };
-    struct NonConstructible {
-        NonConstructible() { throw E(); }
-        NonConstructible(const NonConstructible &) = delete;
-        NonConstructible(NonConstructible &&) = default;
-    };
-
-    std::vector<Action> actions;
-    {
-        Variant<Stub, NonConstructible> v(TypeTag<Stub>(), actions);
-        CHECK(actions.size() == 1);
-
-        CHECK_THROWS_AS(v.emplace<NonConstructible>(), E);
-        CHECK(v.index() == v.index<Stub>());
-        CHECK(actions.size() == 5);
-    }
-    CHECK(actions.size() == 6);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of temporary copy
-    CHECK(actions.at(2) == Action::DESTRUCTION); // of original
-    CHECK(actions.at(3) == Action::MOVE_CONSTRUCTION); // of original
-    CHECK(actions.at(4) == Action::DESTRUCTION); // of temporary copy
-    CHECK(actions.at(5) == Action::DESTRUCTION); // of original
-}
-
-TEST_CASE("Double variant emplacement non-movable") {
-    std::vector<Action> actions;
-    {
-        Variant<NonMovable, Stub> v(TypeTag<Stub>(), actions);
-        CHECK(actions.size() == 1);
-
-        CHECK_NOTHROW(v.emplace<NonMovable>());
-        CHECK(v.index() == v.index<NonMovable>());
-        CHECK(actions.size() == 2);
-    }
-    CHECK(actions.size() == 2);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::DESTRUCTION);
+TEST_CASE("Double variant emplacement with fallback") {
+    Variant<int, MoveThrows> v(TypeTag<int>(), 1);
+    CHECK_NOTHROW((v.emplaceWithFallback<MoveThrows, int>()));
+    CHECK(v.index() == v.index<MoveThrows>());
+    CHECK_NOTHROW((v.emplaceWithFallback<int, int>(2)));
+    REQUIRE(v.index() == v.index<int>());
+    CHECK(v.value<int>() == 2);
+    CHECK_THROWS_AS(
+            (v.emplaceWithFallback<MoveThrows, int>(MoveThrows())),
+            Exception);
+    REQUIRE(v.index() == v.index<int>());
+    CHECK(v.value<int>() == 0);
 }
 
 TEST_CASE("Double variant reset with same type") {
@@ -637,26 +599,6 @@ TEST_CASE("Double variant reset with different types") {
     CHECK(actions.at(5) == Action::COPY_CONSTRUCTION); // of variant value
     CHECK(actions.at(6) == Action::DESTRUCTION); // of local
     CHECK(actions.at(7) == Action::DESTRUCTION); // of variant value
-}
-
-TEST_CASE("Double variant reset with exception") {
-    std::vector<Action> actions;
-    {
-        Variant<Stub, CopyThrows> v(TypeTag<Stub>(), actions);
-        CHECK(actions.size() == 1);
-
-        CopyThrows ct;
-        CHECK_THROWS_AS(v.reset(ct), Exception);
-        CHECK(v.index() == v.index<Stub>());
-        CHECK(actions.size() == 5);
-    }
-    CHECK(actions.size() == 6);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of temporary copy
-    CHECK(actions.at(2) == Action::DESTRUCTION); // of original
-    CHECK(actions.at(3) == Action::MOVE_CONSTRUCTION); // of original
-    CHECK(actions.at(4) == Action::DESTRUCTION); // of temporary copy
-    CHECK(actions.at(5) == Action::DESTRUCTION); // of original
 }
 
 TEST_CASE("Double variant copy assignment with same index") {
@@ -727,32 +669,15 @@ TEST_CASE("Double variant copy assignment with same index & exception") {
     CHECK(actions2.at(1) == Action::DESTRUCTION);
 }
 
-TEST_CASE("Double variant copy assignment with different index & exception") {
-    std::vector<Action> actions;
-    {
-        Variant<Stub, CopyThrows> v1(TypeTag<Stub>(), actions);
-        const Variant<Stub, CopyThrows> v2((TypeTag<CopyThrows>()));
-        CHECK(actions.size() == 1);
-
-        CHECK_THROWS_AS(v1 = v2, Exception);
-        CHECK(v1.index() == v1.index<Stub>());
-        CHECK(actions.size() == 5);
-    }
-    CHECK(actions.size() == 6);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of temporary copy
-    CHECK(actions.at(2) == Action::DESTRUCTION); // of original
-    CHECK(actions.at(3) == Action::MOVE_CONSTRUCTION); // of original
-    CHECK(actions.at(4) == Action::DESTRUCTION); // of temporary copy
-    CHECK(actions.at(5) == Action::DESTRUCTION); // of original
-
+// TEST_CASE(
+//         "Double variant copy assignment with different index & exception") {
     static_assert(
             std::is_copy_assignable<Variant<int, Stub>>::value,
             "int and Stub are copy-assignable");
     static_assert(
             Variant<int, double>::IS_NOTHROW_COPY_ASSIGNABLE,
             "int and double are no-throw copy-assignable");
-}
+// }
 
 TEST_CASE("Double variant no copy assignment") {
     using V = Variant<Stub, NonCopyAssignable>;
@@ -964,6 +889,21 @@ TEST_CASE("Double variant of") {
     CHECK(v1.value<int *>() == intArray);
     REQUIRE(v2.index() == v2.index<const char *>());
     CHECK(v2.value<const char *>()[0] == 'c');
+
+    std::vector<Action> actions;
+    {
+        auto v3 = Variant<int, Stub>::of(Stub(actions));
+        CHECK(v3.index() == v3.index<Stub>());
+    }
+    CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
+    actions.clear();
+
+    {
+        Stub s(actions);
+        auto v4 = Variant<int, Stub>::of(s);
+        CHECK(v4.index() == v4.index<Stub>());
+    }
+    CHECK(contains(actions, Action::COPY_CONSTRUCTION));
 }
 
 TEST_CASE("Double variant swapping with same type") {
