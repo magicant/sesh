@@ -47,6 +47,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/String.hh \
 	common/StringStream.hh \
 	common/Variant.hh \
+	language/parser/AssignmentParser.cc \
+	language/parser/AssignmentParser.hh \
 	language/parser/AssignmentParserImpl.hh \
 	language/parser/AssignmentParserImpl.tcc \
 	language/parser/BasicEnvironment.cc \
