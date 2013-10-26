@@ -91,7 +91,10 @@ public:
     Maybe(Maybe &&) = default;
     Maybe &operator=(const Maybe &) = default;
     Maybe &operator=(Maybe &&) = default;
-    ~Maybe() = default;
+    // XXX: GCC 4.8.1 rejects implicit exception-specification in an explicitly
+    // defaulted destructor declaration if the destructor allows some
+    // exception.
+    /* ~Maybe() = default; */
 
     /**
      * Destructs the currently contained object (if any) and constructs a new
