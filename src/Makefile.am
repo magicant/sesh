@@ -121,6 +121,7 @@ language_parser_AssignmentParserImplTest_SOURCES = \
 	language/parser/Environment.cc \
 	language/parser/Predicate.cc \
 	language/parser/Skipper.cc \
+	language/parser/WordParserTestHelper.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \

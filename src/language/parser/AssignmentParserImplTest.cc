@@ -28,11 +28,9 @@
 #include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
-#include "language/parser/Parser.hh"
-#include "language/parser/Predicate.hh"
 #include "language/parser/Skipper.hh"
+#include "language/parser/WordParserTestHelper.hh"
 #include "language/source/SourceBuffer.hh"
-#include "language/syntax/Printer.hh"
 #include "language/syntax/Word.hh"
 #include "language/syntax/WordComponent.hh"
 
@@ -45,60 +43,15 @@ using sesh::language::parser::CLocaleEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Parser;
-using sesh::language::parser::Predicate;
 using sesh::language::parser::Skipper;
-using sesh::language::syntax::Printer;
+using sesh::language::parser::WordComponentStub;
 using sesh::language::syntax::Word;
-using sesh::language::syntax::WordComponent;
 using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
-
-class WordComponentStub : public WordComponent {
-
-private:
-
-    Iterator mBegin, mEnd;
-
-public:
-
-    WordComponentStub(const Iterator &begin, const Iterator &end) noexcept :
-            mBegin(begin), mEnd(end) { }
-
-    const Iterator &begin() const noexcept { return mBegin; }
-    const Iterator &end() const noexcept { return mEnd; }
-
-    void print(Printer &) const override { }
-
-};
-
-class WordParserStub : public Parser {
-
-private:
-
-    Iterator mBegin;
-    Skipper mSkipper;
-
-public:
-
-    WordParserStub(Environment &e, Predicate<Char> &&isDelimiter) :
-            Parser(e),
-            mBegin(e.current()),
-            mSkipper(e, std::move(isDelimiter)) { }
-
-    std::unique_ptr<Word> parse() {
-        mSkipper.skip();
-
-        std::unique_ptr<Word> word(new Word);
-        word->components().emplace_back(new WordComponentStub(
-                mBegin, environment().current()));
-        return word;
-    }
-
-};
 
 class TestTypes {
 public:
     using Skipper = sesh::language::parser::Skipper;
-    using WordParser = WordParserStub;
+    using WordParser = sesh::language::parser::WordParserStub;
 };
 
 using AssignmentParser = AssignmentParserImpl<TestTypes>;
