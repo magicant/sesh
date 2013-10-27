@@ -7,6 +7,7 @@ check_PROGRAMS = \
 	language/parser/EnvironmentTest \
 	language/parser/RawStringParserTest \
 	language/parser/SkipperTest \
+	language/parser/StringParserTest \
 	language/parser/WordParserImplTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
@@ -59,6 +60,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Reparse.hh \
 	language/parser/Skipper.cc \
 	language/parser/Skipper.hh \
+	language/parser/StringParser.cc \
+	language/parser/StringParser.hh \
 	language/parser/WordComponentParser.hh \
 	language/parser/WordParser.cc \
 	language/parser/WordParser.hh \
@@ -131,6 +134,15 @@ language_parser_SkipperTest_SOURCES = \
 	language/parser/Environment.cc \
 	language/parser/Skipper.cc \
 	language/parser/SkipperTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_StringParserTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/Environment.cc \
+	language/parser/Skipper.cc \
+	language/parser/StringParser.cc \
+	language/parser/StringParserTest.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
