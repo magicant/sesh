@@ -156,7 +156,7 @@ TEST_CASE("Assignment parser, valid variable name, non-empty value") {
     checkAssignmentResult(result, L("variable"), L("="));
 }
 
-TEST_CASE("Assignment parser, invalid variable name") {
+TEST_CASE("Assignment parser, variable name including invalid character") {
     CLocaleEnvironmentStub e;
     AssignmentParser p(e);
 
@@ -165,6 +165,17 @@ TEST_CASE("Assignment parser, invalid variable name") {
     auto result = p.parse();
     CHECK(e.current() == e.end() - 1);
     checkWordResult(result, L("invalid#name=value"));
+}
+
+TEST_CASE("Assignment parser, variable name starting with digit") {
+    CLocaleEnvironmentStub e;
+    AssignmentParser p(e);
+
+    e.appendSource(L("7x=value "));
+    e.setIsEof();
+    auto result = p.parse();
+    CHECK(e.current() == e.end() - 1);
+    checkWordResult(result, L("7x=value"));
 }
 
 TEST_CASE("Assignment parser, escaped =") {
