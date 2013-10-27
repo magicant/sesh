@@ -23,9 +23,9 @@
 #include <functional>
 #include "common/Char.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/Skipper.hh"
+#include "language/parser/StringParser.hh"
 #include "language/parser/WordComponentParser.hh"
 #include "language/syntax/RawString.hh"
 
@@ -34,12 +34,11 @@ namespace language {
 namespace parser {
 
 /** Parser for raw string. */
-class RawStringParser : public Parser, public WordComponentParser {
+class RawStringParser : public WordComponentParser {
 
 private:
 
-    Iterator mBegin;
-    Skipper mSkipper;
+    StringParser mStringParser;
 
 public:
 

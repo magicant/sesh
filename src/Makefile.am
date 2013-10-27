@@ -124,6 +124,7 @@ language_parser_RawStringParserTest_SOURCES = \
 	language/parser/RawStringParser.cc \
 	language/parser/RawStringParserTest.cc \
 	language/parser/Skipper.cc \
+	language/parser/StringParser.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \

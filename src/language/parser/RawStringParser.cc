@@ -18,16 +18,14 @@
 #include "buildconfig.h"
 #include "RawStringParser.hh"
 
-#include <stdexcept>
 #include <utility>
 #include "common/Char.hh"
 #include "common/String.hh"
-#include "language/parser/Environment.hh"
 #include "language/syntax/RawString.hh"
 #include "language/syntax/WordComponent.hh"
 
 using sesh::common::Char;
-using sesh::common::CharTraits;
+using sesh::common::String;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::WordComponent;
 
@@ -39,16 +37,12 @@ RawStringParser::RawStringParser(
         Environment &e,
         Predicate<Char> &&isDelimiter,
         LineContinuationTreatment lct) :
-        Parser(e),
         WordComponentParser(),
-        mBegin(e.current()),
-        mSkipper(e, std::move(isDelimiter), lct) { }
+        mStringParser(e, std::move(isDelimiter), lct) { }
 
 std::unique_ptr<RawString> RawStringParser::parseRawString() {
-    mSkipper.skip();
-
-    return std::unique_ptr<RawString>(
-            new RawString(toString(mBegin, environment().current())));
+    String value = mStringParser.parse();
+    return std::unique_ptr<RawString>(new RawString(std::move(value)));
 }
 
 std::unique_ptr<WordComponent> RawStringParser::parse() {
