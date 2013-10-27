@@ -63,6 +63,10 @@ using Result = AssignmentParser::Result;
 
 void checkWord(const Word *w, const String &value) {
     REQUIRE(w != nullptr);
+    if (value.empty()) {
+        CHECK(w->components().empty());
+        return;
+    }
     CHECK(w->components().size() == 1);
     RawString *rs =
             dynamic_cast<RawString *>(w->components().at(0).get());

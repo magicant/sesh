@@ -55,8 +55,10 @@ public:
         mSkipper.skip();
 
         std::unique_ptr<syntax::Word> word(new syntax::Word);
-        word->components().emplace_back(new syntax::RawString(
-                toString(mBegin, environment().current())));
+        if (environment().current() != mBegin) {
+            word->components().emplace_back(new syntax::RawString(
+                    toString(mBegin, environment().current())));
+        }
         return word;
     }
 
