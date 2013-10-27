@@ -68,6 +68,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/RawStringParser.cc \
 	language/parser/RawStringParser.hh \
 	language/parser/Reparse.hh \
+	language/parser/SimpleCommandParser.cc \
+	language/parser/SimpleCommandParser.hh \
 	language/parser/SimpleCommandParserImpl.hh \
 	language/parser/SimpleCommandParserImpl.tcc \
 	language/parser/Skipper.cc \
