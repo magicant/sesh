@@ -28,7 +28,7 @@
 #include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
-#include "language/parser/Skipper.hh"
+#include "language/parser/StringParser.hh"
 #include "language/parser/WordParserTestHelper.hh"
 #include "language/source/SourceBuffer.hh"
 #include "language/syntax/Assignment.hh"
@@ -45,7 +45,6 @@ using sesh::language::parser::CLocaleEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Parser;
-using sesh::language::parser::Skipper;
 using sesh::language::syntax::Assignment;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::Word;
@@ -53,7 +52,7 @@ using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
 
 class TestTypes {
 public:
-    using Skipper = sesh::language::parser::Skipper;
+    using StringParser = sesh::language::parser::StringParser;
     using WordParser = sesh::language::parser::WordParserStub;
 };
 

@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include "language/parser/AssignmentParserImpl.hh"
-#include "language/parser/Skipper.hh"
+#include "language/parser/StringParser.hh"
 #include "language/parser/WordParser.hh"
 
 namespace sesh {
@@ -30,7 +30,7 @@ namespace parser {
 
 class RealAssignmentParserTypes {
 public:
-    using Skipper = parser::Skipper;
+    using StringParser = parser::StringParser;
     using WordParser = parser::WordParser;
 };
 

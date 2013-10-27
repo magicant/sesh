@@ -46,9 +46,9 @@ class AssignmentParserImpl : public Parser {
 
 private:
 
-    using Skipper = typename Types::Skipper;
+    using NameParser = typename Types::StringParser;
     using WordParser = typename Types::WordParser;
-    using State = common::Variant<Skipper, WordParser>;
+    using State = common::Variant<NameParser, WordParser>;
 
     source::SourceBuffer::ConstIterator mBegin;
     common::Maybe<common::String> mVariableName;
@@ -68,6 +68,13 @@ public:
     using Result = common::Variant<AssignmentPointer, WordPointer>;
 
 private:
+
+    /**
+     * Determines if the argument string is a valid variable name, assuming the
+     * string is the parse result of the name parser.
+     */
+    static bool isValidVariableName(
+            const Environment &, const common::String &);
 
     void parseVariableName();
 

@@ -40,21 +40,25 @@ AssignmentParserImpl<Types>::AssignmentParserImpl(Environment &e) :
         Parser(e),
         mBegin(e.current()),
         mVariableName(),
-        mState(State::template create<Skipper>(
+        mState(State::template create<NameParser>(
                 e,
                 std::not2(Predicate<common::Char>(isVariableNameChar)))) { }
 
 template<typename Types>
+bool AssignmentParserImpl<Types>::isValidVariableName(
+        const Environment &e, const common::String &s) {
+    return !s.empty() && !std::isdigit(s[0], e.locale());
+}
+
+template<typename Types>
 void AssignmentParserImpl<Types>::parseVariableName() {
-    assert(mState.index() == mState.template index<Skipper>());
+    assert(mState.index() == mState.template index<NameParser>());
 
-    mState.template value<Skipper>().skip();
+    common::String name = mState.template value<NameParser>().parse();
 
-    // Is a valid variable name present?
-    if (environment().current() != mBegin &&
-            currentCharInt() == common::CharTraits::to_int_type(L('=')) &&
-            !std::isdigit(*mBegin, environment().locale())) {
-        mVariableName.emplace(toString(mBegin, environment().current()));
+    if (isValidVariableName(environment(), name) &&
+            currentCharInt() == common::CharTraits::to_int_type(L('='))) {
+        mVariableName.emplace(std::move(name));
         ++environment().current();
     } else {
         // No variable name; The whole token is a word.
@@ -64,7 +68,7 @@ void AssignmentParserImpl<Types>::parseVariableName() {
 
 template<typename Types>
 auto AssignmentParserImpl<Types>::parse() -> Result {
-    if (mState.index() == mState.template index<Skipper>()) {
+    if (mState.index() == mState.template index<NameParser>()) {
         parseVariableName();
         mState.template emplace<WordParser>(environment(), isTokenDelimiter);
     }
