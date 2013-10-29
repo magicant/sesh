@@ -57,7 +57,7 @@ public:
     WordParserImpl(WordParserImpl &&) = default;
     WordParserImpl &operator=(const WordParserImpl &) = delete;
     WordParserImpl &operator=(WordParserImpl &&) = delete;
-    ~WordParserImpl() = default;
+    // XXX: GCC bug #51629: ~WordParserImpl() = default;
 
 private:
 

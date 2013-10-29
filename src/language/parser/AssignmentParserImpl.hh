@@ -61,7 +61,7 @@ public:
     AssignmentParserImpl(AssignmentParserImpl &&) = default;
     AssignmentParserImpl &operator=(const AssignmentParserImpl &) = delete;
     AssignmentParserImpl &operator=(AssignmentParserImpl &&) = delete;
-    ~AssignmentParserImpl() = default;
+    // XXX: GCC bug #51629: ~AssignmentParserImpl() = default;
 
     using AssignmentPointer = std::unique_ptr<syntax::Assignment>;
     using WordPointer = std::unique_ptr<syntax::Word>;
