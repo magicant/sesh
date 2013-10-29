@@ -25,13 +25,12 @@
 #include "common/Char.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
+#include "language/parser/WordComponentParser.hh"
 #include "language/syntax/Word.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
-
-class WordComponentParser;
 
 /**
  * Word parser.
@@ -58,7 +57,7 @@ public:
     WordParserImpl(WordParserImpl &&) = default;
     WordParserImpl &operator=(const WordParserImpl &) = delete;
     WordParserImpl &operator=(WordParserImpl &&) = delete;
-    ~WordParserImpl() = default;
+    // XXX: GCC bug #51629: ~WordParserImpl() = default;
 
 private:
 

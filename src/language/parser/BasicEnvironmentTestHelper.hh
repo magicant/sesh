@@ -20,6 +20,7 @@
 
 #include "buildconfig.h"
 
+#include <locale>
 #include "common/ErrorLevel.hh"
 #include "common/String.hh"
 #include "language/parser/BasicEnvironment.hh"
@@ -57,6 +58,10 @@ private:
         throw "unexpected addDiagnosticMessage";
     }
 
+    const std::locale &locale() const override {
+        throw "unexpected locale";
+    }
+
 public:
 
     void setIsEof(bool isEof = true) {
@@ -88,6 +93,16 @@ public:
         for (common::String::size_type i = 0; i < string.length(); ++i)
             CHECK(sourceBuffer().at(i) == string.at(i));
         CHECK_THROWS_AS(sourceBuffer().at(string.length()), std::out_of_range);
+    }
+
+};
+
+class CLocaleEnvironmentStub : public BasicEnvironmentStub {
+
+public:
+
+    const std::locale &locale() const override {
+        return std::locale::classic();
     }
 
 };

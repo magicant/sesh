@@ -15,38 +15,37 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_Predicate_hh
-#define INCLUDED_language_parser_Predicate_hh
-
 #include "buildconfig.h"
+#include "language/parser/Predicate.hh"
 
-#include <functional>
+#include <locale>
 #include "common/Char.hh"
-#include "language/parser/Environment.hh"
+#include "common/String.hh"
+
+using sesh::common::Char;
+using sesh::common::String;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-template<typename T>
-using Predicate = std::function<bool(const Environment &, T)>;
+bool isTokenDelimiter(const Environment &e, Char c) {
+    static const String delimiters = L(" \t\n;&|<>()");
+    return delimiters.find(c) != String::npos ||
+#if HAVE_STD__ISBLANK
+            std::isblank(c, e.locale())
+#else
+            ((void) e, false)
+#endif // #if HAVE_STD__ISBLANK
+            ;
+}
 
-/**
- * Determines if the argument character is a standard token delimiter like a
- * blank, semicolon, parenthesis, etc.
- */
-bool isTokenDelimiter(const Environment &, common::Char);
-
-/**
- * Determines if the argument character can be included in a variable name.
- * This function may return true for a non-ASCII character.
- */
-bool isVariableNameChar(const Environment &, common::Char);
+bool isVariableNameChar(const Environment &e, Char c) {
+    return c == L('_') || std::isalnum(c, e.locale());
+}
 
 } // namespace parser
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_parser_Predicate_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

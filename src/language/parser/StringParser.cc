@@ -16,51 +16,33 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Skipper.hh"
+#include "StringParser.hh"
 
 #include <utility>
 #include "common/Char.hh"
 #include "common/String.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/NeedMoreSource.hh"
 
 using sesh::common::Char;
 using sesh::common::CharTraits;
+using sesh::common::String;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-Skipper::Skipper(
+StringParser::StringParser(
         Environment &e,
-        Predicate<Char> &&isStopper,
+        Predicate<Char> &&isDelimiter,
         LineContinuationTreatment lct) :
         Parser(e),
-        mIsStopper(std::move(isStopper)),
-        mLineContinuationTreatment(lct) {
-    if (mIsStopper == nullptr)
-        mIsStopper = [](const Environment &, Char) { return false; };
-}
+        mBegin(e.current()),
+        mSkipper(e, std::move(isDelimiter), lct) { }
 
-void Skipper::removeLineContinuation() {
-    switch (mLineContinuationTreatment) {
-    case LineContinuationTreatment::LITERAL:
-        return;
-    case LineContinuationTreatment::REMOVE:
-        environment().removeLineContinuation(environment().current());
-        return;
-    }
-}
+String StringParser::parse() {
+    mSkipper.skip();
 
-bool Skipper::currentIsStopper() const {
-    CharInt ci = currentCharInt();
-    return CharTraits::eq_int_type(ci, CharTraits::eof()) ||
-            mIsStopper(environment(), CharTraits::to_char_type(ci));
-}
-
-void Skipper::skip() {
-    while (removeLineContinuation(), !currentIsStopper())
-        ++environment().current();
+    return toString(mBegin, environment().current());
 }
 
 } // namespace parser

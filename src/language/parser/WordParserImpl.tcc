@@ -43,7 +43,7 @@ WordParserImpl<Types>::WordParserImpl(
         mWord(new syntax::Word),
         mCurrentComponentParser(nullptr) {
     if (mIsDelimiter == nullptr)
-        mIsDelimiter = [](Environment &, common::Char) { return false; };
+        mIsDelimiter = [](const Environment &, common::Char) { return false; };
 }
 
 template<typename Types>

@@ -15,38 +15,33 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_Predicate_hh
-#define INCLUDED_language_parser_Predicate_hh
+#ifndef INCLUDED_language_parser_AssignmentParser_hh
+#define INCLUDED_language_parser_AssignmentParser_hh
 
 #include "buildconfig.h"
 
-#include <functional>
-#include "common/Char.hh"
-#include "language/parser/Environment.hh"
+#include "language/parser/AssignmentParserImpl.hh"
+#include "language/parser/Skipper.hh"
+#include "language/parser/WordParser.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-template<typename T>
-using Predicate = std::function<bool(const Environment &, T)>;
+class RealAssignmentParserTypes {
+public:
+    using Skipper = parser::Skipper;
+    using WordParser = parser::WordParser;
+};
 
-/**
- * Determines if the argument character is a standard token delimiter like a
- * blank, semicolon, parenthesis, etc.
- */
-bool isTokenDelimiter(const Environment &, common::Char);
+using AssignmentParser = AssignmentParserImpl<RealAssignmentParserTypes>;
 
-/**
- * Determines if the argument character can be included in a variable name.
- * This function may return true for a non-ASCII character.
- */
-bool isVariableNameChar(const Environment &, common::Char);
+extern template class AssignmentParserImpl<RealAssignmentParserTypes>;
 
 } // namespace parser
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_parser_Predicate_hh
+#endif // #ifndef INCLUDED_language_parser_AssignmentParser_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

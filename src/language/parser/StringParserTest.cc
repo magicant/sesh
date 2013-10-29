@@ -27,7 +27,7 @@
 #include "language/parser/Environment.hh"
 #include "language/parser/LineContinuationTreatment.hh"
 #include "language/parser/NeedMoreSource.hh"
-#include "language/parser/Skipper.hh"
+#include "language/parser/StringParser.hh"
 
 namespace {
 
@@ -37,194 +37,164 @@ using sesh::language::parser::BasicEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::LineContinuationTreatment;
 using sesh::language::parser::NeedMoreSource;
-using sesh::language::parser::Skipper;
+using sesh::language::parser::StringParser;
 
 template<Char c>
 bool is(const Environment &, Char c2) {
     return c == c2;
 }
 
-TEST_CASE("Skipper construction") {
+TEST_CASE("String parser construction") {
     BasicEnvironmentStub e;
-    Skipper s(e, is<L('\0')>);
-    Skipper s2(s);
-    Skipper(std::move(s2));
+    StringParser p(e, is<L('\0')>);
+    StringParser p2(p);
+    StringParser(std::move(p2));
 }
 
-TEST_CASE("Skipper, 0 append") {
+TEST_CASE("String parser, 0 append") {
     BasicEnvironmentStub e;
-    Skipper s(e, is<L('$')>);
+    StringParser p(e, is<L('$')>);
 
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.appendSource(String(L("AB\0C$XYZ"), 8));
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == String(L("AB\0C"), 4));
     CHECK(e.current() == e.begin() + 4);
 }
 
-TEST_CASE("Skipper, 1 append") {
+TEST_CASE("String parser, 1 append") {
     BasicEnvironmentStub e;
     e.appendSource(L("ABC+XYZ"));
     e.current() += 4;
 
-    Skipper s(e, is<L('-')>);
+    StringParser p(e, is<L('-')>);
 
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.appendSource(L("$123-+"));
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == L("XYZ$123"));
     CHECK(e.current() == e.end() - 2);
 }
 
-TEST_CASE("Skipper, 0 append, to end") {
+TEST_CASE("String parser, 0 append, to end") {
     BasicEnvironmentStub e;
-    Skipper s(e, is<L('x')>);
+    StringParser p(e, is<L('x')>);
     e.appendSource(L("apple"));
     e.setIsEof();
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == L("apple"));
     CHECK(e.current() == e.end());
 }
 
-TEST_CASE("Skipper, 1 append, to end") {
+TEST_CASE("String parser, 1 append, to end") {
     BasicEnvironmentStub e;
     e.appendSource(L("hot do"));
     e.current() += 4;
 
-    Skipper s(e, is<L('x')>);
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    StringParser p(e, is<L('x')>);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.appendSource(L("g"));
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.setIsEof();
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == L("dog"));
     CHECK(e.current() == e.end());
 }
 
-TEST_CASE("Skipper, 1 append, empty result") {
+TEST_CASE("String parser, 1 append, empty result") {
     BasicEnvironmentStub e;
     e.appendSource(L("X"));
     e.current() += 1;
 
-    Skipper s(e, is<L('*')>);
+    StringParser p(e, is<L('*')>);
 
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.appendSource(L("***"));
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == L(""));
     CHECK(e.current() == e.end() - 3);
 }
 
-TEST_CASE("Skipper, null stopper") {
+TEST_CASE("String parser, null delimiter") {
     BasicEnvironmentStub e;
-    Skipper s(e, nullptr);
+    StringParser p(e, nullptr);
 
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.appendSource(L("Hello"));
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.appendSource(L(", "));
     e.appendSource(L("world"));
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.appendSource(L("!"));
     e.setIsEof();
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == L("Hello, world!"));
     CHECK(e.current() == e.end());
 }
 
-TEST_CASE("Skipper, no remove line continuations 1") {
+TEST_CASE("String parser, no remove line continuations 1") {
     BasicEnvironmentStub e;
-    Skipper s(e, is<L('@')>, LineContinuationTreatment::LITERAL);
+    StringParser p(e, is<L('@')>, LineContinuationTreatment::LITERAL);
 
     e.appendSource(L("AB\\\nC@"));
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == L("AB\\\nC"));
     CHECK(e.current() == e.end() - 1);
 }
 
-TEST_CASE("Skipper, no remove line continuations 2") {
+TEST_CASE("String parser, no remove line continuations 2") {
     BasicEnvironmentStub e;
-    Skipper s(e, is<L('\\')>, LineContinuationTreatment::LITERAL);
+    StringParser p(e, is<L('\\')>, LineContinuationTreatment::LITERAL);
 
     e.appendSource(L("AB\\\nC@"));
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == L("AB"));
     CHECK(e.current() == e.begin() + 2);
 }
 
-TEST_CASE("Skipper, remove line continuations 1") {
+TEST_CASE("String parser, remove line continuations 1") {
     BasicEnvironmentStub e;
-    Skipper s(e, is<L('@')>, LineContinuationTreatment::REMOVE);
+    StringParser p(e, is<L('@')>, LineContinuationTreatment::REMOVE);
 
     e.appendSource(L("ABC\\\\\n\nDEF\\"));
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.appendSource(L("\nGHI@"));
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == L("ABC\\\nDEFGHI"));
     CHECK(e.current() == e.end() - 1);
 }
 
-TEST_CASE("Skipper, remove line continuations 2") {
+TEST_CASE("String parser remove line continuations 2") {
     BasicEnvironmentStub e;
-    Skipper s(e, is<L('\\')>, LineContinuationTreatment::REMOVE);
+    StringParser p(e, is<L('\\')>, LineContinuationTreatment::REMOVE);
 
     e.appendSource(L("ABC\\\nDEF\\"));
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.setIsEof();
 
-    s.skip();
+    String result = p.parse();
+    CHECK(result == L("ABCDEF"));
     CHECK(e.current() == e.end() - 1);
-}
-
-TEST_CASE("Skipper, reuse") {
-    BasicEnvironmentStub e;
-    Skipper s(e, is<L('|')>);
-
-    e.appendSource(L("-|--||----|"));
-
-    s.skip();
-    CHECK(e.current() == e.begin() + 1);
-    s.skip();
-    CHECK(e.current() == e.begin() + 1);
-
-    e.current() += 1;
-    s.skip();
-    CHECK(e.current() == e.begin() + 4);
-    s.skip();
-    CHECK(e.current() == e.begin() + 4);
-
-    e.current() += 1;
-    s.skip();
-    CHECK(e.current() == e.begin() + 5);
-    s.skip();
-    CHECK(e.current() == e.begin() + 5);
-
-    e.current() += 2;
-    s.skip();
-    CHECK(e.current() == e.begin() + 10);
-    s.skip();
-    CHECK(e.current() == e.begin() + 10);
-
-    e.current() += 1;
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
-    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
-
-    e.setIsEof();
-    s.skip();
-    CHECK(e.current() == e.begin() + 11);
-    s.skip();
-    CHECK(e.current() == e.begin() + 11);
 }
 
 } // namespace
