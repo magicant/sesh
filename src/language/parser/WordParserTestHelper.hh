@@ -28,33 +28,12 @@
 #include "language/parser/Predicate.hh"
 #include "language/parser/Skipper.hh"
 #include "language/source/SourceBuffer.hh"
-#include "language/syntax/Printer.hh"
+#include "language/syntax/RawString.hh"
 #include "language/syntax/Word.hh"
-#include "language/syntax/WordComponent.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
-
-class WordComponentStub : public syntax::WordComponent {
-
-private:
-
-    using Iterator = source::SourceBuffer::ConstIterator;
-
-    Iterator mBegin, mEnd;
-
-public:
-
-    WordComponentStub(const Iterator &begin, const Iterator &end) noexcept :
-            mBegin(begin), mEnd(end) { }
-
-    const Iterator &begin() const noexcept { return mBegin; }
-    const Iterator &end() const noexcept { return mEnd; }
-
-    void print(syntax::Printer &) const override { }
-
-};
 
 class WordParserStub : public Parser {
 
@@ -76,8 +55,8 @@ public:
         mSkipper.skip();
 
         std::unique_ptr<syntax::Word> word(new syntax::Word);
-        word->components().emplace_back(new WordComponentStub(
-                mBegin, environment().current()));
+        word->components().emplace_back(new syntax::RawString(
+                toString(mBegin, environment().current())));
         return word;
     }
 

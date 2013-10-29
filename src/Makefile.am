@@ -127,6 +127,7 @@ language_parser_AssignmentParserImplTest_SOURCES = \
 	language/source/SourceBuffer.cc \
 	language/syntax/Assignment.cc \
 	language/syntax/Printer.cc \
+	language/syntax/RawString.cc \
 	language/syntax/Word.cc
 language_parser_BasicEnvironmentTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
