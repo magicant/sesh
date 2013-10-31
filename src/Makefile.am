@@ -12,6 +12,7 @@ check_PROGRAMS = \
 	language/parser/SkipperTest \
 	language/parser/StringParserTest \
 	language/parser/WordParserImplTest \
+	language/parser/tokenTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
 	language/source/SourceBufferTest \
@@ -81,6 +82,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/WordParser.hh \
 	language/parser/WordParserImpl.hh \
 	language/parser/WordParserImpl.tcc \
+	language/parser/token.cc \
+	language/parser/token.hh \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
@@ -212,6 +215,14 @@ language_parser_WordParserImplTest_SOURCES = \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \
 	language/syntax/Word.cc
+language_parser_tokenTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/Environment.cc \
+	language/parser/token.cc \
+	language/parser/tokenTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_source_LineAppendedSourceTest_SOURCES = \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSourceTest.cc \
