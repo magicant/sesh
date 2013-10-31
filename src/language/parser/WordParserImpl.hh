@@ -35,7 +35,7 @@ namespace parser {
 /**
  * Word parser.
  *
- * @tparam Types A placeholder type that specify word component parser types
+ * @tparam Types A placeholder type that specifies word component parser types
  * that are used by the word parser.
  */
 template<typename Types>

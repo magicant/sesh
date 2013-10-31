@@ -35,8 +35,8 @@ namespace parser {
 /**
  * Assignment parser. It parses a token as an assignment or word.
  *
- * @tparam Types A placeholder type that specify parser types that are used by
- * the assignment parser.
+ * @tparam Types A placeholder type that specifies parser types that are used
+ * by the assignment parser.
  *
  * @see syntax::Assignment
  * @see syntax::Word
