@@ -64,6 +64,44 @@ common::String peekSymbol(Environment &);
  */
 common::String parseSymbol(Environment &);
 
+/**
+ * Checks if there is a keyword (reserved word) token at the environment's
+ * current position.
+ *
+ * Returns the keyword as a string. If no keyword was found, an empty string is
+ * returned.
+ *
+ * Line continuations are removed if encountered while parsing. The iterator
+ * position of the environment is never changed.
+ *
+ * If more source is needed to finish parsing the keyword, this function throws
+ * NeedMoreSource. In this case, the caller should set the EOF flag or append
+ * to the source and then call this function again.
+ *
+ * @throws NeedMoreSource (see above)
+ */
+common::String peekKeyword(Environment &);
+
+/**
+ * Parses a keyword (reserved word) token from the current iterator position of
+ * the environment.
+ *
+ * Returns the parsed keyword as a string. If no keyword was found, an empty
+ * string is returned.
+ *
+ * The iterator position is incremented past the parsed keyword if (and only
+ * if) a valid keyword was parsed.
+ *
+ * Line continuations are removed if encountered while parsing.
+ *
+ * If more source is needed to finish parsing the keyword, this function throws
+ * NeedMoreSource. In this case, the caller should set the EOF flag or append
+ * to the source and then call this function again.
+ *
+ * @throws NeedMoreSource (see above)
+ */
+common::String parseKeyword(Environment &);
+
 } // namespace parser
 } // namespace language
 } // namespace sesh

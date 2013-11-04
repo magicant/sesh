@@ -218,6 +218,7 @@ language_parser_WordParserImplTest_SOURCES = \
 language_parser_tokenTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/Environment.cc \
+	language/parser/Predicate.cc \
 	language/parser/token.cc \
 	language/parser/tokenTest.cc \
 	language/source/LineContinuedSource.cc \
