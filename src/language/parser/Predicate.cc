@@ -42,6 +42,10 @@ bool isBlank(const Environment &e, Char c) {
 #endif // #if HAVE_STD__ISBLANK
 }
 
+bool isBlankOrNewline(const Environment &e, Char c) {
+    return isNewline(e, c) || isBlank(e, c);
+}
+
 bool isTokenDelimiter(const Environment &e, Char c) {
     static const String delimiters = L(" \t\n;&|<>()");
     return delimiters.find(c) != String::npos ||
