@@ -47,7 +47,8 @@ void Skipper::removeLineContinuation() {
     case LineContinuationTreatment::LITERAL:
         return;
     case LineContinuationTreatment::REMOVE:
-        environment().removeLineContinuation(environment().current());
+        while (environment().removeLineContinuation(environment().current())) {
+        }
         return;
     }
 }

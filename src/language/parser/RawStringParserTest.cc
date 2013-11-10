@@ -207,6 +207,21 @@ TEST_CASE("Raw string parser remove line continuations 2") {
     CHECK(e.current() == e.end() - 1);
 }
 
+TEST_CASE("Raw string parser remove line continuations 3") {
+    BasicEnvironmentStub e;
+    RawStringParser p(e, is<L('\\')>, LineContinuationTreatment::REMOVE);
+
+    e.appendSource(L("ABC\\\n\\\n\\\nDEF"));
+    REQUIRE_THROWS_AS(p.parseRawString(), NeedMoreSource);
+
+    e.setIsEof();
+
+    auto result = p.parseRawString();
+    REQUIRE(result != nullptr);
+    CHECK(result->value() == L("ABCDEF"));
+    CHECK(e.current() == e.end());
+}
+
 } // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
