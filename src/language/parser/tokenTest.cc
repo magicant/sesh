@@ -36,6 +36,7 @@ namespace {
 using sesh::common::CharTraits;
 using sesh::common::String;
 using sesh::language::parser::BasicEnvironmentStub;
+using sesh::language::parser::CLocaleEnvironmentStub;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Environment;
 using sesh::language::parser::parseSymbol;
@@ -191,7 +192,7 @@ TEST_CASE("Token, symbol line continuations") {
 }
 
 void checkNonKeywordWithoutEof(String &&s) {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     e.appendSource(std::move(s));
     CHECK(peekKeyword(e) == String());
     CHECK(e.current() == e.begin());
@@ -304,7 +305,7 @@ TEST_CASE("Token, check non keywords without EOF") {
 }
 
 void checkNonKeywordWithEof(String &&s) {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     e.appendSource(std::move(s));
     e.setIsEof();
     CHECK(peekKeyword(e) == String());
@@ -314,7 +315,7 @@ void checkNonKeywordWithEof(String &&s) {
 }
 
 void checkKeywordNeedMoreSource(String &&s) {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     e.appendSource(std::move(s));
     CHECK_THROWS_AS(peekKeyword(e), NeedMoreSource);
     CHECK_THROWS_AS(parseKeyword(e), NeedMoreSource);
@@ -369,7 +370,7 @@ TEST_CASE("Token, check keyword prefixes") {
 }
 
 void checkKeywordWithEof(const String &s) {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     e.appendSource(String(s));
     e.setIsEof();
     CHECK(peekKeyword(e) == s);
@@ -398,7 +399,7 @@ void checkExactKeyword(const String &s) {
     checkKeywordWithEof(String(s));
 
     {
-        BasicEnvironmentStub e;
+        CLocaleEnvironmentStub e;
         e.appendSource(s.substr(0u, 1u));
         e.appendSource(L("\\\n\\\n"));
         e.appendSource(s.substr(1u));
@@ -407,7 +408,7 @@ void checkExactKeyword(const String &s) {
         CHECK(e.current() == e.begin());
     }
     {
-        BasicEnvironmentStub e;
+        CLocaleEnvironmentStub e;
         e.appendSource(s.substr(0u, 1u));
         e.appendSource(L("\\\n\\\n"));
         e.appendSource(s.substr(1u));
@@ -417,7 +418,7 @@ void checkExactKeyword(const String &s) {
         CHECK(e.current() == e.begin() + s.length());
     }
     {
-        BasicEnvironmentStub e;
+        CLocaleEnvironmentStub e;
         e.appendSource(s.substr(0u, 1u));
         e.appendSource(L("\\\n\\\n"));
         e.appendSource(s.substr(1u));
