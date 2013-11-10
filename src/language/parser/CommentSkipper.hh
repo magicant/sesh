@@ -79,8 +79,14 @@ public:
 
 };
 
-/** Creates a comment skipper that skips comments and blank characters. */
+/**
+ * Creates a comment skipper that skips comments and blank characters. The
+ * returned skipper does not skip newline characters.
+ */
 CommentSkipper normalCommentSkipper(Environment &);
+
+/** Creates a comment skipper that skips comments, blanks, and newlines. */
+CommentSkipper whitespaceSkipper(Environment &);
 
 } // namespace parser
 } // namespace language

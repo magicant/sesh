@@ -63,6 +63,11 @@ CommentSkipper normalCommentSkipper(Environment &e) {
     return CommentSkipper(e, Skipper(e, std::not2(Predicate<Char>(isBlank))));
 }
 
+CommentSkipper whitespaceSkipper(Environment &e) {
+    return CommentSkipper(e,
+            Skipper(e, std::not2(Predicate<Char>(isBlankOrNewline))));
+}
+
 } // namespace parser
 } // namespace language
 } // namespace sesh
