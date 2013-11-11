@@ -20,8 +20,6 @@
 
 #include "buildconfig.h"
 
-#include <exception>
-
 namespace sesh {
 namespace language {
 namespace parser {
