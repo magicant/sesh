@@ -187,6 +187,19 @@ TEST_CASE("Skipper, remove line continuations 2") {
     CHECK(e.current() == e.end() - 1);
 }
 
+TEST_CASE("Skipper, remove line continuations 3") {
+    BasicEnvironmentStub e;
+    Skipper s(e, is<L('\\')>, LineContinuationTreatment::REMOVE);
+
+    e.appendSource(L("ABC\\\n\\\n\\\nDEF"));
+    REQUIRE_THROWS_AS(s.skip(), NeedMoreSource);
+
+    e.setIsEof();
+
+    s.skip();
+    CHECK(e.current() == e.end());
+}
+
 TEST_CASE("Skipper, reuse") {
     BasicEnvironmentStub e;
     Skipper s(e, is<L('|')>);

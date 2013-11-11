@@ -18,6 +18,7 @@
 #include "buildconfig.h"
 #include "language/parser/Predicate.hh"
 
+#include <cassert>
 #include <locale>
 #include "common/Char.hh"
 #include "common/String.hh"
@@ -38,8 +39,13 @@ bool isBlank(const Environment &e, Char c) {
     return std::isblank(c, e.locale());
 #else
     (void) e;
+    assert((e.locale(), true));
     return c == L(' ') || c == L('\t');
 #endif // #if HAVE_STD__ISBLANK
+}
+
+bool isBlankOrNewline(const Environment &e, Char c) {
+    return isNewline(e, c) || isBlank(e, c);
 }
 
 bool isTokenDelimiter(const Environment &e, Char c) {
@@ -48,7 +54,7 @@ bool isTokenDelimiter(const Environment &e, Char c) {
 #if HAVE_STD__ISBLANK
             std::isblank(c, e.locale())
 #else
-            ((void) e, false)
+            ((void) e.locale(), false)
 #endif // #if HAVE_STD__ISBLANK
             ;
 }

@@ -37,6 +37,8 @@ bool isNewline(const Environment &, common::Char);
 /** Determines if the argument character is a blank. */
 bool isBlank(const Environment &, common::Char);
 
+bool isBlankOrNewline(const Environment &, common::Char);
+
 /**
  * Determines if the argument character is a standard token delimiter like a
  * blank, semicolon, parenthesis, etc.

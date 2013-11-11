@@ -7,11 +7,13 @@ check_PROGRAMS = \
 	language/parser/BasicEnvironmentTest \
 	language/parser/CommentSkipperTest \
 	language/parser/EnvironmentTest \
+	language/parser/PipelineParserTest \
 	language/parser/RawStringParserTest \
 	language/parser/SimpleCommandParserImplTest \
 	language/parser/SkipperTest \
 	language/parser/StringParserTest \
 	language/parser/WordParserImplTest \
+	language/parser/tokenTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
 	language/source/SourceBufferTest \
@@ -63,6 +65,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/LineContinuationTreatment.hh \
 	language/parser/NeedMoreSource.hh \
 	language/parser/Parser.hh \
+	language/parser/PipelineParser.cc \
+	language/parser/PipelineParser.hh \
 	language/parser/Predicate.cc \
 	language/parser/Predicate.hh \
 	language/parser/RawStringParser.cc \
@@ -81,6 +85,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/WordParser.hh \
 	language/parser/WordParserImpl.hh \
 	language/parser/WordParserImpl.tcc \
+	language/parser/token.cc \
+	language/parser/token.hh \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
@@ -157,6 +163,21 @@ language_parser_EnvironmentTest_SOURCES = \
 	language/parser/EnvironmentTest.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_PipelineParserTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/CommentSkipper.cc \
+	language/parser/Environment.cc \
+	language/parser/PipelineParser.cc \
+	language/parser/PipelineParserTest.cc \
+	language/parser/Predicate.cc \
+	language/parser/Skipper.cc \
+	language/parser/StringParser.cc \
+	language/parser/token.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Pipeline.cc \
+	language/syntax/Printer.cc
 language_parser_RawStringParserTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/Environment.cc \
@@ -212,6 +233,15 @@ language_parser_WordParserImplTest_SOURCES = \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \
 	language/syntax/Word.cc
+language_parser_tokenTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/Environment.cc \
+	language/parser/Predicate.cc \
+	language/parser/token.cc \
+	language/parser/tokenTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_source_LineAppendedSourceTest_SOURCES = \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSourceTest.cc \

@@ -48,7 +48,7 @@ using sesh::common::CharTraits;
 using sesh::common::ErrorLevel;
 using sesh::common::String;
 using sesh::common::Variant;
-using sesh::language::parser::BasicEnvironmentStub;
+using sesh::language::parser::CLocaleEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Parser;
@@ -125,13 +125,13 @@ void checkAssignment(
 }
 
 TEST_CASE("Simple command parser construction") {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     SimpleCommandParser scp1(e);
     SimpleCommandParser(std::move(scp1));
 }
 
 TEST_CASE("Simple command parser, empty command") {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     SimpleCommandParser scp(e);
 
     REQUIRE_THROWS_AS(scp.parseSimpleCommand(), NeedMoreSource);
@@ -147,7 +147,7 @@ TEST_CASE("Simple command parser, empty command") {
 }
 
 TEST_CASE("Simple command parser, empty command with comment") {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     SimpleCommandParser scp(e);
 
     REQUIRE_THROWS_AS(scp.parseSimpleCommand(), NeedMoreSource);
@@ -164,7 +164,7 @@ TEST_CASE("Simple command parser, empty command with comment") {
 }
 
 TEST_CASE("Simple command parser, one word, immediate") {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     SimpleCommandParser scp(e);
 
     REQUIRE_THROWS_AS(scp.parseSimpleCommand(), NeedMoreSource);
@@ -182,7 +182,7 @@ TEST_CASE("Simple command parser, one word, immediate") {
 }
 
 TEST_CASE("Simple command parser, one word, after space") {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     SimpleCommandParser scp(e);
 
     REQUIRE_THROWS_AS(scp.parseSimpleCommand(), NeedMoreSource);
@@ -199,7 +199,7 @@ TEST_CASE("Simple command parser, one word, after space") {
 }
 
 TEST_CASE("Simple command parser, one assignment, immediate") {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     SimpleCommandParser scp(e);
 
     REQUIRE_THROWS_AS(scp.parseSimpleCommand(), NeedMoreSource);
@@ -216,7 +216,7 @@ TEST_CASE("Simple command parser, one assignment, immediate") {
 }
 
 TEST_CASE("Simple command parser, one assignment, after space") {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     SimpleCommandParser scp(e);
 
     REQUIRE_THROWS_AS(scp.parseSimpleCommand(), NeedMoreSource);
@@ -242,7 +242,7 @@ TEST_CASE("Simple command parser, one redirection, after space") {
 }
 
 TEST_CASE("Simple command parser, assignments and words, eof") {
-    BasicEnvironmentStub e;
+    CLocaleEnvironmentStub e;
     SimpleCommandParser scp(e);
 
     e.appendSource(L("a=A"));
