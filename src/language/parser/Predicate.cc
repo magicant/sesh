@@ -29,6 +29,19 @@ namespace sesh {
 namespace language {
 namespace parser {
 
+bool isNewline(const Environment &, Char c) {
+    return c == L('\n');
+}
+
+bool isBlank(const Environment &e, Char c) {
+#if HAVE_STD__ISBLANK
+    return std::isblank(c, e.locale());
+#else
+    (void) e;
+    return c == L(' ') || c == L('\t');
+#endif // #if HAVE_STD__ISBLANK
+}
+
 bool isTokenDelimiter(const Environment &e, Char c) {
     static const String delimiters = L(" \t\n;&|<>()");
     return delimiters.find(c) != String::npos ||

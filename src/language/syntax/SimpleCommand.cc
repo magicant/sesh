@@ -26,11 +26,7 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-SimpleCommand::SimpleCommand(const source::SourceLocation &sl) :
-        Command(sl), mWords(), mAssignments() { }
-
-SimpleCommand::SimpleCommand(source::SourceLocation &&sl) :
-        Command(std::move(sl)), mWords(), mAssignments() { }
+SimpleCommand::SimpleCommand() : Command(), mWords(), mAssignments() { }
 
 void SimpleCommand::print(Printer &p) const {
     for (const AssignmentPointer &a : assignments()) {

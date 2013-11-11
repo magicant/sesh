@@ -15,41 +15,19 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_Command_hh
-#define INCLUDED_language_syntax_Command_hh
-
 #include "buildconfig.h"
+#include "SimpleCommandParser.hh"
 
-#include <utility>
-#include "language/source/SourceLocation.hh"
-#include "language/syntax/Printable.hh"
+#include "language/parser/SimpleCommandParserImpl.tcc"
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace parser {
 
-/** A command is either a simple or compound command. */
-class Command : public Printable {
+template class SimpleCommandParserImpl<RealSimpleCommandParserTypes>;
 
-private:
-
-    // TODO Redirection
-
-public:
-
-    Command() = default;
-    Command(const Command &) = default;
-    Command(Command &&) = default;
-    Command &operator=(const Command &) = default;
-    Command &operator=(Command &&) = default;
-    ~Command() override = default;
-
-}; // class Command
-
-} // namespace syntax
+} // namespace parser
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_syntax_Command_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -50,8 +50,7 @@ private:
 
 public:
 
-    explicit SimpleCommand(const source::SourceLocation &sl);
-    explicit SimpleCommand(source::SourceLocation &&sl);
+    SimpleCommand();
 
     SimpleCommand(const SimpleCommand &) = delete;
     SimpleCommand(SimpleCommand &&) = default;

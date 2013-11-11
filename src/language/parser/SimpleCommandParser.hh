@@ -15,41 +15,34 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_Command_hh
-#define INCLUDED_language_syntax_Command_hh
+#ifndef INCLUDED_language_parser_SimpleCommandParser_hh
+#define INCLUDED_language_parser_SimpleCommandParser_hh
 
 #include "buildconfig.h"
 
-#include <utility>
-#include "language/source/SourceLocation.hh"
-#include "language/syntax/Printable.hh"
+#include "language/parser/AssignmentParser.hh"
+#include "language/parser/SimpleCommandParserImpl.hh"
+#include "language/parser/WordParser.hh"
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace parser {
 
-/** A command is either a simple or compound command. */
-class Command : public Printable {
-
-private:
-
-    // TODO Redirection
-
+class RealSimpleCommandParserTypes {
 public:
+    using AssignmentParser = parser::AssignmentParser;
+    using WordParser = parser::WordParser;
+};
 
-    Command() = default;
-    Command(const Command &) = default;
-    Command(Command &&) = default;
-    Command &operator=(const Command &) = default;
-    Command &operator=(Command &&) = default;
-    ~Command() override = default;
+using SimpleCommandParser =
+        SimpleCommandParserImpl<RealSimpleCommandParserTypes>;
 
-}; // class Command
+extern template class SimpleCommandParserImpl<RealSimpleCommandParserTypes>;
 
-} // namespace syntax
+} // namespace parser
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_Command_hh
+#endif // #ifndef INCLUDED_language_parser_SimpleCommandParser_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

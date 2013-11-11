@@ -31,6 +31,12 @@ namespace parser {
 template<typename T>
 using Predicate = std::function<bool(const Environment &, T)>;
 
+/** Determines if the argument character is a newline (<code>'\n'</code>). */
+bool isNewline(const Environment &, common::Char);
+
+/** Determines if the argument character is a blank. */
+bool isBlank(const Environment &, common::Char);
+
 /**
  * Determines if the argument character is a standard token delimiter like a
  * blank, semicolon, parenthesis, etc.
