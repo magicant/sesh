@@ -29,8 +29,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 /**
  * A sequence, which is called a "list" in the POSIX standard, is a series of
  * one or more and-or lists.

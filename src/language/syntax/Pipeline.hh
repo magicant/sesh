@@ -29,8 +29,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 /**
  * A pipeline is a list of one or more commands that are executed at a time
  * with the standard input/output connected with each other.

@@ -30,8 +30,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 /**
  * A valid simple command contains at least one word, assignment, or
  * redirection. Each word must contain at least one word component.

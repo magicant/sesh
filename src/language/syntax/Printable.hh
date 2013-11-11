@@ -20,11 +20,11 @@
 
 #include "buildconfig.h"
 
+#include "language/syntax/Printer.hh"
+
 namespace sesh {
 namespace language {
 namespace syntax {
-
-class Printer;
 
 /**
  * Printable objects represent (part of) abstract syntax trees that can be
