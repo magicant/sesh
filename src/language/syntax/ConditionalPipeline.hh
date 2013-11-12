@@ -28,8 +28,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 /**
  * A conditional pipeline is a pipeline that is executed conditionally
  * depending on the exit status of the previous pipeline.

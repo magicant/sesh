@@ -30,8 +30,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 /**
  * An and-or list is a pipeline possibly followed by any number of conditional
  * pipelines.

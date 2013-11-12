@@ -28,8 +28,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 /**
  * A raw string is a word component that is an unquoted string literal.
  *

@@ -29,8 +29,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 /** An assignment is part of a simple command. */
 class Assignment : public Printable {
 

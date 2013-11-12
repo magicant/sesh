@@ -29,8 +29,6 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printer;
-
 /**
  * A word is a token that may contain expansions. A word is composed of any
  * number of word components.
