@@ -37,7 +37,7 @@ namespace parser {
 
 template<typename Types>
 AssignmentParserImpl<Types>::AssignmentParserImpl(Environment &e) :
-        Parser(e),
+        ParserBase(e),
         mBegin(e.current()),
         mVariableName(),
         mState(State::template create<NameParser>(

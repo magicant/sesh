@@ -35,7 +35,7 @@ namespace sesh {
 namespace language {
 namespace parser {
 
-class WordParserStub : public Parser {
+class WordParserStub : public ParserBase {
 
 private:
 
@@ -47,7 +47,7 @@ private:
 public:
 
     WordParserStub(Environment &e, Predicate<common::Char> &&isDelimiter) :
-            Parser(e),
+            ParserBase(e),
             mBegin(e.current()),
             mSkipper(e, std::move(isDelimiter)) { }
 

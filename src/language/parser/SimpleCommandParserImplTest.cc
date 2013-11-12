@@ -29,7 +29,7 @@
 #include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
-#include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/SimpleCommandParserImpl.hh"
 #include "language/parser/SimpleCommandParserImpl.tcc"
@@ -51,7 +51,7 @@ using sesh::common::Variant;
 using sesh::language::parser::CLocaleEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
-using sesh::language::parser::Parser;
+using sesh::language::parser::ParserBase;
 using sesh::language::parser::SimpleCommandParserImpl;
 using sesh::language::parser::WordParserStub;
 using sesh::language::parser::isTokenDelimiter;

@@ -23,7 +23,7 @@
 #include "common/Char.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
 
 namespace sesh {
@@ -31,7 +31,7 @@ namespace language {
 namespace parser {
 
 /** Skipper is a parser that skips blanks or other unmeaningful characters. */
-class Skipper : public Parser {
+class Skipper : public ParserBase {
 
 private:
 

@@ -49,7 +49,7 @@ const String PIPE = L("|");
 } // namespace
 
 PipelineParser::PipelineParser(Environment &e, CommandParserCreator &&cpc) :
-        Parser(e),
+        ParserBase(e),
         mState(State::BEGINNING),
         mPipeline(new syntax::Pipeline),
         mCreateCommandParser(std::move(cpc)),

@@ -38,7 +38,7 @@ template<typename Types>
 WordParserImpl<Types>::WordParserImpl(
         Environment &e,
         Predicate<common::Char> &&isDelimiter) :
-        Parser(e),
+        ParserBase(e),
         mIsDelimiter(std::move(isDelimiter)),
         mWord(new syntax::Word),
         mCurrentComponentParser(nullptr) {

@@ -24,7 +24,7 @@
 #include "common/Maybe.hh"
 #include "common/Variant.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Word.hh"
 
@@ -42,7 +42,7 @@ namespace parser {
  * @see syntax::Word
  */
 template<typename Types>
-class AssignmentParserImpl : public Parser {
+class AssignmentParserImpl : public ParserBase {
 
 private:
 

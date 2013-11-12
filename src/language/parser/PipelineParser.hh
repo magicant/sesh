@@ -26,7 +26,7 @@
 #include "language/parser/CommandParser.hh"
 #include "language/parser/CommentSkipper.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/syntax/Pipeline.hh"
 
 namespace sesh {
@@ -34,7 +34,7 @@ namespace language {
 namespace parser {
 
 /** Pipeline parser. */
-class PipelineParser : public Parser {
+class PipelineParser : public ParserBase {
 
 public:
 

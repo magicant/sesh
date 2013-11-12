@@ -44,7 +44,7 @@ using sesh::language::parser::AssignmentParserImpl;
 using sesh::language::parser::CLocaleEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
-using sesh::language::parser::Parser;
+using sesh::language::parser::ParserBase;
 using sesh::language::syntax::Assignment;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::Word;

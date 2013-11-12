@@ -37,7 +37,7 @@ namespace parser {
 template<typename Types>
 SimpleCommandParserImpl<Types>::SimpleCommandParserImpl(Environment &e)
         noexcept :
-        Parser(e),
+        ParserBase(e),
         CommandParser(),
         mState(State::of(normalCommentSkipper(e))),
         mCommand(new syntax::SimpleCommand) { }

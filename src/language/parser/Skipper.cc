@@ -35,7 +35,7 @@ Skipper::Skipper(
         Environment &e,
         Predicate<Char> &&isStopper,
         LineContinuationTreatment lct) :
-        Parser(e),
+        ParserBase(e),
         mIsStopper(std::move(isStopper)),
         mLineContinuationTreatment(lct) {
     if (mIsStopper == nullptr)

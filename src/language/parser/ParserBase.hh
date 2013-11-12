@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_Parser_hh
-#define INCLUDED_language_parser_Parser_hh
+#ifndef INCLUDED_language_parser_ParserBase_hh
+#define INCLUDED_language_parser_ParserBase_hh
 
 #include "buildconfig.h"
 
@@ -31,7 +31,7 @@ namespace language {
 namespace parser {
 
 /** Fundamental part of parser implementation. */
-class Parser {
+class ParserBase {
 
 private:
 
@@ -42,12 +42,12 @@ protected:
     using CharInt = sesh::common::CharTraits::int_type;
     using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
 
-    explicit Parser(Environment &e) noexcept : mEnvironment(e) { }
-    Parser(const Parser &) = default;
-    Parser(Parser &&) = default;
-    Parser &operator=(const Parser &) = delete;
-    Parser &operator=(Parser &&) = delete;
-    ~Parser() = default;
+    explicit ParserBase(Environment &e) noexcept : mEnvironment(e) { }
+    ParserBase(const ParserBase &) = default;
+    ParserBase(ParserBase &&) = default;
+    ParserBase &operator=(const ParserBase &) = delete;
+    ParserBase &operator=(ParserBase &&) = delete;
+    ~ParserBase() = default;
 
     Environment &environment() const noexcept { return mEnvironment; }
 
@@ -71,6 +71,6 @@ protected:
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_parser_Parser_hh
+#endif // #ifndef INCLUDED_language_parser_ParserBase_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

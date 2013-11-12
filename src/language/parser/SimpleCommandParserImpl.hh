@@ -24,7 +24,7 @@
 #include "common/Variant.hh"
 #include "language/parser/CommandParser.hh"
 #include "language/parser/CommentSkipper.hh"
-#include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/syntax/SimpleCommand.hh"
 
 namespace sesh {
@@ -38,7 +38,7 @@ namespace parser {
  * this simple command parser depends on.
  */
 template<typename Types>
-class SimpleCommandParserImpl : public Parser, public CommandParser {
+class SimpleCommandParserImpl : public ParserBase, public CommandParser {
 
 private:
 

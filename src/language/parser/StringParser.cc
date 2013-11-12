@@ -35,7 +35,7 @@ StringParser::StringParser(
         Environment &e,
         Predicate<Char> &&isDelimiter,
         LineContinuationTreatment lct) :
-        Parser(e),
+        ParserBase(e),
         mBegin(e.current()),
         mSkipper(e, std::move(isDelimiter), lct) { }
 

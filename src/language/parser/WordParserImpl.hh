@@ -23,7 +23,7 @@
 #include <functional>
 #include <memory>
 #include "common/Char.hh"
-#include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/WordComponentParser.hh"
 #include "language/syntax/Word.hh"
@@ -39,7 +39,7 @@ namespace parser {
  * that are used by the word parser.
  */
 template<typename Types>
-class WordParserImpl : public Parser {
+class WordParserImpl : public ParserBase {
 
 private:
 
