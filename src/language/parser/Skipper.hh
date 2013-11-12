@@ -31,7 +31,7 @@ namespace language {
 namespace parser {
 
 /** Skipper is a parser that skips blanks or other unmeaningful characters. */
-class Skipper : public ParserBase {
+class Skipper : protected ParserBase {
 
 private:
 

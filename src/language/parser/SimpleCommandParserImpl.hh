@@ -38,7 +38,7 @@ namespace parser {
  * this simple command parser depends on.
  */
 template<typename Types>
-class SimpleCommandParserImpl : public ParserBase, public CommandParser {
+class SimpleCommandParserImpl : protected ParserBase, public CommandParser {
 
 private:
 

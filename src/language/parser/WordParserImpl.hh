@@ -39,7 +39,7 @@ namespace parser {
  * that are used by the word parser.
  */
 template<typename Types>
-class WordParserImpl : public ParserBase {
+class WordParserImpl : protected ParserBase {
 
 private:
 

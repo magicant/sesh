@@ -35,7 +35,7 @@ namespace sesh {
 namespace language {
 namespace parser {
 
-class WordParserStub : public ParserBase {
+class WordParserStub : protected ParserBase {
 
 private:
 

@@ -36,7 +36,7 @@ namespace parser {
  * A comment starts with a hash sign ('#') and continues up to (but not
  * including) the first newline.
  */
-class CommentSkipper : public ParserBase {
+class CommentSkipper : protected ParserBase {
 
 private:
 

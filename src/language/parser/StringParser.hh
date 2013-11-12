@@ -36,7 +36,7 @@ namespace parser {
  * A simple parser that extracts a string from the initial position up to a
  * delimiter.
  */
-class StringParser : public ParserBase {
+class StringParser : protected ParserBase {
 
 private:
 

@@ -34,7 +34,7 @@ namespace language {
 namespace parser {
 
 /** Pipeline parser. */
-class PipelineParser : public ParserBase {
+class PipelineParser : protected ParserBase {
 
 public:
 

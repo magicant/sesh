@@ -42,7 +42,7 @@ namespace parser {
  * @see syntax::Word
  */
 template<typename Types>
-class AssignmentParserImpl : public ParserBase {
+class AssignmentParserImpl : protected ParserBase {
 
 private:
 
