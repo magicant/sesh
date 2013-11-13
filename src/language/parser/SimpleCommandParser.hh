@@ -20,24 +20,28 @@
 
 #include "buildconfig.h"
 
-#include "language/parser/AssignmentParser.hh"
-#include "language/parser/SimpleCommandParserImpl.hh"
-#include "language/parser/WordParser.hh"
+#include "language/parser/SimpleCommandParserBase.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-class RealSimpleCommandParserTypes {
+class SimpleCommandParser final : public SimpleCommandParserBase {
+
 public:
-    using AssignmentParser = parser::AssignmentParser;
-    using WordParser = parser::WordParser;
+
+    using SimpleCommandParserBase::SimpleCommandParserBase;
+
+    ~SimpleCommandParser() override = default;
+
+private:
+
+    AssignmentParserPointer createAssignmentParser() const override;
+
+    WordParserPointer createWordParser(Predicate<common::Char> &&isDelimiter)
+            const override;
+
 };
-
-using SimpleCommandParser =
-        SimpleCommandParserImpl<RealSimpleCommandParserTypes>;
-
-extern template class SimpleCommandParserImpl<RealSimpleCommandParserTypes>;
 
 } // namespace parser
 } // namespace language

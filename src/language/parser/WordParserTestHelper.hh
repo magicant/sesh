@@ -25,6 +25,7 @@
 #include <vector>
 #include "common/Char.hh"
 #include "language/parser/Environment.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/Skipper.hh"
 #include "language/source/SourceBuffer.hh"
@@ -35,7 +36,8 @@ namespace sesh {
 namespace language {
 namespace parser {
 
-class WordParserStub : protected ParserBase {
+class WordParserStub :
+        public Parser<std::unique_ptr<syntax::Word>>, protected ParserBase {
 
 private:
 
@@ -51,7 +53,7 @@ public:
             mBegin(e.current()),
             mSkipper(e, std::move(isDelimiter)) { }
 
-    std::unique_ptr<syntax::Word> parse() {
+    std::unique_ptr<syntax::Word> parse() override {
         mSkipper.skip();
 
         std::unique_ptr<syntax::Word> word(new syntax::Word);

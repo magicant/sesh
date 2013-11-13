@@ -18,13 +18,24 @@
 #include "buildconfig.h"
 #include "SimpleCommandParser.hh"
 
-#include "language/parser/SimpleCommandParserImpl.tcc"
+#include "common/Char.hh"
+#include "language/parser/AssignmentParser.hh"
+
+using sesh::common::Char;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-template class SimpleCommandParserImpl<RealSimpleCommandParserTypes>;
+auto SimpleCommandParser::createAssignmentParser() const
+        -> AssignmentParserPointer {
+    return nullptr; // FIXME
+}
+
+auto SimpleCommandParser::createWordParser(Predicate<Char> &&isDelimiter) const
+        -> WordParserPointer {
+    return nullptr; // FIXME
+}
 
 } // namespace parser
 } // namespace language

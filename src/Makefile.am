@@ -19,7 +19,7 @@ check_PROGRAMS = \
 	language/parser/EnvironmentTest \
 	language/parser/PipelineParserTest \
 	language/parser/RawStringParserTest \
-	language/parser/SimpleCommandParserImplTest \
+	language/parser/SimpleCommandParserBaseTest \
 	language/parser/SkipperTest \
 	language/parser/StringParserTest \
 	language/parser/WordParserImplTest \
@@ -85,8 +85,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Reparse.hh \
 	language/parser/SimpleCommandParser.cc \
 	language/parser/SimpleCommandParser.hh \
-	language/parser/SimpleCommandParserImpl.hh \
-	language/parser/SimpleCommandParserImpl.tcc \
+	language/parser/SimpleCommandParserBase.cc \
+	language/parser/SimpleCommandParserBase.hh \
 	language/parser/Skipper.cc \
 	language/parser/Skipper.hh \
 	language/parser/StringParser.cc \
@@ -200,12 +200,13 @@ language_parser_RawStringParserTest_SOURCES = \
 	language/source/SourceBuffer.cc \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc
-language_parser_SimpleCommandParserImplTest_SOURCES = \
+language_parser_SimpleCommandParserBaseTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/CommentSkipper.cc \
 	language/parser/Environment.cc \
 	language/parser/Predicate.cc \
-	language/parser/SimpleCommandParserImplTest.cc \
+	language/parser/SimpleCommandParserBase.cc \
+	language/parser/SimpleCommandParserBaseTest.cc \
 	language/parser/Skipper.cc \
 	language/parser/WordParserTestHelper.hh \
 	language/source/LineContinuedSource.cc \
