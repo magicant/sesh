@@ -21,12 +21,13 @@
 #include "buildconfig.h"
 
 #include <functional>
+#include <memory>
 #include "common/Char.hh"
 #include "language/parser/LineContinuationTreatment.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/Skipper.hh"
 #include "language/parser/StringParser.hh"
-#include "language/parser/WordComponentParser.hh"
 #include "language/syntax/RawString.hh"
 
 namespace sesh {
@@ -34,7 +35,7 @@ namespace language {
 namespace parser {
 
 /** Parser for raw string. */
-class RawStringParser : public WordComponentParser {
+class RawStringParser : public Parser<std::unique_ptr<syntax::WordComponent>> {
 
 private:
 

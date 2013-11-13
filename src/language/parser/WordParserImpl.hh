@@ -23,9 +23,9 @@
 #include <functional>
 #include <memory>
 #include "common/Char.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
-#include "language/parser/WordComponentParser.hh"
 #include "language/syntax/Word.hh"
 
 namespace sesh {
@@ -43,12 +43,14 @@ class WordParserImpl : protected ParserBase {
 
 private:
 
+    using ComponentParser = Parser<std::unique_ptr<syntax::WordComponent>>;
+
     Predicate<common::Char> mIsDelimiter;
 
     std::unique_ptr<syntax::Word> mWord;
 
     /** May be null. */
-    std::unique_ptr<WordComponentParser> mCurrentComponentParser;
+    std::unique_ptr<ComponentParser> mCurrentComponentParser;
 
 public:
 

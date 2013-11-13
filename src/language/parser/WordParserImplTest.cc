@@ -27,9 +27,9 @@
 #include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
-#include "language/parser/WordComponentParser.hh"
 #include "language/parser/WordParserImpl.tcc"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Word.hh"
@@ -42,9 +42,9 @@ using sesh::common::String;
 using sesh::language::parser::BasicEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
+using sesh::language::parser::Parser;
 using sesh::language::parser::ParserBase;
 using sesh::language::parser::Predicate;
-using sesh::language::parser::WordComponentParser;
 using sesh::language::parser::WordParserImpl;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::WordComponent;
@@ -55,7 +55,8 @@ class RawStringStub : public WordComponent {
 
 };
 
-class RawStringParserStub : public WordComponentParser, protected ParserBase {
+class RawStringParserStub :
+        public Parser<std::unique_ptr<WordComponent>>, protected ParserBase {
 
 public:
 
@@ -64,7 +65,7 @@ public:
             Predicate<Char> &&isDelimiter,
             bool removeLineContinuations = true)
             noexcept :
-            WordComponentParser(),
+            Parser(),
             ParserBase(e) {
         CHECK(isDelimiter != nullptr);
         CHECK(removeLineContinuations);
