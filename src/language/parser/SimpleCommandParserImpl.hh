@@ -22,8 +22,8 @@
 
 #include <memory>
 #include "common/Variant.hh"
-#include "language/parser/CommandParser.hh"
 #include "language/parser/CommentSkipper.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/ParserBase.hh"
 #include "language/syntax/SimpleCommand.hh"
 
@@ -38,7 +38,8 @@ namespace parser {
  * this simple command parser depends on.
  */
 template<typename Types>
-class SimpleCommandParserImpl : protected ParserBase, public CommandParser {
+class SimpleCommandParserImpl :
+        protected ParserBase, public Parser<std::unique_ptr<syntax::Command>> {
 
 private:
 

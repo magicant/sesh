@@ -24,9 +24,9 @@
 #include <utility>
 #include "common/Char.hh"
 #include "common/String.hh"
-#include "language/parser/CommandParser.hh"
 #include "language/parser/CommentSkipper.hh"
 #include "language/parser/Environment.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/token.hh"
 #include "language/syntax/Word.hh"
