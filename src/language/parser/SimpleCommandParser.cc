@@ -29,7 +29,7 @@ namespace parser {
 
 auto SimpleCommandParser::createAssignmentParser() const
         -> AssignmentParserPointer {
-    return nullptr; // FIXME
+    return AssignmentParserPointer(new AssignmentParser(environment()));
 }
 
 auto SimpleCommandParser::createWordParser(Predicate<Char> &&isDelimiter) const

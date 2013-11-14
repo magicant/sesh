@@ -24,10 +24,12 @@
 #include <utility>
 #include "common/Char.hh"
 #include "common/String.hh"
-#include "language/parser/AssignmentParserImpl.tcc"
+#include "language/parser/AssignmentParserBase.hh"
+#include "language/parser/AssignmentParserResult.hh"
 #include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
+#include "language/parser/Predicate.hh"
 #include "language/parser/StringParser.hh"
 #include "language/parser/WordParserTestHelper.hh"
 #include "language/source/SourceBuffer.hh"
@@ -40,26 +42,33 @@ namespace {
 
 using sesh::common::Char;
 using sesh::common::String;
-using sesh::language::parser::AssignmentParserImpl;
+using sesh::language::parser::AssignmentParserBase;
+using sesh::language::parser::AssignmentParserResult;
 using sesh::language::parser::CLocaleEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::ParserBase;
+using sesh::language::parser::Predicate;
+using sesh::language::parser::WordParserStub;
 using sesh::language::syntax::Assignment;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::Word;
 using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
 
-class TestTypes {
-public:
-    using StringParser = sesh::language::parser::StringParser;
-    using WordParser = sesh::language::parser::WordParserStub;
+class AssignmentParser : public AssignmentParserBase {
+
+    using AssignmentParserBase::AssignmentParserBase;
+
+    WordParserPointer createWordParser(Predicate<Char> &&isDelimiter)
+            const override {
+        return WordParserPointer(
+                new WordParserStub(environment(), std::move(isDelimiter)));
+    }
+
 };
 
-using AssignmentParser = AssignmentParserImpl<TestTypes>;
 using AssignmentPointer = AssignmentParser::AssignmentPointer;
 using WordPointer = AssignmentParser::WordPointer;
-using Result = AssignmentParser::Result;
 
 void checkWord(const Word *w, const String &value) {
     REQUIRE(w != nullptr);
@@ -75,7 +84,7 @@ void checkWord(const Word *w, const String &value) {
 }
 
 void checkWordResult(
-        const AssignmentParser::Result &result, const String &value) {
+        const AssignmentParserResult &result, const String &value) {
     REQUIRE(result.index() == result.index<WordPointer>());
     checkWord(result.value<WordPointer>().get(), value);
 }
@@ -88,7 +97,7 @@ void checkAssignment(
 }
 
 void checkAssignmentResult(
-        const AssignmentParser::Result &result,
+        const AssignmentParserResult &result,
         const String &variableName,
         const String &wordValue) {
     REQUIRE(result.index() == result.index<AssignmentPointer>());

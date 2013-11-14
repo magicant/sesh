@@ -15,11 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_AssignmentParserImpl_tcc
-#define INCLUDED_language_parser_AssignmentParserImpl_tcc
-
 #include "buildconfig.h"
-#include "AssignmentParserImpl.hh"
+#include "AssignmentParserBase.hh"
 
 #include <cassert>
 #include <functional>
@@ -28,36 +25,41 @@
 #include "common/Char.hh"
 #include "common/String.hh"
 #include "common/Variant.hh"
+#include "language/parser/Environment.hh"
 #include "language/parser/Predicate.hh"
+#include "language/parser/StringParser.hh"
 #include "language/syntax/Assignment.hh"
+
+using sesh::common::Char;
+using sesh::common::CharTraits;
+using sesh::common::String;
+using sesh::language::parser::Environment;
+using sesh::language::parser::StringParser;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-template<typename Types>
-AssignmentParserImpl<Types>::AssignmentParserImpl(Environment &e) :
+AssignmentParserBase::AssignmentParserBase(Environment &e) :
+        Parser(),
         ParserBase(e),
         mBegin(e.current()),
         mVariableName(),
-        mState(State::template create<NameParser>(
-                e,
-                std::not2(Predicate<common::Char>(isVariableNameChar)))) { }
+        mState(State::of(NameParserPointer(new StringParser(
+                e, std::not2(Predicate<Char>(isVariableNameChar)))))) { }
 
-template<typename Types>
-bool AssignmentParserImpl<Types>::isValidVariableName(
-        const Environment &e, const common::String &s) {
+bool AssignmentParserBase::isValidVariableName(
+        const Environment &e, const String &s) {
     return !s.empty() && !std::isdigit(s[0], e.locale());
 }
 
-template<typename Types>
-void AssignmentParserImpl<Types>::parseVariableName() {
-    assert(mState.index() == mState.template index<NameParser>());
+void AssignmentParserBase::parseVariableName() {
+    assert(mState.index() == mState.index<NameParserPointer>());
 
-    common::String name = mState.template value<NameParser>().parse();
+    String name = mState.value<NameParserPointer>()->parse();
 
     if (isValidVariableName(environment(), name) &&
-            currentCharInt() == common::CharTraits::to_int_type(L('='))) {
+            currentCharInt() == CharTraits::to_int_type(L('='))) {
         mVariableName.emplace(std::move(name));
         ++environment().current();
     } else {
@@ -66,26 +68,24 @@ void AssignmentParserImpl<Types>::parseVariableName() {
     }
 }
 
-template<typename Types>
-auto AssignmentParserImpl<Types>::parse() -> Result {
-    if (mState.index() == mState.template index<NameParser>()) {
+AssignmentParserResult AssignmentParserBase::parse() {
+    if (mState.index() == mState.index<NameParserPointer>()) {
         parseVariableName();
-        mState.template emplace<WordParser>(environment(), isTokenDelimiter);
+        mState.emplace<WordParserPointer>(createWordParser(isTokenDelimiter));
     }
 
-    WordPointer word = mState.template value<WordParser>().parse();
+    WordPointer word = mState.value<WordParserPointer>()->parse();
     assert(word != nullptr);
     if (mVariableName.hasValue())
-        return Result::of(AssignmentPointer(new syntax::Assignment(
-                std::move(mVariableName).value(), std::move(word))));
+        return AssignmentParserResult::of(
+                AssignmentPointer(new syntax::Assignment(
+                        std::move(mVariableName).value(), std::move(word))));
     else
-        return Result::of(WordPointer(std::move(word)));
+        return AssignmentParserResult::of(WordPointer(std::move(word)));
 }
 
 } // namespace parser
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_parser_AssignmentParserImpl_tcc
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

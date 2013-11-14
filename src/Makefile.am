@@ -13,7 +13,7 @@ bin_PROGRAMS = sesh
 check_PROGRAMS = \
 	common/MaybeTest \
 	common/VariantTest \
-	language/parser/AssignmentParserImplTest \
+	language/parser/AssignmentParserBaseTest \
 	language/parser/BasicEnvironmentTest \
 	language/parser/CommentSkipperTest \
 	language/parser/EnvironmentTest \
@@ -63,8 +63,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/Variant.hh \
 	language/parser/AssignmentParser.cc \
 	language/parser/AssignmentParser.hh \
-	language/parser/AssignmentParserImpl.hh \
-	language/parser/AssignmentParserImpl.tcc \
+	language/parser/AssignmentParserBase.cc \
+	language/parser/AssignmentParserBase.hh \
 	language/parser/AssignmentParserResult.hh \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironment.hh \
@@ -136,8 +136,9 @@ common_MaybeTest_SOURCES = \
 	common/MaybeTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
-language_parser_AssignmentParserImplTest_SOURCES = \
-	language/parser/AssignmentParserImplTest.cc \
+language_parser_AssignmentParserBaseTest_SOURCES = \
+	language/parser/AssignmentParserBase.cc \
+	language/parser/AssignmentParserBaseTest.cc \
 	language/parser/BasicEnvironment.cc \
 	language/parser/Environment.cc \
 	language/parser/Predicate.cc \
