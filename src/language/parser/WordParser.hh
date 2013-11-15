@@ -20,17 +20,28 @@
 
 #include "buildconfig.h"
 
-#include "language/parser/WordParserImpl.hh"
+#include "language/parser/WordParserBase.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-class RealWordParserTypes;
+class WordParser final : public WordParserBase {
 
-using WordParser = WordParserImpl<RealWordParserTypes>;
+public:
 
-extern template class WordParserImpl<RealWordParserTypes>;
+    using WordParserBase::WordParserBase;
+
+    ~WordParser() override = default;
+
+private:
+
+    std::unique_ptr<ComponentParser> createRawStringParser(
+            Predicate<common::Char> &&isDelimiter,
+            LineContinuationTreatment = LineContinuationTreatment::REMOVE)
+            const override;
+
+};
 
 } // namespace parser
 } // namespace language

@@ -18,7 +18,9 @@
 #include "buildconfig.h"
 #include "AssignmentParser.hh"
 
+#include <utility>
 #include "common/Char.hh"
+#include "language/parser/WordParser.hh"
 
 using sesh::common::Char;
 
@@ -28,7 +30,8 @@ namespace parser {
 
 auto AssignmentParser::createWordParser(Predicate<Char> &&isDelimiter) const
         -> WordParserPointer {
-    return nullptr; // FIXME
+    return WordParserPointer(
+            new WordParser(environment(), std::move(isDelimiter)));
 }
 
 } // namespace parser

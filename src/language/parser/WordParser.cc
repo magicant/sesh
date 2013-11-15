@@ -18,19 +18,22 @@
 #include "buildconfig.h"
 #include "WordParser.hh"
 
+#include "common/Char.hh"
 #include "language/parser/RawStringParser.hh"
-#include "language/parser/WordParserImpl.tcc"
+
+using sesh::common::Char;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-class RealWordParserTypes {
-public:
-    using RawStringParser = parser::RawStringParser;
-};
-
-template class WordParserImpl<RealWordParserTypes>;
+auto WordParser::createRawStringParser(
+        Predicate<Char> &&isDelimiter,
+        LineContinuationTreatment lct) const
+        -> std::unique_ptr<ComponentParser> {
+    return std::unique_ptr<ComponentParser>(
+            new RawStringParser(environment(), std::move(isDelimiter), lct));
+}
 
 } // namespace parser
 } // namespace language

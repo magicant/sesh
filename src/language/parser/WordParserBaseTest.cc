@@ -26,11 +26,12 @@
 #include "common/String.hh"
 #include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
+#include "language/parser/LineContinuationTreatment.hh"
 #include "language/parser/NeedMoreSource.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
-#include "language/parser/WordParserImpl.tcc"
+#include "language/parser/WordParserBase.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Word.hh"
 #include "language/syntax/WordComponent.hh"
@@ -41,11 +42,12 @@ using sesh::common::Char;
 using sesh::common::String;
 using sesh::language::parser::BasicEnvironmentStub;
 using sesh::language::parser::Environment;
+using sesh::language::parser::LineContinuationTreatment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Parser;
 using sesh::language::parser::ParserBase;
 using sesh::language::parser::Predicate;
-using sesh::language::parser::WordParserImpl;
+using sesh::language::parser::WordParserBase;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::WordComponent;
 
@@ -63,12 +65,12 @@ public:
     RawStringParserStub(
             Environment &e,
             Predicate<Char> &&isDelimiter,
-            bool removeLineContinuations = true)
+            LineContinuationTreatment lct)
             noexcept :
             Parser(),
             ParserBase(e) {
         CHECK(isDelimiter != nullptr);
-        CHECK(removeLineContinuations);
+        CHECK(lct == LineContinuationTreatment::REMOVE);
     }
 
     std::unique_ptr<WordComponent> parse() override {
@@ -80,11 +82,25 @@ public:
 
 };
 
-class TestTypes {
+class WordParser : public WordParserBase {
+
 public:
-    using RawStringParser = RawStringParserStub;
+
+    using WordParserBase::WordParserBase;
+
+    ~WordParser() override = default;
+
+private:
+
+    std::unique_ptr<ComponentParser> createRawStringParser(
+            Predicate<Char> &&isDelimiter,
+            LineContinuationTreatment lct)
+            const override {
+        return std::unique_ptr<ComponentParser>(new RawStringParserStub(
+                environment(), std::move(isDelimiter), lct));
+    }
+
 };
-using WordParser = WordParserImpl<TestTypes>;
 
 template<Char c>
 bool is(const Environment &, Char c2) {
@@ -99,7 +115,6 @@ bool fail(const Environment &, Char) {
 TEST_CASE("Word parser construction") {
     BasicEnvironmentStub e;
     WordParser p(e, [](const Environment &, Char) { return false; });
-    WordParser(std::move(p));
 }
 
 TEST_CASE("Word parser empty word") {
