@@ -29,12 +29,12 @@
 #include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/token.hh"
+#include "language/syntax/Pipeline.hh"
 #include "language/syntax/Word.hh"
 #include "language/syntax/WordComponent.hh"
 
 using sesh::common::Char;
 using sesh::common::String;
-using sesh::language::parser::normalCommentSkipper;
 using sesh::language::syntax::Pipeline;
 
 namespace sesh {
@@ -51,7 +51,7 @@ const String PIPE = L("|");
 PipelineParser::PipelineParser(Environment &e, CommandParserCreator &&cpc) :
         ParserBase(e),
         mState(State::BEGINNING),
-        mPipeline(new syntax::Pipeline),
+        mPipeline(new Pipeline),
         mCreateCommandParser(std::move(cpc)),
         mCommandParser(nullptr),
         mSkipper() {
@@ -72,7 +72,7 @@ bool PipelineParser::parseCommand() {
     return true;
 }
 
-std::unique_ptr<syntax::Pipeline> PipelineParser::parse() {
+std::unique_ptr<Pipeline> PipelineParser::parse() {
     assert(mPipeline != nullptr);
 
     switch (mState) {
