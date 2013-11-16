@@ -37,7 +37,7 @@ RawStringParser::RawStringParser(
         Environment &e,
         Predicate<Char> &&isDelimiter,
         LineContinuationTreatment lct) :
-        WordComponentParser(),
+        Parser(),
         mStringParser(e, std::move(isDelimiter), lct) { }
 
 std::unique_ptr<RawString> RawStringParser::parseRawString() {

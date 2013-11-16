@@ -20,23 +20,26 @@
 
 #include "buildconfig.h"
 
-#include "language/parser/AssignmentParserImpl.hh"
-#include "language/parser/StringParser.hh"
-#include "language/parser/WordParser.hh"
+#include "language/parser/AssignmentParserBase.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-class RealAssignmentParserTypes {
+class AssignmentParser final : public AssignmentParserBase {
+
 public:
-    using StringParser = parser::StringParser;
-    using WordParser = parser::WordParser;
+
+    using AssignmentParserBase::AssignmentParserBase;
+
+    ~AssignmentParser() override = default;
+
+private:
+
+    WordParserPointer createWordParser(Predicate<common::Char> &&isDelimiter)
+            const override;
+
 };
-
-using AssignmentParser = AssignmentParserImpl<RealAssignmentParserTypes>;
-
-extern template class AssignmentParserImpl<RealAssignmentParserTypes>;
 
 } // namespace parser
 } // namespace language

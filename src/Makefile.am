@@ -13,16 +13,16 @@ bin_PROGRAMS = sesh
 check_PROGRAMS = \
 	common/MaybeTest \
 	common/VariantTest \
-	language/parser/AssignmentParserImplTest \
+	language/parser/AssignmentParserBaseTest \
 	language/parser/BasicEnvironmentTest \
 	language/parser/CommentSkipperTest \
 	language/parser/EnvironmentTest \
 	language/parser/PipelineParserTest \
 	language/parser/RawStringParserTest \
-	language/parser/SimpleCommandParserImplTest \
+	language/parser/SimpleCommandParserBaseTest \
 	language/parser/SkipperTest \
 	language/parser/StringParserTest \
-	language/parser/WordParserImplTest \
+	language/parser/WordParserBaseTest \
 	language/parser/tokenTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
@@ -63,11 +63,11 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/Variant.hh \
 	language/parser/AssignmentParser.cc \
 	language/parser/AssignmentParser.hh \
-	language/parser/AssignmentParserImpl.hh \
-	language/parser/AssignmentParserImpl.tcc \
+	language/parser/AssignmentParserBase.cc \
+	language/parser/AssignmentParserBase.hh \
+	language/parser/AssignmentParserResult.hh \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironment.hh \
-	language/parser/CommandParser.hh \
 	language/parser/CommentSkipper.cc \
 	language/parser/CommentSkipper.hh \
 	language/parser/Environment.cc \
@@ -75,6 +75,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/LineContinuationTreatment.hh \
 	language/parser/NeedMoreSource.hh \
 	language/parser/Parser.hh \
+	language/parser/ParserBase.hh \
 	language/parser/PipelineParser.cc \
 	language/parser/PipelineParser.hh \
 	language/parser/Predicate.cc \
@@ -84,17 +85,16 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Reparse.hh \
 	language/parser/SimpleCommandParser.cc \
 	language/parser/SimpleCommandParser.hh \
-	language/parser/SimpleCommandParserImpl.hh \
-	language/parser/SimpleCommandParserImpl.tcc \
+	language/parser/SimpleCommandParserBase.cc \
+	language/parser/SimpleCommandParserBase.hh \
 	language/parser/Skipper.cc \
 	language/parser/Skipper.hh \
 	language/parser/StringParser.cc \
 	language/parser/StringParser.hh \
-	language/parser/WordComponentParser.hh \
 	language/parser/WordParser.cc \
 	language/parser/WordParser.hh \
-	language/parser/WordParserImpl.hh \
-	language/parser/WordParserImpl.tcc \
+	language/parser/WordParserBase.cc \
+	language/parser/WordParserBase.hh \
 	language/parser/token.cc \
 	language/parser/token.hh \
 	language/source/LineAppendedSource.cc \
@@ -136,8 +136,9 @@ common_MaybeTest_SOURCES = \
 	common/MaybeTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
-language_parser_AssignmentParserImplTest_SOURCES = \
-	language/parser/AssignmentParserImplTest.cc \
+language_parser_AssignmentParserBaseTest_SOURCES = \
+	language/parser/AssignmentParserBase.cc \
+	language/parser/AssignmentParserBaseTest.cc \
 	language/parser/BasicEnvironment.cc \
 	language/parser/Environment.cc \
 	language/parser/Predicate.cc \
@@ -200,12 +201,13 @@ language_parser_RawStringParserTest_SOURCES = \
 	language/source/SourceBuffer.cc \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc
-language_parser_SimpleCommandParserImplTest_SOURCES = \
+language_parser_SimpleCommandParserBaseTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/CommentSkipper.cc \
 	language/parser/Environment.cc \
 	language/parser/Predicate.cc \
-	language/parser/SimpleCommandParserImplTest.cc \
+	language/parser/SimpleCommandParserBase.cc \
+	language/parser/SimpleCommandParserBaseTest.cc \
 	language/parser/Skipper.cc \
 	language/parser/WordParserTestHelper.hh \
 	language/source/LineContinuedSource.cc \
@@ -235,10 +237,11 @@ language_parser_StringParserTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
-language_parser_WordParserImplTest_SOURCES = \
+language_parser_WordParserBaseTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/Environment.cc \
-	language/parser/WordParserImplTest.cc \
+	language/parser/WordParserBase.cc \
+	language/parser/WordParserBaseTest.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \

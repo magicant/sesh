@@ -20,52 +20,48 @@
 
 #include "buildconfig.h"
 
-#include <memory>
-#include <utility>
-#include "common/String.hh"
-#include "language/parser/Environment.hh"
-#include "language/source/SourceBuffer.hh"
-
 namespace sesh {
 namespace language {
 namespace parser {
 
-/** Fundamental part of parser implementation. */
+/**
+ * Abstract base class for parser classes.
+ *
+ * @tparam Result The type of an object returned as a result. Typically this
+ * type is a unique pointer to an actual result object.
+ */
+template<typename Result>
 class Parser {
 
-private:
+public:
 
-    Environment &mEnvironment;
-
-protected:
-
-    using CharInt = sesh::common::CharTraits::int_type;
-    using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
-
-    explicit Parser(Environment &e) noexcept : mEnvironment(e) { }
-    Parser(const Parser &) = default;
-    Parser(Parser &&) = default;
-    Parser &operator=(const Parser &) = delete;
-    Parser &operator=(Parser &&) = delete;
-    ~Parser() = default;
-
-    Environment &environment() const noexcept { return mEnvironment; }
+    virtual ~Parser() = default;
 
     /**
-     * Returns the character pointed to by the argument iterator if the
-     * iterator is before the end of the buffer. If the iterator is at the end:
-     *  - EOF is returned if the environment says EOF has been reached; or
-     *  - NeedMoreSource is thrown otherwise.
+     * Parses (part of) the source and returns the result. Typically the
+     * <code>Result</code> type is a pointer to something and a null pointer
+     * means a parse error. The precise meaning of the result is defined by
+     * each subclass.
+     *
+     * If this parser has an associated {@link Environment}, its current
+     * iterator position is updated so that it points to the character just
+     * past the parsed part of the source.
+     *
+     * If this function returns a result without throwing, the internal state
+     * of this parser is no longer valid and this function must never be called
+     * again.
+     *
+     * If more source is needed to finish parsing, this function throws
+     * NeedMoreSource. In this case, the caller should update the source and
+     * then call this function again. (Normally, the caller should either set
+     * the EOF flag or append to the source in the environment.)
+     *
+     * @throws NeedMoreSource when more source is needed to finish parsing.
      */
-    CharInt dereference(const Iterator &i) const {
-        return parser::dereference(environment(), i);
-    }
+    virtual Result parse() = 0;
+    // TODO what if alias substitution happened?
 
-    CharInt currentCharInt() const {
-        return dereference(environment().current());
-    }
-
-};
+}; // template class Parser
 
 } // namespace parser
 } // namespace language

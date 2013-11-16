@@ -15,38 +15,28 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_language_parser_AssignmentParserResult_hh
+#define INCLUDED_language_parser_AssignmentParserResult_hh
+
 #include "buildconfig.h"
-#include "StringParser.hh"
 
-#include <utility>
-#include "common/Char.hh"
-#include "common/String.hh"
-#include "language/parser/Environment.hh"
-
-using sesh::common::Char;
-using sesh::common::CharTraits;
-using sesh::common::String;
+#include <memory>
+#include "common/Variant.hh"
+#include "language/syntax/Assignment.hh"
+#include "language/syntax/Word.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-StringParser::StringParser(
-        Environment &e,
-        Predicate<Char> &&isDelimiter,
-        LineContinuationTreatment lct) :
-        ParserBase(e),
-        mBegin(e.current()),
-        mSkipper(e, std::move(isDelimiter), lct) { }
-
-String StringParser::parse() {
-    mSkipper.skip();
-
-    return toString(mBegin, environment().current());
-}
+using AssignmentParserResult = common::Variant<
+        std::unique_ptr<syntax::Assignment>,
+        std::unique_ptr<syntax::Word>>;
 
 } // namespace parser
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_parser_AssignmentParserResult_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -15,31 +15,35 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_WordParserImpl_hh
-#define INCLUDED_language_parser_WordParserImpl_hh
+#ifndef INCLUDED_language_parser_WordParserBase_hh
+#define INCLUDED_language_parser_WordParserBase_hh
 
 #include "buildconfig.h"
 
-#include <functional>
 #include <memory>
 #include "common/Char.hh"
+#include "language/parser/LineContinuationTreatment.hh"
 #include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
-#include "language/parser/WordComponentParser.hh"
 #include "language/syntax/Word.hh"
+#include "language/syntax/WordComponent.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
 
 /**
- * Word parser.
- *
- * @tparam Types A placeholder type that specifies word component parser types
- * that are used by the word parser.
+ * Word parser. This is an abstract class that implements most part of the
+ * parser. A concrete subclass must provide factory methods that create parsers
+ * used by this parser.
  */
-template<typename Types>
-class WordParserImpl : public Parser {
+class WordParserBase :
+        public Parser<std::unique_ptr<syntax::Word>>, protected ParserBase {
+
+protected:
+
+    using ComponentParser = Parser<std::unique_ptr<syntax::WordComponent>>;
 
 private:
 
@@ -48,18 +52,28 @@ private:
     std::unique_ptr<syntax::Word> mWord;
 
     /** May be null. */
-    std::unique_ptr<WordComponentParser> mCurrentComponentParser;
+    std::unique_ptr<ComponentParser> mCurrentComponentParser;
 
 public:
 
-    WordParserImpl(Environment &, Predicate<common::Char> &&isDelimiter);
-    WordParserImpl(const WordParserImpl &) = delete;
-    WordParserImpl(WordParserImpl &&) = default;
-    WordParserImpl &operator=(const WordParserImpl &) = delete;
-    WordParserImpl &operator=(WordParserImpl &&) = delete;
-    // XXX: GCC bug #51629: ~WordParserImpl() = default;
+    WordParserBase(Environment &, Predicate<common::Char> &&isDelimiter);
+    WordParserBase(const WordParserBase &) = delete;
+    WordParserBase(WordParserBase &&) = default;
+    WordParserBase &operator=(const WordParserBase &) = delete;
+    WordParserBase &operator=(WordParserBase &&) = delete;
+    ~WordParserBase() override = default;
 
 private:
+
+    /**
+     * Creates a new raw string parser that works in the same environment as
+     * this.
+     * @return non-null pointer to a new raw string parser.
+     */
+    virtual std::unique_ptr<ComponentParser> createRawStringParser(
+            Predicate<common::Char> &&isDelimiter,
+            LineContinuationTreatment = LineContinuationTreatment::REMOVE)
+            const = 0;
 
     /**
      * If mCurrentComponentParser is null, tries to create a new one. The type
@@ -86,17 +100,16 @@ public:
      * throws NeedMoreSource. In this case, the caller should set the EOF flag
      * or append to the source and then call this function again.
      *
-     * @throws NeedMoreSource (see above)
-     * @throws std::logic_error when the state of the parser is invalid.
+     * @throws NeedMoreSource when more source is needed to finish parsing.
      */
-    std::unique_ptr<syntax::Word> parse();
+    std::unique_ptr<syntax::Word> parse() final override;
 
-};
+}; // class WordParserBase
 
 } // namespace parser
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_parser_WordParserImpl_hh
+#endif // #ifndef INCLUDED_language_parser_WordParserBase_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

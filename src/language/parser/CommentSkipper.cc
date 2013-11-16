@@ -35,7 +35,7 @@ namespace language {
 namespace parser {
 
 CommentSkipper::CommentSkipper(Environment &e, Skipper &&blankSkipper) :
-        Parser(e),
+        ParserBase(e),
         mState(State::BLANK),
         mBlankSkipper(std::move(blankSkipper)),
         mCommentSkipper(e, isNewline, LineContinuationTreatment::LITERAL) { }

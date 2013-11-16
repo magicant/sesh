@@ -15,12 +15,10 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_SimpleCommandParserImpl_tcc
-#define INCLUDED_language_parser_SimpleCommandParserImpl_tcc
-
 #include "buildconfig.h"
-#include "SimpleCommandParserImpl.hh"
+#include "SimpleCommandParserBase.hh"
 
+#include <cassert>
 #include <memory>
 #include <stdexcept>
 #include <utility>
@@ -28,39 +26,60 @@
 #include "language/parser/CommentSkipper.hh"
 #include "language/parser/Predicate.hh"
 #include "language/source/SourceBuffer.hh"
+#include "language/syntax/Assignment.hh"
 #include "language/syntax/SimpleCommand.hh"
+#include "language/syntax/Word.hh"
+
+using sesh::language::syntax::Assignment;
+using sesh::language::syntax::SimpleCommand;
+using sesh::language::syntax::Word;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-template<typename Types>
-SimpleCommandParserImpl<Types>::SimpleCommandParserImpl(Environment &e)
-        noexcept :
-        Parser(e),
-        CommandParser(),
+SimpleCommandParserBase::SimpleCommandParserBase(Environment &e) noexcept :
+        Parser(),
+        ParserBase(e),
         mState(State::of(normalCommentSkipper(e))),
-        mCommand(new syntax::SimpleCommand) { }
+        mCommand(new SimpleCommand) { }
 
-template<typename Types>
-void SimpleCommandParserImpl<Types>::switchToCommentSkipper() {
-    mState.template emplace<CommentSkipper>(
-            normalCommentSkipper(environment()));
+void SimpleCommandParserBase::switchToCommentSkipper() {
+    mState.emplace<CommentSkipper>(normalCommentSkipper(environment()));
 }
 
-template<typename Types>
-void SimpleCommandParserImpl<Types>::switchToAssignmentOrWordParser() {
+void SimpleCommandParserBase::switchToAssignmentOrWordParser() {
     assert(mCommand != nullptr);
     if (mCommand->words().empty())
-        mState.template emplace<AssignmentParser>(environment());
+        mState.emplace<AssignmentParserPointer>(createAssignmentParser());
     else
-        mState.template emplace<WordParser>(environment(), isTokenDelimiter);
+        mState.emplace<WordParserPointer>(createWordParser(isTokenDelimiter));
 }
 
+class SimpleCommandParserBase::Processor {
+
+private:
+
+    SimpleCommandParserBase &mParser;
+
+public:
+
+    Processor(SimpleCommandParserBase &p) : mParser(p) { }
+
+    using Result = bool;
+
+    bool operator()(AssignmentPointer &&);
+    bool operator()(WordPointer &&);
+
+    bool operator()(CommentSkipper &);
+    bool operator()(AssignmentParserPointer &);
+    bool operator()(WordParserPointer &);
+
+};
+
 /** @return true if we should continue parsing. */
-template<typename Types>
-bool SimpleCommandParserImpl<Types>::Processor::operator()(
-        typename AssignmentParser::AssignmentPointer &&assignment) {
+bool SimpleCommandParserBase::Processor::operator()(
+        AssignmentPointer &&assignment) {
     assert(mParser.mCommand != nullptr);
     assert(assignment != nullptr);
     mParser.mCommand->assignments().emplace_back(std::move(assignment));
@@ -70,9 +89,7 @@ bool SimpleCommandParserImpl<Types>::Processor::operator()(
 }
 
 /** @return true if we should continue parsing. */
-template<typename Types>
-bool SimpleCommandParserImpl<Types>::Processor::operator()(
-        typename AssignmentParser::WordPointer &&word) {
+bool SimpleCommandParserBase::Processor::operator()(WordPointer &&word) {
     assert(word != nullptr);
     if (word->components().empty())
         return false;
@@ -85,31 +102,28 @@ bool SimpleCommandParserImpl<Types>::Processor::operator()(
 }
 
 /** @return true if we should continue parsing. */
-template<typename Types>
-bool SimpleCommandParserImpl<Types>::Processor::operator()(
-        CommentSkipper &skipper) {
+bool SimpleCommandParserBase::Processor::operator()(CommentSkipper &skipper) {
     skipper.skip();
     mParser.switchToAssignmentOrWordParser();
     return true;
 }
 
 /** @return true if we should continue parsing. */
-template<typename Types>
-bool SimpleCommandParserImpl<Types>::Processor::operator()(
-        AssignmentParser &parser) {
-    return parser.parse().apply(*this);
+bool SimpleCommandParserBase::Processor::operator()(
+        AssignmentParserPointer &parser) {
+    assert(parser != nullptr);
+    return parser->parse().apply(*this);
 }
 
 /** @return true if we should continue parsing. */
-template<typename Types>
-bool SimpleCommandParserImpl<Types>::Processor::operator()(
-        WordParser &parser) {
-    return (*this)(parser.parse());
+bool SimpleCommandParserBase::Processor::operator()(
+        WordParserPointer &parser) {
+    assert(parser != nullptr);
+    return (*this)(parser->parse());
 }
 
-template<typename Types>
 std::unique_ptr<syntax::SimpleCommand>
-SimpleCommandParserImpl<Types>::parseSimpleCommand() {
+SimpleCommandParserBase::parseSimpleCommand() {
     if (mCommand == nullptr)
         throw std::logic_error("invalid parser state");
 
@@ -118,8 +132,7 @@ SimpleCommandParserImpl<Types>::parseSimpleCommand() {
     return std::move(mCommand);
 }
 
-template<typename Types>
-std::unique_ptr<syntax::Command> SimpleCommandParserImpl<Types>::parse() {
+std::unique_ptr<syntax::Command> SimpleCommandParserBase::parse() {
     return parseSimpleCommand();
 }
 
@@ -128,7 +141,5 @@ std::unique_ptr<syntax::Command> SimpleCommandParserImpl<Types>::parse() {
 } // namespace parser
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_parser_SimpleCommandParserImpl_tcc
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

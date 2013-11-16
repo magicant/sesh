@@ -25,9 +25,9 @@
 #include <utility>
 #include "common/String.hh"
 #include "language/parser/BasicEnvironmentTestHelper.hh"
-#include "language/parser/CommandParser.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/PipelineParser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/StringParser.hh"
@@ -40,9 +40,9 @@ namespace {
 using sesh::common::CharTraits;
 using sesh::common::String;
 using sesh::language::parser::CLocaleEnvironmentStub;
-using sesh::language::parser::CommandParser;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
+using sesh::language::parser::Parser;
 using sesh::language::parser::PipelineParser;
 using sesh::language::parser::StringParser;
 using sesh::language::parser::isTokenDelimiter;
@@ -66,7 +66,7 @@ public:
 
 };
 
-class CommandParserStub : public CommandParser {
+class CommandParserStub : public Parser<std::unique_ptr<Command>> {
 
 private:
 
@@ -83,12 +83,14 @@ public:
 
 };
 
-std::unique_ptr<CommandParser> createCommandParser(Environment &e) {
+std::unique_ptr<Parser<std::unique_ptr<Command>>>
+createCommandParser(Environment &e) {
     auto c = dereference(e, e.current());
     if (CharTraits::eq_int_type(c, CharTraits::eof()) ||
             isTokenDelimiter(e, CharTraits::to_char_type(c)))
         return nullptr;
-    return std::unique_ptr<CommandParser>(new CommandParserStub(e));
+    return std::unique_ptr<Parser<std::unique_ptr<Command>>>(
+            new CommandParserStub(e));
 }
 
 void checkPipelineCommand(

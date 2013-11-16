@@ -15,13 +15,9 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_WordParserImpl_tcc
-#define INCLUDED_language_parser_WordParserImpl_tcc
-
 #include "buildconfig.h"
-#include "WordParserImpl.hh"
+#include "WordParserBase.hh"
 
-#include <functional>
 #include <stdexcept>
 #include <utility>
 #include "common/Char.hh"
@@ -30,24 +26,27 @@
 #include "language/syntax/Word.hh"
 #include "language/syntax/WordComponent.hh"
 
+using sesh::common::Char;
+using sesh::common::CharTraits;
+using sesh::language::syntax::Word;
+
 namespace sesh {
 namespace language {
 namespace parser {
 
-template<typename Types>
-WordParserImpl<Types>::WordParserImpl(
+WordParserBase::WordParserBase(
         Environment &e,
-        Predicate<common::Char> &&isDelimiter) :
-        Parser(e),
+        Predicate<Char> &&isDelimiter) :
+        Parser(),
+        ParserBase(e),
         mIsDelimiter(std::move(isDelimiter)),
-        mWord(new syntax::Word),
+        mWord(new Word),
         mCurrentComponentParser(nullptr) {
     if (mIsDelimiter == nullptr)
-        mIsDelimiter = [](const Environment &, common::Char) { return false; };
+        mIsDelimiter = [](const Environment &, Char) { return false; };
 }
 
-template<typename Types>
-void WordParserImpl<Types>::createComponentParser() {
+void WordParserBase::createComponentParser() {
     if (mCurrentComponentParser != nullptr)
         return;
 
@@ -55,19 +54,17 @@ void WordParserImpl<Types>::createComponentParser() {
 
     // TODO support other types of word component parser
 
-    using common::CharTraits;
     CharInt ci = dereference(environment().current());
     if (CharTraits::eq_int_type(ci, CharTraits::eof()))
         return;
     if (mIsDelimiter(environment(), CharTraits::to_char_type(ci)))
         return;
 
-    mCurrentComponentParser.reset(new typename Types::RawStringParser(
-            environment(), Predicate<common::Char>(mIsDelimiter)));
+    mCurrentComponentParser =
+            createRawStringParser(Predicate<Char>(mIsDelimiter));
 }
 
-template<typename Types>
-std::unique_ptr<syntax::Word> WordParserImpl<Types>::parse() {
+std::unique_ptr<Word> WordParserBase::parse() {
     if (mWord == nullptr)
         throw std::logic_error("invalid parser state");
 
@@ -86,7 +83,5 @@ std::unique_ptr<syntax::Word> WordParserImpl<Types>::parse() {
 } // namespace parser
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_parser_WordParserImpl_tcc
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

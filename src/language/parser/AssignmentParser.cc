@@ -18,13 +18,21 @@
 #include "buildconfig.h"
 #include "AssignmentParser.hh"
 
-#include "language/parser/AssignmentParserImpl.tcc"
+#include <utility>
+#include "common/Char.hh"
+#include "language/parser/WordParser.hh"
+
+using sesh::common::Char;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-template class AssignmentParserImpl<RealAssignmentParserTypes>;
+auto AssignmentParser::createWordParser(Predicate<Char> &&isDelimiter) const
+        -> WordParserPointer {
+    return WordParserPointer(
+            new WordParser(environment(), std::move(isDelimiter)));
+}
 
 } // namespace parser
 } // namespace language

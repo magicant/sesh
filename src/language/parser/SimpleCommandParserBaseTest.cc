@@ -30,9 +30,9 @@
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
 #include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
-#include "language/parser/SimpleCommandParserImpl.hh"
-#include "language/parser/SimpleCommandParserImpl.tcc"
+#include "language/parser/SimpleCommandParserBase.hh"
 #include "language/parser/WordParserTestHelper.hh"
 #include "language/source/Source.hh"
 #include "language/source/SourceTestHelper.hh"
@@ -52,7 +52,9 @@ using sesh::language::parser::CLocaleEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Parser;
-using sesh::language::parser::SimpleCommandParserImpl;
+using sesh::language::parser::ParserBase;
+using sesh::language::parser::Predicate;
+using sesh::language::parser::SimpleCommandParserBase;
 using sesh::language::parser::WordParserStub;
 using sesh::language::parser::isTokenDelimiter;
 using sesh::language::source::Source;
@@ -62,7 +64,10 @@ using sesh::language::syntax::RawString;
 using sesh::language::syntax::SimpleCommand;
 using sesh::language::syntax::Word;
 
-class AssignmentParserStub {
+using AssignmentParserResult =
+        Variant<std::unique_ptr<Assignment>, std::unique_ptr<Word>>;
+
+class AssignmentParserStub : public Parser<AssignmentParserResult> {
 
 private:
 
@@ -76,7 +81,7 @@ public:
     using WordPointer = std::unique_ptr<Word>;
     using Result = Variant<AssignmentPointer, WordPointer>;
 
-    Result parse() {
+    Result parse() override {
         auto word = mWordParser.parse();
         if (word->components().empty())
             return Result::of(WordPointer(std::move(word)));
@@ -98,12 +103,22 @@ public:
 
 };
 
-class TestTypes {
-public:
-    using AssignmentParser = AssignmentParserStub;
-    using WordParser = WordParserStub;
+class SimpleCommandParser : public SimpleCommandParserBase {
+
+    using SimpleCommandParserBase::SimpleCommandParserBase;
+
+    AssignmentParserPointer createAssignmentParser() const override {
+        return AssignmentParserPointer(
+                new AssignmentParserStub(environment()));
+    }
+
+    WordParserPointer createWordParser(Predicate<Char> &&isDelimiter)
+            const override {
+        return WordParserPointer(
+                new WordParserStub(environment(), std::move(isDelimiter)));
+    }
+
 };
-using SimpleCommandParser = SimpleCommandParserImpl<TestTypes>;
 
 void checkWord(const Word *w, const String &value) {
     REQUIRE(w != nullptr);

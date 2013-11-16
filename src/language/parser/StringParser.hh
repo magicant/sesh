@@ -24,7 +24,7 @@
 #include "common/Char.hh"
 #include "common/String.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/Skipper.hh"
 
@@ -36,7 +36,7 @@ namespace parser {
  * A simple parser that extracts a string from the initial position up to a
  * delimiter.
  */
-class StringParser : public Parser {
+class StringParser : protected ParserBase {
 
 private:
 

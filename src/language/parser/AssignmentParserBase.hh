@@ -15,16 +15,20 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_AssignmentParserImpl_hh
-#define INCLUDED_language_parser_AssignmentParserImpl_hh
+#ifndef INCLUDED_language_parser_AssignmentParserBase_hh
+#define INCLUDED_language_parser_AssignmentParserBase_hh
 
 #include "buildconfig.h"
 
 #include <memory>
 #include "common/Maybe.hh"
+#include "common/String.hh"
 #include "common/Variant.hh"
+#include "language/parser/AssignmentParserResult.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
+#include "language/parser/StringParser.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Word.hh"
 
@@ -33,22 +37,22 @@ namespace language {
 namespace parser {
 
 /**
- * Assignment parser. It parses a token as an assignment or word.
- *
- * @tparam Types A placeholder type that specifies parser types that are used
- * by the assignment parser.
- *
- * @see syntax::Assignment
- * @see syntax::Word
+ * Assignment parser. This is an abstract class that implements most part of
+ * the parser. A concrete subclass must provide a factory method that creates
+ * parsers used by this parser.
  */
-template<typename Types>
-class AssignmentParserImpl : public Parser {
+class AssignmentParserBase :
+        public Parser<AssignmentParserResult>, protected ParserBase {
+
+protected:
+
+    using WordParserPointer =
+            std::unique_ptr<Parser<std::unique_ptr<syntax::Word>>>;
 
 private:
 
-    using NameParser = typename Types::StringParser;
-    using WordParser = typename Types::WordParser;
-    using State = common::Variant<NameParser, WordParser>;
+    using NameParserPointer = std::unique_ptr<StringParser>;
+    using State = common::Variant<NameParserPointer, WordParserPointer>;
 
     source::SourceBuffer::ConstIterator mBegin;
     common::Maybe<common::String> mVariableName;
@@ -56,16 +60,15 @@ private:
 
 public:
 
-    AssignmentParserImpl(Environment &);
-    AssignmentParserImpl(const AssignmentParserImpl &) = delete;
-    AssignmentParserImpl(AssignmentParserImpl &&) = default;
-    AssignmentParserImpl &operator=(const AssignmentParserImpl &) = delete;
-    AssignmentParserImpl &operator=(AssignmentParserImpl &&) = delete;
-    // XXX: GCC bug #51629: ~AssignmentParserImpl() = default;
+    AssignmentParserBase(Environment &);
+    AssignmentParserBase(const AssignmentParserBase &) = delete;
+    AssignmentParserBase(AssignmentParserBase &&) = default;
+    AssignmentParserBase &operator=(const AssignmentParserBase &) = delete;
+    AssignmentParserBase &operator=(AssignmentParserBase &&) = delete;
+    ~AssignmentParserBase() override = default;
 
     using AssignmentPointer = std::unique_ptr<syntax::Assignment>;
     using WordPointer = std::unique_ptr<syntax::Word>;
-    using Result = common::Variant<AssignmentPointer, WordPointer>;
 
 private:
 
@@ -75,6 +78,13 @@ private:
      */
     static bool isValidVariableName(
             const Environment &, const common::String &);
+
+    /**
+     * Creates a new word parser that works in the same environment as this.
+     * @return non-null pointer to a new word parser.
+     */
+    virtual WordParserPointer createWordParser(
+            Predicate<common::Char> &&isDelimiter) const = 0;
 
     void parseVariableName();
 
@@ -95,10 +105,9 @@ public:
      * function throws NeedMoreSource. In this case, the caller should set the
      * EOF flag or append to the source and then call this function again.
      *
-     * @throws NeedMoreSource (see above) @throws std::logic_error when the
-     * state of the parser is invalid.
+     * @throws NeedMoreSource when more source is needed to finish parsing.
      */
-    Result parse();
+    AssignmentParserResult parse() final override;
 
 };
 
@@ -106,6 +115,6 @@ public:
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_parser_AssignmentParserImpl_hh
+#endif // #ifndef INCLUDED_language_parser_AssignmentParserBase_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
