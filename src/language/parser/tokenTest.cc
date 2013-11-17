@@ -37,9 +37,12 @@ using sesh::common::CharTraits;
 using sesh::common::String;
 using sesh::language::parser::BasicEnvironmentStub;
 using sesh::language::parser::CLocaleEnvironmentStub;
-using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Environment;
+using sesh::language::parser::NeedMoreSource;
+using sesh::language::parser::parseKeyword;
 using sesh::language::parser::parseSymbol;
+using sesh::language::parser::peekKeyword;
+using sesh::language::parser::peekSymbol;
 using sesh::language::source::SourceBuffer;
 
 using Iterator = sesh::language::source::SourceBuffer::ConstIterator;
