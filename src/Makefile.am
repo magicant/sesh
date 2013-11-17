@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	common/VariantTest \
 	language/parser/AssignmentParserBaseTest \
 	language/parser/BasicEnvironmentTest \
+	language/parser/CommandParserBaseTest \
 	language/parser/CommentSkipperTest \
 	language/parser/EnvironmentTest \
 	language/parser/PipelineParserTest \
@@ -68,6 +69,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/AssignmentParserResult.hh \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironment.hh \
+	language/parser/CommandParserBase.cc \
+	language/parser/CommandParserBase.hh \
 	language/parser/CommentSkipper.cc \
 	language/parser/CommentSkipper.hh \
 	language/parser/Environment.cc \
@@ -156,6 +159,16 @@ language_parser_BasicEnvironmentTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironmentTest.cc \
 	language/parser/BasicEnvironmentTestHelper.hh \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_CommandParserBaseTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/CommandParserBase.cc \
+	language/parser/CommandParserBaseTest.cc \
+	language/parser/Environment.cc \
+	language/parser/Predicate.cc \
+	language/parser/token.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
