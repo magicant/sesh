@@ -78,7 +78,10 @@ public:
             mInnerParser(e, isTokenDelimiter) { }
 
     std::unique_ptr<Command> parse() {
-        return std::unique_ptr<Command>(new CommandStub(mInnerParser.parse()));
+        String s = mInnerParser.parse();
+        if (s.empty())
+            return nullptr;
+        return std::unique_ptr<Command>(new CommandStub(std::move(s)));
     }
 
 };
@@ -86,8 +89,7 @@ public:
 std::unique_ptr<Parser<std::unique_ptr<Command>>>
 createCommandParser(Environment &e) {
     auto c = dereference(e, e.current());
-    if (CharTraits::eq_int_type(c, CharTraits::eof()) ||
-            isTokenDelimiter(e, CharTraits::to_char_type(c)))
+    if (CharTraits::eq_int_type(c, CharTraits::eof()))
         return nullptr;
     return std::unique_ptr<Parser<std::unique_ptr<Command>>>(
             new CommandParserStub(e));
