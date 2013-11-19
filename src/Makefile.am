@@ -69,6 +69,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/AssignmentParserResult.hh \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironment.hh \
+	language/parser/CommandParser.cc \
+	language/parser/CommandParser.hh \
 	language/parser/CommandParserBase.cc \
 	language/parser/CommandParserBase.hh \
 	language/parser/CommentSkipper.cc \
