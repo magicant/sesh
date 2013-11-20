@@ -34,7 +34,53 @@ namespace sesh {
 namespace language {
 namespace parser {
 
+namespace token {
+
+const String AND = L("&");
+const String AND_AND = L("&&");
+const String GREATER = L(">");
+const String GREATER_AND = L(">&");
+const String GREATER_GREATER = L(">>");
+const String GREATER_PIPE = L(">|");
+const String LEFT_PARENTHESIS = L("(");
+const String LESS = L("<");
+const String LESS_AND = L("<&");
+const String LESS_GREATER = L("<>");
+const String LESS_LESS = L("<<");
+const String LESS_LESS_MINUS = L("<<-");
+const String LESS_PIPE = L("<|");
+const String PIPE = L("|");
+const String PIPE_PIPE = L("||");
+const String RIGHT_PARENTHESIS = L(")");
+const String SEMICOLON = L(";");
+const String SEMICOLON_SEMICOLON = L(";;");
+
+const String CASE = L("case");
+const String DO = L("do");
+const String DONE = L("done");
+const String ELIF = L("elif");
+const String ELSE = L("else");
+const String ESAC = L("esac");
+const String EXCLAMATION = L("!");
+const String FI = L("fi");
+const String FOR = L("for");
+const String FUNCTION = L("function");
+const String IF = L("if");
+const String IN = L("in");
+const String LEFT_BRACE = L("{");
+const String LEFT_BRACKET_BRACKET = L("[[");
+const String RIGHT_BRACE = L("}");
+const String RIGHT_BRACKET_BRACKET = L("]]");
+const String SELECT = L("select");
+const String THEN = L("then");
+const String UNTIL = L("until");
+const String WHILE = L("while");
+
+} // namespace token
+
 namespace {
+
+const String EMPTY;
 
 /** Remove line continuations if any and return the current character. */
 CharTraits::int_type charAt(SourceBuffer::Difference n, Environment &e) {
@@ -47,76 +93,69 @@ CharTraits::int_type charAt(SourceBuffer::Difference n, Environment &e) {
 
 #define IL(x) (CharTraits::to_int_type(L(x)))
 
-String peekSymbol(Environment &e) {
-    SourceBuffer::Size length;
-
+const String &peekSymbol(Environment &e) {
     switch (charAt(0, e)) {
     case IL('&'):
         switch (charAt(1, e)) {
-        case IL('&'):  length = 2;  break;
-        default:       length = 1;  break;
+        case IL('&'):
+            return token::AND_AND;
+        default:
+            return token::AND;
         }
-        break;
     case IL('|'):
         switch (charAt(1, e)) {
-        case IL('|'):  length = 2;  break;
-        default:       length = 1;  break;
+        case IL('|'):
+            return token::PIPE_PIPE;
+        default:
+            return token::PIPE;
         }
-        break;
     case IL(';'):
         switch (charAt(1, e)) {
-        case IL(';'):  length = 2;  break;
-        default:       length = 1;  break;
+        case IL(';'):
+            return token::SEMICOLON_SEMICOLON;
+        default:
+            return token::SEMICOLON;
         }
-        break;
     case IL('<'):
         switch (charAt(1, e)) {
         case IL('<'):
             switch (charAt(2, e)) {
-            case IL('-'):  length = 3;  break;
-            default:       length = 2;  break;
+            case IL('-'):
+                return token::LESS_LESS_MINUS;
+            default:
+                return token::LESS_LESS;
             }
-            break;
         case IL('>'):
+            return token::LESS_GREATER;
         case IL('&'):
+            return token::LESS_AND;
         case IL('|'):
-            length = 2;
-            break;
+            return token::LESS_PIPE;
         default:
-            length = 1;
-            break;
+            return token::LESS;
         }
-        break;
     case IL('>'):
         switch (charAt(1, e)) {
         case IL('>'):
+            return token::GREATER_GREATER;
         case IL('&'):
+            return token::GREATER_AND;
         case IL('|'):
-            length = 2;
-            break;
+            return token::GREATER_PIPE;
         default:
-            length = 1;
-            break;
+            return token::GREATER;
         }
-        break;
     case IL('('):
-        length = 1;
-        break;
+        return token::LEFT_PARENTHESIS;
     case IL(')'):
-        length = 1;
-        break;
+        return token::RIGHT_PARENTHESIS;
     default:
-        length = 0;
-        break;
+        return EMPTY;
     }
-
-    Iterator begin = e.current();
-    Iterator end = begin + length;
-    return toString(begin, end);
 }
 
-String parseSymbol(Environment &e) {
-    String symbol = peekSymbol(e);
+const String &parseSymbol(Environment &e) {
+    const String &symbol = peekSymbol(e);
     e.current() += symbol.length();
     return symbol;
 }
@@ -124,134 +163,107 @@ String parseSymbol(Environment &e) {
 namespace {
 
 /**
- * Checks if there is a specified string at the current position. If there is,
- * the length of the string is returned. Otherwise, zero is returned.
+ * Returns a candidate keyword that may exist at the current position.
  *
- * Line continuations are removed while parsing. The current position of the
- * environment is not changed.
+ * If there actually is a keyword at the current position, the keyword is
+ * returned. Otherwise, the return value is an empty string or an arbitrary
+ * keyword string.
  */
-String::size_type matchStringAndGetLength(Environment &e, const String &s) {
-    for (String::size_type i = 0; i < s.length(); i++) {
-        if (charAt(i, e) != CharTraits::to_int_type(s[i]))
-            return 0;
-    }
-    return s.length();
-}
-
-} // namespace
-
-String peekKeyword(Environment &e) {
-    static const String CASE = L("case");
-    static const String FUNCTION = L("function");
-    static const String SELECT = L("select");
-    static const String THEN = L("then");
-    static const String UNTIL = L("until");
-    static const String WHILE = L("while");
-
-    SourceBuffer::Size length;
-
-    // Keywords: ! [[ ]] { } case do done elif else esac fi for function if in
-    // select then until while
-    switch (auto c = charAt(0, e)) {
+const String &keywordCandidate(Environment &e) {
+    switch (charAt(0, e)) {
     case IL('!'):
+        return token::EXCLAMATION;
     case IL('{'):
+        return token::LEFT_BRACE;
     case IL('}'):
-        length = 1;
-        break;
+        return token::RIGHT_BRACE;
     case IL('['):
+        return token::LEFT_BRACKET_BRACKET;
     case IL(']'):
-        length = (charAt(1, e) == c) ? 2 : 0; // [[ ]]
-        break;
+        return token::RIGHT_BRACKET_BRACKET;
     case IL('c'):
-        length = matchStringAndGetLength(e, CASE);
-        break;
+        return token::CASE;
     case IL('d'):
-        if (charAt(1, e) != IL('o')) {
-            length = 0;
-            break;
-        }
-        if (charAt(2, e) == IL('n') && charAt(3, e) == IL('e'))
-            length = 4; // done
+        if (charAt(1, e) != IL('o'))
+            return EMPTY;
+        if (charAt(2, e) == IL('n'))
+            return token::DONE;
         else
-            length = 2; // do
-        break;
+            return token::DO;
     case IL('e'):
         switch (charAt(1, e)) {
         case IL('l'):
-            if ((charAt(2, e) == IL('i') && charAt(3, e) == IL('f')) ||
-                    (charAt(2, e) == IL('s') && charAt(3, e) == IL('e')))
-                length = 4; // elif else
-            else
-                length = 0;
-            break;
+            switch (charAt(2, e)) {
+            case IL('i'):
+                return token::ELIF;
+            case IL('s'):
+                return token::ELSE;
+            default:
+                return EMPTY;
+            }
         case IL('s'):
-            if (charAt(2, e) == IL('a') && charAt(3, e) == IL('c'))
-                length = 4; // esac
-            else
-                length = 0;
-            break;
+            return token::ESAC;
         default:
-            length = 0;
-            break;
+            return EMPTY;
         }
         break;
     case IL('f'):
         switch (charAt(1, e)) {
         case IL('i'):
-            length = 2; // fi
-            break;
+            return token::FI;
         case IL('o'):
-            length = (charAt(2, e) == IL('r')) ? 3 : 0; // for
-            break;
+            return token::FOR;
         case IL('u'):
-            length = matchStringAndGetLength(e, FUNCTION);
-            break;
+            return token::FUNCTION;
         default:
-            length = 0;
-            break;
+            return EMPTY;
         }
-        break;
     case IL('i'):
         switch (charAt(1, e)) {
         case IL('f'):
+            return token::IF;
         case IL('n'):
-            length = 2; // if in
-            break;
+            return token::IN;
         default:
-            length = 0;
-            break;
+            return EMPTY;
         }
-        break;
     case IL('s'):
-        length = matchStringAndGetLength(e, SELECT);
-        break;
+        return token::SELECT;
     case IL('t'):
-        length = matchStringAndGetLength(e, THEN);
-        break;
+        return token::THEN;
     case IL('u'):
-        length = matchStringAndGetLength(e, UNTIL);
-        break;
+        return token::UNTIL;
     case IL('w'):
-        length = matchStringAndGetLength(e, WHILE);
-        break;
+        return token::WHILE;
     default:
-        length = 0;
-        break;
+        return EMPTY;
     }
-
-    // A keyword must be followed by EOF or a token delimiter.
-    auto charAfterKeyword = charAt(length, e);
-    if (!CharTraits::eq_int_type(charAfterKeyword, CharTraits::eof()) &&
-            !isTokenDelimiter(e, CharTraits::to_char_type(charAfterKeyword)))
-        length = 0;
-
-    Iterator begin = e.current();
-    Iterator end = begin + length;
-    return toString(begin, end);
 }
 
-String parseKeyword(Environment &e) {
-    String keyword = peekKeyword(e);
+} // namespace
+
+const String &peekKeyword(Environment &e) {
+    const String &keyword = keywordCandidate(e);
+
+    if (keyword.empty())
+        return keyword; // not a keyword
+
+    // Check if the current token starts with the (candidate) keyword string
+    for (String::size_type i = 0; i < keyword.length(); i++)
+        if (charAt(i, e) != CharTraits::to_int_type(keyword[i]))
+            return EMPTY;
+
+    // A keyword must be followed by EOF or a token delimiter.
+    auto charAfterKeyword = charAt(keyword.length(), e);
+    if (!CharTraits::eq_int_type(charAfterKeyword, CharTraits::eof()) &&
+            !isTokenDelimiter(e, CharTraits::to_char_type(charAfterKeyword)))
+        return EMPTY;
+
+    return keyword;
+}
+
+const String &parseKeyword(Environment &e) {
+    const String &keyword = peekKeyword(e);
     e.current() += keyword.length();
     return keyword;
 }

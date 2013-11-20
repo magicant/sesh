@@ -47,8 +47,9 @@ public:
      *
      * The function must return a new command parser that should be used to
      * parse the command starting from the current position of the environment.
-     * The returned pointer is null if there is no valid command at the current
-     * position.
+     * If there is no valid command at the current position, either the command
+     * parser pointer returned by the function or the command pointer returned
+     * by the parser should be null.
      *
      * The function may peek a token at the current position to determine the
      * type of the command parser it creates. The function may remove line

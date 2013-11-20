@@ -35,18 +35,13 @@
 
 using sesh::common::Char;
 using sesh::common::String;
+using sesh::language::parser::token::EXCLAMATION;
+using sesh::language::parser::token::PIPE;
 using sesh::language::syntax::Pipeline;
 
 namespace sesh {
 namespace language {
 namespace parser {
-
-namespace {
-
-const String BANG = L("!");
-const String PIPE = L("|");
-
-} // namespace
 
 PipelineParser::PipelineParser(Environment &e, CommandParserCreator &&cpc) :
         ParserBase(e),
@@ -77,8 +72,8 @@ std::unique_ptr<Pipeline> PipelineParser::parse() {
 
     switch (mState) {
     case State::BEGINNING:
-        if (peekKeyword(environment()) == BANG) {
-            environment().current() += BANG.length();
+        if (peekKeyword(environment()) == EXCLAMATION) {
+            environment().current() += EXCLAMATION.length();
             mPipeline->exitStatusType() = Pipeline::ExitStatusType::NEGATED;
 
             mSkipper.emplace(normalCommentSkipper(environment()));
@@ -89,7 +84,7 @@ changeStateSkippingToCommand:
             mSkipper->skip();
             mSkipper.clear();
 
-            if (peekKeyword(environment()) == BANG) {
+            if (peekKeyword(environment()) == EXCLAMATION) {
                 // TODO report error
                 return nullptr;
             }

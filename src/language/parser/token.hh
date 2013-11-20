@@ -27,6 +27,49 @@ namespace sesh {
 namespace language {
 namespace parser {
 
+namespace token {
+
+extern const common::String AND;
+extern const common::String AND_AND;
+extern const common::String GREATER;
+extern const common::String GREATER_AND;
+extern const common::String GREATER_GREATER;
+extern const common::String GREATER_PIPE;
+extern const common::String LEFT_PARENTHESIS;
+extern const common::String LESS;
+extern const common::String LESS_AND;
+extern const common::String LESS_GREATER;
+extern const common::String LESS_LESS;
+extern const common::String LESS_LESS_MINUS;
+extern const common::String LESS_PIPE;
+extern const common::String PIPE;
+extern const common::String PIPE_PIPE;
+extern const common::String RIGHT_PARENTHESIS;
+extern const common::String SEMICOLON_SEMICOLON;
+
+extern const common::String CASE;
+extern const common::String DO;
+extern const common::String DONE;
+extern const common::String ELIF;
+extern const common::String ELSE;
+extern const common::String ESAC;
+extern const common::String EXCLAMATION;
+extern const common::String FI;
+extern const common::String FOR;
+extern const common::String FUNCTION;
+extern const common::String IF;
+extern const common::String IN;
+extern const common::String LEFT_BRACE;
+extern const common::String LEFT_BRACKET_BRACKET;
+extern const common::String RIGHT_BRACE;
+extern const common::String RIGHT_BRACKET_BRACKET;
+extern const common::String SELECT;
+extern const common::String THEN;
+extern const common::String UNTIL;
+extern const common::String WHILE;
+
+} // namespace token
+
 /**
  * Checks if there is a symbol at the current iterator position of the
  * environment.
@@ -43,7 +86,7 @@ namespace parser {
  *
  * @throws NeedMoreSource (see above)
  */
-common::String peekSymbol(Environment &);
+const common::String &peekSymbol(Environment &);
 
 /**
  * Parses a symbol from the current iterator position of the environment.
@@ -62,7 +105,7 @@ common::String peekSymbol(Environment &);
  *
  * @throws NeedMoreSource (see above)
  */
-common::String parseSymbol(Environment &);
+const common::String &parseSymbol(Environment &);
 
 /**
  * Checks if there is a keyword (reserved word) token at the environment's
@@ -80,7 +123,7 @@ common::String parseSymbol(Environment &);
  *
  * @throws NeedMoreSource (see above)
  */
-common::String peekKeyword(Environment &);
+const common::String &peekKeyword(Environment &);
 
 /**
  * Parses a keyword (reserved word) token from the current iterator position of
@@ -100,7 +143,7 @@ common::String peekKeyword(Environment &);
  *
  * @throws NeedMoreSource (see above)
  */
-common::String parseKeyword(Environment &);
+const common::String &parseKeyword(Environment &);
 
 } // namespace parser
 } // namespace language
