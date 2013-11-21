@@ -45,6 +45,7 @@ extern const common::String LESS_PIPE;
 extern const common::String PIPE;
 extern const common::String PIPE_PIPE;
 extern const common::String RIGHT_PARENTHESIS;
+extern const common::String SEMICOLON;
 extern const common::String SEMICOLON_SEMICOLON;
 
 extern const common::String CASE;
