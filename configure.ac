@@ -8,15 +8,16 @@
 # ANY WARRANTY, to the extent permitted by law; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.68])
 AC_INIT([Sesh], [0], [magicant@wonderwand.net], [sesh],
     [https://github.com/magicant/sesh])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([
-    1.13
+    1.11
     dist-xz
     foreign
     no-installinfo
+    parallel-tests
     subdir-objects
     -Wall
     -Werror

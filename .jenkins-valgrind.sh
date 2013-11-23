@@ -8,6 +8,6 @@ do
 done
 cd *-*/
 
-sh configure
+sh configure --disable-dependency-tracking
 trap 'cat src/test-suite.log' EXIT
 make -k LOG_COMPILER='$(SHELL) $(top_srcdir)/../.jenkins-log.sh' check

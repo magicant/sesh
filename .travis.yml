@@ -1,0 +1,10 @@
+language: cpp
+compiler:
+ - gcc
+ - clang
+install:
+ - sh -x .travis.sh --install
+script:
+ - sh -x .travis.sh --run
+after_failure:
+ - cat src/test-suite.log
