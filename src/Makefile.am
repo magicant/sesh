@@ -13,6 +13,7 @@ bin_PROGRAMS = sesh
 check_PROGRAMS = \
 	common/MaybeTest \
 	common/VariantTest \
+	language/parser/AndOrListParserTest \
 	language/parser/AssignmentParserBaseTest \
 	language/parser/BasicEnvironmentTest \
 	language/parser/CommandParserBaseTest \
@@ -62,6 +63,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/String.hh \
 	common/StringStream.hh \
 	common/Variant.hh \
+	language/parser/AndOrListParser.cc \
+	language/parser/AndOrListParser.hh \
 	language/parser/AssignmentParser.cc \
 	language/parser/AssignmentParser.hh \
 	language/parser/AssignmentParserBase.cc \
@@ -141,6 +144,23 @@ common_MaybeTest_SOURCES = \
 	common/MaybeTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
+language_parser_AndOrListParserTest_SOURCES = \
+	language/parser/AndOrListParser.cc \
+	language/parser/AndOrListParserTest.cc \
+	language/parser/BasicEnvironment.cc \
+	language/parser/CommentSkipper.cc \
+	language/parser/Environment.cc \
+	language/parser/Predicate.cc \
+	language/parser/Skipper.cc \
+	language/parser/StringParser.cc \
+	language/parser/token.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/AndOrList.cc \
+	language/syntax/ConditionalPipeline.cc \
+	language/syntax/Pipeline.cc \
+	language/syntax/Printer.cc
 language_parser_AssignmentParserBaseTest_SOURCES = \
 	language/parser/AssignmentParserBase.cc \
 	language/parser/AssignmentParserBaseTest.cc \
