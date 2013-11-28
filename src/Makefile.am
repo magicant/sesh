@@ -95,6 +95,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Reparse.hh \
 	language/parser/SequenceParser.cc \
 	language/parser/SequenceParser.hh \
+	language/parser/SequenceParserHelper.cc \
+	language/parser/SequenceParserHelper.hh \
 	language/parser/SimpleCommandParser.cc \
 	language/parser/SimpleCommandParser.hh \
 	language/parser/SimpleCommandParserBase.cc \
