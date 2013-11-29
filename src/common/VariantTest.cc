@@ -542,6 +542,43 @@ TEST_CASE("Double variant emplacement with fallback") {
     CHECK(v.value<int>() == 0);
 }
 
+TEST_CASE("Double variant reset") {
+    std::vector<Action> actions;
+    {
+        Variant<int, Stub> v(TypeTag<int>(), 1);
+        CHECK(v.value<int>() == 1);
+
+        CHECK_NOTHROW(v.reset(Stub(actions)));
+        CHECK(v.index() == v.index<Stub>());
+        CHECK(actions.size() == 3);
+
+        CHECK_NOTHROW(v.reset(2));
+        REQUIRE(v.index() == v.index<int>());
+        CHECK(v.value<int>() == 2);
+        CHECK(actions.size() == 4);
+
+        Stub stub(actions);
+        CHECK(actions.size() == 5);
+        CHECK_NOTHROW(v.reset(stub));
+        CHECK(v.index() == v.index<Stub>());
+        CHECK(actions.size() == 6);
+        CHECK_NOTHROW(v.reset(stub));
+        CHECK(v.index() == v.index<Stub>());
+        CHECK(actions.size() == 8);
+    }
+    CHECK(actions.size() == 10);
+    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION); // of temporary
+    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of variant value
+    CHECK(actions.at(2) == Action::DESTRUCTION); // of temporary
+    CHECK(actions.at(3) == Action::DESTRUCTION); // of variant value
+    CHECK(actions.at(4) == Action::STANDARD_CONSTRUCTION); // of local
+    CHECK(actions.at(5) == Action::COPY_CONSTRUCTION); // of variant value
+    CHECK(actions.at(6) == Action::DESTRUCTION); // of variant value
+    CHECK(actions.at(7) == Action::COPY_CONSTRUCTION); // of variant value
+    CHECK(actions.at(8) == Action::DESTRUCTION); // of local
+    CHECK(actions.at(9) == Action::DESTRUCTION); // of variant value
+}
+
 TEST_CASE("Double variant assignment with same type") {
     std::vector<Action> actions1, actions2;
     {
@@ -917,8 +954,8 @@ TEST_CASE("Double variant swapping with same type") {
     REQUIRE(v2.index() == v2.index<int>());
     CHECK(v2.value<int>() == 7);
 
-    v1.assign(32.0);
-    v2.assign(8.5);
+    v1.reset(32.0);
+    v2.reset(8.5);
     v1.swap(v2);
     REQUIRE(v1.index() == v1.index<double>());
     CHECK(v1.value<double>() == 8.5);

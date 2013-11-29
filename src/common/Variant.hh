@@ -678,6 +678,7 @@ public:
      * something is thrown at runtime, std::terminate is called.
      *
      * @see #emplaceWithFallback
+     * @see #reset
      */
     template<typename U, typename... Arg>
     void emplace(Arg &&... arg) noexcept {
@@ -709,6 +710,25 @@ public:
     }
 
     /**
+     * Sets the value of this variant to the argument by emplacement.
+     *
+     * If emplacement fails due to an exception, std::terminate is called.
+     *
+     * Requirements: The argument type <code>V</code> must be constructible.
+     *
+     * @tparam U the (usually inferred) type of the new contained value.
+     * @tparam V the actual type of the new contained value.
+     * @param v a reference to the original value
+     *
+     * @see #assign
+     * @see #emplace
+     */
+    template<typename U, typename V = typename std::decay<U>::type>
+    void reset(U &&v) noexcept {
+        emplace<V>(std::forward<U>(v));
+    }
+
+    /**
      * Sets the value of this variant to the argument by assignment or
      * emplacement. The assignment operator is used if the currently contained
      * type is <code>V</code>. Otherwise, the argument is emplaced.
@@ -722,6 +742,8 @@ public:
      * @tparam U the (usually inferred) type of the new contained value.
      * @tparam V the actual type of the new contained value.
      * @param v a reference to the original value
+     *
+     * @see #reset
      */
     template<typename U, typename V = typename std::decay<U>::type>
     void assign(U &&v) noexcept(std::is_nothrow_assignable<V, U &&>::value) {
