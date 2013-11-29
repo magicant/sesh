@@ -716,7 +716,7 @@ public:
      * Propagates any exception thrown by the assignment operator. If
      * emplacement fails due to an exception, std::terminate is called.
      *
-     * Requirements: The argument type <code>U</code> must be constructible and
+     * Requirements: The argument type <code>V</code> must be constructible and
      * assignable from the argument.
      *
      * @tparam U the (usually inferred) type of the new contained value.
