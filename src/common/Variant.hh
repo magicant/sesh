@@ -724,7 +724,7 @@ public:
      * @param v a reference to the original value
      */
     template<typename U, typename V = typename std::decay<U>::type>
-    void reset(U &&v) noexcept(std::is_nothrow_assignable<V, U &&>::value) {
+    void assign(U &&v) noexcept(std::is_nothrow_assignable<V, U &&>::value) {
         if (index() == index<V>())
             value<V>() = std::forward<U>(v);
         else

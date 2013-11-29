@@ -542,7 +542,7 @@ TEST_CASE("Double variant emplacement with fallback") {
     CHECK(v.value<int>() == 0);
 }
 
-TEST_CASE("Double variant reset with same type") {
+TEST_CASE("Double variant assignment with same type") {
     std::vector<Action> actions1, actions2;
     {
         Variant<int, Stub> v(TypeTag<Stub>(), actions1);
@@ -550,12 +550,12 @@ TEST_CASE("Double variant reset with same type") {
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
 
-        CHECK_NOTHROW(v.reset(stub));
+        CHECK_NOTHROW(v.assign(stub));
         CHECK(v.index() == v.index<Stub>());
         CHECK(actions1.size() == 2);
         CHECK(actions2.size() == 1);
 
-        CHECK_NOTHROW(v.reset(std::move(stub)));
+        CHECK_NOTHROW(v.assign(std::move(stub)));
         CHECK(v.index() == v.index<Stub>());
         CHECK(actions1.size() == 3);
         CHECK(actions2.size() == 1);
@@ -570,23 +570,23 @@ TEST_CASE("Double variant reset with same type") {
     CHECK(actions2.at(1) == Action::DESTRUCTION);
 }
 
-TEST_CASE("Double variant reset with different types") {
+TEST_CASE("Double variant assignment with different types") {
     std::vector<Action> actions;
     {
         Variant<int, Stub> v(TypeTag<int>(), 1);
 
-        CHECK_NOTHROW(v.reset(Stub(actions)));
+        CHECK_NOTHROW(v.assign(Stub(actions)));
         CHECK(v.index() == v.index<Stub>());
         CHECK(actions.size() == 3);
 
-        CHECK_NOTHROW(v.reset(100));
+        CHECK_NOTHROW(v.assign(100));
         REQUIRE(v.index() == v.index<int>());
         CHECK(v.value<int>() == 100);
         CHECK(actions.size() == 4);
 
         Stub stub(actions);
         CHECK(actions.size() == 5);
-        CHECK_NOTHROW(v.reset(stub));
+        CHECK_NOTHROW(v.assign(stub));
         REQUIRE(v.index() == v.index<Stub>());
         CHECK(actions.size() == 6);
     }
@@ -917,8 +917,8 @@ TEST_CASE("Double variant swapping with same type") {
     REQUIRE(v2.index() == v2.index<int>());
     CHECK(v2.value<int>() == 7);
 
-    v1.reset(32.0);
-    v2.reset(8.5);
+    v1.assign(32.0);
+    v2.assign(8.5);
     v1.swap(v2);
     REQUIRE(v1.index() == v1.index<double>());
     CHECK(v1.value<double>() == 8.5);
