@@ -34,7 +34,9 @@ namespace language {
 namespace parser {
 
 /** Pipeline parser. */
-class PipelineParser : protected ParserBase {
+class PipelineParser final :
+        public Parser<std::unique_ptr<syntax::Pipeline>>,
+        protected ParserBase {
 
 public:
 
@@ -92,7 +94,7 @@ public:
     PipelineParser(PipelineParser &&) = default;
     PipelineParser &operator=(const PipelineParser &) = delete;
     PipelineParser &operator=(PipelineParser &&) = delete;
-    ~PipelineParser() = default;
+    ~PipelineParser() override = default;
 
 private:
 
@@ -113,7 +115,7 @@ public:
      *
      * @throws NeedMoreSource (see above)
      */
-    std::unique_ptr<syntax::Pipeline> parse();
+    std::unique_ptr<syntax::Pipeline> parse() override;
 
 };
 

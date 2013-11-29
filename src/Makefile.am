@@ -21,6 +21,7 @@ check_PROGRAMS = \
 	language/parser/EnvironmentTest \
 	language/parser/PipelineParserTest \
 	language/parser/RawStringParserTest \
+	language/parser/SequenceParserTest \
 	language/parser/SimpleCommandParserBaseTest \
 	language/parser/SkipperTest \
 	language/parser/StringParserTest \
@@ -81,6 +82,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Environment.cc \
 	language/parser/Environment.hh \
 	language/parser/LineContinuationTreatment.hh \
+	language/parser/LineMode.hh \
 	language/parser/NeedMoreSource.hh \
 	language/parser/Parser.hh \
 	language/parser/ParserBase.hh \
@@ -91,6 +93,10 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/RawStringParser.cc \
 	language/parser/RawStringParser.hh \
 	language/parser/Reparse.hh \
+	language/parser/SequenceParser.cc \
+	language/parser/SequenceParser.hh \
+	language/parser/SequenceParserHelper.cc \
+	language/parser/SequenceParserHelper.hh \
 	language/parser/SimpleCommandParser.cc \
 	language/parser/SimpleCommandParser.hh \
 	language/parser/SimpleCommandParserBase.cc \
@@ -236,6 +242,24 @@ language_parser_RawStringParserTest_SOURCES = \
 	language/source/SourceBuffer.cc \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc
+language_parser_SequenceParserTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/CommentSkipper.cc \
+	language/parser/Environment.cc \
+	language/parser/Predicate.cc \
+	language/parser/SequenceParser.cc \
+	language/parser/SequenceParserTest.cc \
+	language/parser/Skipper.cc \
+	language/parser/StringParser.cc \
+	language/parser/token.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/AndOrList.cc \
+	language/syntax/ConditionalPipeline.cc \
+	language/syntax/Pipeline.cc \
+	language/syntax/Printer.cc \
+	language/syntax/Sequence.cc
 language_parser_SimpleCommandParserBaseTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/CommentSkipper.cc \
