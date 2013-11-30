@@ -542,7 +542,44 @@ TEST_CASE("Double variant emplacement with fallback") {
     CHECK(v.value<int>() == 0);
 }
 
-TEST_CASE("Double variant reset with same type") {
+TEST_CASE("Double variant reset") {
+    std::vector<Action> actions;
+    {
+        Variant<int, Stub> v(TypeTag<int>(), 1);
+        CHECK(v.value<int>() == 1);
+
+        CHECK_NOTHROW(v.reset(Stub(actions)));
+        CHECK(v.index() == v.index<Stub>());
+        CHECK(actions.size() == 3);
+
+        CHECK_NOTHROW(v.reset(2));
+        REQUIRE(v.index() == v.index<int>());
+        CHECK(v.value<int>() == 2);
+        CHECK(actions.size() == 4);
+
+        Stub stub(actions);
+        CHECK(actions.size() == 5);
+        CHECK_NOTHROW(v.reset(stub));
+        CHECK(v.index() == v.index<Stub>());
+        CHECK(actions.size() == 6);
+        CHECK_NOTHROW(v.reset(stub));
+        CHECK(v.index() == v.index<Stub>());
+        CHECK(actions.size() == 8);
+    }
+    CHECK(actions.size() == 10);
+    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION); // of temporary
+    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of variant value
+    CHECK(actions.at(2) == Action::DESTRUCTION); // of temporary
+    CHECK(actions.at(3) == Action::DESTRUCTION); // of variant value
+    CHECK(actions.at(4) == Action::STANDARD_CONSTRUCTION); // of local
+    CHECK(actions.at(5) == Action::COPY_CONSTRUCTION); // of variant value
+    CHECK(actions.at(6) == Action::DESTRUCTION); // of variant value
+    CHECK(actions.at(7) == Action::COPY_CONSTRUCTION); // of variant value
+    CHECK(actions.at(8) == Action::DESTRUCTION); // of local
+    CHECK(actions.at(9) == Action::DESTRUCTION); // of variant value
+}
+
+TEST_CASE("Double variant assignment with same type") {
     std::vector<Action> actions1, actions2;
     {
         Variant<int, Stub> v(TypeTag<Stub>(), actions1);
@@ -550,12 +587,12 @@ TEST_CASE("Double variant reset with same type") {
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
 
-        CHECK_NOTHROW(v.reset(stub));
+        CHECK_NOTHROW(v.assign(stub));
         CHECK(v.index() == v.index<Stub>());
         CHECK(actions1.size() == 2);
         CHECK(actions2.size() == 1);
 
-        CHECK_NOTHROW(v.reset(std::move(stub)));
+        CHECK_NOTHROW(v.assign(std::move(stub)));
         CHECK(v.index() == v.index<Stub>());
         CHECK(actions1.size() == 3);
         CHECK(actions2.size() == 1);
@@ -570,23 +607,23 @@ TEST_CASE("Double variant reset with same type") {
     CHECK(actions2.at(1) == Action::DESTRUCTION);
 }
 
-TEST_CASE("Double variant reset with different types") {
+TEST_CASE("Double variant assignment with different types") {
     std::vector<Action> actions;
     {
         Variant<int, Stub> v(TypeTag<int>(), 1);
 
-        CHECK_NOTHROW(v.reset(Stub(actions)));
+        CHECK_NOTHROW(v.assign(Stub(actions)));
         CHECK(v.index() == v.index<Stub>());
         CHECK(actions.size() == 3);
 
-        CHECK_NOTHROW(v.reset(100));
+        CHECK_NOTHROW(v.assign(100));
         REQUIRE(v.index() == v.index<int>());
         CHECK(v.value<int>() == 100);
         CHECK(actions.size() == 4);
 
         Stub stub(actions);
         CHECK(actions.size() == 5);
-        CHECK_NOTHROW(v.reset(stub));
+        CHECK_NOTHROW(v.assign(stub));
         REQUIRE(v.index() == v.index<Stub>());
         CHECK(actions.size() == 6);
     }

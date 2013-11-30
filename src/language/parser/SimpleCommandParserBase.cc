@@ -45,15 +45,15 @@ SimpleCommandParserBase::SimpleCommandParserBase(Environment &e) noexcept :
         mCommand(new SimpleCommand) { }
 
 void SimpleCommandParserBase::switchToCommentSkipper() {
-    mState.emplace<CommentSkipper>(normalCommentSkipper(environment()));
+    mState.reset(normalCommentSkipper(environment()));
 }
 
 void SimpleCommandParserBase::switchToAssignmentOrWordParser() {
     assert(mCommand != nullptr);
     if (mCommand->words().empty())
-        mState.emplace<AssignmentParserPointer>(createAssignmentParser());
+        mState.reset(createAssignmentParser());
     else
-        mState.emplace<WordParserPointer>(createWordParser(isTokenDelimiter));
+        mState.reset(createWordParser(isTokenDelimiter));
 }
 
 class SimpleCommandParserBase::Processor {

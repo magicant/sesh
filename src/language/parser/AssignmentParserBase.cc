@@ -71,7 +71,7 @@ void AssignmentParserBase::parseVariableName() {
 AssignmentParserResult AssignmentParserBase::parse() {
     if (mState.index() == mState.index<NameParserPointer>()) {
         parseVariableName();
-        mState.emplace<WordParserPointer>(createWordParser(isTokenDelimiter));
+        mState.reset(createWordParser(isTokenDelimiter));
     }
 
     WordPointer word = mState.value<WordParserPointer>()->parse();
