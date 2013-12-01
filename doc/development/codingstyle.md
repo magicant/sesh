@@ -161,9 +161,14 @@ Rationale:
 
 ### Function inlining
 
-A function should be inlined if and only if:
+Defaulted special member functions should always be defined in the class type definition, rather than defined out-of-line in a single compilation unit.
 
-- it has an empty body;
-- it does nothing but calling another function with its arguments simply forwarded;
-- it is a trivial special member function; or
-- it is a function template.
+Rationale:
+
+- An explicitly defaulted definition in the class type definition implicitly infers a suitable exception specification. If defined out-of-line, we would need to give a correct exception specification explicitly, which is more error-prone.
+- Compared to other functions, it is more difficult to keep track of whether a special member function should be inlined or not, especially when its base class or the types of the data members are changed later.
+- Out-of-line defintions of those functions may make the final binary larger if they are unused.
+
+A disadvantage of the above rule is that it may make compilation time longer.
+
+Other functions should be inlined only if their body is extremely simple.
