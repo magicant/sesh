@@ -22,6 +22,7 @@
 #include <locale>
 #include "common/Char.hh"
 #include "common/String.hh"
+#include "config.h"
 
 using sesh::common::Char;
 using sesh::common::String;
@@ -35,13 +36,13 @@ bool isNewline(const Environment &, Char c) {
 }
 
 bool isBlank(const Environment &e, Char c) {
-#if HAVE_STD__ISBLANK
+#if HAVE_STD_ISBLANK_LOCALE
     return std::isblank(c, e.locale());
 #else
     (void) e;
     assert((e.locale(), true));
     return c == L(' ') || c == L('\t');
-#endif // #if HAVE_STD__ISBLANK
+#endif // #if HAVE_STD_ISBLANK_LOCALE
 }
 
 bool isBlankOrNewline(const Environment &e, Char c) {
@@ -51,11 +52,11 @@ bool isBlankOrNewline(const Environment &e, Char c) {
 bool isTokenDelimiter(const Environment &e, Char c) {
     static const String delimiters = L(" \t\n;&|<>()");
     return delimiters.find(c) != String::npos ||
-#if HAVE_STD__ISBLANK
+#if HAVE_STD_ISBLANK_LOCALE
             std::isblank(c, e.locale())
 #else
             ((void) e.locale(), false)
-#endif // #if HAVE_STD__ISBLANK
+#endif // #if HAVE_STD_ISBLANK_LOCALE
             ;
 }
 
