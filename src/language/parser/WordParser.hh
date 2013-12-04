@@ -20,28 +20,91 @@
 
 #include "buildconfig.h"
 
-#include "language/parser/WordParserBase.hh"
+#include <functional>
+#include <memory>
+#include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
+#include "language/syntax/Word.hh"
+#include "language/syntax/WordComponent.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-class WordParser final : public WordParserBase {
+/**
+ * Word parser. This is an abstract class that implements most part of the
+ * parser. A concrete subclass must provide factory methods that create parsers
+ * used by this parser.
+ */
+class WordParser :
+        public Parser<std::unique_ptr<syntax::Word>>, protected ParserBase {
 
 public:
 
-    using WordParserBase::WordParserBase;
+    using ComponentPointer = std::unique_ptr<syntax::WordComponent>;
+    using ComponentParserPointer = std::unique_ptr<Parser<ComponentPointer>>;
 
+    /**
+     * A function of this type is called to create word component parsers while
+     * parsing the word. The function is called each time the word parser
+     * starts parsing a component of the word.
+     *
+     * The function must return a new component parser that should be used to
+     * parse the component starting from the current position of the
+     * environment. If there is no valid component at the current position,
+     * either the component parser pointer returned by the function or the
+     * component pointer returned by the parser should be null.
+     *
+     * The function may peek a character at the current position to determine
+     * the type of the component parser it creates. The function may remove
+     * line continuations from the token, but may not modify the environment
+     * otherwise.
+     */
+    using ComponentParserCreator =
+            std::function<ComponentParserPointer(Environment &)>;
+
+private:
+
+    ComponentParserCreator mCreateComponentParser;
+
+    std::unique_ptr<syntax::Word> mWord;
+
+    /** May be null. */
+    ComponentParserPointer mCurrentComponentParser;
+
+public:
+
+    WordParser(Environment &, ComponentParserCreator &&);
+    WordParser(const WordParser &) = delete;
+    WordParser(WordParser &&) = default;
+    WordParser &operator=(const WordParser &) = delete;
+    WordParser &operator=(WordParser &&) = delete;
     ~WordParser() override = default;
 
 private:
 
-    std::unique_ptr<ComponentParser> createRawStringParser(
-            Predicate<common::Char> &&isDelimiter,
-            LineContinuationTreatment = LineContinuationTreatment::REMOVE)
-            const override;
+    bool parseComponent();
 
-};
+public:
+
+    /**
+     * Returns the parse result. The return value is a non-null word pointer.
+     * The word may be empty, so the caller should check the emptiness for
+     * validation. The environment's current iterator position is updated so
+     * that it points to the character past the parsed word.
+     *
+     * If this function returns without throwing, the internal state of this
+     * parser is no longer valid and this function must never be called again.
+     *
+     * If more source is needed to finish parsing the word, this function
+     * throws NeedMoreSource. In this case, the caller should set the EOF flag
+     * or append to the source and then call this function again.
+     *
+     * @throws NeedMoreSource when more source is needed to finish parsing.
+     */
+    std::unique_ptr<syntax::Word> parse() final override;
+
+}; // class WordParser
 
 } // namespace parser
 } // namespace language

@@ -31,7 +31,7 @@
 #include "language/parser/Parser.hh"
 #include "language/parser/ParserBase.hh"
 #include "language/parser/Predicate.hh"
-#include "language/parser/WordParserBase.hh"
+#include "language/parser/WordParser.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Word.hh"
 #include "language/syntax/WordComponent.hh"
@@ -47,7 +47,7 @@ using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Parser;
 using sesh::language::parser::ParserBase;
 using sesh::language::parser::Predicate;
-using sesh::language::parser::WordParserBase;
+using sesh::language::parser::WordParser;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::WordComponent;
 
@@ -62,66 +62,37 @@ class RawStringParserStub :
 
 public:
 
-    RawStringParserStub(
-            Environment &e,
-            Predicate<Char> &&isDelimiter,
-            LineContinuationTreatment lct)
-            noexcept :
-            Parser(),
-            ParserBase(e) {
-        CHECK(isDelimiter != nullptr);
-        CHECK(lct == LineContinuationTreatment::REMOVE);
-    }
+    RawStringParserStub(Environment &e) noexcept : Parser(), ParserBase(e) { }
 
     std::unique_ptr<WordComponent> parse() override {
         if (environment().end() - environment().current() < 2)
-            throw NeedMoreSource();
+            return environment().isEof() ? nullptr : throw NeedMoreSource();
         environment().current() += 2;
         return std::unique_ptr<WordComponent>(new RawStringStub);
     }
 
 };
 
-class WordParser : public WordParserBase {
-
-public:
-
-    using WordParserBase::WordParserBase;
-
-    ~WordParser() override = default;
-
-private:
-
-    std::unique_ptr<ComponentParser> createRawStringParser(
-            Predicate<Char> &&isDelimiter,
-            LineContinuationTreatment lct)
-            const override {
-        return std::unique_ptr<ComponentParser>(new RawStringParserStub(
-                environment(), std::move(isDelimiter), lct));
-    }
-
-};
-
-template<Char c>
-bool is(const Environment &, Char c2) {
-    return c == c2;
+WordParser::ComponentParserPointer failCreateComponentParser(Environment &) {
+    throw "unexpected";
 }
 
-bool fail(const Environment &, Char) {
-    FAIL("unexpected predicate test");
-    return true;
+WordParser::ComponentParserPointer createNullComponentParser(Environment &) {
+    return nullptr;
+}
+
+WordParser::ComponentParserPointer createComponentParserStub(Environment &e) {
+    return WordParser::ComponentParserPointer(new RawStringParserStub(e));
 }
 
 TEST_CASE("Word parser construction") {
     BasicEnvironmentStub e;
-    WordParser p(e, [](const Environment &, Char) { return false; });
+    WordParser p(e, failCreateComponentParser);
 }
 
-TEST_CASE("Word parser empty word") {
+TEST_CASE("Word parser, empty word, null component parser") {
     BasicEnvironmentStub e;
-    e.setIsEof();
-
-    WordParser p(e, fail);
+    WordParser p(e, createNullComponentParser);
     auto result = p.parse();
 
     REQUIRE(result != nullptr);
@@ -129,24 +100,58 @@ TEST_CASE("Word parser empty word") {
     CHECK(e.current() == e.end());
 }
 
-TEST_CASE("Word parser raw string") {
+TEST_CASE("Word parser, empty word, null component") {
+    BasicEnvironmentStub e;
+    e.setIsEof();
+
+    WordParser p(e, createComponentParserStub);
+    auto result = p.parse();
+
+    REQUIRE(result != nullptr);
+    CHECK(result->components().empty());
+    CHECK(e.current() == e.end());
+}
+
+TEST_CASE("Word parser, one component") {
     BasicEnvironmentStub e;
     e.appendSource(L("AA!"));
+    e.setIsEof();
 
-    WordParser p(e, is<L('!')>);
+    WordParser p(e, createComponentParserStub);
     auto result = p.parse();
 
     REQUIRE(result != nullptr);
     CHECK(result->components().size() == 1);
     CHECK(e.current() == e.begin() + 2);
     RawStringStub *rss =
-            dynamic_cast<RawStringStub *>(result->components()[0].get());
+            dynamic_cast<RawStringStub *>(result->components().at(0).get());
     CHECK(rss != nullptr);
 }
 
-TEST_CASE("Word parser re-parse") {
+TEST_CASE("Word parser, three components") {
     BasicEnvironmentStub e;
-    WordParser p(e, is<L('X')>);
+    e.appendSource(L("banana"));
+    e.setIsEof();
+
+    WordParser p(e, createComponentParserStub);
+    auto result = p.parse();
+
+    REQUIRE(result != nullptr);
+    CHECK(result->components().size() == 3);
+    CHECK(e.current() == e.end());
+
+    RawStringStub *rss;
+    rss = dynamic_cast<RawStringStub *>(result->components().at(0).get());
+    CHECK(rss != nullptr);
+    rss = dynamic_cast<RawStringStub *>(result->components().at(1).get());
+    CHECK(rss != nullptr);
+    rss = dynamic_cast<RawStringStub *>(result->components().at(2).get());
+    CHECK(rss != nullptr);
+}
+
+TEST_CASE("Word parser, need more source") {
+    BasicEnvironmentStub e;
+    WordParser p(e, createComponentParserStub);
 
     e.appendSource(L("!"));
     REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
@@ -155,32 +160,17 @@ TEST_CASE("Word parser re-parse") {
     REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
 
     e.appendSource(L("X"));
+    REQUIRE_THROWS_AS(p.parse(), NeedMoreSource);
+
+    e.setIsEof();
     auto result = p.parse();
     REQUIRE(result != nullptr);
     CHECK(result->components().size() == 1);
     CHECK(e.current() == e.begin() + 2);
     RawStringStub *rss =
-            dynamic_cast<RawStringStub *>(result->components()[0].get());
+            dynamic_cast<RawStringStub *>(result->components().at(0).get());
     CHECK(rss != nullptr);
 }
-
-TEST_CASE("Word parser line continuation") {
-    BasicEnvironmentStub e;
-    e.appendSource(L("\\\nAA\\\n!"));
-
-    WordParser p(e, is<L('!')>);
-    auto result = p.parse();
-
-    e.checkSource(L("AA!"));
-    REQUIRE(result != nullptr);
-    CHECK(result->components().size() == 1);
-    CHECK(e.current() == e.begin() + 2);
-    RawStringStub *rss =
-            dynamic_cast<RawStringStub *>(result->components()[0].get());
-    CHECK(rss != nullptr);
-}
-
-// TODO other word component parser types
 
 } // namespace
 
