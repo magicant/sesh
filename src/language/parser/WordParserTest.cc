@@ -51,24 +51,24 @@ using sesh::language::parser::WordParser;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::WordComponent;
 
-class RawStringStub : public WordComponent {
+class ComponentStub : public WordComponent {
 
     void print(Printer &) const override { throw "unexpected print"; }
 
 };
 
-class RawStringParserStub :
+class ComponentParserStub :
         public Parser<std::unique_ptr<WordComponent>>, protected ParserBase {
 
 public:
 
-    RawStringParserStub(Environment &e) noexcept : Parser(), ParserBase(e) { }
+    ComponentParserStub(Environment &e) noexcept : Parser(), ParserBase(e) { }
 
     std::unique_ptr<WordComponent> parse() override {
         if (environment().end() - environment().current() < 2)
             return environment().isEof() ? nullptr : throw NeedMoreSource();
         environment().current() += 2;
-        return std::unique_ptr<WordComponent>(new RawStringStub);
+        return std::unique_ptr<WordComponent>(new ComponentStub);
     }
 
 };
@@ -82,7 +82,7 @@ WordParser::ComponentParserPointer createNullComponentParser(Environment &) {
 }
 
 WordParser::ComponentParserPointer createComponentParserStub(Environment &e) {
-    return WordParser::ComponentParserPointer(new RawStringParserStub(e));
+    return WordParser::ComponentParserPointer(new ComponentParserStub(e));
 }
 
 TEST_CASE("Word parser construction") {
@@ -123,8 +123,8 @@ TEST_CASE("Word parser, one component") {
     REQUIRE(result != nullptr);
     CHECK(result->components().size() == 1);
     CHECK(e.current() == e.begin() + 2);
-    RawStringStub *rss =
-            dynamic_cast<RawStringStub *>(result->components().at(0).get());
+    ComponentStub *rss =
+            dynamic_cast<ComponentStub *>(result->components().at(0).get());
     CHECK(rss != nullptr);
 }
 
@@ -140,12 +140,12 @@ TEST_CASE("Word parser, three components") {
     CHECK(result->components().size() == 3);
     CHECK(e.current() == e.end());
 
-    RawStringStub *rss;
-    rss = dynamic_cast<RawStringStub *>(result->components().at(0).get());
+    ComponentStub *rss;
+    rss = dynamic_cast<ComponentStub *>(result->components().at(0).get());
     CHECK(rss != nullptr);
-    rss = dynamic_cast<RawStringStub *>(result->components().at(1).get());
+    rss = dynamic_cast<ComponentStub *>(result->components().at(1).get());
     CHECK(rss != nullptr);
-    rss = dynamic_cast<RawStringStub *>(result->components().at(2).get());
+    rss = dynamic_cast<ComponentStub *>(result->components().at(2).get());
     CHECK(rss != nullptr);
 }
 
@@ -167,8 +167,8 @@ TEST_CASE("Word parser, need more source") {
     REQUIRE(result != nullptr);
     CHECK(result->components().size() == 1);
     CHECK(e.current() == e.begin() + 2);
-    RawStringStub *rss =
-            dynamic_cast<RawStringStub *>(result->components().at(0).get());
+    ComponentStub *rss =
+            dynamic_cast<ComponentStub *>(result->components().at(0).get());
     CHECK(rss != nullptr);
 }
 
