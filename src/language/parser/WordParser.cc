@@ -42,18 +42,18 @@ WordParser::WordParser(
         ParserBase(e),
         mCreateComponentParser(std::move(cpc)),
         mWord(new Word),
-        mCurrentComponentParser(nullptr) {
+        mComponentParser(nullptr) {
     assert(mCreateComponentParser != nullptr);
 }
 
 bool WordParser::parseComponent() {
-    if (mCurrentComponentParser == nullptr) {
-        mCurrentComponentParser = mCreateComponentParser(environment());
-        if (mCurrentComponentParser == nullptr)
+    if (mComponentParser == nullptr) {
+        mComponentParser = mCreateComponentParser(environment());
+        if (mComponentParser == nullptr)
             return false;
     }
-    auto component = mCurrentComponentParser->parse();
-    mCurrentComponentParser = nullptr;
+    auto component = mComponentParser->parse();
+    mComponentParser = nullptr;
     if (component == nullptr)
         return false;
     mWord->components().push_back(std::move(component));

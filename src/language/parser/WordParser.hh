@@ -70,7 +70,7 @@ private:
     std::unique_ptr<syntax::Word> mWord;
 
     /** May be null. */
-    ComponentParserPointer mCurrentComponentParser;
+    ComponentParserPointer mComponentParser;
 
 public:
 
