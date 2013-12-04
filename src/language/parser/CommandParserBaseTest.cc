@@ -74,7 +74,7 @@ TEST_CASE("Command parser, simple command parser") {
     checkCommandStub(command.get());
 }
 
-// TODO test reuse
+// TODO test compound commands and function definition command
 
 } // namespace
 

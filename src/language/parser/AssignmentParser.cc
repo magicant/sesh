@@ -20,6 +20,7 @@
 
 #include <utility>
 #include "common/Char.hh"
+#include "language/parser/WordComponentParser.hh"
 #include "language/parser/WordParser.hh"
 
 using sesh::common::Char;
@@ -30,8 +31,13 @@ namespace parser {
 
 auto AssignmentParser::createWordParser(Predicate<Char> &&isDelimiter) const
         -> WordParserPointer {
-    return WordParserPointer(
-            new WordParser(environment(), std::move(isDelimiter)));
+    return WordParserPointer(new WordParser(
+            environment(),
+            [isDelimiter](Environment &e) {
+                return WordParser::ComponentParserPointer(
+                        new WordComponentParser(
+                                e, Predicate<Char>(isDelimiter)));
+            }));
 }
 
 } // namespace parser

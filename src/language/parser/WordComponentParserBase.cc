@@ -16,68 +16,46 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "WordParserBase.hh"
+#include "WordComponentParserBase.hh"
 
-#include <stdexcept>
 #include <utility>
-#include "common/Char.hh"
 #include "common/String.hh"
-#include "language/parser/Environment.hh"
-#include "language/syntax/Word.hh"
-#include "language/syntax/WordComponent.hh"
 
 using sesh::common::Char;
 using sesh::common::CharTraits;
-using sesh::language::syntax::Word;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-WordParserBase::WordParserBase(
-        Environment &e,
-        Predicate<Char> &&isDelimiter) :
+WordComponentParserBase::WordComponentParserBase(
+        Environment &e, Predicate<Char> &&isDelimiter) :
         Parser(),
         ParserBase(e),
         mIsDelimiter(std::move(isDelimiter)),
-        mWord(new Word),
-        mCurrentComponentParser(nullptr) {
-    if (mIsDelimiter == nullptr)
-        mIsDelimiter = [](const Environment &, Char) { return false; };
-}
+        mActualParser(nullptr) { }
 
-void WordParserBase::createComponentParser() {
-    if (mCurrentComponentParser != nullptr)
+void WordComponentParserBase::prepareActualParser() {
+    if (mActualParser != nullptr)
         return;
 
-    environment().removeLineContinuation(environment().current());
-
-    // TODO support other types of word component parser
+    while (environment().removeLineContinuation(environment().current())) { }
 
     CharInt ci = dereference(environment().current());
     if (CharTraits::eq_int_type(ci, CharTraits::eof()))
         return;
     if (mIsDelimiter(environment(), CharTraits::to_char_type(ci)))
         return;
+    // TODO support other types of component parsers
 
-    mCurrentComponentParser =
-            createRawStringParser(Predicate<Char>(mIsDelimiter));
+    mActualParser = createRawStringParser(Predicate<Char>(mIsDelimiter));
 }
 
-std::unique_ptr<Word> WordParserBase::parse() {
-    if (mWord == nullptr)
-        throw std::logic_error("invalid parser state");
-
-    while (createComponentParser(), mCurrentComponentParser != nullptr) {
-        auto result = mCurrentComponentParser->parse();
-        mCurrentComponentParser = nullptr;
-
-//        if (result == nullptr) // parse error?
-//            return nullptr;
-        mWord->components().emplace_back(std::move(result));
-    }
-
-    return std::move(mWord);
+auto WordComponentParserBase::parse() -> ComponentPointer {
+    prepareActualParser();
+    if (mActualParser == nullptr)
+        return nullptr;
+    return mActualParser->parse();
 }
 
 } // namespace parser

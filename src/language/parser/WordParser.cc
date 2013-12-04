@@ -18,21 +18,54 @@
 #include "buildconfig.h"
 #include "WordParser.hh"
 
+#include <cassert>
+#include <stdexcept>
+#include <utility>
 #include "common/Char.hh"
-#include "language/parser/RawStringParser.hh"
+#include "common/String.hh"
+#include "language/parser/Environment.hh"
+#include "language/syntax/Word.hh"
+#include "language/syntax/WordComponent.hh"
 
 using sesh::common::Char;
+using sesh::common::CharTraits;
+using sesh::language::syntax::Word;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-auto WordParser::createRawStringParser(
-        Predicate<Char> &&isDelimiter,
-        LineContinuationTreatment lct) const
-        -> std::unique_ptr<ComponentParser> {
-    return std::unique_ptr<ComponentParser>(
-            new RawStringParser(environment(), std::move(isDelimiter), lct));
+WordParser::WordParser(
+        Environment &e,
+        ComponentParserCreator &&cpc) :
+        Parser(),
+        ParserBase(e),
+        mCreateComponentParser(std::move(cpc)),
+        mWord(new Word),
+        mComponentParser(nullptr) {
+    assert(mCreateComponentParser != nullptr);
+}
+
+bool WordParser::parseComponent() {
+    if (mComponentParser == nullptr) {
+        mComponentParser = mCreateComponentParser(environment());
+        if (mComponentParser == nullptr)
+            return false;
+    }
+    auto component = mComponentParser->parse();
+    mComponentParser = nullptr;
+    if (component == nullptr)
+        return false;
+    mWord->components().push_back(std::move(component));
+    return true;
+}
+
+std::unique_ptr<Word> WordParser::parse() {
+    if (mWord == nullptr)
+        throw std::logic_error("invalid parser state");
+
+    while (parseComponent()) { }
+    return std::move(mWord);
 }
 
 } // namespace parser

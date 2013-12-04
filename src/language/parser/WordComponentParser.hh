@@ -15,39 +15,38 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_language_parser_WordComponentParser_hh
+#define INCLUDED_language_parser_WordComponentParser_hh
+
 #include "buildconfig.h"
-#include "SimpleCommandParser.hh"
 
-#include <utility>
-#include "common/Char.hh"
-#include "language/parser/AssignmentParser.hh"
-#include "language/parser/WordComponentParser.hh"
-#include "language/parser/WordParser.hh"
-
-using sesh::common::Char;
+#include "language/parser/WordComponentParserBase.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-auto SimpleCommandParser::createAssignmentParser() const
-        -> AssignmentParserPointer {
-    return AssignmentParserPointer(new AssignmentParser(environment()));
-}
+class WordComponentParser final : public WordComponentParserBase {
 
-auto SimpleCommandParser::createWordParser(Predicate<Char> &&isDelimiter) const
-        -> WordParserPointer {
-    return WordParserPointer(new WordParser(
-            environment(),
-            [isDelimiter](Environment &e) {
-                return WordParser::ComponentParserPointer(
-                        new WordComponentParser(
-                                e, Predicate<Char>(isDelimiter)));
-            }));
-}
+public:
+
+    using WordComponentParserBase::WordComponentParserBase;
+
+    ~WordComponentParser() override = default;
+
+private:
+
+    ParserPointer createRawStringParser(
+            Predicate<common::Char> &&isDelimiter,
+            LineContinuationTreatment = LineContinuationTreatment::REMOVE)
+            const override;
+
+}; // class WordComponentParser
 
 } // namespace parser
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_parser_WordComponentParser_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
