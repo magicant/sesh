@@ -1,5 +1,7 @@
 set -eu
 
+export MAKEFLAGS="-j3"
+
 case $1#${CC} in
   (--install#gcc)
     sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
