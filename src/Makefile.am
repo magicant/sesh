@@ -25,6 +25,7 @@ check_PROGRAMS = \
 	language/parser/SimpleCommandParserBaseTest \
 	language/parser/SkipperTest \
 	language/parser/StringParserTest \
+	language/parser/WordComponentParserBaseTest \
 	language/parser/WordParserBaseTest \
 	language/parser/tokenTest \
 	language/source/LineAppendedSourceTest \
@@ -105,6 +106,10 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Skipper.hh \
 	language/parser/StringParser.cc \
 	language/parser/StringParser.hh \
+	language/parser/WordComponentParser.cc \
+	language/parser/WordComponentParser.hh \
+	language/parser/WordComponentParserBase.cc \
+	language/parser/WordComponentParserBase.hh \
 	language/parser/WordParser.cc \
 	language/parser/WordParser.hh \
 	language/parser/WordParserBase.cc \
@@ -293,6 +298,14 @@ language_parser_StringParserTest_SOURCES = \
 	language/parser/Skipper.cc \
 	language/parser/StringParser.cc \
 	language/parser/StringParserTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_WordComponentParserBaseTest_SOURCES = \
+	language/parser/BasicEnvironment.cc \
+	language/parser/Environment.cc \
+	language/parser/WordComponentParserBase.cc \
+	language/parser/WordComponentParserBaseTest.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
