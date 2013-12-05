@@ -3,12 +3,16 @@ GNU General Public License (GPL). When you redistribute and/or modify
 it, you may apply either version 3 or any later version of the License
 at your option.
 
-The distribution of this software includes the following material
-that is covered by another license:
+The distribution of this software includes the following materials
+that are covered by another license:
 
  - Catch, a header-only unit test framework
    Licensed under the Boost Software License, Version 1.
    <https://github.com/philsquared/Catch>
+
+ - Boost, a widely used C++ libraries, version 1.55.0 (excerpted)
+   Licensed under the Boost Software License, Version 1.
+   <http://www.boost.org/>
 
 The full text of the licenses are presented below.
 
