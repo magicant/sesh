@@ -54,8 +54,7 @@ TESTS = $(check_PROGRAMS) $(TESTSCRIPTS)
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(SHELL)
 
-catch_include = -I$(top_srcdir)/external/Catch/single_include
-AM_CPPFLAGS = $(catch_include)
+AM_CPPFLAGS = -I$(top_srcdir)/external/include
 
 sesh_SOURCES = buildconfig.h main.cc \
 	common/Char.hh \
