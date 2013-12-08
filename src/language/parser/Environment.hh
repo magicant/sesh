@@ -22,6 +22,7 @@
 
 #include <locale>
 #include "common/ErrorLevel.hh"
+#include "common/Message.hh"
 #include "common/String.hh"
 #include "language/source/SourceBuffer.hh"
 
@@ -85,7 +86,7 @@ public:
     /** Add a message to report an syntax error or issue a warning. */
     virtual void addDiagnosticMessage(
             const source::SourceBuffer::ConstIterator &position,
-            common::String &&message,
+            common::Message<> &&message,
             common::ErrorLevel) = 0;
 
     /** Returns the locale that may affect the parsing process. */

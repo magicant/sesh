@@ -55,7 +55,8 @@ private:
     }
 
     void addDiagnosticMessage(
-            const Iterator &, common::String &&, common::ErrorLevel) override {
+            const Iterator &, common::Message<> &&, common::ErrorLevel)
+            override {
         throw "unexpected addDiagnosticMessage";
     }
 
