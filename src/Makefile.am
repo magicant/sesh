@@ -12,6 +12,7 @@ bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
 	common/MaybeTest \
+	common/MessageTest \
 	common/VariantTest \
 	language/parser/AndOrListParserTest \
 	language/parser/AssignmentParserBaseTest \
@@ -60,6 +61,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/Char.hh \
 	common/ErrorLevel.hh \
 	common/Maybe.hh \
+	common/Message.cc \
+	common/Message.hh \
 	common/OutputStream.hh \
 	common/String.hh \
 	common/StringStream.hh \
@@ -151,6 +154,9 @@ sesh_SOURCES = buildconfig.h main.cc \
 # Header files that are contained in sesh_SOURCES are not listed below.
 common_MaybeTest_SOURCES = \
 	common/MaybeTest.cc
+common_MessageTest_SOURCES = \
+	common/Message.cc \
+	common/MessageTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
 language_parser_AndOrListParserTest_SOURCES = \
