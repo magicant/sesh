@@ -99,7 +99,7 @@ public:
 
 };
 
-class CLocaleEnvironmentStub : public BasicEnvironmentStub {
+class CLocaleEnvironmentStub : public virtual BasicEnvironmentStub {
 
 public:
 
