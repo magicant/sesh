@@ -117,6 +117,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/WordParser.hh \
 	language/parser/token.cc \
 	language/parser/token.hh \
+	language/source/DiagnosticMessage.cc \
+	language/source/DiagnosticMessage.hh \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
