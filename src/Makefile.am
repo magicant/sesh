@@ -177,7 +177,6 @@ language_parser_AssignmentParserBaseTest_SOURCES = \
 	language/parser/Predicate.cc \
 	language/parser/Skipper.cc \
 	language/parser/StringParser.cc \
-	language/parser/WordParserTestHelper.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \
@@ -188,7 +187,6 @@ language_parser_AssignmentParserBaseTest_SOURCES = \
 language_parser_BasicEnvironmentTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironmentTest.cc \
-	language/parser/BasicEnvironmentTestHelper.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
@@ -270,7 +268,6 @@ language_parser_SimpleCommandParserBaseTest_SOURCES = \
 	language/parser/SimpleCommandParserBase.cc \
 	language/parser/SimpleCommandParserBaseTest.cc \
 	language/parser/Skipper.cc \
-	language/parser/WordParserTestHelper.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \
@@ -342,17 +339,14 @@ language_source_SourceBufferTest_SOURCES = \
 	language/source/SourceBufferTest.cc
 language_source_SourceLineLocationTest_SOURCES = \
 	language/source/SourceLineLocation.cc \
-	language/source/SourceLineLocationTest.cc \
-	language/source/SourceLineLocationTestHelper.hh
+	language/source/SourceLineLocationTest.cc
 language_source_SourceLocationTest_SOURCES = \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLocation.cc \
-	language/source/SourceLocationTest.cc \
-	language/source/SourceLocationTestHelper.hh
+	language/source/SourceLocationTest.cc
 language_source_SourceTest_SOURCES = \
 	language/source/Source.cc \
-	language/source/SourceTest.cc \
-	language/source/SourceTestHelper.hh
+	language/source/SourceTest.cc
 language_syntax_AndOrListTest_SOURCES = \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLocation.cc \
@@ -386,8 +380,7 @@ language_syntax_PipelineTest_SOURCES = \
 	language/syntax/Printer.cc
 language_syntax_PrinterTest_SOURCES = \
 	language/syntax/Printer.cc \
-	language/syntax/PrinterTest.cc \
-	language/syntax/PrinterTestHelper.hh
+	language/syntax/PrinterTest.cc
 language_syntax_RawStringTest_SOURCES = \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc \
@@ -416,7 +409,16 @@ language_syntax_WordTest_SOURCES = \
 	language/syntax/Word.cc \
 	language/syntax/WordTest.cc
 
+TESTHEADERS = \
+	language/parser/BasicEnvironmentTestHelper.hh \
+	language/parser/WordParserTestHelper.hh \
+	language/parser/WordParserTestHelper.hh \
+	language/source/SourceLineLocationTestHelper.hh \
+	language/source/SourceLocationTestHelper.hh \
+	language/source/SourceTestHelper.hh \
+	language/syntax/PrinterTestHelper.hh
+
 checkheaderinclude.log: checkheaderinclude.sh $(SOURCES)
 checkincludebuildconfig.log: checkincludebuildconfig.sh $(SOURCES)
 
-EXTRA_DIST = $(TESTSCRIPTS)
+EXTRA_DIST = $(TESTSCRIPTS) $(TESTHEADERS)
