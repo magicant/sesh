@@ -420,6 +420,7 @@ language_syntax_WordTest_SOURCES = \
 
 TESTHEADERS = \
 	language/parser/BasicEnvironmentTestHelper.hh \
+	language/parser/DiagnosticEnvironmentTestHelper.hh \
 	language/parser/WordParserTestHelper.hh \
 	language/parser/WordParserTestHelper.hh \
 	language/source/DiagnosticMessageTestHelper.hh \
