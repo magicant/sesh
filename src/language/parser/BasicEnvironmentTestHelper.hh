@@ -21,6 +21,7 @@
 #include "buildconfig.h"
 
 #include <locale>
+#include <utility>
 #include "common/ErrorLevel.hh"
 #include "common/String.hh"
 #include "language/parser/BasicEnvironment.hh"
