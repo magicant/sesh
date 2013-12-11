@@ -422,6 +422,7 @@ TESTHEADERS = \
 	language/parser/BasicEnvironmentTestHelper.hh \
 	language/parser/WordParserTestHelper.hh \
 	language/parser/WordParserTestHelper.hh \
+	language/source/DiagnosticMessageTestHelper.hh \
 	language/source/SourceLineLocationTestHelper.hh \
 	language/source/SourceLocationTestHelper.hh \
 	language/source/SourceTestHelper.hh \
