@@ -151,7 +151,6 @@ void checkSyntaxError(String &&source) {
     AndOrListParser p(e, createPipelineParser);
     std::unique_ptr<AndOrList> l = p.parse();
     CHECK(l == nullptr);
-    // TODO check syntax error
 }
 
 #define CHECK_SYNTAX_ERROR(source) \
