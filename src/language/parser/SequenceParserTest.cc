@@ -175,7 +175,6 @@ void checkSyntaxError(String &&source, LineMode lm) {
     SequenceParser p(e, createAndOrListParser, lm);
     auto s = p.parse();
     CHECK(s == nullptr);
-    // TODO check syntax error
 }
 
 #define CHECK_SYNTAX_ERROR(source, lineMode) \
