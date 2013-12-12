@@ -104,10 +104,7 @@ changeStateSkippingToCommand:
         }
     } // switch
 
-    if (mPipeline->commands().empty()) {
-        // TODO report error
-        return nullptr;
-    }
+    assert(!mPipeline->commands().empty());
     return std::move(mPipeline);
 }
 
