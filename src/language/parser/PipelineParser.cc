@@ -23,7 +23,10 @@
 #include <stdexcept>
 #include <utility>
 #include "common/Char.hh"
+#include "common/ErrorLevel.hh"
+#include "common/Message.hh"
 #include "common/String.hh"
+#include "i18n/M.h"
 #include "language/parser/CommentSkipper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/Parser.hh"
@@ -34,6 +37,8 @@
 #include "language/syntax/WordComponent.hh"
 
 using sesh::common::Char;
+using sesh::common::ErrorLevel;
+using sesh::common::Message;
 using sesh::common::String;
 using sesh::language::parser::token::EXCLAMATION;
 using sesh::language::parser::token::PIPE;
@@ -51,6 +56,14 @@ PipelineParser::PipelineParser(Environment &e, CommandParserCreator &&cpc) :
         mCommandParser(nullptr),
         mSkipper() {
     assert(mCreateCommandParser != nullptr);
+}
+
+void PipelineParser::reportUnexpectedExclamationError() {
+    const Char *message = mPipeline->commands().empty() ?
+            L(M("double negation not allowed")) :
+            L(M("`!' cannot follow `|'"));
+    environment().addDiagnosticMessage(
+            environment().current(), Message<>(message), ErrorLevel::ERROR);
 }
 
 bool PipelineParser::parseCommand() {
@@ -85,7 +98,7 @@ changeStateSkippingToCommand:
             mSkipper.clear();
 
             if (peekKeyword(environment()) == EXCLAMATION) {
-                // TODO report error
+                reportUnexpectedExclamationError();
                 return nullptr;
             }
         }

@@ -23,14 +23,20 @@
 #include <initializer_list>
 #include <memory>
 #include <utility>
+#include "common/Char.hh"
+#include "common/ErrorLevel.hh"
+#include "common/Message.hh"
 #include "common/String.hh"
 #include "language/parser/BasicEnvironmentTestHelper.hh"
+#include "language/parser/DiagnosticEnvironmentTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
 #include "language/parser/Parser.hh"
+#include "language/parser/ParserBase.hh"
 #include "language/parser/PipelineParser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/StringParser.hh"
+#include "language/source/SourceBuffer.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
@@ -38,17 +44,25 @@
 namespace {
 
 using sesh::common::CharTraits;
+using sesh::common::ErrorLevel;
+using sesh::common::Message;
 using sesh::common::String;
 using sesh::language::parser::CLocaleEnvironmentStub;
+using sesh::language::parser::DiagnosticEnvironmentStub;
 using sesh::language::parser::Environment;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Parser;
+using sesh::language::parser::ParserBase;
 using sesh::language::parser::PipelineParser;
 using sesh::language::parser::StringParser;
 using sesh::language::parser::isTokenDelimiter;
+using sesh::language::source::SourceBuffer;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
+
+class CLocaleDiagnosticEnvironmentStub :
+        public CLocaleEnvironmentStub, public DiagnosticEnvironmentStub { };
 
 class CommandStub : public Command {
 
@@ -66,7 +80,8 @@ public:
 
 };
 
-class CommandParserStub : public Parser<std::unique_ptr<Command>> {
+class CommandParserStub :
+        public Parser<std::unique_ptr<Command>>, protected ParserBase {
 
 private:
 
@@ -75,12 +90,19 @@ private:
 public:
 
     explicit CommandParserStub(Environment &e) :
+            Parser(),
+            ParserBase(e),
             mInnerParser(e, isTokenDelimiter) { }
 
     std::unique_ptr<Command> parse() {
         String s = mInnerParser.parse();
-        if (s.empty())
+        if (s.empty()) {
+            environment().addDiagnosticMessage(
+                    environment().current(),
+                    Message<>(L("error in CommandParserStub")),
+                    ErrorLevel::ERROR);
             return nullptr;
+        }
         return std::unique_ptr<Command>(new CommandStub(std::move(s)));
     }
 
@@ -89,8 +111,13 @@ public:
 std::unique_ptr<Parser<std::unique_ptr<Command>>>
 createCommandParser(Environment &e) {
     auto c = dereference(e, e.current());
-    if (CharTraits::eq_int_type(c, CharTraits::eof()))
+    if (CharTraits::eq_int_type(c, CharTraits::eof())) {
+        e.addDiagnosticMessage(
+                e.current(),
+                Message<>(L("error in createCommandParser")),
+                ErrorLevel::ERROR);
         return nullptr;
+    }
     return std::unique_ptr<Parser<std::unique_ptr<Command>>>(
             new CommandParserStub(e));
 }
@@ -116,29 +143,23 @@ void checkPipelineCommands(
     }
 }
 
-void checkSyntaxError(String &&source) {
-    CLocaleEnvironmentStub e;
+void checkSyntaxError(
+        String &&source, SourceBuffer::Size position, Message<> &&message) {
+    CLocaleDiagnosticEnvironmentStub e;
     e.appendSource(std::move(source));
     e.setIsEof();
 
     PipelineParser p(e, createCommandParser);
     std::unique_ptr<Pipeline> pl = p.parse();
     CHECK(pl == nullptr);
-    // TODO check syntax error
+    e.checkMessages({{
+            e.begin() + position, std::move(message), ErrorLevel::ERROR}});
 }
-
-#define CHECK_SYNTAX_ERROR(source) \
-        do { INFO(source); checkSyntaxError(L(source)); } while (0)
 
 TEST_CASE("Pipeline parser, construction") {
     CLocaleEnvironmentStub e;
     PipelineParser p(e, createCommandParser);
     PipelineParser(std::move(p));
-}
-
-TEST_CASE("Pipeline parser, empty input") {
-    CHECK_SYNTAX_ERROR("");
-    CHECK_SYNTAX_ERROR("\n");
 }
 
 TEST_CASE("Pipeline parser, single command without negation") {
@@ -315,22 +336,39 @@ TEST_CASE("Pipeline parser, need more source") {
 // TODO alias substitution in first command after '!'
 // TODO alias substitution in second command
 
+TEST_CASE("Pipeline parser, empty input") {
+    checkSyntaxError(L(""), 0, Message<>(L("error in createCommandParser")));
+}
+
+TEST_CASE("Pipeline parser, immediate newline") {
+    checkSyntaxError(L("\n"), 0, Message<>(L("error in CommandParserStub")));
+}
+
 TEST_CASE("Pipeline parser, invalid '!' after '!'") {
-    CHECK_SYNTAX_ERROR("! !");
+    checkSyntaxError(L("! !"), 2, Message<>(L("double negation not allowed")));
 }
 
 TEST_CASE("Pipeline parser, invalid '!' after '|'") {
-    CHECK_SYNTAX_ERROR("one| !");
+    checkSyntaxError(L("one| !"), 5, Message<>(L("`!' cannot follow `|'")));
 }
 
 TEST_CASE("Pipeline parser, missing command after '!'") {
-    CHECK_SYNTAX_ERROR("!");
-    CHECK_SYNTAX_ERROR("! # comment");
+    checkSyntaxError(L("!"), 1, Message<>(L("error in createCommandParser")));
+}
+
+TEST_CASE("Pipeline parser, comment after '!'") {
+    checkSyntaxError(
+            L("! #X"), 4, Message<>(L("error in createCommandParser")));
 }
 
 TEST_CASE("Pipeline parser, missing command after '|'") {
-    CHECK_SYNTAX_ERROR("one|");
-    CHECK_SYNTAX_ERROR("one| # comment");
+    checkSyntaxError(
+            L("one|"), 4, Message<>(L("error in createCommandParser")));
+}
+
+TEST_CASE("Pipeline parser, comment after '|'") {
+    checkSyntaxError(
+            L("one| #X"), 7, Message<>(L("error in createCommandParser")));
 }
 
 } // namespace

@@ -225,6 +225,7 @@ language_parser_EnvironmentTest_SOURCES = \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
 language_parser_PipelineParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BasicEnvironment.cc \
 	language/parser/CommentSkipper.cc \
 	language/parser/Environment.cc \
@@ -234,6 +235,7 @@ language_parser_PipelineParserTest_SOURCES = \
 	language/parser/Skipper.cc \
 	language/parser/StringParser.cc \
 	language/parser/token.cc \
+	language/source/DiagnosticMessage.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \
