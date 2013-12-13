@@ -64,6 +64,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/String.hh \
 	common/StringStream.hh \
 	common/Variant.hh \
+	i18n/M.h \
 	language/parser/AndOrListParser.cc \
 	language/parser/AndOrListParser.hh \
 	language/parser/AssignmentParser.cc \

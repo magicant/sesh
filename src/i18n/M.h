@@ -15,32 +15,18 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_Char_hh
-#define INCLUDED_common_Char_hh
+#ifndef INCLUDED_i18n_M_h
+#define INCLUDED_i18n_M_h
 
 #include "buildconfig.h"
 
-namespace sesh {
-namespace common {
-
 /**
- * The character type that is used throughout the program (except when calling
- * an OS API function).
+ * Marks a native string literal for translation.
+ *
+ * When used with the L macro, the M macro should be used inside the L macro.
  */
-using Char = wchar_t;
+#define M(message) message
 
-/**
- * This macro converts a character or string literal of the char type to an
- * equivalent literal of the Char type.
- */
-#define L(x) L_(x)
-#define L_(x) L##x
-
-// This does not work with the M macro: #define L(x) L##x
-
-} // namespace common
-} // namespace sesh
-
-#endif // #ifndef INCLUDED_common_Char_hh
+#endif // #ifndef INCLUDED_i18n_M_h
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
