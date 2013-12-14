@@ -200,12 +200,14 @@ language_parser_BasicEnvironmentTest_SOURCES = \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
 language_parser_CommandParserBaseTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BasicEnvironment.cc \
 	language/parser/CommandParserBase.cc \
 	language/parser/CommandParserBaseTest.cc \
 	language/parser/Environment.cc \
 	language/parser/Predicate.cc \
 	language/parser/token.cc \
+	language/source/DiagnosticMessage.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
