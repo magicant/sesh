@@ -42,8 +42,8 @@ namespace {
 
 bool isValidCommandSymbol(const String &symbol) {
     if (symbol.empty())
-        return true;
-    switch (symbol[0u]) {
+        return false;
+    switch (symbol[0]) {
     case L('&'):
     case L('|'):
     case L(';'):
@@ -66,18 +66,18 @@ void CommandParserBase::createActualParserFromKeyword() {
 
 void CommandParserBase::createActualParser() {
     const String &symbol = peekSymbol(environment());
-    if (!isValidCommandSymbol(symbol)) {
-        // TODO report error for invalid symbol
-        return;
-    }
-    if (symbol == LEFT_PARENTHESIS) {
-        return; // TODO create a grouping parser
-    }
-
     if (symbol.empty()) {
         createActualParserFromKeyword();
         if (mActualParser != nullptr)
             return;
+    } else {
+        if (!isValidCommandSymbol(symbol)) {
+            // TODO report error for invalid symbol
+            return;
+        }
+        if (symbol == LEFT_PARENTHESIS) {
+            return; // TODO create a grouping parser
+        }
     }
 
     mActualParser = createSimpleCommandParser();
