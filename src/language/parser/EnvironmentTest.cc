@@ -23,6 +23,7 @@
 #include <locale>
 #include <utility>
 #include "common/ErrorLevel.hh"
+#include "common/Message.hh"
 #include "common/String.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/NeedMoreSource.hh"
@@ -34,6 +35,7 @@ namespace {
 
 using sesh::common::CharTraits;
 using sesh::common::ErrorLevel;
+using sesh::common::Message;
 using sesh::common::String;
 using sesh::language::parser::NeedMoreSource;
 using sesh::language::parser::Environment;
@@ -71,7 +73,7 @@ private:
         throw "unexpected";
     }
 
-    void addDiagnosticMessage(const Iterator &, String &&, ErrorLevel)
+    void addDiagnosticMessage(const Iterator &, Message<> &&, ErrorLevel)
             override {
         throw "unexpected";
     }
@@ -141,7 +143,7 @@ private:
         throw "unexpected";
     }
 
-    void addDiagnosticMessage(const Iterator &, String &&, ErrorLevel)
+    void addDiagnosticMessage(const Iterator &, Message<> &&, ErrorLevel)
             override {
         throw "unexpected";
     }

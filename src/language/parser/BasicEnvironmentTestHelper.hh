@@ -21,6 +21,7 @@
 #include "buildconfig.h"
 
 #include <locale>
+#include <utility>
 #include "common/ErrorLevel.hh"
 #include "common/String.hh"
 #include "language/parser/BasicEnvironment.hh"
@@ -54,7 +55,8 @@ private:
     }
 
     void addDiagnosticMessage(
-            const Iterator &, common::String &&, common::ErrorLevel) override {
+            const Iterator &, common::Message<> &&, common::ErrorLevel)
+            override {
         throw "unexpected addDiagnosticMessage";
     }
 
@@ -97,7 +99,7 @@ public:
 
 };
 
-class CLocaleEnvironmentStub : public BasicEnvironmentStub {
+class CLocaleEnvironmentStub : public virtual BasicEnvironmentStub {
 
 public:
 

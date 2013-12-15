@@ -19,6 +19,7 @@ AM_INIT_AUTOMAKE([
     no-installinfo
     parallel-tests
     subdir-objects
+    tar-ustar
     -Wall
     -Werror
 ])

@@ -98,6 +98,7 @@ public:
 
 private:
 
+    void reportUnexpectedExclamationError();
     bool parseCommand();
 
 public:

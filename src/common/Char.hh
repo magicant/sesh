@@ -33,7 +33,10 @@ using Char = wchar_t;
  * This macro converts a character or string literal of the char type to an
  * equivalent literal of the Char type.
  */
-#define L(x) L##x
+#define L(x) L_(x)
+#define L_(x) L##x
+
+// This does not work with the M macro: #define L(x) L##x
 
 } // namespace common
 } // namespace sesh

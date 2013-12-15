@@ -21,17 +21,29 @@
 #include "catch.hpp"
 
 #include <memory>
+#include <utility>
+#include "common/Char.hh"
+#include "common/ErrorLevel.hh"
+#include "common/Message.hh"
+#include "common/String.hh"
 #include "language/parser/BasicEnvironmentTestHelper.hh"
 #include "language/parser/CommandParserBase.hh"
+#include "language/parser/DiagnosticEnvironmentTestHelper.hh"
 #include "language/parser/Parser.hh"
+#include "language/source/SourceBuffer.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Printer.hh"
 
 namespace {
 
+using sesh::common::ErrorLevel;
+using sesh::common::Message;
+using sesh::common::String;
 using sesh::language::parser::BasicEnvironmentStub;
 using sesh::language::parser::CommandParserBase;
+using sesh::language::parser::DiagnosticEnvironmentStub;
 using sesh::language::parser::Parser;
+using sesh::language::source::SourceBuffer;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Printer;
 
@@ -60,6 +72,18 @@ void checkCommandStub(const Command *c) {
     CHECK(sc != nullptr);
 }
 
+void checkSyntaxError(
+        String &&source, SourceBuffer::Size position, Message<> &&message) {
+    DiagnosticEnvironmentStub e;
+    e.appendSource(std::move(source));
+
+    CommandParser p(e);
+    std::unique_ptr<Command> c = p.parse();
+    CHECK(c == nullptr);
+    e.checkMessages({{
+            e.begin() + position, std::move(message), ErrorLevel::ERROR}});
+}
+
 TEST_CASE("Command parser, construction") {
     BasicEnvironmentStub e;
     CommandParser p(e);
@@ -75,6 +99,26 @@ TEST_CASE("Command parser, simple command parser") {
 }
 
 // TODO test compound commands and function definition command
+
+TEST_CASE("Command parser, invalid symbol &") {
+    auto message = L("unexpected symbol `&'; a command was expected");
+    checkSyntaxError(L("& "), 0, Message<>(message));
+}
+
+TEST_CASE("Command parser, invalid symbol |") {
+    auto message = L("unexpected symbol `|'; a command was expected");
+    checkSyntaxError(L("| "), 0, Message<>(message));
+}
+
+TEST_CASE("Command parser, invalid symbol )") {
+    auto message = L("unexpected symbol `)'; a command was expected");
+    checkSyntaxError(L(")"), 0, Message<>(message));
+}
+
+TEST_CASE("Command parser, invalid symbol ;") {
+    auto message = L("unexpected symbol `;'; a command was expected");
+    checkSyntaxError(L("; "), 0, Message<>(message));
+}
 
 } // namespace
 

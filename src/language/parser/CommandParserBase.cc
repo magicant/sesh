@@ -20,12 +20,17 @@
 
 #include <memory>
 #include "common/Char.hh"
+#include "common/ErrorLevel.hh"
+#include "common/Message.hh"
 #include "common/String.hh"
+#include "i18n/M.h"
 #include "language/parser/Environment.hh"
 #include "language/parser/token.hh"
 #include "language/syntax/Command.hh"
 
 using sesh::common::Char;
+using sesh::common::ErrorLevel;
+using sesh::common::Message;
 using sesh::common::String;
 using sesh::language::parser::Environment;
 using sesh::language::parser::token::LEFT_PARENTHESIS;
@@ -42,8 +47,8 @@ namespace {
 
 bool isValidCommandSymbol(const String &symbol) {
     if (symbol.empty())
-        return true;
-    switch (symbol[0u]) {
+        return false;
+    switch (symbol[0]) {
     case L('&'):
     case L('|'):
     case L(';'):
@@ -52,6 +57,12 @@ bool isValidCommandSymbol(const String &symbol) {
     default:
         return true;
     }
+}
+
+void reportInvalidSymbolError(Environment &e, const String &symbol) {
+    auto message = L(M("unexpected symbol `%1%'; a command was expected"));
+    e.addDiagnosticMessage(
+            e.current(), Message<String>(message) % symbol, ErrorLevel::ERROR);
 }
 
 } // namespace
@@ -66,18 +77,18 @@ void CommandParserBase::createActualParserFromKeyword() {
 
 void CommandParserBase::createActualParser() {
     const String &symbol = peekSymbol(environment());
-    if (!isValidCommandSymbol(symbol)) {
-        // TODO report error for invalid symbol
-        return;
-    }
-    if (symbol == LEFT_PARENTHESIS) {
-        return; // TODO create a grouping parser
-    }
-
     if (symbol.empty()) {
         createActualParserFromKeyword();
         if (mActualParser != nullptr)
             return;
+    } else {
+        if (!isValidCommandSymbol(symbol)) {
+            reportInvalidSymbolError(environment(), symbol);
+            return;
+        }
+        if (symbol == LEFT_PARENTHESIS) {
+            return; // TODO create a grouping parser
+        }
     }
 
     mActualParser = createSimpleCommandParser();

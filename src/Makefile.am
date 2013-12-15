@@ -12,6 +12,7 @@ bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
 	common/MaybeTest \
+	common/MessageTest \
 	common/VariantTest \
 	language/parser/AndOrListParserTest \
 	language/parser/AssignmentParserBaseTest \
@@ -54,17 +55,19 @@ TESTS = $(check_PROGRAMS) $(TESTSCRIPTS)
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(SHELL)
 
-catch_include = -I$(top_srcdir)/external/Catch/single_include
-AM_CPPFLAGS = $(catch_include)
+AM_CPPFLAGS = -I$(top_srcdir)/external/include
 
 sesh_SOURCES = buildconfig.h main.cc \
 	common/Char.hh \
 	common/ErrorLevel.hh \
 	common/Maybe.hh \
+	common/Message.cc \
+	common/Message.hh \
 	common/OutputStream.hh \
 	common/String.hh \
 	common/StringStream.hh \
 	common/Variant.hh \
+	i18n/M.h \
 	language/parser/AndOrListParser.cc \
 	language/parser/AndOrListParser.hh \
 	language/parser/AssignmentParser.cc \
@@ -114,6 +117,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/WordParser.hh \
 	language/parser/token.cc \
 	language/parser/token.hh \
+	language/source/DiagnosticMessage.cc \
+	language/source/DiagnosticMessage.hh \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
@@ -151,6 +156,9 @@ sesh_SOURCES = buildconfig.h main.cc \
 # Header files that are contained in sesh_SOURCES are not listed below.
 common_MaybeTest_SOURCES = \
 	common/MaybeTest.cc
+common_MessageTest_SOURCES = \
+	common/Message.cc \
+	common/MessageTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
 language_parser_AndOrListParserTest_SOURCES = \
@@ -178,7 +186,6 @@ language_parser_AssignmentParserBaseTest_SOURCES = \
 	language/parser/Predicate.cc \
 	language/parser/Skipper.cc \
 	language/parser/StringParser.cc \
-	language/parser/WordParserTestHelper.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \
@@ -189,17 +196,18 @@ language_parser_AssignmentParserBaseTest_SOURCES = \
 language_parser_BasicEnvironmentTest_SOURCES = \
 	language/parser/BasicEnvironment.cc \
 	language/parser/BasicEnvironmentTest.cc \
-	language/parser/BasicEnvironmentTestHelper.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
 language_parser_CommandParserBaseTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BasicEnvironment.cc \
 	language/parser/CommandParserBase.cc \
 	language/parser/CommandParserBaseTest.cc \
 	language/parser/Environment.cc \
 	language/parser/Predicate.cc \
 	language/parser/token.cc \
+	language/source/DiagnosticMessage.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
@@ -219,6 +227,7 @@ language_parser_EnvironmentTest_SOURCES = \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
 language_parser_PipelineParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BasicEnvironment.cc \
 	language/parser/CommentSkipper.cc \
 	language/parser/Environment.cc \
@@ -228,6 +237,7 @@ language_parser_PipelineParserTest_SOURCES = \
 	language/parser/Skipper.cc \
 	language/parser/StringParser.cc \
 	language/parser/token.cc \
+	language/source/DiagnosticMessage.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \
@@ -271,7 +281,6 @@ language_parser_SimpleCommandParserBaseTest_SOURCES = \
 	language/parser/SimpleCommandParserBase.cc \
 	language/parser/SimpleCommandParserBaseTest.cc \
 	language/parser/Skipper.cc \
-	language/parser/WordParserTestHelper.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \
@@ -343,17 +352,14 @@ language_source_SourceBufferTest_SOURCES = \
 	language/source/SourceBufferTest.cc
 language_source_SourceLineLocationTest_SOURCES = \
 	language/source/SourceLineLocation.cc \
-	language/source/SourceLineLocationTest.cc \
-	language/source/SourceLineLocationTestHelper.hh
+	language/source/SourceLineLocationTest.cc
 language_source_SourceLocationTest_SOURCES = \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLocation.cc \
-	language/source/SourceLocationTest.cc \
-	language/source/SourceLocationTestHelper.hh
+	language/source/SourceLocationTest.cc
 language_source_SourceTest_SOURCES = \
 	language/source/Source.cc \
-	language/source/SourceTest.cc \
-	language/source/SourceTestHelper.hh
+	language/source/SourceTest.cc
 language_syntax_AndOrListTest_SOURCES = \
 	language/source/SourceLineLocation.cc \
 	language/source/SourceLocation.cc \
@@ -387,8 +393,7 @@ language_syntax_PipelineTest_SOURCES = \
 	language/syntax/Printer.cc
 language_syntax_PrinterTest_SOURCES = \
 	language/syntax/Printer.cc \
-	language/syntax/PrinterTest.cc \
-	language/syntax/PrinterTestHelper.hh
+	language/syntax/PrinterTest.cc
 language_syntax_RawStringTest_SOURCES = \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc \
@@ -417,7 +422,18 @@ language_syntax_WordTest_SOURCES = \
 	language/syntax/Word.cc \
 	language/syntax/WordTest.cc
 
+TESTHEADERS = \
+	language/parser/BasicEnvironmentTestHelper.hh \
+	language/parser/DiagnosticEnvironmentTestHelper.hh \
+	language/parser/WordParserTestHelper.hh \
+	language/parser/WordParserTestHelper.hh \
+	language/source/DiagnosticMessageTestHelper.hh \
+	language/source/SourceLineLocationTestHelper.hh \
+	language/source/SourceLocationTestHelper.hh \
+	language/source/SourceTestHelper.hh \
+	language/syntax/PrinterTestHelper.hh
+
 checkheaderinclude.log: checkheaderinclude.sh $(SOURCES)
 checkincludebuildconfig.log: checkincludebuildconfig.sh $(SOURCES)
 
-EXTRA_DIST = $(TESTSCRIPTS)
+EXTRA_DIST = $(TESTSCRIPTS) $(TESTHEADERS)
