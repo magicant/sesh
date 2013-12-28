@@ -11,6 +11,7 @@
 bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
+	common/EnumSetTest \
 	common/MaybeTest \
 	common/MessageTest \
 	common/VariantTest \
@@ -55,6 +56,8 @@ AM_CPPFLAGS = -I$(top_srcdir)/external/include
 
 sesh_SOURCES = buildconfig.h main.cc \
 	common/Char.hh \
+	common/EnumSet.hh \
+	common/EnumTraits.hh \
 	common/ErrorLevel.hh \
 	common/Maybe.hh \
 	common/Message.cc \
@@ -145,6 +148,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/syntax/WordComponent.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
+common_EnumSetTest_SOURCES = \
+	common/EnumSetTest.cc
 common_MaybeTest_SOURCES = \
 	common/MaybeTest.cc
 common_MessageTest_SOURCES = \
