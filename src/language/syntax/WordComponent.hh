@@ -38,6 +38,8 @@ public:
     WordComponent &operator=(WordComponent &&) = default;
     ~WordComponent() override = default;
 
+    virtual bool isRawString() const noexcept { return false; }
+
     /**
      * If this word component always evaluates to the same string in any shell
      * environment state, appends the string to the argument and returns true.
