@@ -55,6 +55,7 @@ using sesh::language::syntax::WordComponent;
 
 class RawStringStub : public WordComponent {
 
+    bool appendConstantValue(String &) const override { throw "unexpected"; }
     void print(Printer &) const override { throw "unexpected print"; }
 
 };

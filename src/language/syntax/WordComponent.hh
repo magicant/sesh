@@ -20,6 +20,7 @@
 
 #include "buildconfig.h"
 
+#include "common/String.hh"
 #include "language/syntax/Printable.hh"
 
 namespace sesh {
@@ -36,6 +37,13 @@ public:
     WordComponent &operator=(const WordComponent &) = default;
     WordComponent &operator=(WordComponent &&) = default;
     ~WordComponent() override = default;
+
+    /**
+     * If this word component always evaluates to the same string in any shell
+     * environment state, appends the string to the argument and returns true.
+     * Otherwise, returns false without any side effects.
+     */
+    virtual bool appendConstantValue(common::String &) const = 0;
 
 }; // class WordComponent
 

@@ -57,6 +57,8 @@ public:
     common::String &value() { return mValue; }
     const common::String &value() const { return mValue; }
 
+    bool appendConstantValue(common::String &) const override;
+
     void print(Printer &) const override;
 
 }; // class RawString

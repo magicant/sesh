@@ -88,6 +88,7 @@ private:
 
 class WordComponentStub : public WordComponent {
 
+    bool appendConstantValue(String &) const override { throw "unexpected"; }
     void print(Printer &) const override { throw "unexpected print"; }
 
 };
