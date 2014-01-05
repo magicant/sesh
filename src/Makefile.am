@@ -84,6 +84,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/FailingParser.hh \
 	language/parser/IncompleteParse.cc \
 	language/parser/IncompleteParse.hh \
+	language/parser/Keyword.cc \
+	language/parser/Keyword.hh \
 	language/parser/LineContinuationEnvironment.cc \
 	language/parser/LineContinuationEnvironment.hh \
 	language/parser/LineContinuationTreatment.hh \
