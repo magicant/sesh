@@ -14,6 +14,7 @@ check_PROGRAMS = \
 	common/MaybeTest \
 	common/MessageTest \
 	common/VariantTest \
+	language/parser/EnvironmentHelperTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
 	language/source/SourceBufferTest \
@@ -54,6 +55,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/Variant.hh \
 	i18n/M.h \
 	language/parser/Environment.hh \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/EnvironmentHelper.hh \
 	language/parser/EofEnvironment.hh \
 	language/parser/IncompleteParse.cc \
 	language/parser/IncompleteParse.hh \
@@ -103,6 +106,13 @@ common_MessageTest_SOURCES = \
 	common/MessageTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
+language_parser_EnvironmentHelperTest_SOURCES = \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/EnvironmentHelperTest.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_source_LineAppendedSourceTest_SOURCES = \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSourceTest.cc \
