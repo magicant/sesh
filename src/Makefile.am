@@ -54,6 +54,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/Variant.hh \
 	i18n/M.h \
 	language/parser/Environment.hh \
+	language/parser/EofEnvironment.hh \
 	language/parser/IncompleteParse.cc \
 	language/parser/IncompleteParse.hh \
 	language/parser/SourceEnvironment.cc \
