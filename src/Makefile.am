@@ -191,6 +191,7 @@ language_syntax_WordTest_SOURCES = \
 	language/syntax/WordTest.cc
 
 TESTHEADERS = \
+	language/parser/EnvironmentTestHelper.hh \
 	language/source/DiagnosticMessageTestHelper.hh \
 	language/source/SourceLineLocationTestHelper.hh \
 	language/source/SourceLocationTestHelper.hh \
