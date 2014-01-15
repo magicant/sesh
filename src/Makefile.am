@@ -54,6 +54,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/Variant.hh \
 	i18n/M.h \
 	language/parser/Environment.hh \
+	language/parser/SourceEnvironment.cc \
+	language/parser/SourceEnvironment.hh \
 	language/source/DiagnosticMessage.cc \
 	language/source/DiagnosticMessage.hh \
 	language/source/LineAppendedSource.cc \
