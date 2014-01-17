@@ -60,6 +60,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/EofEnvironment.hh \
 	language/parser/IncompleteParse.cc \
 	language/parser/IncompleteParse.hh \
+	language/parser/Reparse.cc \
+	language/parser/Reparse.hh \
 	language/parser/SourceEnvironment.cc \
 	language/parser/SourceEnvironment.hh \
 	language/source/DiagnosticMessage.cc \
