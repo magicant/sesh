@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	common/MessageTest \
 	common/VariantTest \
 	language/parser/EnvironmentHelperTest \
+	language/parser/ParserTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
 	language/source/SourceBufferTest \
@@ -60,6 +61,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/EofEnvironment.hh \
 	language/parser/IncompleteParse.cc \
 	language/parser/IncompleteParse.hh \
+	language/parser/Parser.hh \
 	language/parser/ParserBase.cc \
 	language/parser/ParserBase.hh \
 	language/parser/Reparse.cc \
@@ -114,6 +116,15 @@ language_parser_EnvironmentHelperTest_SOURCES = \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/EnvironmentHelperTest.cc \
 	language/parser/IncompleteParse.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_ParserTest_SOURCES = \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/ParserBase.cc \
+	language/parser/ParserTest.cc \
+	language/parser/Reparse.cc \
 	language/parser/SourceEnvironment.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
