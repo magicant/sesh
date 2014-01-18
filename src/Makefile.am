@@ -66,6 +66,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Parser.hh \
 	language/parser/ParserBase.cc \
 	language/parser/ParserBase.hh \
+	language/parser/Predicate.hh \
 	language/parser/Reparse.cc \
 	language/parser/Reparse.hh \
 	language/parser/SourceEnvironment.cc \
