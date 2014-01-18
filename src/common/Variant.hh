@@ -23,6 +23,7 @@
 #include <cassert>
 #include <cstddef>
 #include <initializer_list>
+#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -181,7 +182,7 @@ public:
     template<typename U, typename... Arg>
     void construct(Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) {
-        new (&value<U>()) U(std::forward<Arg>(arg)...);
+        new (std::addressof(value<U>())) U(std::forward<Arg>(arg)...);
     }
 
     /**
@@ -270,7 +271,7 @@ public:
                     typename std::remove_reference<T>::type>::type>
     void operator()(T &&v)
             noexcept(std::is_nothrow_constructible<V, T &&>::value) {
-        new (&mTarget.template value<V>()) V(std::forward<T>(v));
+        mTarget.template construct<V>(std::forward<T>(v));
     }
 
 };
