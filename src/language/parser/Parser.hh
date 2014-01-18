@@ -61,6 +61,10 @@ public:
 
     using ParserBase::ParserBase;
 
+    Parser(const Parser &) = default;
+    Parser(Parser &&) = default;
+    Parser &operator=(const Parser &) = default;
+    Parser &operator=(Parser &&) = default;
     virtual ~Parser() noexcept = default;
 
     /**
