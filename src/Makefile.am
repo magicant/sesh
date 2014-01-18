@@ -82,6 +82,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Repeat.hh \
 	language/parser/SourceEnvironment.cc \
 	language/parser/SourceEnvironment.hh \
+	language/parser/StringParser.hh \
 	language/source/DiagnosticMessage.cc \
 	language/source/DiagnosticMessage.hh \
 	language/source/LineAppendedSource.cc \
