@@ -20,6 +20,7 @@
 
 #include "buildconfig.h"
 
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include "common/Variant.hh"
@@ -157,13 +158,13 @@ public:
      * Returns a pointer to the contained object. The maybe object must not be
      * empty.
      */
-    T *operator->() noexcept { return &value(); }
+    T *operator->() noexcept { return std::addressof(value()); }
 
     /**
      * Returns a pointer to the contained object. The maybe object must not be
      * empty.
      */
-    const T *operator->() const noexcept { return &value(); }
+    const T *operator->() const noexcept { return std::addressof(value()); }
 
     /**
      * Returns {@link #value()} if non-empty. Otherwise, returns a reference to
