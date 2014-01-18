@@ -97,7 +97,7 @@ private:
 
     void resetImpl() noexcept override {
         mSubparser.reset();
-        this->NormalParser<ResultContainer>::reset();
+        this->NormalParser<ResultContainer>::resetImpl();
     }
 
 }; // template<typename Subparser> class Repeat

@@ -79,6 +79,24 @@ TEST_CASE("Repeat, three results") {
     CHECK(r.parse().value().at(2) == L('C'));
 }
 
+TEST_CASE("Repeat, reset") {
+    RepeatTestEnvironment e;
+    Repeat<CharParser> r = charRepeat(e, L(','));
+
+    e.appendSource(L("A,B,"));
+
+    REQUIRE(r.parse().hasValue());
+    CHECK(r.parse().value().size() == 1);
+    CHECK(e.position() == 1);
+
+    e.setPosition(2);
+    r.reset();
+
+    REQUIRE(r.parse().hasValue());
+    CHECK(r.parse().value().size() == 1);
+    CHECK(e.position() == 3);
+}
+
 } // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
