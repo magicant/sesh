@@ -54,8 +54,6 @@ protected:
         return mResult;
     }
 
-private:
-
     /** This default implementation simply clears the {@link #result}. */
     void resetImpl() noexcept override {
         result().clear();

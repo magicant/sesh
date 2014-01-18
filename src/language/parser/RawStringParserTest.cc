@@ -93,6 +93,31 @@ TEST_CASE("Raw string parser, empty result") {
     CHECK(e.position() == 1);
 }
 
+TEST_CASE("Raw string parser, reset") {
+    RawStringParserTestEnvironment e;
+    RawStringParser p(e, isNot<L('-')>);
+    RawString *rs;
+
+    e.appendSource(L("A-B-"));
+
+    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse().value() != nullptr);
+    rs = dynamic_cast<RawString *>(p.parse().value().get());
+    REQUIRE(rs != nullptr);
+    CHECK(rs->value() == L("A"));
+    CHECK(e.position() == 1);
+
+    p.reset();
+    e.setPosition(2);
+
+    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse().value() != nullptr);
+    rs = dynamic_cast<RawString *>(p.parse().value().get());
+    REQUIRE(rs != nullptr);
+    CHECK(rs->value() == L("B"));
+    CHECK(e.position() == 3);
+}
+
 } // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

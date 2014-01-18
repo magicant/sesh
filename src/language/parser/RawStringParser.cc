@@ -49,7 +49,7 @@ void RawStringParser::parseImpl() {
 
 void RawStringParser::resetImpl() noexcept {
     mStringParser.reset();
-    NormalParser::reset();
+    NormalParser::resetImpl();
 }
 
 } // namespace parser
