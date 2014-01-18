@@ -19,6 +19,7 @@ check_PROGRAMS = \
 	language/parser/EnvironmentHelperTest \
 	language/parser/LineContinuationEnvironmentTest \
 	language/parser/ParserTest \
+	language/parser/RawStringParserTest \
 	language/parser/RepeatTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
@@ -83,6 +84,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/SourceEnvironment.cc \
 	language/parser/SourceEnvironment.hh \
 	language/parser/StringParser.hh \
+	language/parser/RawStringParser.cc \
+	language/parser/RawStringParser.hh \
 	language/source/DiagnosticMessage.cc \
 	language/source/DiagnosticMessage.hh \
 	language/source/LineAppendedSource.cc \
@@ -174,6 +177,20 @@ language_parser_ParserTest_SOURCES = \
 	language/parser/SourceEnvironment.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_RawStringParserTest_SOURCES = \
+	language/parser/CharParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/RawStringParser.cc \
+	language/parser/RawStringParserTest.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Printer.cc \
+	language/syntax/RawString.cc
 language_parser_RepeatTest_SOURCES = \
 	language/parser/CharParser.cc \
 	language/parser/EnvironmentHelper.cc \
