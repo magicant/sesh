@@ -14,6 +14,11 @@ check_PROGRAMS = \
 	common/MaybeTest \
 	common/MessageTest \
 	common/VariantTest \
+	language/parser/CharFilterTest \
+	language/parser/CharParserTest \
+	language/parser/EnvironmentHelperTest \
+	language/parser/LineContinuationEnvironmentTest \
+	language/parser/ParserTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
 	language/source/SourceBufferTest \
@@ -53,6 +58,28 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/StringStream.hh \
 	common/Variant.hh \
 	i18n/M.h \
+	language/parser/CharFilter.cc \
+	language/parser/CharFilter.hh \
+	language/parser/CharParser.cc \
+	language/parser/CharParser.hh \
+	language/parser/Environment.hh \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/EnvironmentHelper.hh \
+	language/parser/EofEnvironment.hh \
+	language/parser/IncompleteParse.cc \
+	language/parser/IncompleteParse.hh \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/LineContinuationEnvironment.hh \
+	language/parser/LineContinuationTreatment.hh \
+	language/parser/NormalParser.hh \
+	language/parser/Parser.hh \
+	language/parser/ParserBase.cc \
+	language/parser/ParserBase.hh \
+	language/parser/Predicate.hh \
+	language/parser/Reparse.cc \
+	language/parser/Reparse.hh \
+	language/parser/SourceEnvironment.cc \
+	language/parser/SourceEnvironment.hh \
 	language/source/DiagnosticMessage.cc \
 	language/source/DiagnosticMessage.hh \
 	language/source/LineAppendedSource.cc \
@@ -97,6 +124,53 @@ common_MessageTest_SOURCES = \
 	common/MessageTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
+language_parser_CharFilterTest_SOURCES = \
+	language/parser/CharFilter.cc \
+	language/parser/CharFilterTest.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_CharParserTest_SOURCES = \
+	language/parser/CharParser.cc \
+	language/parser/CharParserTest.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_EnvironmentHelperTest_SOURCES = \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/EnvironmentHelperTest.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_LineContinuationEnvironmentTest_SOURCES = \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/LineContinuationEnvironmentTest.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_ParserTest_SOURCES = \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/ParserBase.cc \
+	language/parser/ParserTest.cc \
+	language/parser/Reparse.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_source_LineAppendedSourceTest_SOURCES = \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSourceTest.cc \
@@ -186,6 +260,7 @@ language_syntax_WordTest_SOURCES = \
 	language/syntax/WordTest.cc
 
 TESTHEADERS = \
+	language/parser/EnvironmentTestHelper.hh \
 	language/source/DiagnosticMessageTestHelper.hh \
 	language/source/SourceLineLocationTestHelper.hh \
 	language/source/SourceLocationTestHelper.hh \
