@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	common/MessageTest \
 	common/VariantTest \
 	language/parser/CharFilterTest \
+	language/parser/CharParserTest \
 	language/parser/EnvironmentHelperTest \
 	language/parser/LineContinuationEnvironmentTest \
 	language/parser/ParserTest \
@@ -59,6 +60,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	i18n/M.h \
 	language/parser/CharFilter.cc \
 	language/parser/CharFilter.hh \
+	language/parser/CharParser.cc \
+	language/parser/CharParser.hh \
 	language/parser/Environment.hh \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/EnvironmentHelper.hh \
@@ -124,6 +127,17 @@ common_VariantTest_SOURCES = \
 language_parser_CharFilterTest_SOURCES = \
 	language/parser/CharFilter.cc \
 	language/parser/CharFilterTest.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_CharParserTest_SOURCES = \
+	language/parser/CharParser.cc \
+	language/parser/CharParserTest.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
 	language/parser/LineContinuationEnvironment.cc \
