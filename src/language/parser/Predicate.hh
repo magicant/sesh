@@ -21,12 +21,11 @@
 #include "buildconfig.h"
 
 #include <functional>
+#include "language/parser/Environment.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
-
-class Environment;
 
 template<typename T>
 using Predicate = std::function<bool(const Environment &, T)>;
