@@ -92,6 +92,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/RawStringParser.hh \
 	language/parser/WordComponentParser.cc \
 	language/parser/WordComponentParser.hh \
+	language/parser/WordComponentParserImpl.cc \
+	language/parser/WordComponentParserImpl.hh \
 	language/source/DiagnosticMessage.cc \
 	language/source/DiagnosticMessage.hh \
 	language/source/LineAppendedSource.cc \
