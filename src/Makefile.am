@@ -69,6 +69,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/CharFilter.hh \
 	language/parser/CharParser.cc \
 	language/parser/CharParser.hh \
+	language/parser/CharPredicates.cc \
+	language/parser/CharPredicates.hh \
 	language/parser/Converter.hh \
 	language/parser/Environment.hh \
 	language/parser/EnvironmentHelper.cc \
