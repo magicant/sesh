@@ -21,6 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include "language/syntax/Printable.hh"
 #include "language/syntax/WordComponent.hh"
@@ -44,6 +45,9 @@ private:
     std::vector<ComponentPointer> mComponents;
 
 public:
+
+    template<typename... Arg>
+    Word(Arg &&... arg) : mComponents(std::forward<Arg>(arg)...) { }
 
     Word() = default;
     Word(const Word &) = delete;
