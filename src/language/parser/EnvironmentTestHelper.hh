@@ -22,6 +22,7 @@
 
 #include "catch.hpp"
 
+#include <locale>
 #include <stdexcept>
 #include <utility>
 #include "common/String.hh"
@@ -63,6 +64,14 @@ public:
     }
 
 }; // class SourceTestEnvironment
+
+class CLocaleEnvironment : public virtual SourceEnvironment {
+
+    const std::locale &locale() const noexcept override {
+        return std::locale::classic();
+    }
+
+}; // class CLocaleEnvironment
 
 } // namespace parser
 } // namespace language
