@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	common/MessageTest \
 	common/VariantTest \
 	language/parser/AssignedWordParserTest \
+	language/parser/AssignmentParserTest \
 	language/parser/CharFilterTest \
 	language/parser/CharParserTest \
 	language/parser/ConverterTest \
@@ -65,6 +66,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	i18n/M.h \
 	language/parser/AssignedWordParser.cc \
 	language/parser/AssignedWordParser.hh \
+	language/parser/AssignmentParser.cc \
+	language/parser/AssignmentParser.hh \
 	language/parser/CharFilter.cc \
 	language/parser/CharFilter.hh \
 	language/parser/CharParser.cc \
@@ -159,6 +162,22 @@ language_parser_AssignedWordParserTest_SOURCES = \
 	language/source/SourceBuffer.cc \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc \
+	language/syntax/Word.cc
+language_parser_AssignmentParserTest_SOURCES = \
+	language/parser/AssignmentParser.cc \
+	language/parser/AssignmentParserTest.cc \
+	language/parser/CharParser.cc \
+	language/parser/CharPredicates.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Assignment.cc \
+	language/syntax/Printer.cc \
 	language/syntax/Word.cc
 language_parser_CharFilterTest_SOURCES = \
 	language/parser/CharFilter.cc \
