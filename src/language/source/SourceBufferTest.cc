@@ -91,7 +91,6 @@ TEST_CASE("Source buffer substitution, at and operator[]") {
     });
     checkSourceBufferString(sb, L("Test"));
     sb.substitute([](SourcePointer &&p) -> SourcePointer {
-        // XXX: GCC 4.8.1 and Clang 3.3 want explicit move.
         return std::move(p);
     });
     checkSourceBufferString(sb, L("Test"));
@@ -99,7 +98,6 @@ TEST_CASE("Source buffer substitution, at and operator[]") {
         REQUIRE(p != nullptr);
         CHECK(dynamic_cast<const StringPrependedSource *>(p.get()) != nullptr);
         checkSourceString(*p, L("Test"));
-        // XXX: GCC 4.8.1 and Clang 3.3 want explicit move.
         return std::move(p);
     });
     checkSourceBufferString(sb, L("Test"));
