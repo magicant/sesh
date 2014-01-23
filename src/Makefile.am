@@ -68,6 +68,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/AssignedWordParser.hh \
 	language/parser/AssignmentParser.cc \
 	language/parser/AssignmentParser.hh \
+	language/parser/AssignmentParserImpl.cc \
+	language/parser/AssignmentParserImpl.hh \
 	language/parser/CharFilter.cc \
 	language/parser/CharFilter.hh \
 	language/parser/CharParser.cc \
