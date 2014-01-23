@@ -1,4 +1,4 @@
-/* Copyright (C) 2013-2014 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,25 +15,45 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_Predicate_hh
-#define INCLUDED_language_parser_Predicate_hh
-
 #include "buildconfig.h"
+#include "CharPredicates.hh"
 
-#include <functional>
+#include <locale>
+#include "common/Char.hh"
+#include "common/String.hh"
+#include "config.h"
 #include "language/parser/Environment.hh"
+
+using sesh::common::Char;
+using sesh::common::String;
+using sesh::common::contains;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-template<typename T>
-using Predicate = std::function<bool(const Environment &, T)>;
+bool isTokenDelimiter(const Environment &e, Char c) {
+    static const String delimiters = L(" \t\n;&|<>()");
+    return contains(delimiters, c) ||
+#if HAVE_STD__ISBLANK
+            std::isblank(c, e.locale())
+#else
+            ((void) e.locale(), false)
+#endif // #if HAVE_STD__ISBLANK
+            ;
+}
+
+bool isRawStringChar(const Environment &e, Char c) {
+    static const String specialChars = L("\\\"\'$`");
+    return !contains(specialChars, c) && !isTokenDelimiter(e, c);
+}
+
+bool isVariableNameChar(const Environment &e, Char c) {
+    return c == L('_') || std::isalnum(c, e.locale());
+}
 
 } // namespace parser
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_parser_Predicate_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

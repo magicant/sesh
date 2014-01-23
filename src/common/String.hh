@@ -35,6 +35,16 @@ using String = std::basic_string<Char>;
 /** The character traits type of String. */
 using CharTraits = String::traits_type;
 
+/** Checks if the given string contains the given character. */
+template<typename CharT, typename Traits, typename Allocator>
+bool contains(
+        const std::basic_string<CharT, Traits, Allocator> &s,
+        typename std::basic_string<CharT, Traits, Allocator>::value_type c,
+        typename std::basic_string<CharT, Traits, Allocator>::size_type pos =
+                0) {
+    return s.find(c, pos) == std::basic_string<CharT, Traits, Allocator>::npos;
+}
+
 } // namespace common
 } // namespace sesh
 
