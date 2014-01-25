@@ -18,11 +18,28 @@
 #include "buildconfig.h"
 #include "Word.hh"
 
+#include <algorithm>
+#include <cassert>
+#include <iterator>
 #include <utility>
+#include <vector>
 
 namespace sesh {
 namespace language {
 namespace syntax {
+
+void Word::addComponent(ComponentPointer c) {
+    assert(c != nullptr);
+    mComponents.push_back(std::move(c));
+}
+
+void Word::append(Word &&w) {
+    std::move(
+            w.mComponents.begin(),
+            w.mComponents.end(),
+            std::back_inserter(mComponents));
+    w.mComponents.clear();
+}
 
 void Word::print(Printer &p) const {
     for (const ComponentPointer &c : components())

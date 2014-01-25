@@ -56,12 +56,21 @@ public:
     Word &operator=(Word &&) = default;
     ~Word() override = default;
 
-    std::vector<ComponentPointer> &components() noexcept {
-        return mComponents;
-    }
     const std::vector<ComponentPointer> &components() const noexcept {
         return mComponents;
     }
+
+    /**
+     * Adds a component to this word.
+     * @param c non-null pointer to the component to add.
+     */
+    void addComponent(ComponentPointer c);
+
+    /**
+     * Moves all components of the argument word to the end of this word. The
+     * argument word will be empty after this method returns.
+     */
+    void append(Word &&);
 
     void print(Printer &) const override;
 

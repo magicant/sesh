@@ -43,9 +43,9 @@ struct Fixture {
     Assignment a;
     Fixture() : a() {
         a.variableName() = L("varName");
-        a.value().components().push_back(Word::ComponentPointer(
+        a.value().addComponent(Word::ComponentPointer(
                 new RawString(L("assigned"))));
-        a.value().components().push_back(Word::ComponentPointer(
+        a.value().addComponent(Word::ComponentPointer(
                 new RawString(L("Value"))));
     }
 };
@@ -80,11 +80,11 @@ TEST_CASE_METHOD(Fixture, "Assignment data 1") {
 TEST_CASE("Assignment data 2") {
     String name(L("name"));
     Assignment a1(name, Assignment::WordPointer(new Word));
-    a1.value().components().push_back(
+    a1.value().addComponent(
             Word::ComponentPointer(new RawString(L("value"))));
-    a1.value().components().push_back(
+    a1.value().addComponent(
             Word::ComponentPointer(new RawString(L(" "))));
-    a1.value().components().push_back(
+    a1.value().addComponent(
             Word::ComponentPointer(new RawString(L("string"))));
     CHECK(a1.variableName() == name);
     CHECK(a1.value().components().size() == 3);
