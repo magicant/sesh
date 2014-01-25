@@ -105,6 +105,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/SourceEnvironment.cc \
 	language/parser/SourceEnvironment.hh \
 	language/parser/StringParser.hh \
+	language/parser/Token.hh \
 	language/parser/WordComponentParser.cc \
 	language/parser/WordComponentParser.hh \
 	language/parser/WordComponentParserImpl.cc \
