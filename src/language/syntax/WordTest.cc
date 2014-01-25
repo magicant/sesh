@@ -67,6 +67,20 @@ TEST_CASE("Word, constant value") {
     CHECK(w1.maybeConstantValue().value() == String());
 }
 
+TEST_CASE("Word, is raw string") {
+    Word w;
+    CHECK(w.isRawString());
+
+    w.addComponent(Word::ComponentPointer(new RawString));
+    CHECK(w.isRawString());
+
+    w.addComponent(Word::ComponentPointer(new RawString(L("Test"))));
+    CHECK(w.isRawString());
+
+    w.addComponent(Word::ComponentPointer(new NonConstant));
+    CHECK_FALSE(w.isRawString());
+}
+
 TEST_CASE("Word print") {
     forEachLineMode([](Printer &p) {
         Word w;

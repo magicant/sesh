@@ -66,6 +66,13 @@ const Maybe<String> &Word::maybeConstantValue() const {
     return mMaybeConstantValueCache.value();
 }
 
+bool Word::isRawString() const {
+    return std::all_of(
+            mComponents.begin(),
+            mComponents.end(),
+            [](const ComponentPointer &c) { return c->isRawString(); });
+}
+
 void Word::print(Printer &p) const {
     for (const ComponentPointer &c : components())
         p << *c;

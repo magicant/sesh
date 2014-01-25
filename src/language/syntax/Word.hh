@@ -93,6 +93,9 @@ public:
      */
     const common::Maybe<common::String> &maybeConstantValue() const;
 
+    /** Returns true if all components of this word are raw strings. */
+    bool isRawString() const;
+
     void print(Printer &) const override;
 
 }; // class Word
