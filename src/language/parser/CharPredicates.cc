@@ -32,15 +32,19 @@ namespace sesh {
 namespace language {
 namespace parser {
 
+bool isBlank(const Environment &e, Char c) {
+#if HAVE_STD__ISBLANK
+    return std::isblank(c, e.locale());
+#else
+    (void) e;
+    assert((e.locale(), true));
+    return c == L(' ') || c == L('\t');
+#endif // #if HAVE_STD__ISBLANK
+}
+
 bool isTokenDelimiter(const Environment &e, Char c) {
     static const String delimiters = L(" \t\n;&|<>()");
-    return contains(delimiters, c) ||
-#if HAVE_STD__ISBLANK
-            std::isblank(c, e.locale())
-#else
-            ((void) e.locale(), false)
-#endif // #if HAVE_STD__ISBLANK
-            ;
+    return contains(delimiters, c) || isBlank(e, c);
 }
 
 bool isRawStringChar(const Environment &e, Char c) {
