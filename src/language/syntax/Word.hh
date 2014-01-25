@@ -23,6 +23,8 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include "common/Maybe.hh"
+#include "common/String.hh"
 #include "language/syntax/Printable.hh"
 #include "language/syntax/WordComponent.hh"
 
@@ -44,10 +46,15 @@ private:
 
     std::vector<ComponentPointer> mComponents;
 
+    mutable common::Maybe<common::Maybe<common::String>>
+            mMaybeConstantValueCache;
+
 public:
 
     template<typename... Arg>
-    Word(Arg &&... arg) : mComponents(std::forward<Arg>(arg)...) { }
+    Word(Arg &&... arg) :
+            mComponents(std::forward<Arg>(arg)...),
+            mMaybeConstantValueCache() { }
 
     Word() = default;
     Word(const Word &) = delete;
@@ -71,6 +78,20 @@ public:
      * argument word will be empty after this method returns.
      */
     void append(Word &&);
+
+private:
+
+    common::Maybe<common::String> computeMaybeConstantValue() const;
+
+public:
+
+    /**
+     * If the value of this word is constant, i.e., this word always evaluates
+     * to the same single string regardless of the execution environment, then
+     * returns a reference to a maybe object containing the constant value.
+     * Otherwise, returns a reference to an empty maybe object.
+     */
+    const common::Maybe<common::String> &maybeConstantValue() const;
 
     void print(Printer &) const override;
 

@@ -21,18 +21,51 @@
 #include "catch.hpp"
 
 #include <memory>
+#include <utility>
 #include "common/Char.hh"
+#include "common/String.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 #include "language/syntax/RawString.hh"
 #include "language/syntax/Word.hh"
+#include "language/syntax/WordComponent.hh"
 
 namespace {
 
+using sesh::common::String;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::Word;
+using sesh::language::syntax::WordComponent;
 using sesh::language::syntax::forEachLineMode;
+
+class NonConstant : public WordComponent {
+    bool appendConstantValue(String &) const override { return false; }
+    void print(Printer &) const override { throw "unexpected print"; }
+};
+
+TEST_CASE("Word, constant value") {
+    Word w1, w2;
+    REQUIRE(w1.maybeConstantValue().hasValue());
+    CHECK(w1.maybeConstantValue().value() == String());
+
+    w1.addComponent(Word::ComponentPointer(new RawString(L("ABC"))));
+    REQUIRE(w1.maybeConstantValue().hasValue());
+    CHECK(w1.maybeConstantValue().value() == L("ABC"));
+
+    w1.addComponent(Word::ComponentPointer(new RawString(L("123"))));
+    REQUIRE(w1.maybeConstantValue().hasValue());
+    CHECK(w1.maybeConstantValue().value() == L("ABC123"));
+
+    w1.addComponent(Word::ComponentPointer(new NonConstant));
+    CHECK_FALSE(w1.maybeConstantValue().hasValue());
+
+    CHECK(w2.maybeConstantValue().hasValue());
+    w2.append(std::move(w1));
+    CHECK_FALSE(w2.maybeConstantValue().hasValue());
+    REQUIRE(w1.maybeConstantValue().hasValue());
+    CHECK(w1.maybeConstantValue().value() == String());
+}
 
 TEST_CASE("Word print") {
     forEachLineMode([](Printer &p) {
