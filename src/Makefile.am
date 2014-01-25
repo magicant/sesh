@@ -18,6 +18,7 @@ check_PROGRAMS = \
 	language/parser/AssignmentParserTest \
 	language/parser/CharFilterTest \
 	language/parser/CharParserTest \
+	language/parser/CommentParserTest \
 	language/parser/ConverterTest \
 	language/parser/EnvironmentHelperTest \
 	language/parser/LineContinuationEnvironmentTest \
@@ -76,6 +77,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/CharParser.hh \
 	language/parser/CharPredicates.cc \
 	language/parser/CharPredicates.hh \
+	language/parser/CommentParser.cc \
+	language/parser/CommentParser.hh \
 	language/parser/Converter.hh \
 	language/parser/Environment.hh \
 	language/parser/EnvironmentHelper.cc \
@@ -195,6 +198,19 @@ language_parser_CharFilterTest_SOURCES = \
 language_parser_CharParserTest_SOURCES = \
 	language/parser/CharParser.cc \
 	language/parser/CharParserTest.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_CommentParserTest_SOURCES = \
+	language/parser/CharFilter.cc \
+	language/parser/CharParser.cc \
+	language/parser/CommentParser.cc \
+	language/parser/CommentParserTest.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
 	language/parser/LineContinuationEnvironment.cc \
