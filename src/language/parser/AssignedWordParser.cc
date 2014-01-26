@@ -41,13 +41,6 @@ constexpr bool isColon(const Environment &, Char c) noexcept {
     return c == L(':');
 }
 
-void moveComponents(Word &&fromWord, Word &toWord) {
-    std::move(
-            fromWord.components().begin(),
-            fromWord.components().end(),
-            std::back_inserter(toWord.components()));
-}
-
 } // namespace
 
 AssignedWordParser::AssignedWordParser(
@@ -60,7 +53,7 @@ AssignedWordParser::AssignedWordParser(
 bool AssignedWordParser::parseWord() {
     WordPointer word = std::move(mWordParser->parse().value());
     if (result().hasValue())
-        moveComponents(std::move(*word), *result().value());
+        result().value()->append(std::move(*word));
     else
         result().emplace(std::move(word));
     mWordParser->reset();
@@ -72,8 +65,8 @@ bool AssignedWordParser::parseColon() {
     auto &maybeColon = mColonParser.parse();
     if (!maybeColon.hasValue())
         return false;
-    result().value()->components().emplace_back(
-            new RawString(String(1, maybeColon.value())));
+    result().value()->addComponent(Word::ComponentPointer(
+            new RawString(String(1, maybeColon.value()))));
     mColonParser.reset();
     mState = State::WORD;
     return true;

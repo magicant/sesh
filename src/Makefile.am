@@ -11,13 +11,16 @@
 bin_PROGRAMS = sesh
 
 check_PROGRAMS = \
+	common/EnumSetTest \
 	common/MaybeTest \
 	common/MessageTest \
 	common/VariantTest \
 	language/parser/AssignedWordParserTest \
 	language/parser/AssignmentParserTest \
+	language/parser/BlankAndCommentParserTest \
 	language/parser/CharFilterTest \
 	language/parser/CharParserTest \
+	language/parser/CommentParserTest \
 	language/parser/ConverterTest \
 	language/parser/EnvironmentHelperTest \
 	language/parser/LineContinuationEnvironmentTest \
@@ -55,6 +58,8 @@ AM_CPPFLAGS = -I$(top_srcdir)/external/include
 
 sesh_SOURCES = buildconfig.h main.cc \
 	common/Char.hh \
+	common/EnumSet.hh \
+	common/EnumTraits.hh \
 	common/ErrorLevel.hh \
 	common/Maybe.hh \
 	common/Message.cc \
@@ -70,12 +75,16 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/AssignmentParser.hh \
 	language/parser/AssignmentParserImpl.cc \
 	language/parser/AssignmentParserImpl.hh \
+	language/parser/BlankAndCommentParser.cc \
+	language/parser/BlankAndCommentParser.hh \
 	language/parser/CharFilter.cc \
 	language/parser/CharFilter.hh \
 	language/parser/CharParser.cc \
 	language/parser/CharParser.hh \
 	language/parser/CharPredicates.cc \
 	language/parser/CharPredicates.hh \
+	language/parser/CommentParser.cc \
+	language/parser/CommentParser.hh \
 	language/parser/Converter.hh \
 	language/parser/Environment.hh \
 	language/parser/EnvironmentHelper.cc \
@@ -84,6 +93,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/FailingParser.hh \
 	language/parser/IncompleteParse.cc \
 	language/parser/IncompleteParse.hh \
+	language/parser/Keyword.cc \
+	language/parser/Keyword.hh \
 	language/parser/LineContinuationEnvironment.cc \
 	language/parser/LineContinuationEnvironment.hh \
 	language/parser/LineContinuationTreatment.hh \
@@ -100,6 +111,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/SourceEnvironment.cc \
 	language/parser/SourceEnvironment.hh \
 	language/parser/StringParser.hh \
+	language/parser/Token.hh \
 	language/parser/WordComponentParser.cc \
 	language/parser/WordComponentParser.hh \
 	language/parser/WordComponentParserImpl.cc \
@@ -143,6 +155,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/syntax/WordComponent.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
+common_EnumSetTest_SOURCES = \
+	common/EnumSetTest.cc
 common_MaybeTest_SOURCES = \
 	common/MaybeTest.cc
 common_MessageTest_SOURCES = \
@@ -181,6 +195,21 @@ language_parser_AssignmentParserTest_SOURCES = \
 	language/syntax/Assignment.cc \
 	language/syntax/Printer.cc \
 	language/syntax/Word.cc
+language_parser_BlankAndCommentParserTest_SOURCES = \
+	language/parser/BlankAndCommentParser.cc \
+	language/parser/BlankAndCommentParserTest.cc \
+	language/parser/CharFilter.cc \
+	language/parser/CharParser.cc \
+	language/parser/CharPredicates.cc \
+	language/parser/CommentParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_parser_CharFilterTest_SOURCES = \
 	language/parser/CharFilter.cc \
 	language/parser/CharFilterTest.cc \
@@ -195,6 +224,19 @@ language_parser_CharFilterTest_SOURCES = \
 language_parser_CharParserTest_SOURCES = \
 	language/parser/CharParser.cc \
 	language/parser/CharParserTest.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_CommentParserTest_SOURCES = \
+	language/parser/CharFilter.cc \
+	language/parser/CharParser.cc \
+	language/parser/CommentParser.cc \
+	language/parser/CommentParserTest.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
 	language/parser/LineContinuationEnvironment.cc \

@@ -23,6 +23,8 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include "common/Maybe.hh"
+#include "common/String.hh"
 #include "language/syntax/Printable.hh"
 #include "language/syntax/WordComponent.hh"
 
@@ -44,10 +46,15 @@ private:
 
     std::vector<ComponentPointer> mComponents;
 
+    mutable common::Maybe<common::Maybe<common::String>>
+            mMaybeConstantValueCache;
+
 public:
 
     template<typename... Arg>
-    Word(Arg &&... arg) : mComponents(std::forward<Arg>(arg)...) { }
+    Word(Arg &&... arg) :
+            mComponents(std::forward<Arg>(arg)...),
+            mMaybeConstantValueCache() { }
 
     Word() = default;
     Word(const Word &) = delete;
@@ -56,12 +63,38 @@ public:
     Word &operator=(Word &&) = default;
     ~Word() override = default;
 
-    std::vector<ComponentPointer> &components() noexcept {
-        return mComponents;
-    }
     const std::vector<ComponentPointer> &components() const noexcept {
         return mComponents;
     }
+
+    /**
+     * Adds a component to this word.
+     * @param c non-null pointer to the component to add.
+     */
+    void addComponent(ComponentPointer c);
+
+    /**
+     * Moves all components of the argument word to the end of this word. The
+     * argument word will be empty after this method returns.
+     */
+    void append(Word &&);
+
+private:
+
+    common::Maybe<common::String> computeMaybeConstantValue() const;
+
+public:
+
+    /**
+     * If the value of this word is constant, i.e., this word always evaluates
+     * to the same single string regardless of the execution environment, then
+     * returns a reference to a maybe object containing the constant value.
+     * Otherwise, returns a reference to an empty maybe object.
+     */
+    const common::Maybe<common::String> &maybeConstantValue() const;
+
+    /** Returns true if all components of this word are raw strings. */
+    bool isRawString() const;
 
     void print(Printer &) const override;
 

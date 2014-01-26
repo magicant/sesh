@@ -15,29 +15,37 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_common_EnumTraits_hh
+#define INCLUDED_common_EnumTraits_hh
+
 #include "buildconfig.h"
-#include "RawString.hh"
-
-#include "common/String.hh"
-#include "language/syntax/Printer.hh"
-
-using sesh::common::String;
 
 namespace sesh {
-namespace language {
-namespace syntax {
+namespace common {
 
-bool RawString::appendConstantValue(String &s) const {
-    s += value();
-    return true;
-}
+/**
+ * The enum traits template is a placeholder where characteristics of an
+ * enumeration.
+ *
+ * A specialization of this template must have the following public members:
+@code
+template<> class EnumTraits<SomeEnumType> {
+public:
+    // The maximum value of the SomeEnumType enumerators.
+    constexpr static SomeEnumType max = ...;
+};
+@endcode
+ *
+ * The non-specialized version of this template is not defined.
+ *
+ * @tparam E An enumeration type.
+ */
+template<typename E>
+class EnumTraits;
 
-void RawString::print(Printer &p) const {
-    p << value();
-}
-
-} // namespace syntax
-} // namespace language
+} // namespace common
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_common_EnumTraits_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

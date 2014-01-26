@@ -54,8 +54,12 @@ public:
     RawString &operator=(RawString &&) = default;
     ~RawString() override = default;
 
+    bool isRawString() const noexcept override { return true; }
+
     common::String &value() { return mValue; }
     const common::String &value() const { return mValue; }
+
+    bool appendConstantValue(common::String &) const override;
 
     void print(Printer &) const override;
 

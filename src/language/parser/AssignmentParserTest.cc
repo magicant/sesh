@@ -88,6 +88,7 @@ private:
 
 class WordComponentStub : public WordComponent {
 
+    bool appendConstantValue(String &) const override { throw "unexpected"; }
     void print(Printer &) const override { throw "unexpected print"; }
 
 };
@@ -98,7 +99,8 @@ class AssignedWordParserStub : public NormalParser<std::unique_ptr<Word>> {
 
     void parseImpl() override {
         result().emplace(new Word);
-        result().value()->components().emplace_back(new WordComponentStub);
+        result().value()->addComponent(
+                Word::ComponentPointer(new WordComponentStub));
     }
 
 }; // class AssignedWordParserStub

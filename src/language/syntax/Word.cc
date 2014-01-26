@@ -18,11 +18,60 @@
 #include "buildconfig.h"
 #include "Word.hh"
 
+#include <algorithm>
+#include <cassert>
+#include <iterator>
 #include <utility>
+#include <vector>
+#include "common/Maybe.hh"
+#include "common/String.hh"
+
+using sesh::common::Maybe;
+using sesh::common::String;
+using sesh::common::createMaybeOf;
 
 namespace sesh {
 namespace language {
 namespace syntax {
+
+void Word::addComponent(ComponentPointer c) {
+    mMaybeConstantValueCache.clear();
+
+    assert(c != nullptr);
+    mComponents.push_back(std::move(c));
+}
+
+void Word::append(Word &&w) {
+    mMaybeConstantValueCache.clear();
+    w.mMaybeConstantValueCache.clear();
+
+    std::move(
+            w.mComponents.begin(),
+            w.mComponents.end(),
+            std::back_inserter(mComponents));
+    w.mComponents.clear();
+}
+
+Maybe<String> Word::computeMaybeConstantValue() const {
+    String constantValue;
+    for (const ComponentPointer &c : components())
+        if (!c->appendConstantValue(constantValue))
+            return Maybe<String>();
+    return createMaybeOf(std::move(constantValue));
+}
+
+const Maybe<String> &Word::maybeConstantValue() const {
+    if (!mMaybeConstantValueCache.hasValue())
+        mMaybeConstantValueCache.emplace(computeMaybeConstantValue());
+    return mMaybeConstantValueCache.value();
+}
+
+bool Word::isRawString() const {
+    return std::all_of(
+            mComponents.begin(),
+            mComponents.end(),
+            [](const ComponentPointer &c) { return c->isRawString(); });
+}
 
 void Word::print(Printer &p) const {
     for (const ComponentPointer &c : components())
