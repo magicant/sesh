@@ -27,6 +27,7 @@ check_PROGRAMS = \
 	language/parser/ParserTest \
 	language/parser/RawStringParserTest \
 	language/parser/RepeatTest \
+	language/parser/TokenParserTest \
 	language/parser/WordComponentParserTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
@@ -112,6 +113,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/SourceEnvironment.hh \
 	language/parser/StringParser.hh \
 	language/parser/Token.hh \
+	language/parser/TokenParser.cc \
+	language/parser/TokenParser.hh \
 	language/parser/WordComponentParser.cc \
 	language/parser/WordComponentParser.hh \
 	language/parser/WordComponentParserImpl.cc \
@@ -303,6 +306,27 @@ language_parser_RepeatTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_TokenParserTest_SOURCES = \
+	language/parser/BlankAndCommentParser.cc \
+	language/parser/CharFilter.cc \
+	language/parser/CharParser.cc \
+	language/parser/CharPredicates.cc \
+	language/parser/CommentParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/Keyword.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/parser/TokenParser.cc \
+	language/parser/TokenParserTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Assignment.cc \
+	language/syntax/Printer.cc \
+	language/syntax/RawString.cc \
+	language/syntax/Word.cc
 language_parser_WordComponentParserTest_SOURCES = \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
@@ -403,6 +427,7 @@ language_syntax_WordTest_SOURCES = \
 TESTHEADERS = \
 	language/parser/AssignmentParserTestHelper.hh \
 	language/parser/EnvironmentTestHelper.hh \
+	language/parser/TokenParserTestHelper.hh \
 	language/parser/WordParserTestHelper.hh \
 	language/source/DiagnosticMessageTestHelper.hh \
 	language/source/SourceLineLocationTestHelper.hh \
