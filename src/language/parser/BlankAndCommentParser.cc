@@ -16,44 +16,33 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "CharPredicates.hh"
+#include "BlankAndCommentParser.hh"
 
-#include <locale>
-#include "common/Char.hh"
+#include <utility>
+#include "common/Maybe.hh"
 #include "common/String.hh"
-#include "config.h"
-#include "language/parser/Environment.hh"
+#include "language/parser/CharPredicates.hh"
 
-using sesh::common::Char;
+using sesh::common::Maybe;
 using sesh::common::String;
-using sesh::common::contains;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
-bool isBlank(const Environment &e, Char c) {
-#if HAVE_STD__ISBLANK
-    return std::isblank(c, e.locale());
-#else
-    (void) e;
-    assert((e.locale(), true));
-    return c == L(' ') || c == L('\t');
-#endif // #if HAVE_STD__ISBLANK
+BlankAndCommentParser::BlankAndCommentParser(Environment &e) :
+        NormalParser(e), mBlankParser(e, e, isBlank), mCommentParser(e) { }
+
+void BlankAndCommentParser::parseImpl() {
+    Maybe<String> &resultString = mBlankParser.parse();
+    if (mCommentParser.parse().hasValue())
+        resultString.value() += mCommentParser.parse().value();
+    result() = std::move(resultString);
 }
 
-bool isTokenDelimiter(const Environment &e, Char c) {
-    static const String delimiters = L(" \t\n;&|<>()");
-    return contains(delimiters, c) || isBlank(e, c);
-}
-
-bool isRawStringChar(const Environment &e, Char c) {
-    static const String specialChars = L("\\\"\'$`");
-    return !contains(specialChars, c) && !isTokenDelimiter(e, c);
-}
-
-bool isVariableNameChar(const Environment &e, Char c) {
-    return c == L('_') || std::isalnum(c, e.locale());
+void BlankAndCommentParser::resetImpl() noexcept {
+    mBlankParser.reset();
+    mCommentParser.reset();
 }
 
 } // namespace parser

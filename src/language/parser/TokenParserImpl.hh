@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,29 +15,32 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_language_parser_TokenParserImpl_hh
+#define INCLUDED_language_parser_TokenParserImpl_hh
+
 #include "buildconfig.h"
-#include "RawString.hh"
 
-#include "common/String.hh"
-#include "language/syntax/Printer.hh"
-
-using sesh::common::String;
+#include "language/parser/TokenParser.hh"
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace parser {
 
-bool RawString::appendConstantValue(String &s) const {
-    s += value();
-    return true;
-}
+class TokenParserImpl : public TokenParser {
 
-void RawString::print(Printer &p) const {
-    p << value();
-}
+    using TokenParser::TokenParser;
 
-} // namespace syntax
+    AssignmentParserPointer createAssignmentParser() const override;
+
+    WordParserPointer createWordParser(
+            Predicate<common::Char> &&isAcceptableChar) const override;
+
+}; // class TokenParserImpl
+
+} // namespace parser
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_parser_TokenParserImpl_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

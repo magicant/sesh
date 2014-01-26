@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -16,27 +16,30 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "RawString.hh"
+#include "TokenParserImpl.hh"
 
-#include "common/String.hh"
-#include "language/syntax/Printer.hh"
-
-using sesh::common::String;
+#include <utility>
+#include "language/parser/AssignmentParserImpl.hh"
+#include "language/parser/WordParser.hh"
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace parser {
 
-bool RawString::appendConstantValue(String &s) const {
-    s += value();
-    return true;
+auto TokenParserImpl::createAssignmentParser() const
+        -> AssignmentParserPointer {
+    return AssignmentParserPointer(
+            new AssignmentParserImpl(environment()));
 }
 
-void RawString::print(Printer &p) const {
-    p << value();
+auto TokenParserImpl::createWordParser(
+        Predicate<common::Char> &&isAcceptableChar) const
+        -> WordParserPointer {
+    return WordParserPointer(new WordParser(
+            environment(), std::move(isAcceptableChar)));
 }
 
-} // namespace syntax
+} // namespace parser
 } // namespace language
 } // namespace sesh
 

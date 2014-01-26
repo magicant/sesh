@@ -42,7 +42,7 @@ bool contains(
         typename std::basic_string<CharT, Traits, Allocator>::value_type c,
         typename std::basic_string<CharT, Traits, Allocator>::size_type pos =
                 0) {
-    return s.find(c, pos) == std::basic_string<CharT, Traits, Allocator>::npos;
+    return s.find(c, pos) != std::basic_string<CharT, Traits, Allocator>::npos;
 }
 
 } // namespace common

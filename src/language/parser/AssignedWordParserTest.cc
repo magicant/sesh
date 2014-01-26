@@ -72,7 +72,8 @@ class WordParserStub : public Converter<StringParser, WordPointer> {
     void convert(String &&s) override {
         WordPointer w(new Word);
         if (!s.empty())
-            w->components().emplace_back(new RawString(std::move(s)));
+            w->addComponent(
+                    Word::ComponentPointer(new RawString(std::move(s))));
         result().emplace(std::move(w));
     }
 
