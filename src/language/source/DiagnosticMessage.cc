@@ -30,8 +30,8 @@ namespace language {
 namespace source {
 
 DiagnosticMessage::DiagnosticMessage(
-        const Position &p, Message<> &&m, ErrorLevel el) :
-        mPosition(p),
+        Position p, Message<> &&m, ErrorLevel el) :
+        mPosition(std::move(p)),
         mErrorLevel(el),
         mMessage(std::move(m)) { }
 
