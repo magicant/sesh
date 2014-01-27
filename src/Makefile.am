@@ -87,6 +87,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/CommentParser.cc \
 	language/parser/CommentParser.hh \
 	language/parser/Converter.hh \
+	language/parser/DiagnosticEnvironment.cc \
+	language/parser/DiagnosticEnvironment.hh \
 	language/parser/Environment.hh \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/EnvironmentHelper.hh \
@@ -428,6 +430,7 @@ language_syntax_WordTest_SOURCES = \
 
 TESTHEADERS = \
 	language/parser/AssignmentParserTestHelper.hh \
+	language/parser/DiagnosticEnvironmentTestHelper.hh \
 	language/parser/EnvironmentTestHelper.hh \
 	language/parser/TokenParserTestHelper.hh \
 	language/parser/WordParserTestHelper.hh \
