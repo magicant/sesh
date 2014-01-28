@@ -122,6 +122,7 @@ void TokenParser::resetImpl() noexcept {
         mAssignmentParser->reset();
     if (mWordParser != nullptr)
         mWordParser->reset();
+    NormalParser::resetImpl();
 }
 
 void TokenParser::reset(EnumSet<TokenType> acceptableTokenTypes) noexcept {

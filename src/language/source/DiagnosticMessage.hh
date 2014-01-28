@@ -46,8 +46,7 @@ private:
 
 public:
 
-    DiagnosticMessage(
-            const Position &, common::Message<> &&, common::ErrorLevel);
+    DiagnosticMessage(Position, common::Message<> &&, common::ErrorLevel);
 
     const Position &position() const noexcept { return mPosition; }
     common::ErrorLevel errorLevel() const noexcept { return mErrorLevel; }

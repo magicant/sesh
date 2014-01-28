@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -16,26 +16,31 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "DiagnosticMessage.hh"
+#include "DiagnosticEnvironment.hh"
 
 #include <utility>
 #include "common/ErrorLevel.hh"
 #include "common/Message.hh"
+#include "language/source/DiagnosticMessage.hh"
 
 using sesh::common::ErrorLevel;
 using sesh::common::Message;
+using sesh::language::source::DiagnosticMessage;
 
 namespace sesh {
 namespace language {
-namespace source {
+namespace parser {
 
-DiagnosticMessage::DiagnosticMessage(
-        Position p, Message<> &&m, ErrorLevel el) :
-        mPosition(std::move(p)),
-        mErrorLevel(el),
-        mMessage(std::move(m)) { }
+void DiagnosticEnvironment::addDiagnosticMessage(
+        Size position, Message<> &&m, ErrorLevel el) {
+    mDiagnosticMessages.emplace_back(
+            DiagnosticMessage::Position(
+                    sourceBuffer().shared_from_this(), position),
+            std::move(m),
+            el);
+}
 
-} // namespace source
+} // namespace parser
 } // namespace language
 } // namespace sesh
 

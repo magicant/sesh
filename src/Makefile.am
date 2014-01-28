@@ -27,6 +27,7 @@ check_PROGRAMS = \
 	language/parser/ParserTest \
 	language/parser/RawStringParserTest \
 	language/parser/RepeatTest \
+	language/parser/SimpleCommandParserTest \
 	language/parser/TokenParserTest \
 	language/parser/WordComponentParserTest \
 	language/source/LineAppendedSourceTest \
@@ -87,6 +88,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/CommentParser.cc \
 	language/parser/CommentParser.hh \
 	language/parser/Converter.hh \
+	language/parser/DiagnosticEnvironment.cc \
+	language/parser/DiagnosticEnvironment.hh \
 	language/parser/Environment.hh \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/EnvironmentHelper.hh \
@@ -109,6 +112,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Reparse.cc \
 	language/parser/Reparse.hh \
 	language/parser/Repeat.hh \
+	language/parser/SimpleCommandParser.cc \
+	language/parser/SimpleCommandParser.hh \
 	language/parser/SourceEnvironment.cc \
 	language/parser/SourceEnvironment.hh \
 	language/parser/StringParser.hh \
@@ -308,6 +313,32 @@ language_parser_RepeatTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_SimpleCommandParserTest_SOURCES = \
+	common/Message.cc \
+	language/parser/BlankAndCommentParser.cc \
+	language/parser/CharFilter.cc \
+	language/parser/CharParser.cc \
+	language/parser/CharPredicates.cc \
+	language/parser/CommentParser.cc \
+	language/parser/DiagnosticEnvironment.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/Keyword.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SimpleCommandParser.cc \
+	language/parser/SimpleCommandParserTest.cc \
+	language/parser/SourceEnvironment.cc \
+	language/parser/TokenParser.cc \
+	language/source/DiagnosticMessage.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Assignment.cc \
+	language/syntax/Printer.cc \
+	language/syntax/RawString.cc \
+	language/syntax/SimpleCommand.cc \
+	language/syntax/Word.cc
 language_parser_TokenParserTest_SOURCES = \
 	language/parser/BlankAndCommentParser.cc \
 	language/parser/CharFilter.cc \
@@ -428,6 +459,7 @@ language_syntax_WordTest_SOURCES = \
 
 TESTHEADERS = \
 	language/parser/AssignmentParserTestHelper.hh \
+	language/parser/DiagnosticEnvironmentTestHelper.hh \
 	language/parser/EnvironmentTestHelper.hh \
 	language/parser/TokenParserTestHelper.hh \
 	language/parser/WordParserTestHelper.hh \
