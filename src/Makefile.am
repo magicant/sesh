@@ -88,6 +88,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/CharPredicates.hh \
 	language/parser/CommandParser.cc \
 	language/parser/CommandParser.hh \
+	language/parser/CommandParserImpl.cc \
+	language/parser/CommandParserImpl.hh \
 	language/parser/CommentParser.cc \
 	language/parser/CommentParser.hh \
 	language/parser/Converter.hh \
