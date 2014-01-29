@@ -20,6 +20,7 @@ check_PROGRAMS = \
 	language/parser/BlankAndCommentParserTest \
 	language/parser/CharFilterTest \
 	language/parser/CharParserTest \
+	language/parser/CommandParserTest \
 	language/parser/CommentParserTest \
 	language/parser/ConverterTest \
 	language/parser/EnvironmentHelperTest \
@@ -85,6 +86,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/CharParser.hh \
 	language/parser/CharPredicates.cc \
 	language/parser/CharPredicates.hh \
+	language/parser/CommandParser.cc \
+	language/parser/CommandParser.hh \
 	language/parser/CommentParser.cc \
 	language/parser/CommentParser.hh \
 	language/parser/Converter.hh \
@@ -242,6 +245,28 @@ language_parser_CharParserTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_CommandParserTest_SOURCES = \
+	language/parser/BlankAndCommentParser.cc \
+	language/parser/CharFilter.cc \
+	language/parser/CharParser.cc \
+	language/parser/CharPredicates.cc \
+	language/parser/CommandParser.cc \
+	language/parser/CommandParserTest.cc \
+	language/parser/CommentParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/Keyword.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/parser/TokenParser.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Assignment.cc \
+	language/syntax/Printer.cc \
+	language/syntax/RawString.cc \
+	language/syntax/Word.cc
 language_parser_CommentParserTest_SOURCES = \
 	language/parser/CharFilter.cc \
 	language/parser/CharParser.cc \
