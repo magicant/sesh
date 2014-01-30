@@ -59,7 +59,7 @@ public:
 
 private:
 
-    explicit Keyword(const common::String &value) :
+    explicit Keyword(const common::String &value) noexcept :
             reference_wrapper(value) { }
 
 public:
