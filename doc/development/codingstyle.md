@@ -144,6 +144,18 @@ Raw pointer types should be avoided. To clarify how the pointed-to object is man
 
 The pointed-to object type of a std::shared_ptr should normally be const-qualified. Sharing a modifiable object is typically a bad design.
 
+### Special member functions
+
+If at least one of the following special member functions is explicitly declared in a class type, all of them should be declared.
+
+- Copy constructor
+- Move constructor
+- Copy assignment operator
+- Move assignment operator
+- Destructor
+
+Prefer defaulted definition of special member functions over manual definition where possible.
+
 ## Doxygen comments
 
 ## Other C++ features
