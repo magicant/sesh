@@ -27,6 +27,7 @@ check_PROGRAMS = \
 	language/parser/EnvironmentHelperTest \
 	language/parser/LineContinuationEnvironmentTest \
 	language/parser/ParserTest \
+	language/parser/PipelineParserTest \
 	language/parser/RawStringParserTest \
 	language/parser/RepeatTest \
 	language/parser/SimpleCommandParserTest \
@@ -115,6 +116,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Parser.hh \
 	language/parser/ParserBase.cc \
 	language/parser/ParserBase.hh \
+	language/parser/PipelineParser.cc \
+	language/parser/PipelineParser.hh \
 	language/parser/Predicate.hh \
 	language/parser/Operator.cc \
 	language/parser/Operator.hh \
@@ -328,6 +331,32 @@ language_parser_ParserTest_SOURCES = \
 	language/parser/SourceEnvironment.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_PipelineParserTest_SOURCES = \
+	language/parser/BlankAndCommentParser.cc \
+	language/parser/CharFilter.cc \
+	language/parser/CharParser.cc \
+	language/parser/CharPredicates.cc \
+	language/parser/CommentParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/Keyword.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/Operator.cc \
+	language/parser/OperatorParser.cc \
+	language/parser/ParserBase.cc \
+	language/parser/PipelineParser.cc \
+	language/parser/PipelineParserTest.cc \
+	language/parser/SourceEnvironment.cc \
+	language/parser/SpecificOperatorParser.cc \
+	language/parser/TokenParser.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Assignment.cc \
+	language/syntax/Pipeline.cc \
+	language/syntax/Printer.cc \
+	language/syntax/RawString.cc \
+	language/syntax/Word.cc
 language_parser_RawStringParserTest_SOURCES = \
 	language/parser/CharParser.cc \
 	language/parser/EnvironmentHelper.cc \
