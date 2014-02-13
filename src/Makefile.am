@@ -117,6 +117,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/Predicate.hh \
 	language/parser/Operator.cc \
 	language/parser/Operator.hh \
+	language/parser/OperatorParser.cc \
+	language/parser/OperatorParser.hh \
 	language/parser/RawStringParser.cc \
 	language/parser/RawStringParser.hh \
 	language/parser/Reparse.cc \
