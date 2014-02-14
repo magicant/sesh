@@ -14,6 +14,7 @@ check_PROGRAMS = \
 	common/EnumSetTest \
 	common/MaybeTest \
 	common/MessageTest \
+	common/TrieTest \
 	common/VariantTest \
 	language/parser/AssignedWordParserTest \
 	language/parser/AssignmentParserTest \
@@ -70,6 +71,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/OutputStream.hh \
 	common/String.hh \
 	common/StringStream.hh \
+	common/Trie.hh \
 	common/Variant.hh \
 	i18n/M.h \
 	language/parser/AssignedWordParser.cc \
@@ -177,6 +179,8 @@ common_MaybeTest_SOURCES = \
 common_MessageTest_SOURCES = \
 	common/Message.cc \
 	common/MessageTest.cc
+common_TrieTest_SOURCES = \
+	common/TrieTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
 language_parser_AssignedWordParserTest_SOURCES = \
