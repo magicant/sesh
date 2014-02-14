@@ -14,6 +14,7 @@ check_PROGRAMS = \
 	common/EnumSetTest \
 	common/MaybeTest \
 	common/MessageTest \
+	common/TrieTest \
 	common/VariantTest \
 	language/parser/AssignedWordParserTest \
 	language/parser/AssignmentParserTest \
@@ -30,6 +31,7 @@ check_PROGRAMS = \
 	language/parser/RepeatTest \
 	language/parser/SimpleCommandParserTest \
 	language/parser/TokenParserTest \
+	language/parser/TrieParserTest \
 	language/parser/WordComponentParserTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
@@ -70,6 +72,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/OutputStream.hh \
 	common/String.hh \
 	common/StringStream.hh \
+	common/Trie.hh \
 	common/Variant.hh \
 	i18n/M.h \
 	language/parser/AssignedWordParser.cc \
@@ -112,6 +115,10 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/ParserBase.cc \
 	language/parser/ParserBase.hh \
 	language/parser/Predicate.hh \
+	language/parser/Operator.cc \
+	language/parser/Operator.hh \
+	language/parser/OperatorParser.cc \
+	language/parser/OperatorParser.hh \
 	language/parser/RawStringParser.cc \
 	language/parser/RawStringParser.hh \
 	language/parser/Reparse.cc \
@@ -127,6 +134,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/TokenParser.hh \
 	language/parser/TokenParserImpl.cc \
 	language/parser/TokenParserImpl.hh \
+	language/parser/TrieParser.hh \
 	language/parser/WordComponentParser.cc \
 	language/parser/WordComponentParser.hh \
 	language/parser/WordComponentParserImpl.cc \
@@ -177,6 +185,8 @@ common_MaybeTest_SOURCES = \
 common_MessageTest_SOURCES = \
 	common/Message.cc \
 	common/MessageTest.cc
+common_TrieTest_SOURCES = \
+	common/TrieTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
 language_parser_AssignedWordParserTest_SOURCES = \
@@ -387,6 +397,17 @@ language_parser_TokenParserTest_SOURCES = \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc \
 	language/syntax/Word.cc
+language_parser_TrieParserTest_SOURCES = \
+	language/parser/CharParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/parser/TrieParserTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_parser_WordComponentParserTest_SOURCES = \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
