@@ -31,6 +31,7 @@ check_PROGRAMS = \
 	language/parser/RepeatTest \
 	language/parser/SimpleCommandParserTest \
 	language/parser/TokenParserTest \
+	language/parser/TrieParserTest \
 	language/parser/WordComponentParserTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
@@ -129,6 +130,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/TokenParser.hh \
 	language/parser/TokenParserImpl.cc \
 	language/parser/TokenParserImpl.hh \
+	language/parser/TrieParser.hh \
 	language/parser/WordComponentParser.cc \
 	language/parser/WordComponentParser.hh \
 	language/parser/WordComponentParserImpl.cc \
@@ -391,6 +393,17 @@ language_parser_TokenParserTest_SOURCES = \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc \
 	language/syntax/Word.cc
+language_parser_TrieParserTest_SOURCES = \
+	language/parser/CharParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/parser/TrieParserTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_parser_WordComponentParserTest_SOURCES = \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
