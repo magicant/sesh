@@ -64,6 +64,64 @@ private:
 
 public:
 
+    static Keyword keywordCase() noexcept {
+        return Keyword(CASE);
+    }
+    static Keyword keywordDo() noexcept {
+        return Keyword(DO);
+    }
+    static Keyword keywordDone() noexcept {
+        return Keyword(DONE);
+    }
+    static Keyword keywordElif() noexcept {
+        return Keyword(ELIF);
+    }
+    static Keyword keywordElse() noexcept {
+        return Keyword(ELSE);
+    }
+    static Keyword keywordExclamation() noexcept {
+        return Keyword(EXCLAMATION);
+    }
+    static Keyword keywordFi() noexcept {
+        return Keyword(FI);
+    }
+    static Keyword keywordFor() noexcept {
+        return Keyword(FOR);
+    }
+    static Keyword keywordFunction() noexcept {
+        return Keyword(FUNCTION);
+    }
+    static Keyword keywordIf() noexcept {
+        return Keyword(IF);
+    }
+    static Keyword keywordIn() noexcept {
+        return Keyword(IN);
+    }
+    static Keyword keywordLeftBrace() noexcept {
+        return Keyword(LEFT_BRACE);
+    }
+    static Keyword keywordLeftBracketBracket() noexcept {
+        return Keyword(LEFT_BRACKET_BRACKET);
+    }
+    static Keyword keywordRightBrace() noexcept {
+        return Keyword(RIGHT_BRACE);
+    }
+    static Keyword keywordRightBracketBracket() noexcept {
+        return Keyword(RIGHT_BRACKET_BRACKET);
+    }
+    static Keyword keywordSelect() noexcept {
+        return Keyword(SELECT);
+    }
+    static Keyword keywordThen() noexcept {
+        return Keyword(THEN);
+    }
+    static Keyword keywordUntil() noexcept {
+        return Keyword(UNTIL);
+    }
+    static Keyword keywordWhile() noexcept {
+        return Keyword(WHILE);
+    }
+
     /**
      * Parses the argument string. If it is a keyword, a non-null maybe object
      * is returned that contains the argument keyword. Otherwise, an empty
