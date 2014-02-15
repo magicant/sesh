@@ -51,27 +51,27 @@ const String Operator::SEMICOLON_SEMICOLON = L(";;");
 
 Trie<Char, Operator> Operator::createTrie() {
     Trie<Char, Operator> trie;
-    for (const String &s : {
-            Operator::AND,
-            Operator::AND_AND,
-            Operator::GREATER,
-            Operator::GREATER_AND,
-            Operator::GREATER_GREATER,
-            Operator::GREATER_PIPE,
-            Operator::LEFT_PARENTHESIS,
-            Operator::LESS,
-            Operator::LESS_AND,
-            Operator::LESS_GREATER,
-            Operator::LESS_LESS,
-            Operator::LESS_LESS_MINUS,
-            Operator::LESS_PIPE,
-            Operator::PIPE,
-            Operator::PIPE_PIPE,
-            Operator::RIGHT_PARENTHESIS,
-            Operator::SEMICOLON,
-            Operator::SEMICOLON_SEMICOLON,
+    for (Operator o : {
+            operatorAnd(),
+            operatorAndAnd(),
+            operatorGreater(),
+            operatorGreaterAnd(),
+            operatorGreaterGreater(),
+            operatorGreaterPipe(),
+            operatorLeftParenthesis(),
+            operatorLess(),
+            operatorLessAnd(),
+            operatorLessGreater(),
+            operatorLessLess(),
+            operatorLessLessMinus(),
+            operatorLessPipe(),
+            operatorPipe(),
+            operatorPipePipe(),
+            operatorRightParenthesis(),
+            operatorSemicolon(),
+            operatorSemicolonSemicolon(),
             })
-        trie.emplaceDescendants(s).emplaceValue(Operator(s));
+        trie.emplaceDescendants(o.get()).emplaceValue(o);
     return std::move(trie);
 }
 
