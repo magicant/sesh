@@ -30,6 +30,7 @@ check_PROGRAMS = \
 	language/parser/RawStringParserTest \
 	language/parser/RepeatTest \
 	language/parser/SimpleCommandParserTest \
+	language/parser/SpecificOperatorParserTest \
 	language/parser/TokenParserTest \
 	language/parser/TrieParserTest \
 	language/parser/WordComponentParserTest \
@@ -128,6 +129,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/SimpleCommandParser.hh \
 	language/parser/SourceEnvironment.cc \
 	language/parser/SourceEnvironment.hh \
+	language/parser/SpecificOperatorParser.cc \
+	language/parser/SpecificOperatorParser.hh \
 	language/parser/StringParser.hh \
 	language/parser/Token.hh \
 	language/parser/TokenParser.cc \
@@ -376,6 +379,20 @@ language_parser_SimpleCommandParserTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/SimpleCommand.cc \
 	language/syntax/Word.cc
+language_parser_SpecificOperatorParserTest_SOURCES = \
+	language/parser/CharParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/Operator.cc \
+	language/parser/OperatorParser.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/parser/SpecificOperatorParser.cc \
+	language/parser/SpecificOperatorParserTest.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_parser_TokenParserTest_SOURCES = \
 	language/parser/BlankAndCommentParser.cc \
 	language/parser/CharFilter.cc \
