@@ -21,6 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
+#include "common/EnumTraits.hh"
 #include "common/Variant.hh"
 #include "language/parser/Keyword.hh"
 #include "language/syntax/Assignment.hh"
