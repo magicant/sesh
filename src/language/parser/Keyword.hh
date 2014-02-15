@@ -73,6 +73,14 @@ public:
 
 }; // class Keyword
 
+inline bool operator==(const Keyword &k1, const Keyword &k2) noexcept {
+    return &k1.get() == &k2.get();
+}
+
+inline bool operator!=(const Keyword &k1, const Keyword &k2) noexcept {
+    return !(k1 == k2);
+}
+
 } // namespace parser
 } // namespace language
 } // namespace sesh

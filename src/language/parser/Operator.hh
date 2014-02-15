@@ -69,6 +69,14 @@ public:
 
 }; // class Operator
 
+inline bool operator==(const Operator &o1, const Operator &o2) noexcept {
+    return &o1.get() == &o2.get();
+}
+
+inline bool operator!=(const Operator &o1, const Operator &o2) noexcept {
+    return !(o1 == o2);
+}
+
 } // namespace parser
 } // namespace language
 } // namespace sesh
