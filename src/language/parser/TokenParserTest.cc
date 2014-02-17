@@ -160,6 +160,16 @@ TEST_CASE("Simple command word parser, all -> word") {
     checkWord(p.parse().value(), L("W"));
 }
 
+TEST_CASE("Simple command word parser, all -> empty word") {
+    TokenParserTestEnvironment e;
+    e.setIsEof();
+
+    auto types = enumSetOf(
+            TokenType::ASSIGNMENT, TokenType::KEYWORD, TokenType::WORD);
+    TokenParserStub p(e, types);
+    CHECK_FALSE(p.parse().hasValue());
+}
+
 TEST_CASE("Simple command word parser, blank before assignment") {
     TokenParserTestEnvironment e;
     e.appendSource(L("\t \t="));

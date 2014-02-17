@@ -74,7 +74,7 @@ auto TokenParser::parseWord() -> WordPointer & {
         mWordParser = createWordParser(isRawStringChar);
 
     WordPointer &word = mWordParser->parse().value();
-    if (word->components().empty())
+    if (word != nullptr && word->components().empty())
         word = nullptr;
     return word;
 }
