@@ -1,4 +1,4 @@
-/* Copyright (C) 2013-2014 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,46 +15,37 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_Token_hh
-#define INCLUDED_language_parser_Token_hh
-
 #include "buildconfig.h"
+#include "PipelineParserImpl.hh"
 
-#include <memory>
-#include "common/EnumTraits.hh"
-#include "common/Variant.hh"
-#include "language/parser/Keyword.hh"
-#include "language/syntax/Assignment.hh"
-#include "language/syntax/Word.hh"
+#include <utility>
+#include "common/EnumSet.hh"
+#include "language/parser/CommandParserImpl.hh"
+#include "language/parser/Token.hh"
+#include "language/parser/TokenParserImpl.hh"
+
+using sesh::common::EnumSet;
+using sesh::language::parser::CommandParserImpl;
+using sesh::language::parser::TokenType;
+using sesh::language::parser::TokenParserImpl;
 
 namespace sesh {
-
 namespace language {
 namespace parser {
 
-using Token = common::Variant<
-        std::unique_ptr<syntax::Word>,
-        std::unique_ptr<syntax::Assignment>,
-        Keyword>;
+auto PipelineParserImpl::createTokenParser() const -> TokenParserPointer {
+    return TokenParserPointer(new TokenParserImpl(
+            environment(), EnumSet<TokenType>().set()));
+}
 
-enum class TokenType { WORD, ASSIGNMENT, KEYWORD, };
+auto PipelineParserImpl::createCommandParser(TokenParserPointer tp) const
+        -> CommandParserPointer {
+    return CommandParserPointer(new CommandParserImpl(
+            environment(), std::move(tp)));
+}
 
 } // namespace parser
 } // namespace language
-
-namespace common {
-
-template<>
-class EnumTraits<language::parser::TokenType> {
-public:
-    constexpr static language::parser::TokenType max =
-            language::parser::TokenType::KEYWORD;
-};
-
-} // namespace common
-
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_parser_Token_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

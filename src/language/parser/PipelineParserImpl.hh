@@ -1,4 +1,4 @@
-/* Copyright (C) 2013-2014 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,46 +15,32 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parser_Token_hh
-#define INCLUDED_language_parser_Token_hh
+#ifndef INCLUDED_language_parser_PipelineParserImpl_hh
+#define INCLUDED_language_parser_PipelineParserImpl_hh
 
 #include "buildconfig.h"
 
-#include <memory>
-#include "common/EnumTraits.hh"
-#include "common/Variant.hh"
-#include "language/parser/Keyword.hh"
-#include "language/syntax/Assignment.hh"
-#include "language/syntax/Word.hh"
+#include "language/parser/PipelineParser.hh"
 
 namespace sesh {
-
 namespace language {
 namespace parser {
 
-using Token = common::Variant<
-        std::unique_ptr<syntax::Word>,
-        std::unique_ptr<syntax::Assignment>,
-        Keyword>;
+class PipelineParserImpl : public PipelineParser {
 
-enum class TokenType { WORD, ASSIGNMENT, KEYWORD, };
+    using PipelineParser::PipelineParser;
+
+    TokenParserPointer createTokenParser() const override;
+
+    CommandParserPointer createCommandParser(TokenParserPointer) const
+            override;
+
+}; // class PipelineParserImpl
 
 } // namespace parser
 } // namespace language
-
-namespace common {
-
-template<>
-class EnumTraits<language::parser::TokenType> {
-public:
-    constexpr static language::parser::TokenType max =
-            language::parser::TokenType::KEYWORD;
-};
-
-} // namespace common
-
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_parser_Token_hh
+#endif // #ifndef INCLUDED_language_parser_PipelineParserImpl_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

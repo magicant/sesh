@@ -65,9 +65,72 @@ private:
 
 public:
 
+    static Operator operatorAnd() noexcept {
+        return Operator(AND);
+    }
+    static Operator operatorAndAnd() noexcept {
+        return Operator(AND_AND);
+    }
+    static Operator operatorGreater() noexcept {
+        return Operator(GREATER);
+    }
+    static Operator operatorGreaterAnd() noexcept {
+        return Operator(GREATER_AND);
+    }
+    static Operator operatorGreaterGreater() noexcept {
+        return Operator(GREATER_GREATER);
+    }
+    static Operator operatorGreaterPipe() noexcept {
+        return Operator(GREATER_PIPE);
+    }
+    static Operator operatorLeftParenthesis() noexcept {
+        return Operator(LEFT_PARENTHESIS);
+    }
+    static Operator operatorLess() noexcept {
+        return Operator(LESS);
+    }
+    static Operator operatorLessAnd() noexcept {
+        return Operator(LESS_AND);
+    }
+    static Operator operatorLessGreater() noexcept {
+        return Operator(LESS_GREATER);
+    }
+    static Operator operatorLessLess() noexcept {
+        return Operator(LESS_LESS);
+    }
+    static Operator operatorLessLessMinus() noexcept {
+        return Operator(LESS_LESS_MINUS);
+    }
+    static Operator operatorLessPipe() noexcept {
+        return Operator(LESS_PIPE);
+    }
+    static Operator operatorPipe() noexcept {
+        return Operator(PIPE);
+    }
+    static Operator operatorPipePipe() noexcept {
+        return Operator(PIPE_PIPE);
+    }
+    static Operator operatorRightParenthesis() noexcept {
+        return Operator(RIGHT_PARENTHESIS);
+    }
+    static Operator operatorSemicolon() noexcept {
+        return Operator(SEMICOLON);
+    }
+    static Operator operatorSemicolonSemicolon() noexcept {
+        return Operator(SEMICOLON_SEMICOLON);
+    }
+
     static const common::Trie<common::Char, Operator> TRIE;
 
 }; // class Operator
+
+inline bool operator==(const Operator &o1, const Operator &o2) noexcept {
+    return &o1.get() == &o2.get();
+}
+
+inline bool operator!=(const Operator &o1, const Operator &o2) noexcept {
+    return !(o1 == o2);
+}
 
 } // namespace parser
 } // namespace language
