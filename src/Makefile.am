@@ -118,6 +118,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/ParserBase.hh \
 	language/parser/PipelineParser.cc \
 	language/parser/PipelineParser.hh \
+	language/parser/PipelineParserImpl.cc \
+	language/parser/PipelineParserImpl.hh \
 	language/parser/Predicate.hh \
 	language/parser/Operator.cc \
 	language/parser/Operator.hh \
