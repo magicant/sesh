@@ -74,9 +74,11 @@ public:
 
 } // namespace
 
-PipelineParser::PipelineParser(Environment &e) :
+PipelineParser::PipelineParser(Environment &e, TokenParserPointer &&tp) :
         NormalParser<PipelinePointer>(e),
-        mState(ParseState::create<ParsingFirstToken>()) { }
+        mState(ParseState::create<ParsingFirstToken>()) {
+    mState.value<ParsingFirstToken>().tokenParser = std::move(tp);
+}
 
 class PipelineParser::StateProcessor {
 

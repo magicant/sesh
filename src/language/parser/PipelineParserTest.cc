@@ -78,11 +78,15 @@ class PipelineParserTestEnvironment :
         public CLocaleEnvironment {
 };
 
+PipelineParser::TokenParserPointer newTokenParser(Environment &e) {
+    return PipelineParser::TokenParserPointer(
+            new TokenParserStub(e, EnumSet<TokenType>().set()));
+}
+
 class PipelineParserStubBase : public PipelineParser {
     using PipelineParser::PipelineParser;
     TokenParserPointer createTokenParser() const override {
-        return TokenParserPointer(new TokenParserStub(
-                environment(), EnumSet<TokenType>().set()));
+        return newTokenParser(environment());
     }
 }; // class PipelineParserStubBase
 
@@ -152,8 +156,9 @@ TEST_CASE("Pipeline parser, construction") {
     }; // class PipelineParserStub
 
     PipelineParserTestEnvironment e;
-    PipelineParserStub p(e);
-    PipelineParserStub(std::move(p));
+    PipelineParserStub p1(e);
+    PipelineParserStub p2(e, newTokenParser(e));
+    PipelineParserStub(std::move(p2));
 }
 
 TEST_CASE("Pipeline parser, failing token parser") {
@@ -174,6 +179,9 @@ TEST_CASE("Pipeline parser, failing token parser") {
 TEST_CASE("Pipeline parser, non-keyword token, single command") {
     class PipelineParserStub : public PipelineParserStubBase {
         using PipelineParserStubBase::PipelineParserStubBase;
+        TokenParserPointer createTokenParser() const override {
+            throw "unexpected createTokenParser";
+        }
         CommandParserPointer createCommandParser(TokenParserPointer tp) const
                 override {
             REQUIRE(tp != nullptr);
@@ -193,11 +201,19 @@ TEST_CASE("Pipeline parser, non-keyword token, single command") {
     e.appendSource(L("A C"));
     e.setIsEof();
 
-    PipelineParserStub parser(e);
-    REQUIRE(parser.parse().hasValue());
-    REQUIRE(parser.parse().value() != nullptr);
+    auto tp = newTokenParser(e);
+    REQUIRE(tp->parse().hasValue());
+    REQUIRE(tp->parse().value().index() ==
+            tp->parse().value().index<std::unique_ptr<Word>>());
+    checkWord(
+            tp->parse().value().value<std::unique_ptr<Word>>().get(), L("A"));
+    CHECK(e.position() == 1);
 
-    const Pipeline &p = *parser.parse().value();
+    PipelineParserStub pp(e, std::move(tp));
+    REQUIRE(pp.parse().hasValue());
+    REQUIRE(pp.parse().value() != nullptr);
+
+    const Pipeline &p = *pp.parse().value();
     CHECK(p.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
     REQUIRE(p.commands().size() == 1);
     checkCommandStub(p.commands().at(0).get());
