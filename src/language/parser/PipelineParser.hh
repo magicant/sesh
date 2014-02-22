@@ -33,6 +33,18 @@ namespace sesh {
 namespace language {
 namespace parser {
 
+/**
+ * Parses a pipeline.
+ *
+ * Because the constructor of this class takes a token parser that may have
+ * already started parsing, this class does not support resetting in the usual
+ * way. When you reset a pipeline parser, a new token parser is created in a
+ * neutral state.
+ *
+ * This is an abstract class that implements some part of the parser. A
+ * concrete subclass must provide factory methods that create parsers used by
+ * this parser.
+ */
 class PipelineParser : public NormalParser<std::unique_ptr<syntax::Pipeline>> {
 
 public:
@@ -69,7 +81,16 @@ private:
 
 public:
 
-    explicit PipelineParser(Environment &);
+    /**
+     * Constructs a new pipeline parser.
+     *
+     * The argument token parser is used to parse every token of the first
+     * command in the pipeline. The token parser does not have to be in the
+     * "unstarted" state: it may already be "parsing" the first token or even
+     * "finished". If the argument token parser pointer is null, {@link
+     * #createTokenParser} will be called while parsing to create a parser.
+     */
+    explicit PipelineParser(Environment &, TokenParserPointer && = nullptr);
 
 private:
 
