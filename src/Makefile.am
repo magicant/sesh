@@ -16,6 +16,7 @@ check_PROGRAMS = \
 	common/MessageTest \
 	common/TrieTest \
 	common/VariantTest \
+	language/parser/AndOrListParserTest \
 	language/parser/AssignedWordParserTest \
 	language/parser/AssignmentParserTest \
 	language/parser/BlankAndCommentParserTest \
@@ -77,6 +78,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/Trie.hh \
 	common/Variant.hh \
 	i18n/M.h \
+	language/parser/AndOrListParser.cc \
+	language/parser/AndOrListParser.hh \
 	language/parser/AssignedWordParser.cc \
 	language/parser/AssignedWordParser.hh \
 	language/parser/AssignmentParser.cc \
@@ -197,6 +200,24 @@ common_TrieTest_SOURCES = \
 	common/TrieTest.cc
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
+language_parser_AndOrListParserTest_SOURCES = \
+	language/parser/AndOrListParser.cc \
+	language/parser/AndOrListParserTest.cc \
+	language/parser/CharParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/Operator.cc \
+	language/parser/OperatorParser.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/AndOrList.cc \
+	language/syntax/ConditionalPipeline.cc \
+	language/syntax/Pipeline.cc \
+	language/syntax/Printer.cc
 language_parser_AssignedWordParserTest_SOURCES = \
 	language/parser/AssignedWordParser.cc \
 	language/parser/AssignedWordParserTest.cc \
