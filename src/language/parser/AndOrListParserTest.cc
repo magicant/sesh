@@ -25,6 +25,7 @@
 #include "language/parser/AndOrListParser.hh"
 #include "language/parser/CharParser.hh"
 #include "language/parser/Converter.hh"
+#include "language/parser/Environment.hh"
 #include "language/parser/EnvironmentTestHelper.hh"
 #include "language/parser/EofEnvironment.hh"
 #include "language/parser/IncompleteParse.hh"
@@ -34,14 +35,14 @@
 #include "language/syntax/ConditionalPipeline.hh"
 #include "language/syntax/Pipeline.hh"
 
-namespace sesh {
-namespace language {
-namespace parser {
+namespace {
 
 using sesh::common::Char;
+using sesh::language::parser::AndOrListParser;
 using sesh::language::parser::CLocaleEnvironment;
 using sesh::language::parser::CharParser;
 using sesh::language::parser::Converter;
+using sesh::language::parser::Environment;
 using sesh::language::parser::EofEnvironment;
 using sesh::language::parser::IncompleteParse;
 using sesh::language::parser::LineContinuationEnvironment;
@@ -368,8 +369,6 @@ TEST_CASE("And-or list parser, incomplete parse") {
             Condition::OR_ELSE);
 }
 
-} // namespace parser
-} // namespace language
-} // namespace sesh
+} // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
