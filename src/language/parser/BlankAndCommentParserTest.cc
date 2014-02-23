@@ -88,6 +88,22 @@ TEST_CASE("Blank and comment parser, blank and comment") {
     CHECK(e.position() == e.length() - 1);
 }
 
+TEST_CASE("Blank and comment parser, reset") {
+    BlankAndCommentParserTestEnvironment e;
+    e.appendSource(L("\t#\\\n ##\n"));
+
+    BlankAndCommentParser p(e);
+    REQUIRE(p.parse().hasValue());
+    CHECK(p.parse().value() == L("\t#\\"));
+    CHECK(e.position() == 3);
+
+    p.reset();
+    e.setPosition(4);
+    REQUIRE(p.parse().hasValue());
+    CHECK(p.parse().value() == L(" ##"));
+    CHECK(e.position() == 7);
+}
+
 } // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

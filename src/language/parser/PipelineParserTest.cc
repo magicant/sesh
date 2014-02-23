@@ -122,7 +122,8 @@ public:
             mCParser(e, is<L('C')>) { }
 private:
     void parseImpl() override {
-        if (mSpaceParser.parse().hasValue() && mCParser.parse().hasValue())
+        mSpaceParser.parse();
+        if (mCParser.parse().hasValue())
             result() = std::unique_ptr<Command>(new CommandStub);
     }
     void resetImpl() noexcept override {
@@ -303,6 +304,23 @@ TEST_CASE("Pipeline parser, failure in third command") {
     REQUIRE(p.commands().size() == 2);
     checkCommandStub(p.commands().at(0).get());
     checkCommandStub(p.commands().at(1).get());
+}
+
+TEST_CASE("Pipeline parser, pipe followed by linebreak") {
+    PipelineParserTestEnvironment e;
+    e.appendSource(L("! C| #comment\n C|\n\n C; "));
+
+    NegatedPipelineParserStub parser(e);
+    REQUIRE(parser.parse().hasValue());
+    REQUIRE(parser.parse().value() != nullptr);
+    CHECK(e.position() == 21);
+
+    const Pipeline &p = *parser.parse().value();
+    CHECK(p.exitStatusType() == Pipeline::ExitStatusType::NEGATED);
+    REQUIRE(p.commands().size() == 3);
+    checkCommandStub(p.commands().at(0).get());
+    checkCommandStub(p.commands().at(1).get());
+    checkCommandStub(p.commands().at(2).get());
 }
 
 TEST_CASE("Pipeline parser, reset") {

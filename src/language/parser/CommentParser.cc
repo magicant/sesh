@@ -68,6 +68,7 @@ void CommentParser::parseImpl() {
 void CommentParser::resetImpl() noexcept {
     mHashFilter.reset();
     mContentParser.reset();
+    NormalParser::resetImpl();
 }
 
 } // namespace parser

@@ -56,6 +56,7 @@ AndOrListParser::ConditionalPipelineParser::ConditionalPipelineParser(
         Environment &e, Parser<PipelinePointer> &pp) :
         NormalParser<syntax::ConditionalPipeline>(e),
         mConditionParser(createOperatorParser(e)),
+        mLinebreakParser(e),
         mPipelineParser(pp) { }
 
 void AndOrListParser::ConditionalPipelineParser::parseImpl() {
@@ -63,6 +64,8 @@ void AndOrListParser::ConditionalPipelineParser::parseImpl() {
             toCondition(mConditionParser.parse());
     if (!condition.hasValue())
         return;
+
+    mLinebreakParser.parse();
 
     Maybe<PipelinePointer> &p = mPipelineParser.get().parse();
     if (!p.hasValue())
@@ -73,6 +76,7 @@ void AndOrListParser::ConditionalPipelineParser::parseImpl() {
 
 void AndOrListParser::ConditionalPipelineParser::resetImpl() noexcept {
     mConditionParser.reset();
+    mLinebreakParser.reset();
     mPipelineParser.get().reset();
     NormalParser<ConditionalPipeline>::resetImpl();
 }

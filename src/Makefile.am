@@ -20,6 +20,7 @@ check_PROGRAMS = \
 	language/parser/AssignedWordParserTest \
 	language/parser/AssignmentParserTest \
 	language/parser/BlankAndCommentParserTest \
+	language/parser/BlankCommentNewlineParserTest \
 	language/parser/CharFilterTest \
 	language/parser/CharParserTest \
 	language/parser/CommandParserTest \
@@ -27,6 +28,7 @@ check_PROGRAMS = \
 	language/parser/ConverterTest \
 	language/parser/EnvironmentHelperTest \
 	language/parser/LineContinuationEnvironmentTest \
+	language/parser/NewlineParserTest \
 	language/parser/ParserTest \
 	language/parser/PipelineParserTest \
 	language/parser/RawStringParserTest \
@@ -66,6 +68,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/external/include
 
 sesh_SOURCES = buildconfig.h main.cc \
 	common/Char.hh \
+	common/Empty.hh \
 	common/EnumSet.hh \
 	common/EnumTraits.hh \
 	common/ErrorLevel.hh \
@@ -88,6 +91,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/AssignmentParserImpl.hh \
 	language/parser/BlankAndCommentParser.cc \
 	language/parser/BlankAndCommentParser.hh \
+	language/parser/BlankCommentNewlineParser.cc \
+	language/parser/BlankCommentNewlineParser.hh \
 	language/parser/CharFilter.cc \
 	language/parser/CharFilter.hh \
 	language/parser/CharParser.cc \
@@ -115,6 +120,10 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/LineContinuationEnvironment.cc \
 	language/parser/LineContinuationEnvironment.hh \
 	language/parser/LineContinuationTreatment.hh \
+	language/parser/LinebreakParser.cc \
+	language/parser/LinebreakParser.hh \
+	language/parser/NewlineParser.cc \
+	language/parser/NewlineParser.hh \
 	language/parser/NormalParser.hh \
 	language/parser/Parser.hh \
 	language/parser/ParserBase.cc \
@@ -203,10 +212,17 @@ common_VariantTest_SOURCES = \
 language_parser_AndOrListParserTest_SOURCES = \
 	language/parser/AndOrListParser.cc \
 	language/parser/AndOrListParserTest.cc \
+	language/parser/BlankAndCommentParser.cc \
+	language/parser/BlankCommentNewlineParser.cc \
+	language/parser/CharFilter.cc \
 	language/parser/CharParser.cc \
+	language/parser/CharPredicates.cc \
+	language/parser/CommentParser.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
 	language/parser/LineContinuationEnvironment.cc \
+	language/parser/LinebreakParser.cc \
+	language/parser/NewlineParser.cc \
 	language/parser/Operator.cc \
 	language/parser/OperatorParser.cc \
 	language/parser/ParserBase.cc \
@@ -259,6 +275,23 @@ language_parser_BlankAndCommentParserTest_SOURCES = \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
 	language/parser/LineContinuationEnvironment.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
+language_parser_BlankCommentNewlineParserTest_SOURCES = \
+	language/parser/BlankAndCommentParser.cc \
+	language/parser/BlankCommentNewlineParser.cc \
+	language/parser/BlankCommentNewlineParserTest.cc \
+	language/parser/CharFilter.cc \
+	language/parser/CharParser.cc \
+	language/parser/CharPredicates.cc \
+	language/parser/CommentParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/NewlineParser.cc \
 	language/parser/ParserBase.cc \
 	language/parser/SourceEnvironment.cc \
 	language/source/LineContinuedSource.cc \
@@ -345,6 +378,18 @@ language_parser_LineContinuationEnvironmentTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_NewlineParserTest_SOURCES = \
+	language/parser/CharParser.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/NewlineParser.cc \
+	language/parser/NewlineParserTest.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc
 language_parser_ParserTest_SOURCES = \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
@@ -356,6 +401,7 @@ language_parser_ParserTest_SOURCES = \
 	language/source/SourceBuffer.cc
 language_parser_PipelineParserTest_SOURCES = \
 	language/parser/BlankAndCommentParser.cc \
+	language/parser/BlankCommentNewlineParser.cc \
 	language/parser/CharFilter.cc \
 	language/parser/CharParser.cc \
 	language/parser/CharPredicates.cc \
@@ -364,6 +410,8 @@ language_parser_PipelineParserTest_SOURCES = \
 	language/parser/IncompleteParse.cc \
 	language/parser/Keyword.cc \
 	language/parser/LineContinuationEnvironment.cc \
+	language/parser/LinebreakParser.cc \
+	language/parser/NewlineParser.cc \
 	language/parser/Operator.cc \
 	language/parser/OperatorParser.cc \
 	language/parser/ParserBase.cc \

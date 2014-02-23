@@ -97,6 +97,25 @@ TEST_CASE("Comment parser, stop at newline") {
     CHECK(e.position() == e.length() - 1);
 }
 
+TEST_CASE("Comment parser, reset") {
+    CommentParserTestEnvironment e;
+    e.appendSource(L("#1\n#2\n"));
+
+    CommentParser p(e);
+    REQUIRE(p.parse().hasValue());
+    CHECK(p.parse().value() == L("#1"));
+    CHECK(e.position() == 2);
+
+    p.reset();
+    e.setPosition(3);
+    REQUIRE(p.parse().hasValue());
+    CHECK(p.parse().value() == L("#2"));
+    CHECK(e.position() == 5);
+
+    p.reset();
+    CHECK_FALSE(p.parse().hasValue());
+}
+
 } // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

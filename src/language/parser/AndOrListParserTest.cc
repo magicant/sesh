@@ -39,6 +39,7 @@ namespace language {
 namespace parser {
 
 using sesh::common::Char;
+using sesh::language::parser::CLocaleEnvironment;
 using sesh::language::parser::CharParser;
 using sesh::language::parser::Converter;
 using sesh::language::parser::EofEnvironment;
@@ -54,7 +55,8 @@ using Synchronicity = sesh::language::syntax::AndOrList::Synchronicity;
 class AndOrListParserTestEnvironment :
         public SourceTestEnvironment,
         public EofEnvironment,
-        public LineContinuationEnvironment {
+        public LineContinuationEnvironment,
+        public CLocaleEnvironment {
 };
 
 bool isP(const Environment &, Char c) noexcept {
@@ -148,7 +150,7 @@ TEST_CASE("And-or list parser, 1 pipeline followed by double semicolon") {
 
 TEST_CASE("And-or list parser, 1 pipeline followed by double ampersand") {
     AndOrListParserTestEnvironment e;
-    e.appendSource(L("P&& "));
+    e.appendSource(L("P&&X"));
 
     AndOrListParser p(newPipelineParser(e));
     REQUIRE(p.parse().hasValue());
@@ -221,7 +223,7 @@ TEST_CASE("And-or list parser, 3 pipelines followed by double semicolon") {
 
 TEST_CASE("And-or list parser, 6 pipelines followed by double ampersand") {
     AndOrListParserTestEnvironment e;
-    e.appendSource(L("P||P||P&&P&&P||P&& "));
+    e.appendSource(L("P||P||P&&P&&P||P&&X"));
 
     AndOrListParser p(newPipelineParser(e));
     REQUIRE(p.parse().hasValue());
@@ -237,9 +239,25 @@ TEST_CASE("And-or list parser, 6 pipelines followed by double ampersand") {
     CHECK(p.parse().value()->rest().at(4).condition() == Condition::OR_ELSE);
 }
 
+TEST_CASE("And-or list parser, operators followed by linebreaks") {
+    AndOrListParserTestEnvironment e;
+    e.appendSource(L("P&&#comment\nP|| \n#\\\nP& "));
+
+    AndOrListParser p(newPipelineParser(e));
+    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse().value() != nullptr);
+    CHECK(p.parse().value()->rest().size() == 2);
+    CHECK(p.parse().value()->synchronicity() == Synchronicity::ASYNCHRONOUS);
+    e.checkSource(L("P&&#comment\nP|| \n#\\\nP& "));
+    CHECK(e.position() == 22);
+
+    CHECK(p.parse().value()->rest().at(0).condition() == Condition::AND_THEN);
+    CHECK(p.parse().value()->rest().at(1).condition() == Condition::OR_ELSE);
+}
+
 TEST_CASE("And-or list parser, reset") {
     AndOrListParserTestEnvironment e;
-    e.appendSource(L("P;P||P&X"));
+    e.appendSource(L("P;P||\nP&P&& P;X"));
 
     AndOrListParser p(newPipelineParser(e));
     REQUIRE(p.parse().hasValue());
@@ -254,7 +272,15 @@ TEST_CASE("And-or list parser, reset") {
     CHECK(p.parse().value()->rest().size() == 1);
     CHECK(p.parse().value()->rest().at(0).condition() == Condition::OR_ELSE);
     CHECK(p.parse().value()->synchronicity() == Synchronicity::ASYNCHRONOUS);
-    CHECK(e.position() == 7);
+    CHECK(e.position() == 8);
+
+    p.reset();
+    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse().value() != nullptr);
+    CHECK(p.parse().value()->rest().size() == 1);
+    CHECK(p.parse().value()->rest().at(0).condition() == Condition::AND_THEN);
+    CHECK(p.parse().value()->synchronicity() == Synchronicity::SEQUENTIAL);
+    CHECK(e.position() == 14);
 
     p.reset();
     CHECK_FALSE(p.parse().hasValue());

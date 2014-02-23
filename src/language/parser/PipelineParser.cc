@@ -21,6 +21,7 @@
 #include <memory>
 #include <utility>
 #include "common/Maybe.hh"
+#include "language/parser/LinebreakParser.hh"
 #include "language/parser/NormalParser.hh"
 #include "language/parser/Operator.hh"
 #include "language/parser/Parser.hh"
@@ -29,6 +30,7 @@
 #include "language/syntax/Pipeline.hh"
 
 using sesh::common::Maybe;
+using sesh::language::parser::LinebreakParser;
 using sesh::language::parser::SpecificOperatorParser;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Pipeline;
@@ -50,6 +52,7 @@ public:
 private:
 
     SpecificOperatorParser mPipeOperatorParser;
+    LinebreakParser mLinebreakParser;
     CommandParserPointer mCommandParser;
 
 public:
@@ -57,15 +60,19 @@ public:
     explicit PipedCommandParser(CommandParserPointer cp) :
             NormalParser(cp->environment()),
             mPipeOperatorParser(cp->environment(), Operator::operatorPipe()),
+            mLinebreakParser(cp->environment()),
             mCommandParser(std::move(cp)) { }
 
     void parseImpl() final override {
-        if (mPipeOperatorParser.parse().hasValue())
+        if (mPipeOperatorParser.parse().hasValue()) {
+            mLinebreakParser.parse();
             result() = std::move(mCommandParser->parse());
+        }
     }
 
     void resetImpl() noexcept final override {
         mPipeOperatorParser.reset();
+        mLinebreakParser.reset();
         mCommandParser->reset();
         NormalParser<CommandPointer>::resetImpl();
     }
