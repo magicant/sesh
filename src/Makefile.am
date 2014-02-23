@@ -120,6 +120,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/LineContinuationEnvironment.cc \
 	language/parser/LineContinuationEnvironment.hh \
 	language/parser/LineContinuationTreatment.hh \
+	language/parser/LinebreakParser.cc \
+	language/parser/LinebreakParser.hh \
 	language/parser/NewlineParser.cc \
 	language/parser/NewlineParser.hh \
 	language/parser/NormalParser.hh \
