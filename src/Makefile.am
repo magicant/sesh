@@ -68,6 +68,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/external/include
 
 sesh_SOURCES = buildconfig.h main.cc \
 	common/Char.hh \
+	common/Empty.hh \
 	common/EnumSet.hh \
 	common/EnumTraits.hh \
 	common/ErrorLevel.hh \
