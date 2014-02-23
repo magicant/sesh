@@ -18,6 +18,7 @@
 #include "buildconfig.h"
 #include "AndOrListParser.hh"
 
+#include <memory>
 #include <utility>
 #include <vector>
 #include "common/Maybe.hh"
@@ -93,20 +94,25 @@ void AndOrListParser::parseImpl() {
         Maybe<PipelinePointer> &p = mPipelineParser->parse();
         if (!p.hasValue())
             return;
-        result().emplace(new AndOrList(std::move(*p.value())));
+        result().emplace(
+                std::unique_ptr<AndOrList>(
+                        new AndOrList(std::move(*p.value()))),
+                false);
         mPipelineParser->reset();
     }
 
-    AndOrList &aol = *result().value();
+    AndOrList &aol = *result().value().first;
     std::vector<ConditionalPipeline> &rest =
             mConditionalPipelineListParser.parse().value();
 
     if (Maybe<Operator> &o = mSeparatorParser.parse()) {
-        if (*o == Operator::operatorSemicolon())
+        if (*o == Operator::operatorSemicolon()) {
             aol.synchronicity() = AndOrList::Synchronicity::SEQUENTIAL;
-        else if (*o == Operator::operatorAnd())
+            result().value().second = true;
+        } else if (*o == Operator::operatorAnd()) {
             aol.synchronicity() = AndOrList::Synchronicity::ASYNCHRONOUS;
-        else
+            result().value().second = true;
+        } else
             environment().setPosition(mSeparatorParser.begin());
     }
 

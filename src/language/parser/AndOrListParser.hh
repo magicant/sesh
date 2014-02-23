@@ -22,6 +22,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 #include "language/parser/Environment.hh"
 #include "language/parser/LinebreakParser.hh"
 #include "language/parser/NormalParser.hh"
@@ -39,12 +40,17 @@ namespace parser {
 /**
  * Parses an and-or list.
  *
+ * The result of this parser is a non-null pointer to an and-or list and a
+ * Boolean. The Boolean is true if the and-or list was terminated by either the
+ * semicolon or ampersand opeartor; false otherwise.
+ *
  * This is an abstract class that implements some part of the parser. A
  * concrete subclass must provide factory methods that create parsers used by
  * this parser.
  */
 class AndOrListParser :
-        public NormalParser<std::unique_ptr<syntax::AndOrList>> {
+        public NormalParser<
+                std::pair<std::unique_ptr<syntax::AndOrList>, bool>> {
 
 public:
 
