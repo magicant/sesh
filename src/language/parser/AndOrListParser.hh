@@ -23,12 +23,13 @@
 #include <functional>
 #include <memory>
 #include "language/parser/Environment.hh"
-#include "language/parser/OperatorParser.hh"
+#include "language/parser/LinebreakParser.hh"
 #include "language/parser/NormalParser.hh"
+#include "language/parser/OperatorParser.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/Repeat.hh"
-#include "language/syntax/ConditionalPipeline.hh"
 #include "language/syntax/AndOrList.hh"
+#include "language/syntax/ConditionalPipeline.hh"
 #include "language/syntax/Pipeline.hh"
 
 namespace sesh {
@@ -60,6 +61,7 @@ private:
     private:
 
         OperatorParser mConditionParser;
+        LinebreakParser mLinebreakParser;
         std::reference_wrapper<Parser<PipelinePointer>> mPipelineParser;
 
     public:

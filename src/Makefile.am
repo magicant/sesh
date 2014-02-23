@@ -212,10 +212,17 @@ common_VariantTest_SOURCES = \
 language_parser_AndOrListParserTest_SOURCES = \
 	language/parser/AndOrListParser.cc \
 	language/parser/AndOrListParserTest.cc \
+	language/parser/BlankAndCommentParser.cc \
+	language/parser/BlankCommentNewlineParser.cc \
+	language/parser/CharFilter.cc \
 	language/parser/CharParser.cc \
+	language/parser/CharPredicates.cc \
+	language/parser/CommentParser.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
 	language/parser/LineContinuationEnvironment.cc \
+	language/parser/LinebreakParser.cc \
+	language/parser/NewlineParser.cc \
 	language/parser/Operator.cc \
 	language/parser/OperatorParser.cc \
 	language/parser/ParserBase.cc \
