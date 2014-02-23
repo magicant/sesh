@@ -394,6 +394,7 @@ language_parser_ParserTest_SOURCES = \
 	language/source/SourceBuffer.cc
 language_parser_PipelineParserTest_SOURCES = \
 	language/parser/BlankAndCommentParser.cc \
+	language/parser/BlankCommentNewlineParser.cc \
 	language/parser/CharFilter.cc \
 	language/parser/CharParser.cc \
 	language/parser/CharPredicates.cc \
@@ -402,6 +403,8 @@ language_parser_PipelineParserTest_SOURCES = \
 	language/parser/IncompleteParse.cc \
 	language/parser/Keyword.cc \
 	language/parser/LineContinuationEnvironment.cc \
+	language/parser/LinebreakParser.cc \
+	language/parser/NewlineParser.cc \
 	language/parser/Operator.cc \
 	language/parser/OperatorParser.cc \
 	language/parser/ParserBase.cc \
