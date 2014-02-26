@@ -77,6 +77,8 @@ private:
             convert(std::move(from.value()));
     }
 
+protected:
+
     /**
      * Resets the from-parser as well as the intermediate result of this
      * parser. If a subclass overrides this function, it should call

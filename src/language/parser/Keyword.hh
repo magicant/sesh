@@ -79,6 +79,9 @@ public:
     static Keyword keywordElse() noexcept {
         return Keyword(ELSE);
     }
+    static Keyword keywordEsac() noexcept {
+        return Keyword(ESAC);
+    }
     static Keyword keywordExclamation() noexcept {
         return Keyword(EXCLAMATION);
     }
