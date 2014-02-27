@@ -80,7 +80,7 @@ class CommandParserStub : public CommandParser {
                 environment(), EnumSet<TokenType>().set()));
     }
 
-    CommandParserPointer createSimpleCommandParser(TokenParserPointer p)
+    CommandParserPointer createSimpleCommandParser(TokenParserPointer &&p)
             const override {
         CHECK(p != nullptr);
         return CommandParserPointer(

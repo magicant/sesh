@@ -32,7 +32,7 @@ class PipelineParserImpl : public PipelineParser {
 
     TokenParserPointer createTokenParser() const override;
 
-    CommandParserPointer createCommandParser(TokenParserPointer) const
+    CommandParserPointer createCommandParser(TokenParserPointer &&) const
             override;
 
 }; // class PipelineParserImpl

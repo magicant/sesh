@@ -68,7 +68,7 @@ public:
      * token parser returns a keyword as the first token, this parser reports a
      * syntax error (but the parser still succeeds).
      */
-    SimpleCommandParser(Environment &, TokenParserPointer) noexcept;
+    SimpleCommandParser(Environment &, TokenParserPointer &&) noexcept;
 
 private:
 

@@ -35,8 +35,8 @@ auto CommandParserImpl::createTokenParser() const -> TokenParserPointer {
             environment(), EnumSet<TokenType>().set()));
 }
 
-auto CommandParserImpl::createSimpleCommandParser(TokenParserPointer tp) const
-        -> CommandParserPointer {
+auto CommandParserImpl::createSimpleCommandParser(TokenParserPointer &&tp)
+        const -> CommandParserPointer {
     return CommandParserPointer(new SimpleCommandParser(
             environment(), std::move(tp)));
 }

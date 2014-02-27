@@ -28,7 +28,7 @@ namespace sesh {
 namespace language {
 namespace parser {
 
-CommandParser::CommandParser(Environment &e, TokenParserPointer p) noexcept :
+CommandParser::CommandParser(Environment &e, TokenParserPointer &&p) noexcept :
         Parser(e), mTokenParser(std::move(p)), mActualParser() { }
 
 void CommandParser::prepareActualParser() {

@@ -49,7 +49,7 @@ namespace language {
 namespace parser {
 
 SimpleCommandParser::SimpleCommandParser(
-        Environment &e, TokenParserPointer tokenParser) noexcept :
+        Environment &e, TokenParserPointer &&tokenParser) noexcept :
         NormalParser(e),
         mCommand(),
         mTokenParser(std::move(tokenParser)) {

@@ -32,8 +32,8 @@ class CommandParserImpl : public CommandParser {
 
     TokenParserPointer createTokenParser() const override;
 
-    CommandParserPointer createSimpleCommandParser(TokenParserPointer)
-            const override;
+    CommandParserPointer createSimpleCommandParser(TokenParserPointer &&) const
+            override;
 
 }; // class CommandParser
 
