@@ -43,7 +43,7 @@ using sesh::language::syntax::forEachLineMode;
 Assignment::WordPointer newWord(String s) {
     Assignment::WordPointer w(new Word);
     w->addComponent(Word::ComponentPointer(new RawString(s)));
-    return std::move(w);
+    return w;
 }
 
 SimpleCommand::AssignmentPointer newAssignment(String name, String value) {

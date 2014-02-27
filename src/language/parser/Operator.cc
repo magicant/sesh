@@ -72,7 +72,7 @@ Trie<Char, Operator> Operator::createTrie() {
             operatorSemicolonSemicolon(),
             })
         trie.emplaceDescendants(o.get()).emplaceValue(o);
-    return std::move(trie);
+    return trie;
 }
 
 const Trie<Char, Operator> Operator::TRIE = createTrie();
