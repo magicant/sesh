@@ -172,6 +172,17 @@ void bar(const V &v) {
 }
 ```
 
+Don't overload the constructor with all possible combinations of reference types, as it just increases the binary size with many similar fragments of code:
+
+``` C++
+// Bad
+C::C(const P &p, const Q &q, const R &r) : mP(p), mQ(q), mR(r) { }
+C::C(P &&p, const Q &q, const R &r) : mP(std::move(p)), mQ(q), mR(r) { }
+C::C(const P &p, Q &&q, const R &r) : mP(p), mQ(std::move(q)), mR(r) { }
+C::C(P &&p, Q &&q, const R &r) : mP(std::move(p)), mQ(std::move(q)), mR(r) { }
+...
+```
+
 ## Doxygen comments
 
 ## Other C++ features
