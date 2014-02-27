@@ -156,6 +156,22 @@ If at least one of the following special member functions is explicitly declared
 
 Prefer defaulted definition of special member functions over manual definition where possible.
 
+### Function parameters
+
+Whan a parameter is passed by value, the value is constructed and destructed on each function call. To avoid overhead of the constructor and destructor, only small trivially-copyable types should be passed by value.
+
+Even when a function tries to modify a local copy of a parameter, it might be better to pass it by a const reference. The following two functions have almost the same semantics, but differ as to where the copy is constructed and destructed. The parameter is constructed and destructed at every call site if passed by value, while only in the called function if by reference.
+
+``` C++
+void foo(V v) {
+    // modify v and do something
+}
+void bar(const V &v) {
+    V v2 = v;
+    // modify v2 and do something
+}
+```
+
 ## Doxygen comments
 
 ## Other C++ features
