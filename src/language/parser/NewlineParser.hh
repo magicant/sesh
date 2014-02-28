@@ -53,7 +53,7 @@ private:
 
     void resetImpl() noexcept final override;
 
-    common::Maybe<common::Char> &result() noexcept final override;
+    common::Maybe<common::Char> &result() final override;
 
 }; // class NewlineParser
 

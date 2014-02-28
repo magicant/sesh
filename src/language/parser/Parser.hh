@@ -51,9 +51,9 @@ private:
      * Returns a reference to the parse result. This method is called only when
      * the state is "finished".
      */
-    virtual common::Maybe<Result> &result() noexcept = 0;
+    virtual common::Maybe<Result> &result() = 0;
 
-    bool isSuccessful() noexcept final override {
+    bool isSuccessful() final override {
         return result().hasValue();
     }
 

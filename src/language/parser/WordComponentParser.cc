@@ -52,7 +52,7 @@ void WordComponentParser::parseImpl() {
     mActualParser->parse();
 }
 
-auto WordComponentParser::result() noexcept -> Maybe<ComponentPointer> & {
+auto WordComponentParser::result() -> Maybe<ComponentPointer> & {
     return mActualParser->parse();
 }
 

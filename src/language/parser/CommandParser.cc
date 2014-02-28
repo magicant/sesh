@@ -46,7 +46,7 @@ void CommandParser::parseImpl() {
     mActualParser->parse();
 }
 
-auto CommandParser::result() noexcept -> Maybe<CommandPointer> & {
+auto CommandParser::result() -> Maybe<CommandPointer> & {
     return mActualParser->parse();
 }
 

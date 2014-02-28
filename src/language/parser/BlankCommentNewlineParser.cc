@@ -46,7 +46,7 @@ void BlankCommentNewlineParser::resetImpl() noexcept {
     mNewlineParser.reset();
 }
 
-Maybe<String> &BlankCommentNewlineParser::result() noexcept {
+Maybe<String> &BlankCommentNewlineParser::result() {
     return mBlankAndCommentParser.parse();
 }
 

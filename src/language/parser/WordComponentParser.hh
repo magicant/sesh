@@ -77,7 +77,7 @@ private:
 
     void parseImpl() final override;
 
-    common::Maybe<ComponentPointer> &result() noexcept final override;
+    common::Maybe<ComponentPointer> &result() final override;
 
     void resetImpl() noexcept final override;
 

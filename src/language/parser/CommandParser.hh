@@ -89,7 +89,7 @@ private:
 
     void parseImpl() final override;
 
-    common::Maybe<CommandPointer> &result() noexcept final override;
+    common::Maybe<CommandPointer> &result() final override;
 
     void resetImpl() noexcept final override;
 
