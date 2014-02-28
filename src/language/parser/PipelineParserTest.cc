@@ -135,7 +135,7 @@ private:
 
 class NegatedPipelineParserStub : public PipelineParserStubBase {
     using PipelineParserStubBase::PipelineParserStubBase;
-    CommandParserPointer createCommandParser(TokenParserPointer tp) const
+    CommandParserPointer createCommandParser(TokenParserPointer &&tp) const
             override {
         REQUIRE(tp != nullptr);
         CHECK(tp->state() == State::UNSTARTED);
@@ -150,7 +150,7 @@ TEST_CASE("Pipeline parser, construction") {
         TokenParserPointer createTokenParser() const override {
             throw "unexpected createTokenParser";
         }
-        CommandParserPointer createCommandParser(TokenParserPointer) const
+        CommandParserPointer createCommandParser(TokenParserPointer &&) const
                 override {
             throw "unexpected createCommandParser";
         }
@@ -165,7 +165,7 @@ TEST_CASE("Pipeline parser, construction") {
 TEST_CASE("Pipeline parser, failing token parser") {
     class PipelineParserStub : public PipelineParserStubBase {
         using PipelineParserStubBase::PipelineParserStubBase;
-        CommandParserPointer createCommandParser(TokenParserPointer) const
+        CommandParserPointer createCommandParser(TokenParserPointer &&) const
                 override {
             throw "unexpected createCommandParser";
         }
@@ -183,7 +183,7 @@ TEST_CASE("Pipeline parser, non-keyword token, single command") {
         TokenParserPointer createTokenParser() const override {
             throw "unexpected createTokenParser";
         }
-        CommandParserPointer createCommandParser(TokenParserPointer tp) const
+        CommandParserPointer createCommandParser(TokenParserPointer &&tp) const
                 override {
             REQUIRE(tp != nullptr);
             CHECK(tp->state() == State::FINISHED);
@@ -223,7 +223,7 @@ TEST_CASE("Pipeline parser, non-keyword token, single command") {
 TEST_CASE("Pipeline parser, keyword token, single command") {
     class PipelineParserStub : public PipelineParserStubBase {
         using PipelineParserStubBase::PipelineParserStubBase;
-        CommandParserPointer createCommandParser(TokenParserPointer tp) const
+        CommandParserPointer createCommandParser(TokenParserPointer &&tp) const
                 override {
             REQUIRE(tp != nullptr);
             CHECK(tp->state() == State::FINISHED);
@@ -326,7 +326,7 @@ TEST_CASE("Pipeline parser, pipe followed by linebreak") {
 TEST_CASE("Pipeline parser, reset") {
     class PipelineParserStub : public PipelineParserStubBase {
         using PipelineParserStubBase::PipelineParserStubBase;
-        CommandParserPointer createCommandParser(TokenParserPointer) const
+        CommandParserPointer createCommandParser(TokenParserPointer &&) const
                 override {
             return CommandParserPointer(new CommandParserStub(environment()));
         }

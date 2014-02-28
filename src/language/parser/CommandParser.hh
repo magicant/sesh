@@ -70,7 +70,7 @@ public:
      * token parser pointer is null, {@link #createTokenParser} will be called
      * while parsing to create a parser.
      */
-    explicit CommandParser(Environment &e, TokenParserPointer = nullptr)
+    explicit CommandParser(Environment &e, TokenParserPointer && = nullptr)
             noexcept;
 
 private:
@@ -82,14 +82,14 @@ private:
      */
     virtual TokenParserPointer createTokenParser() const = 0;
 
-    virtual CommandParserPointer createSimpleCommandParser(TokenParserPointer)
-            const = 0;
+    virtual CommandParserPointer createSimpleCommandParser(
+            TokenParserPointer &&) const = 0;
 
     void prepareActualParser();
 
     void parseImpl() final override;
 
-    common::Maybe<CommandPointer> &result() noexcept final override;
+    common::Maybe<CommandPointer> &result() final override;
 
     void resetImpl() noexcept final override;
 

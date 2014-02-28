@@ -59,7 +59,7 @@ public:
      */
     TrieParser(
             Environment &e,
-            std::shared_ptr<Trie> trie,
+            std::shared_ptr<Trie> &&trie,
             LineContinuationTreatment lct = LineContinuationTreatment::REMOVE)
             noexcept :
             NormalParser<Result>(e),

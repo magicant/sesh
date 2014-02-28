@@ -126,7 +126,7 @@ private:
      * only when the state is "finished". This method is not const-qualified
      * because it depends on the non-const {@link Parser#result} method.
      */
-    virtual bool isSuccessful() noexcept = 0;
+    virtual bool isSuccessful() = 0;
 
     /**
      * Clears any intermediate or finished parse results so that a next call to

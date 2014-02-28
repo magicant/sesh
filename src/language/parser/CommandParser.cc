@@ -28,7 +28,7 @@ namespace sesh {
 namespace language {
 namespace parser {
 
-CommandParser::CommandParser(Environment &e, TokenParserPointer p) noexcept :
+CommandParser::CommandParser(Environment &e, TokenParserPointer &&p) noexcept :
         Parser(e), mTokenParser(std::move(p)), mActualParser() { }
 
 void CommandParser::prepareActualParser() {
@@ -46,7 +46,7 @@ void CommandParser::parseImpl() {
     mActualParser->parse();
 }
 
-auto CommandParser::result() noexcept -> Maybe<CommandPointer> & {
+auto CommandParser::result() -> Maybe<CommandPointer> & {
     return mActualParser->parse();
 }
 

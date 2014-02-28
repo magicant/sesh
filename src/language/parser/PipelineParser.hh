@@ -95,8 +95,8 @@ public:
 private:
 
     virtual TokenParserPointer createTokenParser() const = 0;
-    virtual CommandParserPointer createCommandParser(TokenParserPointer) const
-            = 0;
+    virtual CommandParserPointer createCommandParser(TokenParserPointer &&)
+            const = 0;
 
     void parseImpl() final override;
 

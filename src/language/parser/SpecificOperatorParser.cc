@@ -45,7 +45,7 @@ void SpecificOperatorParser::parseImpl() {
         o.clear();
 }
 
-Maybe<Operator> &SpecificOperatorParser::result() noexcept {
+Maybe<Operator> &SpecificOperatorParser::result() {
     return mAnyOperatorParser.parse();
 }
 

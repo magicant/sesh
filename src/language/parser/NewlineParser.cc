@@ -47,7 +47,7 @@ void NewlineParser::resetImpl() noexcept {
     mInnerParser.reset();
 }
 
-Maybe<Char> &NewlineParser::result() noexcept {
+Maybe<Char> &NewlineParser::result() {
     return mInnerParser.parse();
 }
 

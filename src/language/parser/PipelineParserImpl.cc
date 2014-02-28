@@ -38,7 +38,7 @@ auto PipelineParserImpl::createTokenParser() const -> TokenParserPointer {
             environment(), EnumSet<TokenType>().set()));
 }
 
-auto PipelineParserImpl::createCommandParser(TokenParserPointer tp) const
+auto PipelineParserImpl::createCommandParser(TokenParserPointer &&tp) const
         -> CommandParserPointer {
     return CommandParserPointer(new CommandParserImpl(
             environment(), std::move(tp)));

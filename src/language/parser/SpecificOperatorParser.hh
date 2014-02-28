@@ -47,7 +47,7 @@ public:
 
     void parseImpl() final override;
 
-    common::Maybe<Operator> &result() noexcept final override;
+    common::Maybe<Operator> &result() final override;
 
     void resetImpl() noexcept final override;
 
