@@ -22,8 +22,8 @@
 
 #include <memory>
 #include "common/Char.hh"
+#include "language/parser/Converter.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/NormalParser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/StringParser.hh"
 #include "language/syntax/WordComponent.hh"
@@ -38,12 +38,8 @@ namespace parser {
  * The result is the unique pointer to a non-empty raw string. If no characters
  * were accepted by the predicate, this parser fails.
  */
-class RawStringParser :
-        public NormalParser<std::unique_ptr<syntax::WordComponent>> {
-
-private:
-
-    StringParser mStringParser;
+class RawStringParser : public Converter<
+        StringParser, std::unique_ptr<syntax::WordComponent>> {
 
 public:
 
@@ -58,9 +54,7 @@ public:
 
 private:
 
-    void parseImpl() final override;
-
-    void resetImpl() noexcept final override;
+    void convert(common::String &&) final override;
 
 }; // class RawStringParser
 
