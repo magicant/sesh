@@ -21,6 +21,7 @@
 #include "catch.hpp"
 
 #include <memory>
+#include <utility>
 #include "common/Char.hh"
 #include "language/parser/AndOrListParser.hh"
 #include "language/parser/CharParser.hh"
@@ -88,8 +89,9 @@ std::unique_ptr<Parser<std::unique_ptr<Pipeline>>> newPipelineParser(
 
 TEST_CASE("And-or list parser, construction") {
     AndOrListParserTestEnvironment e;
-    AndOrListParser p(newPipelineParser(e));
-    (void) p;
+    AndOrListParser p1(newPipelineParser(e));
+    AndOrListParser p2(std::move(p1));
+    p1 = std::move(p2);
 }
 
 TEST_CASE("And-or list parser, failure in first pipeline") {

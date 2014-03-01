@@ -20,9 +20,9 @@
 
 #include "buildconfig.h"
 
-#include <functional>
 #include <memory>
 #include <utility>
+#include "common/Reference.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/LinebreakParser.hh"
 #include "language/parser/NormalParser.hh"
@@ -68,7 +68,7 @@ private:
 
         OperatorParser mConditionParser;
         LinebreakParser mLinebreakParser;
-        std::reference_wrapper<Parser<PipelinePointer>> mPipelineParser;
+        common::Reference<Parser<PipelinePointer>> mPipelineParser;
 
     public:
 

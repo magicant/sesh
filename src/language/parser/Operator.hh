@@ -20,8 +20,8 @@
 
 #include "buildconfig.h"
 
-#include <functional>
 #include "common/Char.hh"
+#include "common/Reference.hh"
 #include "common/String.hh"
 #include "common/Trie.hh"
 
@@ -33,7 +33,7 @@ namespace parser {
  * A wrapper that holds a reference to an operator string. The referred-to
  * string is one of the static constant member strings of this class.
  */
-class Operator : public std::reference_wrapper<const common::String> {
+class Operator : public common::Reference<const common::String> {
 
 public:
 
@@ -59,7 +59,7 @@ public:
 private:
 
     explicit Operator(const common::String &value) noexcept :
-            reference_wrapper(value) { }
+            Reference(value) { }
 
     static common::Trie<common::Char, Operator> createTrie();
 
