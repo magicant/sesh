@@ -20,7 +20,6 @@
 
 #include "buildconfig.h"
 
-#include "common/Maybe.hh"
 #include "language/parser/ParserBase.hh"
 
 namespace sesh {
@@ -47,14 +46,21 @@ public:
 
 private:
 
-    /**
-     * Returns a reference to the parse result. This method is called only when
-     * the state is "finished".
-     */
-    virtual common::Maybe<Result> &result() = 0;
+    Result *mResult = nullptr;
 
-    bool isSuccessful() final override {
-        return result().hasValue();
+protected:
+
+    /**
+     * Returns (a reference to) the parse result. The result is a null pointer
+     * if parsing failed. If parsing succeeded, the result pointer must be
+     * non-null and the pointed-to object must be valid at least until the
+     * parser is reset or destroyed.
+     */
+    Result *&result() noexcept { return mResult; }
+    const Result *result() const noexcept { return mResult; }
+
+    bool isSuccessful() const noexcept final override {
+        return result() != nullptr;
     }
 
 public:
@@ -81,9 +87,10 @@ public:
      *
      * If the current state is "finished", this method has no side effects.
      *
-     * @return Reference to the result. The result maybe object is non-empty if
-     * and only if the parsing was successful. The result is not
-     * const-qualified, so the caller may modify it.
+     * @return Nullable pointer the result. The pointer is non-null if and only
+     * if the parsing was successful. The result is not const-qualified, so the
+     * caller may modify it. The lifetime of the result object does not end
+     * until the parser is reset or destroyed.
      *
      * @throws IncompleteParse Thrown when the source code is not enough to
      * finish parsing. When this exception is thrown, the current position of
@@ -98,10 +105,19 @@ public:
      * #reset} to "unstarted" and the current position is restored to {@link
      * ParserBase#begin}.
      */
-    common::Maybe<Result> &parse() {
+    Result *parse() {
         parseIfNotFinished();
         return result();
     }
+
+protected:
+
+    /**
+     * Clears the result.
+     *
+     * Subclasses must call this class's method if it is overridden.
+     */
+    void resetImpl() noexcept override { result() = nullptr; }
 
 }; // template<typename Result_> class Parser
 

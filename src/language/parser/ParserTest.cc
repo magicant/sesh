@@ -48,14 +48,6 @@ public:
 
 private:
 
-    Maybe<int> mResult;
-
-protected:
-
-    Maybe<int> &result() noexcept override { return mResult; }
-
-private:
-
     virtual void parseImpl2() = 0;
     virtual void resetImpl2() noexcept { }
 
@@ -67,6 +59,7 @@ private:
     void resetImpl() noexcept final override {
         ++mResetImplCallCount;
         resetImpl2();
+        Parser::resetImpl();
     }
 
 }; // class CountingParserStub
@@ -75,9 +68,11 @@ class SucceedingParserStub : public CountingParserStub {
 
     using CountingParserStub::CountingParserStub;
 
+    int mResult = 123;
+
     void parseImpl2() override {
         environment().setPosition(environment().length());
-        result() = 123;
+        result() = &mResult;
     }
 
 }; // class SucceedingParserStub
@@ -88,7 +83,6 @@ class FailingParserStub : public CountingParserStub {
 
     void parseImpl2() override {
         environment().setPosition(environment().length());
-        result().clear();
     }
 
 }; // class FailingParserStub
@@ -135,7 +129,7 @@ TEST_CASE("Parser, reset from unstarted state") {
     CHECK(p.mResetImplCallCount == 1);
 }
 
-TEST_CASE("Parser, parse needs more source & reset from parsing state") {
+TEST_CASE("Parser, incomplete parse & reset from parsing state") {
     SourceTestEnvironment e;
     ThrowingParserStub p(e);
 
@@ -155,13 +149,18 @@ TEST_CASE("Parser, successful parsing and idempotence") {
     SucceedingParserStub p(e);
     e.appendSource(L("ABC"));
 
-    CHECK(p.parse() == createMaybeOf(123));
+    int *i;
+    CHECK_NOTHROW(i = p.parse());
+    REQUIRE(i != nullptr);
+    CHECK(*i == 123);
     CHECK(e.position() == e.length());
     CHECK(p.mParseImplCallCount == 1);
     CHECK(p.mResetImplCallCount == 0);
     CHECK(p.state() == SucceedingParserStub::State::FINISHED);
 
-    CHECK(p.parse() == createMaybeOf(123));
+    CHECK_NOTHROW(i = p.parse());
+    REQUIRE(i != nullptr);
+    CHECK(*i == 123);
     CHECK(e.position() == e.length());
     CHECK(p.mParseImplCallCount == 1);
     CHECK(p.mResetImplCallCount == 0);
@@ -173,13 +172,16 @@ TEST_CASE("Parser, unsuccessful parsing and idempotence") {
     FailingParserStub p(e);
     e.appendSource(L("ABC"));
 
-    CHECK_FALSE(p.parse());
+    int *i;
+    CHECK_NOTHROW(i = p.parse());
+    CHECK(i == nullptr);
     CHECK(e.position() == 0);
     CHECK(p.mParseImplCallCount == 1);
     CHECK(p.mResetImplCallCount == 0);
     CHECK(p.state() == SucceedingParserStub::State::FINISHED);
 
-    CHECK_FALSE(p.parse());
+    CHECK_NOTHROW(i = p.parse());
+    CHECK(i == nullptr);
     CHECK(e.position() == 0);
     CHECK(p.mParseImplCallCount == 1);
     CHECK(p.mResetImplCallCount == 0);
