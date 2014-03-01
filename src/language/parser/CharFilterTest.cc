@@ -63,6 +63,13 @@ class CharFilterTestEnvironment :
         public LineContinuationEnvironment {
 };
 
+TEST_CASE("Char filter, construction and assignment") {
+    CharFilterTestEnvironment e;
+    CharFilter p1(e, is<IL('\0')>);
+    CharFilter p2(p1);
+    p1 = p2;
+}
+
 TEST_CASE("Char filter, success for normal char") {
     CharFilterTestEnvironment e;
     CharFilter p(e, expect<IL('A'), true>);

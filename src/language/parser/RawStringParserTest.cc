@@ -58,8 +58,9 @@ bool isNot(const Environment &, Char c) {
 
 TEST_CASE("Raw string parser, construction") {
     RawStringParserTestEnvironment e;
-    RawStringParser p(e, isNot<L('\0')>);
-    RawStringParser(std::move(p));
+    RawStringParser p1(e, isNot<L('\0')>);
+    RawStringParser p2(std::move(p1));
+    p1 = std::move(p2);
 }
 
 TEST_CASE("Raw string parser, success") {

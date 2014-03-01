@@ -96,6 +96,13 @@ private:
 
 }; // class FailingConverterStub
 
+TEST_CASE("Converter, construction and assignment") {
+    SourceTestEnvironment e;
+    NoopConverterStub c1(e, e);
+    NoopConverterStub c2(c1);
+    c1 = c2;
+}
+
 TEST_CASE("Converter, failure of from-parser") {
     SourceTestEnvironment e;
     NoopConverterStub c(e, e);

@@ -42,10 +42,11 @@ class BlankAndCommentParserTestEnvironment :
         public CLocaleEnvironment {
 };
 
-TEST_CASE("Blank and comment parser, construction") {
+TEST_CASE("Blank and comment parser, construction and assignment") {
     BlankAndCommentParserTestEnvironment e;
-    BlankAndCommentParser p(e);
-    BlankAndCommentParser(std::move(p));
+    BlankAndCommentParser p1(e);
+    BlankAndCommentParser p2(p1);
+    p1 = p2;
 }
 
 TEST_CASE("Blank and comment parser, space and tab and line continuation") {

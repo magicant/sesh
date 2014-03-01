@@ -46,8 +46,8 @@ TEST_CASE("Newline parser, construction") {
     NewlineParserTestEnvironment e;
     NewlineParser p1(e);
     NewlineParser p2(e, LineContinuationTreatment::LITERAL);
-    NewlineParser p3(std::move(p2));
-    p2 = std::move(p3);
+    NewlineParser p3(p2);
+    p2 = p3;
 }
 
 TEST_CASE("Newline parser, no newline") {

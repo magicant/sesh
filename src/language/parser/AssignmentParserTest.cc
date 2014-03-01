@@ -175,10 +175,11 @@ class AssignmentParserStub4 : public AssignmentParserStub3 {
 
 }; // class AssignmentParserStub4
 
-TEST_CASE("Assignment parser, construction") {
+TEST_CASE("Assignment parser, construction and assignment") {
     AssignmentParserTestEnvironment e;
-    AssignmentParserStub1 p(e);
-    AssignmentParserStub1(std::move(p));
+    AssignmentParserStub1 p1(e);
+    AssignmentParserStub1 p2(std::move(p1));
+    p1 = std::move(p2);
 }
 
 TEST_CASE("Assignment parser, empty name") {

@@ -55,6 +55,12 @@ Repeat<CharParser> charRepeat(Environment &e, Char reject) {
             LineContinuationTreatment::LITERAL);
 }
 
+TEST_CASE("Repeat, construction and assignment") {
+    RepeatTestEnvironment e;
+    Repeat<CharParser> r1 = charRepeat(e, L('\0'));
+    Repeat<CharParser> r2 = r1;
+}
+
 TEST_CASE("Repeat, empty results") {
     RepeatTestEnvironment e;
     Repeat<CharParser> r = charRepeat(e, L('A'));

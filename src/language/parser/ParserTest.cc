@@ -20,6 +20,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#include <utility>
 #include "common/Maybe.hh"
 #include "language/parser/EnvironmentTestHelper.hh"
 #include "language/parser/IncompleteParse.hh"
@@ -106,6 +107,15 @@ TEST_CASE("Parser, environment") {
     SourceTestEnvironment e;
     ThrowingParserStub p(e);
     CHECK(&p.environment() == &e);
+}
+
+TEST_CASE("Parser, copy and move") {
+    SourceTestEnvironment e;
+    ThrowingParserStub p1(e);
+    ThrowingParserStub p2(p1);
+    ThrowingParserStub p3(std::move(p2));
+    p2 = p3;
+    p2 = std::move(p3);
 }
 
 TEST_CASE("Parser, initial state") {

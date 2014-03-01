@@ -143,7 +143,7 @@ class NegatedPipelineParserStub : public PipelineParserStubBase {
     }
 }; // class PipelineParserStub
 
-TEST_CASE("Pipeline parser, construction") {
+TEST_CASE("Pipeline parser, construction and assignment") {
     class PipelineParserStub : public PipelineParser {
         using PipelineParser::PipelineParser;
     public:
@@ -160,6 +160,7 @@ TEST_CASE("Pipeline parser, construction") {
     PipelineParserStub p1(e);
     PipelineParserStub p2(e, newTokenParser(e));
     PipelineParserStub(std::move(p2));
+    p2 = std::move(p1);
 }
 
 TEST_CASE("Pipeline parser, failing token parser") {

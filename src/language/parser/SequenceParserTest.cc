@@ -124,7 +124,7 @@ class SequenceParserTestEnvironment :
         public CLocaleEnvironment {
 };
 
-TEST_CASE("Sequence parser, construction") {
+TEST_CASE("Sequence parser, construction and assignment") {
     SourceEnvironment e;
     SequenceParserStub p1(e);
     SequenceParserStub p2(std::move(p1));

@@ -61,6 +61,13 @@ class CharParserTestEnvironment :
         public LineContinuationEnvironment {
 };
 
+TEST_CASE("Char parser, construction and assignment") {
+    CharParserTestEnvironment e;
+    CharParser p1(e, is<L('\0')>);
+    CharParser p2(p1);
+    p1 = p2;
+}
+
 TEST_CASE("Char parser, success") {
     CharParserTestEnvironment e;
     CharParser p(e, expect<L('A'), true>);

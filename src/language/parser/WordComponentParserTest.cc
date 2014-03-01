@@ -104,10 +104,11 @@ bool fail(const Environment &, Char) {
     return true;
 }
 
-TEST_CASE("Word component parser, construction") {
+TEST_CASE("Word component parser, construction and assignment") {
     WordComponentParserTestEnvironment e;
-    WordComponentParserStub p(e, fail);
-    WordComponentParserStub(std::move(p));
+    WordComponentParserStub p1(e, fail);
+    WordComponentParserStub p2(std::move(p1));
+    p1 = std::move(p2);
 }
 
 TEST_CASE("Word component parser, eof") {

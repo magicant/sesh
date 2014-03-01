@@ -89,10 +89,11 @@ void checkWord(const Token &r, const String &s) {
     CHECK(rs->value() == s);
 }
 
-TEST_CASE("Simple command word parser, construction") {
+TEST_CASE("Simple command word parser, construction and assignment") {
     TokenParserTestEnvironment e;
-    TokenParserStub p(e, EnumSet<TokenType>());
-    TokenParserStub(std::move(p));
+    TokenParserStub p1(e, EnumSet<TokenType>());
+    TokenParserStub p2(std::move(p1));
+    p1 = std::move(p2);
 }
 
 TEST_CASE("Simple command word parser, assignment") {
