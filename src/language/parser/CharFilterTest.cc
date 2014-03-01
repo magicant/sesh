@@ -76,8 +76,8 @@ TEST_CASE("Char filter, success for normal char") {
 
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.appendSource(L("A"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == IL('A'));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == IL('A'));
     CHECK(e.position() == 0);
 }
 
@@ -87,8 +87,8 @@ TEST_CASE("Char filter, success for eof") {
 
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == CharTraits::eof());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == CharTraits::eof());
     CHECK(e.position() == 0);
 }
 
@@ -98,7 +98,7 @@ TEST_CASE("Char filter, failure for normal char") {
 
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.appendSource(L("B"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK_FALSE(p.parse() != nullptr);
     CHECK(e.position() == 0);
 }
 
@@ -108,7 +108,7 @@ TEST_CASE("Char filter, failure for eof") {
 
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.setIsEof();
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK_FALSE(p.parse() != nullptr);
     CHECK(e.position() == 0);
 }
 
@@ -124,8 +124,8 @@ TEST_CASE("Char filter, remove line continuations") {
     e.checkSource(L(""));
     e.appendSource(L("\\\n\\\n"));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == CharTraits::eof());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == CharTraits::eof());
     CHECK(e.position() == 0);
     e.checkSource(L(""));
 }
@@ -135,8 +135,8 @@ TEST_CASE("Char filter, keep line continuations") {
     CharFilter p(e, expect<L('\\'), true>, LineContinuationTreatment::LITERAL);
 
     e.appendSource(L("\\\n"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == IL('\\'));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == IL('\\'));
     CHECK(e.position() == 0);
 }
 
@@ -144,20 +144,20 @@ TEST_CASE("Char filter, reset") {
     CharFilterTestEnvironment e;
     CharFilter p(e, is<IL('A')>);
     e.appendSource(L("A"));
-    CHECK(p.parse().hasValue());
+    CHECK(p.parse() != nullptr);
 
     p.reset();
     e.setPosition(e.length());
     e.appendSource(L("\\\nB"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK_FALSE(p.parse() != nullptr);
 
     p.reset(is<IL('B')>);
-    CHECK(p.parse().hasValue());
+    CHECK(p.parse() != nullptr);
 
     p.reset(is<IL('\\')>, LineContinuationTreatment::LITERAL);
     e.setPosition(e.length());
     e.appendSource(L("\\\nC"));
-    CHECK(p.parse().hasValue());
+    CHECK(p.parse() != nullptr);
 }
 
 } // namespace

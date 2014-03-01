@@ -25,7 +25,7 @@
 #include "common/String.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 
 namespace sesh {
@@ -36,12 +36,14 @@ namespace parser {
  * CharFilter checks if the current character satisfies a given predicate. This
  * parser does not move the current position.
  */
-class CharFilter : public NormalParser<common::CharTraits::int_type> {
+class CharFilter : public Parser<common::CharTraits::int_type> {
 
 private:
 
     Predicate<common::Char> mIsAcceptableChar;
     LineContinuationTreatment mLineContinuationTreatment;
+
+    CharInt mCurrentCharInt;
 
 public:
 
@@ -50,7 +52,7 @@ public:
             Predicate<CharInt> &&isAcceptableChar,
             LineContinuationTreatment = LineContinuationTreatment::REMOVE);
 
-    using NormalParser::reset;
+    using Parser::reset;
 
     void reset(
             Predicate<CharInt> &&isAcceptableChar,
