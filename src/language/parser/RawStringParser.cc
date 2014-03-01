@@ -21,12 +21,10 @@
 #include <memory>
 #include <utility>
 #include "common/Char.hh"
-#include "common/Maybe.hh"
 #include "common/String.hh"
 #include "language/syntax/RawString.hh"
 
 using sesh::common::Char;
-using sesh::common::Maybe;
 using sesh::common::String;
 using sesh::language::syntax::RawString;
 
@@ -38,18 +36,11 @@ RawStringParser::RawStringParser(
         Environment &e,
         Predicate<Char> &&isAcceptableChar,
         LineContinuationTreatment lct) :
-        NormalParser(e),
-        mStringParser(e, e, std::move(isAcceptableChar), lct) { }
+        Converter(e, e, e, std::move(isAcceptableChar), lct) { }
 
-void RawStringParser::parseImpl() {
-    String &s = mStringParser.parse().value();
+void RawStringParser::convert(String &&s) {
     if (!s.empty())
         result().emplace(new RawString(std::move(s)));
-}
-
-void RawStringParser::resetImpl() noexcept {
-    mStringParser.reset();
-    NormalParser::resetImpl();
 }
 
 } // namespace parser

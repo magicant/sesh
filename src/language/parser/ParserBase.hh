@@ -20,9 +20,9 @@
 
 #include "buildconfig.h"
 
-#include <functional>
 #include <memory>
 #include <utility>
+#include "common/Reference.hh"
 #include "common/String.hh"
 #include "language/parser/Environment.hh"
 
@@ -75,7 +75,7 @@ protected:
 
 private:
 
-    std::reference_wrapper<Environment> mEnvironment;
+    common::Reference<Environment> mEnvironment;
 
     State mState = State::UNSTARTED;
 

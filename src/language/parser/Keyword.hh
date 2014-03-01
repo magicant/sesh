@@ -20,8 +20,8 @@
 
 #include "buildconfig.h"
 
-#include <functional>
 #include "common/Maybe.hh"
+#include "common/Reference.hh"
 #include "common/String.hh"
 
 namespace sesh {
@@ -32,7 +32,7 @@ namespace parser {
  * A wrapper that holds a reference to a keyword string. The referred-to string
  * is one of the static constant member strings of this class.
  */
-class Keyword : public std::reference_wrapper<const common::String> {
+class Keyword : public common::Reference<const common::String> {
 
 public:
 
@@ -60,7 +60,7 @@ public:
 private:
 
     explicit Keyword(const common::String &value) noexcept :
-            reference_wrapper(value) { }
+            Reference(value) { }
 
 public:
 

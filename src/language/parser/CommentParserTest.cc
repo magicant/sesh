@@ -44,9 +44,10 @@ class CommentParserTestEnvironment :
 
 TEST_CASE("Comment parser, construction") {
     CommentParserTestEnvironment e;
-    CommentParser p(e);
+    CommentParser p1(e);
     CommentParser(e, LineContinuationTreatment::LITERAL);
-    CommentParser(std::move(p));
+    CommentParser p2(p1);
+    p1 = p2;
 }
 
 TEST_CASE("Comment parser, success with removed line continuation") {

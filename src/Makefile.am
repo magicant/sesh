@@ -14,6 +14,7 @@ check_PROGRAMS = \
 	common/EnumSetTest \
 	common/MaybeTest \
 	common/MessageTest \
+	common/ReferenceTest \
 	common/TrieTest \
 	common/VariantTest \
 	language/parser/AndOrListParserTest \
@@ -77,6 +78,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	common/Message.cc \
 	common/Message.hh \
 	common/OutputStream.hh \
+	common/Reference.hh \
 	common/String.hh \
 	common/StringStream.hh \
 	common/Trie.hh \
@@ -210,6 +212,8 @@ common_MaybeTest_SOURCES = \
 common_MessageTest_SOURCES = \
 	common/Message.cc \
 	common/MessageTest.cc
+common_ReferenceTest_SOURCES = \
+	common/ReferenceTest.cc
 common_TrieTest_SOURCES = \
 	common/TrieTest.cc
 common_VariantTest_SOURCES = \

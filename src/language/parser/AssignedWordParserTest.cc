@@ -100,11 +100,12 @@ void checkComponents(
     }
 }
 
-TEST_CASE("Assigned word parser, construction") {
+TEST_CASE("Assigned word parser, construction and assignment") {
     AssignedWordParserTestEnvironment e;
-    AssignedWordParser p(
+    AssignedWordParser p1(
             e, WordParserPointer(new FailingParser<WordPointer>(e)));
-    AssignedWordParser(std::move(p));
+    AssignedWordParser p2(std::move(p1));
+    p1 = std::move(p2);
 }
 
 TEST_CASE("Assigned word parser, parse") {

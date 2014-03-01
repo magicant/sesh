@@ -51,10 +51,11 @@ class TrieParserTestEnvironment :
         public LineContinuationEnvironment {
 };
 
-TEST_CASE("Trie parser, construction") {
+TEST_CASE("Trie parser, construction and assignment") {
     TrieParserTestEnvironment e;
-    TrieParser p(e, std::make_shared<const Trie>());
-    TrieParser(std::move(p));
+    TrieParser p1(e, std::make_shared<const Trie>());
+    TrieParser p2(p1);
+    p1 = p2;
 }
 
 TEST_CASE("Trie parser, success") {

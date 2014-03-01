@@ -42,7 +42,7 @@ class BlankCommentNewlineParserTestEnvironment :
         public CLocaleEnvironment {
 };
 
-TEST_CASE("Blank-comment-newline parser, construction") {
+TEST_CASE("Blank-comment-newline parser, construction and assignment") {
     BlankCommentNewlineParserTestEnvironment e;
     BlankCommentNewlineParser p1(e);
     BlankCommentNewlineParser p2(p1);

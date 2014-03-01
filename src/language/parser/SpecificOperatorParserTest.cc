@@ -47,8 +47,9 @@ class SpecificOperatorParserTestEnvironment :
 
 TEST_CASE("Specific operator parser, construction") {
     SpecificOperatorParserTestEnvironment e;
-    SpecificOperatorParser p(e, Operator::operatorAnd());
-    SpecificOperatorParser(std::move(p));
+    SpecificOperatorParser p1(e, Operator::operatorAnd());
+    SpecificOperatorParser p2(p1);
+    p1 = p2;
 }
 
 TEST_CASE("Specific operator parser, accepted operator") {

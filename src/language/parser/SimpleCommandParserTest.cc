@@ -97,10 +97,11 @@ void checkWord(const std::unique_ptr<Word> &w, const String &value) {
     CHECK(actualValue.value() == value);
 }
 
-TEST_CASE("Simple command parser, construction") {
+TEST_CASE("Simple command parser, construction and assignment") {
     TestEnvironment e;
-    SimpleCommandParser p(e, createTokenParser(e, EnumSet<TokenType>()));
-    SimpleCommandParser(std::move(p));
+    SimpleCommandParser p1(e, createTokenParser(e, EnumSet<TokenType>()));
+    SimpleCommandParser p2(std::move(p1));
+    p1 = std::move(p2);
 }
 
 TEST_CASE("Simple command parser, empty") {
