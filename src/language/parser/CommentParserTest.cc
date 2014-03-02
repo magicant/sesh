@@ -56,8 +56,8 @@ TEST_CASE("Comment parser, success with removed line continuation") {
     e.setIsEof();
 
     CommentParser p(e);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("#"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("#"));
     CHECK(e.position() == e.length());
 }
 
@@ -66,7 +66,7 @@ TEST_CASE("Comment parser, failure with removed line continuation") {
     e.appendSource(L(" "));
 
     CommentParser p(e);
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Comment parser, success with literal line continuation") {
@@ -75,8 +75,8 @@ TEST_CASE("Comment parser, success with literal line continuation") {
     e.setIsEof();
 
     CommentParser p(e, LineContinuationTreatment::LITERAL);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("#"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("#"));
     CHECK(e.position() == e.length());
 }
 
@@ -85,7 +85,7 @@ TEST_CASE("Comment parser, failure with literal line continuation") {
     e.appendSource(L("\\\n#"));
 
     CommentParser p(e, LineContinuationTreatment::LITERAL);
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Comment parser, stop at newline") {
@@ -93,8 +93,8 @@ TEST_CASE("Comment parser, stop at newline") {
     e.appendSource(L("# foo # bar\\\n"));
 
     CommentParser p(e);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("# foo # bar\\"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("# foo # bar\\"));
     CHECK(e.position() == e.length() - 1);
 }
 
@@ -103,18 +103,18 @@ TEST_CASE("Comment parser, reset") {
     e.appendSource(L("#1\n#2\n"));
 
     CommentParser p(e);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("#1"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("#1"));
     CHECK(e.position() == 2);
 
     p.reset();
     e.setPosition(3);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("#2"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("#2"));
     CHECK(e.position() == 5);
 
     p.reset();
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 } // namespace

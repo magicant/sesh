@@ -25,7 +25,7 @@
 #include "language/parser/CharFilter.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/StringParser.hh"
 
 namespace sesh {
@@ -38,7 +38,7 @@ namespace parser {
  * returned as the result. This parser fails if no hash sign was found at the
  * beginning position.
  */
-class CommentParser : public NormalParser<common::String> {
+class CommentParser : public Parser<common::String> {
 
 private:
 

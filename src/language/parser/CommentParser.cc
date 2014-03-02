@@ -55,20 +55,20 @@ constexpr bool isNotNewline(const Environment &, Char c) noexcept {
 } // namespace
 
 CommentParser::CommentParser(Environment &e, LineContinuationTreatment lct) :
-        NormalParser(e),
+        Parser(e),
         mHashFilter(e, isHashSign, lct),
         mContentParser(StringParser::create(
                 e, isNotNewline, LineContinuationTreatment::LITERAL)) { }
 
 void CommentParser::parseImpl() {
-    if (mHashFilter.parse().hasValue())
-        result() = std::move(mContentParser.parse());
+    if (mHashFilter.parse() != nullptr)
+        result() = mContentParser.parse();
 }
 
 void CommentParser::resetImpl() noexcept {
     mHashFilter.reset();
     mContentParser.reset();
-    NormalParser::resetImpl();
+    Parser::resetImpl();
 }
 
 } // namespace parser
