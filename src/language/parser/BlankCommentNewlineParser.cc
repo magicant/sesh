@@ -19,11 +19,9 @@
 #include "BlankCommentNewlineParser.hh"
 
 #include "common/Char.hh"
-#include "common/Maybe.hh"
 #include "common/String.hh"
 
 using sesh::common::Char;
-using sesh::common::Maybe;
 using sesh::common::String;
 
 namespace sesh {
@@ -36,18 +34,15 @@ BlankCommentNewlineParser::BlankCommentNewlineParser(Environment &e) :
         mNewlineParser(e) { }
 
 void BlankCommentNewlineParser::parseImpl() {
-    String &result = mBlankAndCommentParser.parse().value();
-    if (Maybe<Char> &newline = mNewlineParser.parse())
-        result.push_back(*newline);
+    String *resultString = mBlankAndCommentParser.parse();
+    if (Char *newline = mNewlineParser.parse())
+        resultString->push_back(*newline);
+    result() = resultString;
 }
 
 void BlankCommentNewlineParser::resetImpl() noexcept {
     mBlankAndCommentParser.reset();
     mNewlineParser.reset();
-}
-
-Maybe<String> &BlankCommentNewlineParser::result() {
-    return mBlankAndCommentParser.parse();
 }
 
 } // namespace parser

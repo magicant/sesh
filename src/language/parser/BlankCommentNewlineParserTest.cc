@@ -55,8 +55,8 @@ TEST_CASE("Blank-comment-newline parser, nothing") {
     BlankCommentNewlineParserTestEnvironment e;
     BlankCommentNewlineParser p(e);
     e.appendSource(L("X"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().empty());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->empty());
     e.checkSource(L("X"));
     CHECK(e.position() == 0);
 }
@@ -65,8 +65,8 @@ TEST_CASE("Blank-comment-newline parser, blank only") {
     BlankCommentNewlineParserTestEnvironment e;
     BlankCommentNewlineParser p(e);
     e.appendSource(L("\t\\\nX"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("\t"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("\t"));
     e.checkSource(L("\tX"));
     CHECK(e.position() == 1);
 }
@@ -76,8 +76,8 @@ TEST_CASE("Blank-comment-newline parser, comment only") {
     BlankCommentNewlineParser p(e);
     e.appendSource(L("#X"));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("#X"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("#X"));
     e.checkSource(L("#X"));
     CHECK(e.position() == 2);
 }
@@ -86,8 +86,8 @@ TEST_CASE("Blank-comment-newline parser, newline only") {
     BlankCommentNewlineParserTestEnvironment e;
     BlankCommentNewlineParser p(e);
     e.appendSource(L("\\\n\nX"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("\n"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("\n"));
     e.checkSource(L("\nX"));
     CHECK(e.position() == 1);
 }
@@ -96,8 +96,8 @@ TEST_CASE("Blank-comment-newline parser, all") {
     BlankCommentNewlineParserTestEnvironment e;
     BlankCommentNewlineParser p(e);
     e.appendSource(L(" \\\n\t#\\\n \n"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L(" \t#\\\n"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L(" \t#\\\n"));
     e.checkSource(L(" \t#\\\n \n"));
     CHECK(e.position() == 5);
 }
@@ -112,9 +112,9 @@ TEST_CASE("Blank-comment-newline parser, reset") {
 
     p.reset();
 
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
     CHECK(p.begin() == 5);
-    CHECK(p.parse().value() == L(" \n"));
+    CHECK(*p.parse() == L(" \n"));
     CHECK(e.position() == 7);
 
     e.checkSource(L(" \t#\\\n \n"));
