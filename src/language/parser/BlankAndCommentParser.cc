@@ -31,13 +31,13 @@ namespace language {
 namespace parser {
 
 BlankAndCommentParser::BlankAndCommentParser(Environment &e) :
-        NormalParser(e), mBlankParser(e, e, isBlank), mCommentParser(e) { }
+        Parser(e), mBlankParser(e, e, isBlank), mCommentParser(e) { }
 
 void BlankAndCommentParser::parseImpl() {
-    Maybe<String> &resultString = mBlankParser.parse();
-    if (mCommentParser.parse().hasValue())
-        resultString.value() += mCommentParser.parse().value();
-    result() = std::move(resultString);
+    String *resultString = mBlankParser.parse();
+    if (String *commentString = mCommentParser.parse())
+        *resultString += *commentString;
+    result() = resultString;
 }
 
 void BlankAndCommentParser::resetImpl() noexcept {

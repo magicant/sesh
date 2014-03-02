@@ -54,8 +54,8 @@ TEST_CASE("Blank and comment parser, space and tab and line continuation") {
     e.appendSource(L(" \\\n\t\n"));
 
     BlankAndCommentParser p(e);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L(" \t"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L(" \t"));
     CHECK(e.position() == e.length() - 1);
 }
 
@@ -64,8 +64,8 @@ TEST_CASE("Blank and comment parser, no blank or comment") {
     e.appendSource(L("X"));
 
     BlankAndCommentParser p(e);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L(""));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L(""));
     CHECK(e.position() == e.length() - 1);
 }
 
@@ -74,8 +74,8 @@ TEST_CASE("Blank and comment parser, comment only") {
     e.appendSource(L("#comment\n"));
 
     BlankAndCommentParser p(e);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("#comment"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("#comment"));
     CHECK(e.position() == e.length() - 1);
 }
 
@@ -84,8 +84,8 @@ TEST_CASE("Blank and comment parser, blank and comment") {
     e.appendSource(L("\t #\\\n"));
 
     BlankAndCommentParser p(e);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("\t #\\"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("\t #\\"));
     CHECK(e.position() == e.length() - 1);
 }
 
@@ -94,14 +94,14 @@ TEST_CASE("Blank and comment parser, reset") {
     e.appendSource(L("\t#\\\n ##\n"));
 
     BlankAndCommentParser p(e);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L("\t#\\"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L("\t#\\"));
     CHECK(e.position() == 3);
 
     p.reset();
     e.setPosition(4);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L(" ##"));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L(" ##"));
     CHECK(e.position() == 7);
 }
 
