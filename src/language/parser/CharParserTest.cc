@@ -74,8 +74,8 @@ TEST_CASE("Char parser, success") {
 
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.appendSource(L("A"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L('A'));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L('A'));
     CHECK(e.position() == e.length());
 }
 
@@ -85,7 +85,7 @@ TEST_CASE("Char parser, failure, false predicate") {
 
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.appendSource(L("B"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
     CHECK(e.position() == 0);
 }
 
@@ -94,7 +94,7 @@ TEST_CASE("Char parser, failure, eof") {
     CharParser p(e, fail);
 
     e.setIsEof();
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
     CHECK(e.position() == 0);
 }
 
@@ -106,8 +106,8 @@ TEST_CASE("Char parser, remove line continuations") {
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.checkSource(L(""));
     e.appendSource(L("\\\n\\\nC"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L('C'));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L('C'));
     CHECK(e.position() == e.length());
     e.checkSource(L("C"));
 }
@@ -117,8 +117,8 @@ TEST_CASE("Char parser, keep line continuations") {
     CharParser p(e, expect<L('\\'), true>, LineContinuationTreatment::LITERAL);
 
     e.appendSource(L("\\\n"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L('\\'));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L('\\'));
     CHECK(e.position() == 1);
 }
 
@@ -126,18 +126,18 @@ TEST_CASE("Char parser, reset") {
     CharParserTestEnvironment e;
     CharParser p(e, is<L('A')>);
     e.appendSource(L("A"));
-    CHECK(p.parse().hasValue());
+    CHECK(p.parse() != nullptr);
 
     p.reset();
     e.appendSource(L("B"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 
     p.reset(is<L('B')>);
-    CHECK(p.parse().hasValue());
+    CHECK(p.parse() != nullptr);
 
     p.reset(is<L('\\')>, LineContinuationTreatment::LITERAL);
     e.appendSource(L("\\\nC"));
-    CHECK(p.parse().hasValue());
+    CHECK(p.parse() != nullptr);
     CHECK(e.position() == 3);
 }
 
