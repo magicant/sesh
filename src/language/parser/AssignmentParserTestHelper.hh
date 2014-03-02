@@ -23,7 +23,7 @@
 #include <memory>
 #include "common/Char.hh"
 #include "common/String.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Word.hh"
 
@@ -37,9 +37,11 @@ namespace parser {
  * value.
  */
 class AssignmentParserStub :
-            public NormalParser<std::unique_ptr<syntax::Assignment>> {
+            public Parser<std::unique_ptr<syntax::Assignment>> {
 
-    using NormalParser<std::unique_ptr<syntax::Assignment>>::NormalParser;
+    using Parser<std::unique_ptr<syntax::Assignment>>::Parser;
+
+    std::unique_ptr<syntax::Assignment> mResultAssignment;
 
     void parseImpl() override {
         using sesh::common::CharTraits;
@@ -48,9 +50,15 @@ class AssignmentParserStub :
         if (!CharTraits::eq_int_type(ci, CharTraits::to_int_type(L('='))))
             return;
 
-        result().emplace(new syntax::Assignment(
+        mResultAssignment.reset(new syntax::Assignment(
                 L("N"), std::unique_ptr<syntax::Word>(new syntax::Word)));
+        result() = &mResultAssignment;
         environment().setPosition(environment().position() + 1);
+    }
+
+    void resetImpl() noexcept override {
+        mResultAssignment.reset();
+        Parser<std::unique_ptr<syntax::Assignment>>::resetImpl();
     }
 
 }; // class AssignmentParserStub
