@@ -67,8 +67,8 @@ TEST_CASE("Repeat, empty results") {
 
     CHECK_THROWS_AS(r.parse(), IncompleteParse);
     e.appendSource(L("A"));
-    REQUIRE(r.parse().hasValue());
-    CHECK(r.parse().value().empty());
+    REQUIRE(r.parse() != nullptr);
+    CHECK(r.parse()->empty());
 }
 
 TEST_CASE("Repeat, three results") {
@@ -77,12 +77,12 @@ TEST_CASE("Repeat, three results") {
 
     CHECK_THROWS_AS(r.parse(), IncompleteParse);
     e.appendSource(L("ABCX"));
-    REQUIRE(r.parse().hasValue());
+    REQUIRE(r.parse() != nullptr);
     CHECK(e.position() == 3);
-    CHECK(r.parse().value().size() == 3);
-    CHECK(r.parse().value().at(0) == L('A'));
-    CHECK(r.parse().value().at(1) == L('B'));
-    CHECK(r.parse().value().at(2) == L('C'));
+    CHECK(r.parse()->size() == 3);
+    CHECK(r.parse()->at(0) == L('A'));
+    CHECK(r.parse()->at(1) == L('B'));
+    CHECK(r.parse()->at(2) == L('C'));
 }
 
 TEST_CASE("Repeat, reset") {
@@ -91,15 +91,15 @@ TEST_CASE("Repeat, reset") {
 
     e.appendSource(L("A,B,"));
 
-    REQUIRE(r.parse().hasValue());
-    CHECK(r.parse().value().size() == 1);
+    REQUIRE(r.parse() != nullptr);
+    CHECK(r.parse()->size() == 1);
     CHECK(e.position() == 1);
 
     e.setPosition(2);
     r.reset();
 
-    REQUIRE(r.parse().hasValue());
-    CHECK(r.parse().value().size() == 1);
+    REQUIRE(r.parse() != nullptr);
+    CHECK(r.parse()->size() == 1);
     CHECK(e.position() == 3);
 }
 
