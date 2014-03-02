@@ -37,10 +37,17 @@ namespace language {
 namespace parser {
 
 WordParser::WordParser(Environment &e, Predicate<Char> &&isAcceptableChar) :
-        Converter(e, e, e, std::move(isAcceptableChar)) { }
+        Converter(e, e, e, std::move(isAcceptableChar)),
+        mResultWord() { }
 
 void WordParser::convert(std::vector<ComponentPointer> &&components) {
-    result().emplace(new Word(std::move(components)));
+    mResultWord.reset(new Word(std::move(components)));
+    result() = &mResultWord;
+}
+
+void WordParser::resetImpl() noexcept {
+    mResultWord.reset();
+    Converter::resetImpl();
 }
 
 } // namespace parser
