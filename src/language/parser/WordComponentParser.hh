@@ -77,8 +77,6 @@ private:
 
     void parseImpl() final override;
 
-    common::Maybe<ComponentPointer> &result() final override;
-
     void resetImpl() noexcept final override;
 
 }; // class WordComponentParser
