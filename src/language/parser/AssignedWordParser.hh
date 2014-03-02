@@ -23,7 +23,7 @@
 #include <memory>
 #include "language/parser/CharParser.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/syntax/Word.hh"
 
 namespace sesh {
@@ -37,7 +37,7 @@ namespace parser {
  * expansions are recognized not only at the beginning of the word but also in
  * the middle after a separating colon.
  */
-class AssignedWordParser : public NormalParser<std::unique_ptr<syntax::Word>> {
+class AssignedWordParser : public Parser<std::unique_ptr<syntax::Word>> {
 
 public:
 
@@ -51,6 +51,8 @@ private:
     State mState;
     WordParserPointer mWordParser;
     CharParser mColonParser;
+
+    std::unique_ptr<syntax::Word> mResultWord;
 
 public:
 
