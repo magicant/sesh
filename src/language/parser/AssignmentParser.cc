@@ -53,7 +53,11 @@ bool isAssignedWordChar(const Environment &e, Char c) {
 } // namespace
 
 AssignmentParser::AssignmentParser(Environment &e) :
-        NormalParser(e), mNameParser(), mEqualParser(), mWordParser() { }
+        Parser(e),
+        mNameParser(),
+        mEqualParser(),
+        mWordParser(),
+        mResultAssignment() { }
 
 bool AssignmentParser::isValidName(const String &s) const {
     return !s.empty() && !std::isdigit(s.front(), environment().locale());
@@ -62,26 +66,27 @@ bool AssignmentParser::isValidName(const String &s) const {
 void AssignmentParser::parseImpl() {
     if (mNameParser == nullptr)
         mNameParser = createStringParser(isVariableNameChar);
-    auto &maybeName = mNameParser->parse();
-    if (!maybeName.hasValue())
+    String *name = mNameParser->parse();
+    if (name == nullptr)
         return;
-    if (!isValidName(maybeName.value()))
+    if (!isValidName(*name))
         return;
 
     if (mEqualParser == nullptr)
         mEqualParser = createCharParser(isEqual);
-    auto &maybeEqual = mEqualParser->parse();
-    if (!maybeEqual.hasValue())
+    Char *equal = mEqualParser->parse();
+    if (equal == nullptr)
         return;
 
     if (mWordParser == nullptr)
         mWordParser = createAssignedWordParser(isAssignedWordChar);
-    auto &maybeWord = mWordParser->parse();
-    if (!maybeWord.hasValue())
+    auto *word = mWordParser->parse();
+    if (word == nullptr)
         return;
 
-    result().emplace(new Assignment(
-            std::move(maybeName.value()), std::move(maybeWord.value())));
+    mResultAssignment.reset(
+            new Assignment(std::move(*name), std::move(*word)));
+    result() = &mResultAssignment;
 }
 
 void AssignmentParser::resetImpl() noexcept {
@@ -91,7 +96,8 @@ void AssignmentParser::resetImpl() noexcept {
         mEqualParser->reset();
     if (mWordParser != nullptr)
         mWordParser->reset();
-    NormalParser::resetImpl();
+    mResultAssignment.reset();
+    Parser::resetImpl();
 }
 
 } // namespace parser

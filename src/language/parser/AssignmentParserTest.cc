@@ -31,7 +31,7 @@
 #include "language/parser/IncompleteParse.hh"
 #include "language/parser/LineContinuationEnvironment.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Printer.hh"
@@ -50,7 +50,7 @@ using sesh::language::parser::EofEnvironment;
 using sesh::language::parser::IncompleteParse;
 using sesh::language::parser::LineContinuationEnvironment;
 using sesh::language::parser::LineContinuationTreatment;
-using sesh::language::parser::NormalParser;
+using sesh::language::parser::Parser;
 using sesh::language::parser::Predicate;
 using sesh::language::parser::SourceTestEnvironment;
 using sesh::language::syntax::Assignment;
@@ -65,23 +65,25 @@ class AssignmentParserTestEnvironment :
         public CLocaleEnvironment {
 };
 
-class StringParserStub : public NormalParser<String> {
+class StringParserStub : public Parser<String> {
 
 private:
 
-    String mResult;
+    String mResult, mResultCopy;
 
 public:
 
     template<typename... Arg>
     StringParserStub(Environment &e, Arg &&... arg) :
-            NormalParser<String>(e),
-            mResult(std::forward<Arg>(arg)...) { }
+            Parser<String>(e),
+            mResult(std::forward<Arg>(arg)...),
+            mResultCopy() { }
 
 private:
 
     void parseImpl() override {
-        result() = mResult;
+        mResultCopy = mResult;
+        result() = &mResultCopy;
     }
 
 }; // class StringParserStub
@@ -93,14 +95,22 @@ class WordComponentStub : public WordComponent {
 
 };
 
-class AssignedWordParserStub : public NormalParser<std::unique_ptr<Word>> {
+class AssignedWordParserStub : public Parser<std::unique_ptr<Word>> {
 
-    using NormalParser<std::unique_ptr<Word>>::NormalParser;
+    using Parser<std::unique_ptr<Word>>::Parser;
+
+    std::unique_ptr<Word> mResultWord;
 
     void parseImpl() override {
-        result().emplace(new Word);
-        result().value()->addComponent(
+        mResultWord.reset(new Word);
+        mResultWord->addComponent(
                 Word::ComponentPointer(new WordComponentStub));
+        result() = &mResultWord;
+    }
+
+    void resetImpl() noexcept override {
+        mResultWord.reset();
+        Parser::resetImpl();
     }
 
 }; // class AssignedWordParserStub
@@ -185,13 +195,13 @@ TEST_CASE("Assignment parser, construction and assignment") {
 TEST_CASE("Assignment parser, empty name") {
     AssignmentParserTestEnvironment e;
     AssignmentParserStub2 p(e, L(""));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Assignment parser, name starting with digit") {
     AssignmentParserTestEnvironment e;
     AssignmentParserStub2 p(e, L("0"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Assignment parser, no equal") {
@@ -199,7 +209,7 @@ TEST_CASE("Assignment parser, no equal") {
     AssignmentParserStub3 p(e, L("foo"));
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.appendSource(L("|"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Assignment parser, success and reset") {
@@ -207,10 +217,10 @@ TEST_CASE("Assignment parser, success and reset") {
     AssignmentParserStub4 p(e, L("foo"));
     e.appendSource(L("=|"));
 
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
     CHECK(e.position() == 1);
 
-    std::unique_ptr<Assignment> a = std::move(p.parse().value());
+    std::unique_ptr<Assignment> &a = *p.parse();
     REQUIRE(a != nullptr);
     CHECK(a->variableName() == L("foo"));
     REQUIRE(a->value().components().size() == 1);
@@ -219,7 +229,7 @@ TEST_CASE("Assignment parser, success and reset") {
     CHECK(dynamic_cast<const WordComponentStub *>(wc) != nullptr);
 
     p.reset();
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 } // namespace

@@ -24,7 +24,6 @@
 #include "common/Char.hh"
 #include "common/String.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/NormalParser.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/StringParser.hh"
 #include "language/parser/WordComponentParser.hh"
@@ -42,8 +41,7 @@ namespace parser {
  * parser. A concrete subclass must provide a factory method that creates
  * parsers used by this parser.
  */
-class AssignmentParser :
-        public NormalParser<std::unique_ptr<syntax::Assignment>> {
+class AssignmentParser : public Parser<std::unique_ptr<syntax::Assignment>> {
 
 protected:
 
@@ -56,11 +54,15 @@ protected:
     using WordParser = Parser<std::unique_ptr<syntax::Word>>;
     using WordParserPointer = std::unique_ptr<WordParser>;
 
+    using AssignmentPointer = std::unique_ptr<syntax::Assignment>;
+
 private:
 
     StringParserPointer mNameParser;
     CharParserPointer mEqualParser;
     WordParserPointer mWordParser;
+
+    AssignmentPointer mResultAssignment;
 
 public:
 
