@@ -36,11 +36,19 @@ RawStringParser::RawStringParser(
         Environment &e,
         Predicate<Char> &&isAcceptableChar,
         LineContinuationTreatment lct) :
-        Converter(e, e, e, std::move(isAcceptableChar), lct) { }
+        Converter(e, e, e, std::move(isAcceptableChar), lct),
+        mResultWordComponent() { }
 
 void RawStringParser::convert(String &&s) {
-    if (!s.empty())
-        result().emplace(new RawString(std::move(s)));
+    if (!s.empty()) {
+        mResultWordComponent.reset(new RawString(std::move(s)));
+        result() = &mResultWordComponent;
+    }
+}
+
+void RawStringParser::resetImpl() noexcept {
+    mResultWordComponent.reset();
+    Converter::resetImpl();
 }
 
 } // namespace parser
