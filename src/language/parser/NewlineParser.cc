@@ -19,10 +19,8 @@
 #include "NewlineParser.hh"
 
 #include "common/Char.hh"
-#include "common/Maybe.hh"
 
 using sesh::common::Char;
-using sesh::common::Maybe;
 
 namespace sesh {
 namespace language {
@@ -40,15 +38,12 @@ NewlineParser::NewlineParser(Environment &e, LineContinuationTreatment lct) :
         Parser<Char>(e), mInnerParser(e, isNewline, lct) { }
 
 void NewlineParser::parseImpl() {
-    mInnerParser.parse();
+    result() = mInnerParser.parse();
 }
 
 void NewlineParser::resetImpl() noexcept {
     mInnerParser.reset();
-}
-
-Maybe<Char> &NewlineParser::result() {
-    return mInnerParser.parse();
+    Parser::resetImpl();
 }
 
 } // namespace parser
