@@ -68,8 +68,8 @@ TEST_CASE("Trie parser, success") {
     trie->emplaceDescendants(String(L("X"))).emplaceValue(3);
 
     TrieParser p(e, std::move(trie));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == 1);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == 1);
     CHECK(e.position() == 2);
 }
 
@@ -81,7 +81,7 @@ TEST_CASE("Trie parser, failure") {
     trie->emplaceDescendants(String(L("AAA"))).emplaceValue(1);
 
     TrieParser p(e, std::move(trie));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Trie parser, line continuation literal") {
@@ -92,7 +92,7 @@ TEST_CASE("Trie parser, line continuation literal") {
     trie->emplaceDescendants(String(L("AB"))).emplaceValue(1);
 
     TrieParser p(e, std::move(trie), LineContinuationTreatment::LITERAL);
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Trie parser, line continuation remove") {
@@ -103,8 +103,8 @@ TEST_CASE("Trie parser, line continuation remove") {
     trie->emplaceDescendants(String(L("AB"))).emplaceValue(1);
 
     TrieParser p(e, std::move(trie), LineContinuationTreatment::REMOVE);
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == 1);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == 1);
     CHECK(e.position() == 2);
 }
 
@@ -116,15 +116,15 @@ TEST_CASE("Trie parser, reset") {
     trie->emplaceDescendants(String(L("AA"))).emplaceValue(1);
 
     TrieParser p(e, std::move(trie));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == 1);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == 1);
     CHECK(e.position() == 2);
 
     p.reset();
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
 
     e.setIsEof();
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 }
