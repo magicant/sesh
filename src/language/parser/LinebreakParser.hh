@@ -23,7 +23,7 @@
 #include "common/Empty.hh"
 #include "language/parser/BlankCommentNewlineParser.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 
 namespace sesh {
 namespace language {
@@ -35,11 +35,13 @@ namespace parser {
  *
  * The name "linebreak" comes from the shell grammar definition in POSIX.
  */
-class LinebreakParser : public NormalParser<common::Empty> {
+class LinebreakParser : public Parser<common::Empty> {
 
 private:
 
     BlankCommentNewlineParser mInnerParser;
+
+    common::Empty mResult;
 
 public:
 
