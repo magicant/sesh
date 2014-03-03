@@ -95,26 +95,35 @@ private:
 
     bool mIsSeparated;
 
+    Result mResult;
+
 public:
 
     explicit AndOrListParserStub(Environment &e, bool isSeparated = false) :
-            Converter(e, e, isSpace), mIsSeparated(isSeparated) { }
+            Converter(e, e, isSpace),
+            mIsSeparated(isSeparated),
+            mResult() { }
 
 private:
 
     void convert(Char &&) override {
-        result().emplace(
-                std::unique_ptr<AndOrList>(new AndOrList(Pipeline())),
-                mIsSeparated);
+        mResult.first.reset(new AndOrList(Pipeline()));
+        mResult.second = mIsSeparated;
+        result() = &mResult;
+    }
+
+    void resetImpl() noexcept override {
+        mResult.first.reset();
+        Converter::resetImpl();
     }
 
 };
 
 void checkTokenParserLeftBrace(Parser<Token> &p) {
     CHECK(p.state() == ParserBase::State::FINISHED);
-    REQUIRE(p.parse().hasValue());
-    REQUIRE(p.parse().value().index() == p.parse().value().index<Keyword>());
-    CHECK(p.parse().value().value<Keyword>() == Keyword::keywordLeftBrace());
+    REQUIRE(p.parse() != nullptr);
+    REQUIRE(p.parse()->index() == p.parse()->index<Keyword>());
+    CHECK(p.parse()->value<Keyword>() == Keyword::keywordLeftBrace());
 }
 
 class SequenceParserTestEnvironment :
@@ -137,10 +146,10 @@ TEST_CASE("Sequence parser, closing keyword") {
 
     e.appendSource(L("}"));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().first.andOrLists().empty());
-    REQUIRE(p.parse().value().second.hasValue());
-    CHECK(p.parse().value().second.value() == Keyword::keywordRightBrace());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->first.andOrLists().empty());
+    REQUIRE(p.parse()->second.hasValue());
+    CHECK(p.parse()->second.value() == Keyword::keywordRightBrace());
 }
 
 TEST_CASE("Sequence parser, non-closing keyword") {
@@ -159,9 +168,9 @@ TEST_CASE("Sequence parser, non-closing keyword") {
     SequenceParserImpl p(e);
 
     e.appendSource(L("{ "));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().first.andOrLists().size() == 1);
-    CHECK_FALSE(p.parse().value().second.hasValue());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->first.andOrLists().size() == 1);
+    CHECK_FALSE(p.parse()->second.hasValue());
     CHECK(e.position() == 2);
 }
 
@@ -184,10 +193,10 @@ TEST_CASE("Sequence parser, closing keyword after and-or lists") {
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
 
     e.appendSource(L("{ };"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().first.andOrLists().size() == 2);
-    REQUIRE(p.parse().value().second.hasValue());
-    CHECK(p.parse().value().second.value() == Keyword::keywordRightBrace());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->first.andOrLists().size() == 2);
+    REQUIRE(p.parse()->second.hasValue());
+    CHECK(p.parse()->second.value() == Keyword::keywordRightBrace());
     CHECK(e.position() == 5);
 }
 
@@ -206,9 +215,9 @@ TEST_CASE("Sequence parser, failure in and-or list parser") {
     SequenceParserImpl p(e);
 
     e.appendSource(L("{ "));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().first.andOrLists().size() == 0);
-    CHECK_FALSE(p.parse().value().second.hasValue());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->first.andOrLists().size() == 0);
+    CHECK_FALSE(p.parse()->second.hasValue());
     CHECK(e.position() == 1); // better be 0?
 }
 
@@ -229,23 +238,26 @@ TEST_CASE("Sequence parser, stop after non-separated and-or list") {
     SequenceParserImpl p(e);
 
     e.appendSource(L("{ { { { { {"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().first.andOrLists().size() == 3);
-    CHECK_FALSE(p.parse().value().second.hasValue());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->first.andOrLists().size() == 3);
+    CHECK_FALSE(p.parse()->second.hasValue());
     CHECK(e.position() == 6);
 }
 
 TEST_CASE("Sequence parser, reset") {
     class AndOrListParserStub2 : public Converter<
             CharParser, std::pair<std::unique_ptr<AndOrList>, bool>> {
+    private:
+        Result mResult;
     public:
         explicit AndOrListParserStub2(Environment &e) :
-                Converter(e, e, isSpace) { }
+                Converter(e, e, isSpace), mResult() { }
     private:
         void convert(Char &&) override {
-            result().emplace(
-                    std::unique_ptr<AndOrList>(new AndOrList(Pipeline())),
-                    environment().position() != environment().length());
+            mResult.first.reset(new AndOrList(Pipeline()));
+            mResult.second =
+                    environment().position() != environment().length();
+            result() = &mResult;
         }
     };
 
@@ -264,17 +276,17 @@ TEST_CASE("Sequence parser, reset") {
     SequenceParserImpl p(e);
 
     e.appendSource(L("{ "));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().first.andOrLists().size() == 1);
-    CHECK_FALSE(p.parse().value().second.hasValue());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->first.andOrLists().size() == 1);
+    CHECK_FALSE(p.parse()->second.hasValue());
     CHECK(e.position() == 2);
 
     p.reset();
     e.appendSource(L("{ { } "));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().first.andOrLists().size() == 2);
-    REQUIRE(p.parse().value().second.hasValue());
-    CHECK(p.parse().value().second.value() == Keyword::keywordRightBrace());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->first.andOrLists().size() == 2);
+    REQUIRE(p.parse()->second.hasValue());
+    CHECK(p.parse()->second.value() == Keyword::keywordRightBrace());
     CHECK(e.position() == 7);
 }
 
