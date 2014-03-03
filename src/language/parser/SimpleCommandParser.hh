@@ -41,8 +41,7 @@ namespace parser {
  * in the usual way. When you reset the simple command parser, the internal
  * token parser is reset to a "default" state.
  */
-class SimpleCommandParser :
-        public NormalParser<std::unique_ptr<syntax::Command>> {
+class SimpleCommandParser : public Parser<std::unique_ptr<syntax::Command>> {
 
 public:
 
@@ -53,9 +52,10 @@ public:
 
 private:
 
-    SimpleCommandPointer mCommand;
-
     TokenParserPointer mTokenParser;
+
+    SimpleCommandPointer mCommand;
+    CommandPointer mResultCommand;
 
 public:
 

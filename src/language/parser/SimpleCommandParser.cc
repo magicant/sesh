@@ -50,9 +50,10 @@ namespace parser {
 
 SimpleCommandParser::SimpleCommandParser(
         Environment &e, TokenParserPointer &&tokenParser) noexcept :
-        NormalParser(e),
+        Parser(e),
+        mTokenParser(std::move(tokenParser)),
         mCommand(),
-        mTokenParser(std::move(tokenParser)) {
+        mResultCommand() {
     assert(mTokenParser != nullptr);
 }
 
@@ -96,21 +97,24 @@ auto SimpleCommandParser::nextTokenTypes() const -> TokenTypeSet {
 }
 
 void SimpleCommandParser::parseImpl() {
-    while (Maybe<Token> &t = mTokenParser->parse()) {
+    while (Token *t = mTokenParser->parse()) {
         if (mCommand == nullptr)
             mCommand.reset(new SimpleCommand);
         t->apply(TokenParserResultAcceptor(*this));
         mTokenParser->reset(nextTokenTypes());
     }
 
-    if (mCommand != nullptr)
-        result().emplace(mCommand.release());
+    if (mCommand != nullptr) {
+        mResultCommand.reset(mCommand.release());
+        result() = &mResultCommand;
+    }
 }
 
 void SimpleCommandParser::resetImpl() noexcept {
     mCommand = nullptr;
+    mResultCommand = nullptr;
     mTokenParser->reset(EnumSet<TokenType>().set());
-    NormalParser::resetImpl();
+    Parser::resetImpl();
 }
 
 } // namespace parser
