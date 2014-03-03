@@ -68,15 +68,25 @@ bool isP(const Environment &, Char c) noexcept {
 class PipelineParserStub :
         public Converter<CharParser, std::unique_ptr<Pipeline>> {
 
+private:
+
+    std::unique_ptr<Pipeline> mResultPipeline;
+
 public:
 
     explicit PipelineParserStub(Environment &e) :
-            Converter(e, e, isP) { }
+            Converter(e, e, isP), mResultPipeline() { }
 
 private:
 
     void convert(Char &&) override {
-        result().emplace(new Pipeline);
+        mResultPipeline.reset(new Pipeline);
+        result() = &mResultPipeline;
+    }
+
+    void resetImpl() noexcept override {
+        mResultPipeline.reset();
+        Converter::resetImpl();
     }
 
 }; // class PipelineParserStub
@@ -99,7 +109,7 @@ TEST_CASE("And-or list parser, failure in first pipeline") {
     AndOrListParser p(newPipelineParser(e));
 
     e.appendSource(L("X"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("And-or list parser, 1 pipeline followed by nothing") {
@@ -108,12 +118,11 @@ TEST_CASE("And-or list parser, 1 pipeline followed by nothing") {
     e.setIsEof();
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK_FALSE(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().empty());
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK_FALSE(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().empty());
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 1);
 }
 
@@ -122,12 +131,11 @@ TEST_CASE("And-or list parser, 1 pipeline followed by semicolon") {
     e.appendSource(L("P; "));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().empty());
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().empty());
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 2);
 }
 
@@ -136,12 +144,11 @@ TEST_CASE("And-or list parser, 1 pipeline followed by ampersand") {
     e.appendSource(L("P& "));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().empty());
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::ASYNCHRONOUS);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().empty());
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::ASYNCHRONOUS);
     CHECK(e.position() == 2);
 }
 
@@ -150,12 +157,11 @@ TEST_CASE("And-or list parser, 1 pipeline followed by double semicolon") {
     e.appendSource(L("P;; "));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK_FALSE(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().empty());
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK_FALSE(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().empty());
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 1);
 }
 
@@ -164,12 +170,11 @@ TEST_CASE("And-or list parser, 1 pipeline followed by double ampersand") {
     e.appendSource(L("P&&X"));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK_FALSE(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().empty());
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK_FALSE(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().empty());
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 1);
 }
 
@@ -179,18 +184,15 @@ TEST_CASE("And-or list parser, 3 pipelines followed by nothing") {
     e.setIsEof();
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK_FALSE(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().size() == 2);
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK_FALSE(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().size() == 2);
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 7);
 
-    CHECK(p.parse().value().first->rest().at(0).condition() ==
-            Condition::AND_THEN);
-    CHECK(p.parse().value().first->rest().at(1).condition() ==
-            Condition::OR_ELSE);
+    CHECK(p.parse()->first->rest().at(0).condition() == Condition::AND_THEN);
+    CHECK(p.parse()->first->rest().at(1).condition() == Condition::OR_ELSE);
 }
 
 TEST_CASE("And-or list parser, 3 pipelines followed by semicolon") {
@@ -198,18 +200,15 @@ TEST_CASE("And-or list parser, 3 pipelines followed by semicolon") {
     e.appendSource(L("P&&P||P; "));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().size() == 2);
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().size() == 2);
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 8);
 
-    CHECK(p.parse().value().first->rest().at(0).condition() ==
-            Condition::AND_THEN);
-    CHECK(p.parse().value().first->rest().at(1).condition() ==
-            Condition::OR_ELSE);
+    CHECK(p.parse()->first->rest().at(0).condition() == Condition::AND_THEN);
+    CHECK(p.parse()->first->rest().at(1).condition() == Condition::OR_ELSE);
 }
 
 TEST_CASE("And-or list parser, 3 pipelines followed by ampersand") {
@@ -217,18 +216,15 @@ TEST_CASE("And-or list parser, 3 pipelines followed by ampersand") {
     e.appendSource(L("P&&P||P& "));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().size() == 2);
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::ASYNCHRONOUS);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().size() == 2);
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::ASYNCHRONOUS);
     CHECK(e.position() == 8);
 
-    CHECK(p.parse().value().first->rest().at(0).condition() ==
-            Condition::AND_THEN);
-    CHECK(p.parse().value().first->rest().at(1).condition() ==
-            Condition::OR_ELSE);
+    CHECK(p.parse()->first->rest().at(0).condition() == Condition::AND_THEN);
+    CHECK(p.parse()->first->rest().at(1).condition() == Condition::OR_ELSE);
 }
 
 TEST_CASE("And-or list parser, 3 pipelines followed by double semicolon") {
@@ -236,18 +232,15 @@ TEST_CASE("And-or list parser, 3 pipelines followed by double semicolon") {
     e.appendSource(L("P||P&&P;; "));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK_FALSE(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().size() == 2);
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK_FALSE(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().size() == 2);
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 7);
 
-    CHECK(p.parse().value().first->rest().at(0).condition() ==
-            Condition::OR_ELSE);
-    CHECK(p.parse().value().first->rest().at(1).condition() ==
-            Condition::AND_THEN);
+    CHECK(p.parse()->first->rest().at(0).condition() == Condition::OR_ELSE);
+    CHECK(p.parse()->first->rest().at(1).condition() == Condition::AND_THEN);
 }
 
 TEST_CASE("And-or list parser, 6 pipelines followed by double ampersand") {
@@ -255,24 +248,18 @@ TEST_CASE("And-or list parser, 6 pipelines followed by double ampersand") {
     e.appendSource(L("P||P||P&&P&&P||P&&X"));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK_FALSE(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().size() == 5);
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK_FALSE(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().size() == 5);
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 16);
 
-    CHECK(p.parse().value().first->rest().at(0).condition() ==
-            Condition::OR_ELSE);
-    CHECK(p.parse().value().first->rest().at(1).condition() ==
-            Condition::OR_ELSE);
-    CHECK(p.parse().value().first->rest().at(2).condition() ==
-            Condition::AND_THEN);
-    CHECK(p.parse().value().first->rest().at(2).condition() ==
-            Condition::AND_THEN);
-    CHECK(p.parse().value().first->rest().at(4).condition() ==
-            Condition::OR_ELSE);
+    CHECK(p.parse()->first->rest().at(0).condition() == Condition::OR_ELSE);
+    CHECK(p.parse()->first->rest().at(1).condition() == Condition::OR_ELSE);
+    CHECK(p.parse()->first->rest().at(2).condition() == Condition::AND_THEN);
+    CHECK(p.parse()->first->rest().at(2).condition() == Condition::AND_THEN);
+    CHECK(p.parse()->first->rest().at(4).condition() == Condition::OR_ELSE);
 }
 
 TEST_CASE("And-or list parser, operators followed by linebreaks") {
@@ -280,19 +267,16 @@ TEST_CASE("And-or list parser, operators followed by linebreaks") {
     e.appendSource(L("P&&#comment\nP|| \n#\\\nP& "));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().size() == 2);
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::ASYNCHRONOUS);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().size() == 2);
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::ASYNCHRONOUS);
     e.checkSource(L("P&&#comment\nP|| \n#\\\nP& "));
     CHECK(e.position() == 22);
 
-    CHECK(p.parse().value().first->rest().at(0).condition() ==
-            Condition::AND_THEN);
-    CHECK(p.parse().value().first->rest().at(1).condition() ==
-            Condition::OR_ELSE);
+    CHECK(p.parse()->first->rest().at(0).condition() == Condition::AND_THEN);
+    CHECK(p.parse()->first->rest().at(1).condition() == Condition::OR_ELSE);
 }
 
 TEST_CASE("And-or list parser, reset") {
@@ -300,38 +284,33 @@ TEST_CASE("And-or list parser, reset") {
     e.appendSource(L("P;P||\nP&P&& P;X"));
 
     AndOrListParser p(newPipelineParser(e));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().empty());
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().empty());
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 2);
 
     p.reset();
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().size() == 1);
-    CHECK(p.parse().value().first->rest().at(0).condition() ==
-            Condition::OR_ELSE);
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::ASYNCHRONOUS);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().size() == 1);
+    CHECK(p.parse()->first->rest().at(0).condition() == Condition::OR_ELSE);
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::ASYNCHRONOUS);
     CHECK(e.position() == 8);
 
     p.reset();
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().size() == 1);
-    CHECK(p.parse().value().first->rest().at(0).condition() ==
-            Condition::AND_THEN);
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().size() == 1);
+    CHECK(p.parse()->first->rest().at(0).condition() == Condition::AND_THEN);
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 14);
 
     p.reset();
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("And-or list parser, incomplete parse") {
@@ -357,18 +336,15 @@ TEST_CASE("And-or list parser, incomplete parse") {
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.setIsEof();
 
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value().second);
-    REQUIRE(p.parse().value().first != nullptr);
-    CHECK(p.parse().value().first->rest().size() == 2);
-    CHECK(p.parse().value().first->synchronicity() ==
-            Synchronicity::SEQUENTIAL);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(p.parse()->second);
+    REQUIRE(p.parse()->first != nullptr);
+    CHECK(p.parse()->first->rest().size() == 2);
+    CHECK(p.parse()->first->synchronicity() == Synchronicity::SEQUENTIAL);
     CHECK(e.position() == 8);
 
-    CHECK(p.parse().value().first->rest().at(0).condition() ==
-            Condition::AND_THEN);
-    CHECK(p.parse().value().first->rest().at(1).condition() ==
-            Condition::OR_ELSE);
+    CHECK(p.parse()->first->rest().at(0).condition() == Condition::AND_THEN);
+    CHECK(p.parse()->first->rest().at(1).condition() == Condition::OR_ELSE);
 }
 
 } // namespace
