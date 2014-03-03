@@ -22,7 +22,6 @@
 
 #include <memory>
 #include "common/Variant.hh"
-#include "language/parser/NormalParser.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/Repeat.hh"
 #include "language/parser/SpecificOperatorParser.hh"
@@ -45,7 +44,7 @@ namespace parser {
  * concrete subclass must provide factory methods that create parsers used by
  * this parser.
  */
-class PipelineParser : public NormalParser<std::unique_ptr<syntax::Pipeline>> {
+class PipelineParser : public Parser<std::unique_ptr<syntax::Pipeline>> {
 
 public:
 
