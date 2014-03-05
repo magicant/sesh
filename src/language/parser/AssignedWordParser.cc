@@ -45,49 +45,34 @@ constexpr bool isColon(const Environment &, Char c) noexcept {
 
 AssignedWordParser::AssignedWordParser(WordParserPointer &&wordParser) :
         Parser(wordParser->environment()),
-        mState(State::WORD),
         mWordParser(std::move(wordParser)),
         mColonParser(mWordParser->environment(), isColon),
         mResultWord() { }
 
-bool AssignedWordParser::parseWord() {
+bool AssignedWordParser::parseComponent() {
     WordPointer &word = *mWordParser->parse();
+    auto *colon = mColonParser.parse();
+
     if (mResultWord != nullptr)
         mResultWord->append(std::move(*word));
     else
         mResultWord = std::move(word);
-    result() = &mResultWord;
     mWordParser->reset();
-    mState = State::COLON;
-    return true;
-}
 
-bool AssignedWordParser::parseColon() {
-    auto *colon = mColonParser.parse();
     if (colon == nullptr)
         return false;
     mResultWord->addComponent(Word::ComponentPointer(
             new RawString(String(1, *colon))));
     mColonParser.reset();
-    mState = State::WORD;
     return true;
-}
-
-bool AssignedWordParser::parseComponent() {
-    switch (mState) {
-    case State::WORD:
-        return parseWord();
-    case State::COLON:
-        return parseColon();
-    }
 }
 
 void AssignedWordParser::parseImpl() {
     while (parseComponent()) { }
+    result() = &mResultWord;
 }
 
 void AssignedWordParser::resetImpl() noexcept {
-    mState = State::WORD;
     mWordParser->reset();
     mColonParser.reset();
     mResultWord.reset();

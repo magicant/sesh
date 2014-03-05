@@ -46,9 +46,6 @@ public:
 
 private:
 
-    enum class State { WORD, COLON, };
-
-    State mState;
     WordParserPointer mWordParser;
     CharParser mColonParser;
 
@@ -69,8 +66,6 @@ public:
 
 private:
 
-    bool parseWord();
-    bool parseColon();
     bool parseComponent();
 
     void parseImpl() override;
