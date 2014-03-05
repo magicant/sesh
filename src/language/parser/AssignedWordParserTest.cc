@@ -110,14 +110,14 @@ void checkComponents(
 TEST_CASE("Assigned word parser, construction and assignment") {
     AssignedWordParserTestEnvironment e;
     AssignedWordParser p1(
-            e, WordParserPointer(new FailingParser<WordPointer>(e)));
+            WordParserPointer(new FailingParser<WordPointer>(e)));
     AssignedWordParser p2(std::move(p1));
     p1 = std::move(p2);
 }
 
 TEST_CASE("Assigned word parser, parse") {
     AssignedWordParserTestEnvironment e;
-    AssignedWordParser p(e, wordParserStub(e));
+    AssignedWordParser p(wordParserStub(e));
 
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.appendSource(L("A"));
@@ -147,7 +147,7 @@ TEST_CASE("Assigned word parser, parse") {
 
 TEST_CASE("Assigned word parser, reset") {
     AssignedWordParserTestEnvironment e;
-    AssignedWordParser p(e, wordParserStub(e));
+    AssignedWordParser p(wordParserStub(e));
 
     e.appendSource(L("X:Y "));
 

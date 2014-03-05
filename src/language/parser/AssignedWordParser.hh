@@ -65,7 +65,7 @@ public:
      * parse each colon-separated part of the assigned word. This parser must
      * stop parsing when an unquoted colon is found.
      */
-    AssignedWordParser(Environment &, WordParserPointer &&wordParser);
+    AssignedWordParser(WordParserPointer &&wordParser);
 
 private:
 

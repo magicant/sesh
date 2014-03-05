@@ -43,12 +43,11 @@ constexpr bool isColon(const Environment &, Char c) noexcept {
 
 } // namespace
 
-AssignedWordParser::AssignedWordParser(
-        Environment &e, WordParserPointer &&wordParser) :
-        Parser(e),
+AssignedWordParser::AssignedWordParser(WordParserPointer &&wordParser) :
+        Parser(wordParser->environment()),
         mState(State::WORD),
         mWordParser(std::move(wordParser)),
-        mColonParser(e, isColon),
+        mColonParser(mWordParser->environment(), isColon),
         mResultWord() { }
 
 bool AssignedWordParser::parseWord() {
