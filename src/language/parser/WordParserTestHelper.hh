@@ -23,7 +23,7 @@
 #include <memory>
 #include "common/String.hh"
 #include "language/parser/CharPredicates.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/syntax/RawString.hh"
 #include "language/syntax/Word.hh"
 #include "language/syntax/WordComponent.hh"
@@ -37,14 +37,17 @@ namespace parser {
  * contains a single-character raw string if and only if the current character
  * is a normal word character.
  */
-class WordParserStub : public NormalParser<std::unique_ptr<syntax::Word>> {
+class WordParserStub : public Parser<std::unique_ptr<syntax::Word>> {
 
-    using NormalParser<std::unique_ptr<syntax::Word>>::NormalParser;
+    using Parser<std::unique_ptr<syntax::Word>>::Parser;
+
+    std::unique_ptr<syntax::Word> mResultWord;
 
     void parseImpl() override {
         using sesh::common::CharTraits;
 
-        result().emplace(new syntax::Word);
+        mResultWord.reset(new syntax::Word);
+        result() = &mResultWord;
 
         auto ci = currentCharInt();
         if (CharTraits::eq_int_type(ci, CharTraits::eof()))
@@ -54,9 +57,14 @@ class WordParserStub : public NormalParser<std::unique_ptr<syntax::Word>> {
         if (!isRawStringChar(environment(), c))
             return;
 
-        result().value()->addComponent(std::unique_ptr<syntax::WordComponent>(
+        mResultWord->addComponent(std::unique_ptr<syntax::WordComponent>(
                 new syntax::RawString(common::String(1, c))));
         environment().setPosition(environment().position() + 1);
+    }
+
+    void resetImpl() noexcept override {
+        mResultWord.reset();
+        Parser<std::unique_ptr<syntax::Word>>::resetImpl();
     }
 
 }; // class WordParserStub

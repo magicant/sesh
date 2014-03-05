@@ -29,7 +29,6 @@
 #include "language/parser/EofEnvironment.hh"
 #include "language/parser/IncompleteParse.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/NormalParser.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/WordComponentParser.hh"
@@ -45,7 +44,6 @@ using sesh::language::parser::Environment;
 using sesh::language::parser::EofEnvironment;
 using sesh::language::parser::IncompleteParse;
 using sesh::language::parser::LineContinuationTreatment;
-using sesh::language::parser::NormalParser;
 using sesh::language::parser::Parser;
 using sesh::language::parser::Predicate;
 using sesh::language::parser::SourceTestEnvironment;
@@ -61,11 +59,15 @@ class RawStringStub : public WordComponent {
 };
 
 class RawStringParserStub :
-        public NormalParser<std::unique_ptr<WordComponent>> {
+        public Parser<std::unique_ptr<WordComponent>> {
+
+private:
+
+    std::unique_ptr<WordComponent> mResultWordComponent;
 
 public:
 
-    using NormalParser::NormalParser;
+    using Parser::Parser;
 
     void parseImpl() override {
         if (environment().length() - environment().position() < 2) {
@@ -75,7 +77,13 @@ public:
                 throw IncompleteParse();
         }
         environment().setPosition(environment().position() + 2);
-        result().emplace(new RawStringStub);
+        mResultWordComponent.reset(new RawStringStub);
+        result() = &mResultWordComponent;
+    }
+
+    void resetImpl() noexcept override {
+        mResultWordComponent.reset();
+        Parser::resetImpl();
     }
 
 };
@@ -116,7 +124,7 @@ TEST_CASE("Word component parser, eof") {
     e.setIsEof();
 
     WordComponentParserStub p(e, fail);
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Word component parser, raw string") {
@@ -124,8 +132,8 @@ TEST_CASE("Word component parser, raw string") {
     WordComponentParserStub p(e, fail);
 
     e.appendSource(L("AA"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(dynamic_cast<RawStringStub *>(p.parse().value().get()) != nullptr);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(dynamic_cast<RawStringStub *>(p.parse()->get()) != nullptr);
     CHECK(e.position() == e.length());
 }
 

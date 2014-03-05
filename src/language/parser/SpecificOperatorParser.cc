@@ -18,12 +18,10 @@
 #include "buildconfig.h"
 #include "SpecificOperatorParser.hh"
 
-#include "common/Maybe.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/Operator.hh"
 #include "language/parser/Parser.hh"
 
-using sesh::common::Maybe;
 using sesh::language::parser::Environment;
 using sesh::language::parser::Operator;
 using sesh::language::parser::Parser;
@@ -35,22 +33,19 @@ namespace parser {
 
 SpecificOperatorParser::SpecificOperatorParser(
         Environment &e, Operator o, LineContinuationTreatment lct) :
-        Parser<Operator>(e),
+        Parser(e),
         mAcceptedOperator(o),
         mAnyOperatorParser(createOperatorParser(e, lct)) { }
 
 void SpecificOperatorParser::parseImpl() {
-    Maybe<Operator> &o = mAnyOperatorParser.parse();
-    if (o.hasValue() && o.value() != mAcceptedOperator)
-        o.clear();
-}
-
-Maybe<Operator> &SpecificOperatorParser::result() {
-    return mAnyOperatorParser.parse();
+    const Operator *o = mAnyOperatorParser.parse();
+    if (o != nullptr && *o == mAcceptedOperator)
+        result() = o;
 }
 
 void SpecificOperatorParser::resetImpl() noexcept {
     mAnyOperatorParser.reset();
+    Parser::resetImpl();
 }
 
 } // namespace parser

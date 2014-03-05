@@ -25,7 +25,7 @@
 #include "common/Trie.hh"
 #include "language/parser/CharParser.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 
 namespace sesh {
 namespace language {
@@ -37,7 +37,7 @@ namespace parser {
  * value associated with the matched key is returned.
  */
 template<typename Result>
-class TrieParser : public NormalParser<Result> {
+class TrieParser : public Parser<const Result> {
 
 public:
 
@@ -62,7 +62,7 @@ public:
             std::shared_ptr<Trie> &&trie,
             LineContinuationTreatment lct = LineContinuationTreatment::REMOVE)
             noexcept :
-            NormalParser<Result>(e),
+            Parser<const Result>(e),
             mTrie(std::move(trie)),
             mCurrentNode(mTrie->traverserBegin()),
             mCharParser(
@@ -76,7 +76,7 @@ private:
 
     void parseImpl() final override {
         // find longest match
-        while (mCharParser.parse().hasValue())
+        while (mCharParser.parse() != nullptr)
             mCharParser.reset();
 
         // rewind to node with value
@@ -86,13 +86,13 @@ private:
 
         this->environment().setPosition(
                 this->begin() + mCurrentNode.pathString().length());
-        this->result().emplace(mCurrentNode->value());
+        this->result() = &mCurrentNode->value();
     }
 
     void resetImpl() noexcept override {
         mCurrentNode = mTrie->traverserBegin();
         mCharParser.reset();
-        NormalParser<Result>::resetImpl();
+        Parser<const Result>::resetImpl();
     }
 
 }; // template<typename Result> class TrieParser

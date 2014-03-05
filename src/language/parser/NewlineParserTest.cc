@@ -54,7 +54,7 @@ TEST_CASE("Newline parser, no newline") {
     NewlineParserTestEnvironment e;
     NewlineParser p(e);
     e.appendSource(L("\\\n\\\nX"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
     e.checkSource(L("X"));
 }
 
@@ -62,7 +62,7 @@ TEST_CASE("Newline parser, literal line continuation") {
     NewlineParserTestEnvironment e;
     NewlineParser p(e, LineContinuationTreatment::LITERAL);
     e.appendSource(L("\\\n\\\n\n"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
     e.checkSource(L("\\\n\\\n\n"));
 }
 
@@ -70,8 +70,8 @@ TEST_CASE("Newline parser, newline without here-document") {
     NewlineParserTestEnvironment e;
     NewlineParser p(e);
     e.appendSource(L("\\\n\n\\\n"));
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L('\n'));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L('\n'));
     e.checkSource(L("\n\\\n"));
     CHECK(e.position() == 1);
 }
@@ -81,15 +81,15 @@ TEST_CASE("Newline parser, reset") {
     NewlineParser p(e);
     e.appendSource(L("\\\n\n\\\n\n"));
 
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L('\n'));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L('\n'));
     e.checkSource(L("\n\\\n\n"));
     CHECK(e.position() == 1);
 
     p.reset();
 
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == L('\n'));
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == L('\n'));
     e.checkSource(L("\n\n"));
     CHECK(e.position() == 2);
 }

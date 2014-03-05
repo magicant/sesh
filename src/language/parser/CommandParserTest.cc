@@ -27,7 +27,7 @@
 #include "language/parser/EnvironmentTestHelper.hh"
 #include "language/parser/EofEnvironment.hh"
 #include "language/parser/LineContinuationEnvironment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/Token.hh"
 #include "language/parser/TokenParser.hh"
 #include "language/parser/TokenParserTestHelper.hh"
@@ -41,7 +41,7 @@ using sesh::language::parser::CommandParser;
 using sesh::language::parser::Environment;
 using sesh::language::parser::EofEnvironment;
 using sesh::language::parser::LineContinuationEnvironment;
-using sesh::language::parser::NormalParser;
+using sesh::language::parser::Parser;
 using sesh::language::parser::SourceTestEnvironment;
 using sesh::language::parser::TokenParser;
 using sesh::language::parser::TokenParserStub;
@@ -60,13 +60,20 @@ class CommandStub : public Command {
     void print(Printer &) const override { throw "unexpected print"; }
 };
 
-class SimpleCommandParserStub :
-        public NormalParser<std::unique_ptr<Command>> {
+class SimpleCommandParserStub : public Parser<std::unique_ptr<Command>> {
 
-    using NormalParser<std::unique_ptr<Command>>::NormalParser;
+    using Parser<std::unique_ptr<Command>>::Parser;
+
+    std::unique_ptr<Command> mCommand;
 
     void parseImpl() override {
-        result().emplace(new CommandStub);
+        mCommand.reset(new CommandStub);
+        result() = &mCommand;
+    }
+
+    void resetImpl() noexcept override {
+        mCommand.reset();
+        Parser::resetImpl();
     }
 
 }; // class SimpleCommandParserStub
@@ -106,8 +113,8 @@ TEST_CASE("Command parser, simple command, unparsed token") {
     e.setIsEof();
 
     CommandParserStub p(e, createTokenParser(e, enumSetOf(TokenType::WORD)));
-    REQUIRE(p.parse().hasValue());
-    CHECK(dynamic_cast<CommandStub *>(p.parse().value().get()) != nullptr);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(dynamic_cast<CommandStub *>(p.parse()->get()) != nullptr);
 }
 
 TEST_CASE("Command parser, simple command, pre-parsed token") {
@@ -119,8 +126,8 @@ TEST_CASE("Command parser, simple command, pre-parsed token") {
     CHECK(tp->parse());
 
     CommandParserStub cp(e, std::move(tp));
-    REQUIRE(cp.parse().hasValue());
-    CHECK(dynamic_cast<CommandStub *>(cp.parse().value().get()) != nullptr);
+    REQUIRE(cp.parse() != nullptr);
+    CHECK(dynamic_cast<CommandStub *>(cp.parse()->get()) != nullptr);
 }
 
 TEST_CASE("Command parser, simple command, null parser") {
@@ -129,8 +136,8 @@ TEST_CASE("Command parser, simple command, null parser") {
     e.setIsEof();
 
     CommandParserStub p(e);
-    REQUIRE(p.parse().hasValue());
-    CHECK(dynamic_cast<CommandStub *>(p.parse().value().get()) != nullptr);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(dynamic_cast<CommandStub *>(p.parse()->get()) != nullptr);
 }
 
 TEST_CASE("Command parser, simple command, reset") {
@@ -139,13 +146,13 @@ TEST_CASE("Command parser, simple command, reset") {
     e.setIsEof();
 
     CommandParserStub p(e);
-    CHECK(p.parse().hasValue());
+    CHECK(p.parse() != nullptr);
 
     e.appendSource(L("B"));
 
     p.reset();
-    REQUIRE(p.parse().hasValue());
-    CHECK(dynamic_cast<CommandStub *>(p.parse().value().get()) != nullptr);
+    REQUIRE(p.parse() != nullptr);
+    CHECK(dynamic_cast<CommandStub *>(p.parse()->get()) != nullptr);
 }
 
 // TODO compound commands

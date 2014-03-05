@@ -69,12 +69,19 @@ class WordParserStub : public Converter<StringParser, WordPointer> {
 
     using Converter<StringParser, WordPointer>::Converter;
 
+    WordPointer mResultWord;
+
     void convert(String &&s) override {
-        WordPointer w(new Word);
+        mResultWord.reset(new Word);
         if (!s.empty())
-            w->addComponent(
+            mResultWord->addComponent(
                     Word::ComponentPointer(new RawString(std::move(s))));
-        result().emplace(std::move(w));
+        result() = &mResultWord;
+    }
+
+    void resetImpl() noexcept override {
+        mResultWord.reset();
+        Converter<StringParser, WordPointer>::resetImpl();
     }
 
 }; // class WordParserStub
@@ -131,9 +138,10 @@ TEST_CASE("Assigned word parser, parse") {
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.appendSource(L(" "));
 
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
+    REQUIRE(p.parse()->get() != nullptr);
     checkComponents(
-            p.parse().value()->components(),
+            p.parse()->get()->components(),
             {L("AB"), L(":"), L("CD"), L(":"), L("EF")});
 }
 
@@ -143,18 +151,20 @@ TEST_CASE("Assigned word parser, reset") {
 
     e.appendSource(L("X:Y "));
 
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
+    REQUIRE(p.parse()->get() != nullptr);
     checkComponents(
-            p.parse().value()->components(), {L("X"), L(":"), L("Y")});
+            p.parse()->get()->components(), {L("X"), L(":"), L("Y")});
 
     p.reset();
     e.appendSource(L(":0:"));
     e.setIsEof();
     e.setPosition(e.position() + 1);
 
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
+    REQUIRE(p.parse()->get() != nullptr);
     checkComponents(
-            p.parse().value()->components(), {L(":"), L("0"), L(":")});
+            p.parse()->get()->components(), {L(":"), L("0"), L(":")});
 }
 
 } // namespace

@@ -38,9 +38,10 @@ CharFilter::CharFilter(
         Environment &e,
         Predicate<CharInt> &&isAcceptableChar,
         LineContinuationTreatment lct) :
-        NormalParser(e),
+        Parser(e),
         mIsAcceptableChar(std::move(isAcceptableChar)),
-        mLineContinuationTreatment(lct) { }
+        mLineContinuationTreatment(lct),
+        mCurrentCharInt() { }
 
 namespace {
 
@@ -59,9 +60,10 @@ void CharFilter::parseImpl() {
         break;
     }
 
-    CharInt i = currentCharInt();
-    if (mIsAcceptableChar != nullptr && mIsAcceptableChar(environment(), i))
-        result() = i;
+    mCurrentCharInt = currentCharInt();
+    if (mIsAcceptableChar != nullptr &&
+            mIsAcceptableChar(environment(), mCurrentCharInt))
+        result() = &mCurrentCharInt;
 }
 
 void CharFilter::reset(

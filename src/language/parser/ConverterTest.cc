@@ -24,17 +24,17 @@
 #include "language/parser/Environment.hh"
 #include "language/parser/EnvironmentTestHelper.hh"
 #include "language/parser/FailingParser.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 
 namespace {
 
 using sesh::language::parser::Converter;
 using sesh::language::parser::Environment;
 using sesh::language::parser::FailingParser;
-using sesh::language::parser::NormalParser;
+using sesh::language::parser::Parser;
 using sesh::language::parser::SourceTestEnvironment;
 
-class ResetCounter : public NormalParser<int> {
+class ResetCounter : public Parser<int> {
 
 private:
 
@@ -43,17 +43,17 @@ private:
 public:
 
     ResetCounter(Environment &e, int count) noexcept :
-            NormalParser<int>(e), mCount(count) { }
+            Parser(e), mCount(count) { }
 
 private:
 
     void parseImpl() override {
-        result() = mCount;
+        result() = &mCount;
     }
 
     void resetImpl() noexcept override {
         ++mCount;
-        NormalParser<int>::resetImpl();
+        Parser::resetImpl();
     }
 
 }; // class ResetCounter
@@ -67,8 +67,11 @@ public:
 
 private:
 
+    Result mResult;
+
     void convert(int &&i) override {
-        result() = i * 10;
+        mResult = i * 10;
+        result() = &mResult;
     }
 
 }; // class ConverterStub
@@ -106,32 +109,32 @@ TEST_CASE("Converter, construction and assignment") {
 TEST_CASE("Converter, failure of from-parser") {
     SourceTestEnvironment e;
     NoopConverterStub c(e, e);
-    CHECK_FALSE(c.parse().hasValue());
+    CHECK(c.parse() == nullptr);
 }
 
 TEST_CASE("Converter, conversion failure") {
     SourceTestEnvironment e;
     FailingConverterStub c(e);
-    CHECK_FALSE(c.parse().hasValue());
+    CHECK(c.parse() == nullptr);
 }
 
 TEST_CASE("Converter, successes and reset") {
     SourceTestEnvironment e;
     ConverterStub c(e, 3);
 
-    REQUIRE(c.parse().hasValue());
-    CHECK(c.parse().value() == 30.f);
+    REQUIRE(c.parse() != nullptr);
+    CHECK(*c.parse() == 30.f);
 
     c.reset();
 
-    REQUIRE(c.parse().hasValue());
-    CHECK(c.parse().value() == 40.f);
+    REQUIRE(c.parse() != nullptr);
+    CHECK(*c.parse() == 40.f);
 
     c.reset();
     c.reset();
 
-    REQUIRE(c.parse().hasValue());
-    CHECK(c.parse().value() == 60.f);
+    REQUIRE(c.parse() != nullptr);
+    CHECK(*c.parse() == 60.f);
 }
 
 } // namespace

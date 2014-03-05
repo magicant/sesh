@@ -55,8 +55,6 @@ private:
 
     void resetImpl() noexcept final override;
 
-    common::Maybe<common::String> &result() final override;
-
 }; // class BlankCommentNewlineParser
 
 } // namespace parser

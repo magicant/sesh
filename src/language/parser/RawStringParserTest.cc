@@ -71,9 +71,9 @@ TEST_CASE("Raw string parser, success") {
 
     e.appendSource(String(L("AB\0C$XYZ"), 8));
 
-    REQUIRE(p.parse().hasValue());
-    REQUIRE(p.parse().value() != nullptr);
-    RawString *rs = dynamic_cast<RawString *>(p.parse().value().get());
+    REQUIRE(p.parse() != nullptr);
+    REQUIRE(*p.parse() != nullptr);
+    RawString *rs = dynamic_cast<RawString *>(p.parse()->get());
     REQUIRE(rs != nullptr);
     CHECK(rs->value() == String(L("AB\0C"), 4));
     CHECK(e.position() == 4);
@@ -101,9 +101,9 @@ TEST_CASE("Raw string parser, reset") {
 
     e.appendSource(L("A-B-"));
 
-    REQUIRE(p.parse().hasValue());
-    REQUIRE(p.parse().value() != nullptr);
-    rs = dynamic_cast<RawString *>(p.parse().value().get());
+    REQUIRE(p.parse() != nullptr);
+    REQUIRE(*p.parse() != nullptr);
+    rs = dynamic_cast<RawString *>(p.parse()->get());
     REQUIRE(rs != nullptr);
     CHECK(rs->value() == L("A"));
     CHECK(e.position() == 1);
@@ -111,9 +111,9 @@ TEST_CASE("Raw string parser, reset") {
     p.reset();
     e.setPosition(2);
 
-    REQUIRE(p.parse().hasValue());
-    REQUIRE(p.parse().value() != nullptr);
-    rs = dynamic_cast<RawString *>(p.parse().value().get());
+    REQUIRE(p.parse() != nullptr);
+    REQUIRE(*p.parse() != nullptr);
+    rs = dynamic_cast<RawString *>(p.parse()->get());
     REQUIRE(rs != nullptr);
     CHECK(rs->value() == L("B"));
     CHECK(e.position() == 3);

@@ -24,7 +24,7 @@
 #include "common/EnumSet.hh"
 #include "language/parser/BlankAndCommentParser.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 #include "language/parser/Token.hh"
 #include "language/syntax/Assignment.hh"
@@ -46,7 +46,7 @@ namespace parser {
  * parsers. A concrete subclass must provide factory methods that create those
  * parsers.
  */
-class TokenParser : public NormalParser<Token> {
+class TokenParser : public Parser<Token> {
 
 protected:
 
@@ -64,6 +64,8 @@ private:
 
     AssignmentParserPointer mAssignmentParser;
     WordParserPointer mWordParser;
+
+    Token mResultToken;
 
 public:
 
@@ -87,7 +89,7 @@ private:
 
 public:
 
-    using NormalParser::reset;
+    using Parser::reset;
 
     void reset(common::EnumSet<TokenType> acceptableTokenTypes) noexcept;
 

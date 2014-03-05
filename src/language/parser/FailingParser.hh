@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 
 namespace sesh {
 namespace language {
@@ -28,9 +28,9 @@ namespace parser {
 
 /** Parser that always fails. */
 template<typename Result>
-class FailingParser : public NormalParser<Result> {
+class FailingParser : public Parser<Result> {
 
-    using NormalParser<Result>::NormalParser;
+    using Parser<Result>::Parser;
 
     void parseImpl() final override { }
 

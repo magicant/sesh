@@ -22,10 +22,10 @@
 
 #include <memory>
 #include <utility>
+#include "common/Maybe.hh"
 #include "common/Reference.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/LinebreakParser.hh"
-#include "language/parser/NormalParser.hh"
 #include "language/parser/OperatorParser.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/Repeat.hh"
@@ -49,8 +49,7 @@ namespace parser {
  * this parser.
  */
 class AndOrListParser :
-        public NormalParser<
-                std::pair<std::unique_ptr<syntax::AndOrList>, bool>> {
+        public Parser<std::pair<std::unique_ptr<syntax::AndOrList>, bool>> {
 
 public:
 
@@ -62,13 +61,15 @@ public:
 private:
 
     class ConditionalPipelineParser :
-            public NormalParser<syntax::ConditionalPipeline> {
+            public Parser<syntax::ConditionalPipeline> {
 
     private:
 
         OperatorParser mConditionParser;
         LinebreakParser mLinebreakParser;
         common::Reference<Parser<PipelinePointer>> mPipelineParser;
+
+        common::Maybe<syntax::ConditionalPipeline> mResultPipeline;
 
     public:
 
@@ -85,6 +86,8 @@ private:
     PipelineParserPointer mPipelineParser;
     Repeat<ConditionalPipelineParser> mConditionalPipelineListParser;
     OperatorParser mSeparatorParser;
+
+    Result mResult;
 
 public:
 

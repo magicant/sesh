@@ -49,11 +49,12 @@ void emplace(Maybe<Token> &t, V &&v) {
 
 TokenParser::TokenParser(
         Environment &e, EnumSet<TokenType> acceptableTokenTypes) noexcept :
-        NormalParser(e),
+        Parser(e),
         mBlankAndCommentParser(e),
         mAcceptableTokenTypes(acceptableTokenTypes),
         mAssignmentParser(),
-        mWordParser() { }
+        mWordParser(),
+        mResultToken(Token::create<WordPointer>()) { }
 
 bool TokenParser::maybeParseAssignment() {
     if (!mAcceptableTokenTypes[TokenType::ASSIGNMENT])
@@ -62,10 +63,10 @@ bool TokenParser::maybeParseAssignment() {
     if (mAssignmentParser == nullptr)
         mAssignmentParser = createAssignmentParser();
 
-    Maybe<AssignmentPointer> &a = mAssignmentParser->parse();
-    if (!a.hasValue())
+    AssignmentPointer *a = mAssignmentParser->parse();
+    if (a == nullptr)
         return false;
-    emplace(result(), std::move(a.value()));
+    mResultToken.reset(std::move(*a));
     return true;
 }
 
@@ -73,7 +74,7 @@ auto TokenParser::parseWord() -> WordPointer & {
     if (mWordParser == nullptr)
         mWordParser = createWordParser(isRawStringChar);
 
-    WordPointer &word = mWordParser->parse().value();
+    WordPointer &word = *mWordParser->parse();
     if (word != nullptr && word->components().empty())
         word = nullptr;
     return word;
@@ -90,7 +91,7 @@ bool TokenParser::maybeParseKeyword() {
     Maybe<Keyword> k = Keyword::parse(word->maybeConstantValue().value());
     if (!k.hasValue())
         return false;
-    emplace(result(), std::move(k.value()));
+    mResultToken.reset(std::move(k.value()));
     return true;
 }
 
@@ -101,19 +102,15 @@ bool TokenParser::maybeParseWord() {
     WordPointer &word = parseWord();
     if (word == nullptr)
         return false;
-    emplace(result(), std::move(word));
+    mResultToken.reset(std::move(word));
     return true;
 }
 
 void TokenParser::parseImpl() {
     mBlankAndCommentParser.parse();
 
-    if (maybeParseAssignment())
-        return;
-    if (maybeParseKeyword())
-        return;
-    if (maybeParseWord())
-        return;
+    if (maybeParseAssignment() || maybeParseKeyword() || maybeParseWord())
+        result() = &mResultToken;
 }
 
 void TokenParser::resetImpl() noexcept {
@@ -122,7 +119,8 @@ void TokenParser::resetImpl() noexcept {
         mAssignmentParser->reset();
     if (mWordParser != nullptr)
         mWordParser->reset();
-    NormalParser::resetImpl();
+    mResultToken.emplace<WordPointer>();
+    Parser::resetImpl();
 }
 
 void TokenParser::reset(EnumSet<TokenType> acceptableTokenTypes) noexcept {

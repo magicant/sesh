@@ -34,7 +34,7 @@
 #include "language/parser/FailingParser.hh"
 #include "language/parser/Keyword.hh"
 #include "language/parser/LineContinuationEnvironment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/PipelineParser.hh"
 #include "language/parser/Token.hh"
 #include "language/parser/TokenParserTestHelper.hh"
@@ -58,7 +58,7 @@ using sesh::language::parser::EofEnvironment;
 using sesh::language::parser::FailingParser;
 using sesh::language::parser::Keyword;
 using sesh::language::parser::LineContinuationEnvironment;
-using sesh::language::parser::NormalParser;
+using sesh::language::parser::Parser;
 using sesh::language::parser::PipelineParser;
 using sesh::language::parser::SourceTestEnvironment;
 using sesh::language::parser::TokenParserStub;
@@ -112,24 +112,28 @@ constexpr bool is(const Environment &, Char c) noexcept {
     return c == expected;
 }
 
-class CommandParserStub : public NormalParser<std::unique_ptr<Command>> {
+class CommandParserStub : public Parser<std::unique_ptr<Command>> {
 private:
     CharParser mSpaceParser, mCParser;
+    std::unique_ptr<Command> mResultCommand;
 public:
     CommandParserStub(Environment &e) :
-            NormalParser<std::unique_ptr<Command>>(e),
+            Parser<std::unique_ptr<Command>>(e),
             mSpaceParser(e, is<L(' ')>),
             mCParser(e, is<L('C')>) { }
 private:
     void parseImpl() override {
         mSpaceParser.parse();
-        if (mCParser.parse().hasValue())
-            result() = std::unique_ptr<Command>(new CommandStub);
+        if (mCParser.parse() != nullptr) {
+            mResultCommand.reset(new CommandStub);
+            result() = &mResultCommand;
+        }
     }
     void resetImpl() noexcept override {
         mSpaceParser.reset();
         mCParser.reset();
-        NormalParser<std::unique_ptr<Command>>::resetImpl();
+        mResultCommand.reset();
+        Parser<std::unique_ptr<Command>>::resetImpl();
     }
 };
 
@@ -175,7 +179,7 @@ TEST_CASE("Pipeline parser, failing token parser") {
     PipelineParserTestEnvironment e;
     PipelineParserStub p(e);
     e.setIsEof();
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Pipeline parser, non-keyword token, single command") {
@@ -188,12 +192,11 @@ TEST_CASE("Pipeline parser, non-keyword token, single command") {
                 override {
             REQUIRE(tp != nullptr);
             CHECK(tp->state() == State::FINISHED);
-            REQUIRE(tp->parse().hasValue());
-            REQUIRE(tp->parse().value().index() ==
-                    tp->parse().value().index<std::unique_ptr<Word>>());
+            REQUIRE(tp->parse() != nullptr);
+            REQUIRE(tp->parse()->index() ==
+                    tp->parse()->index<std::unique_ptr<Word>>());
             checkWord(
-                    tp->parse().value().value<std::unique_ptr<Word>>().get(),
-                    L("A"));
+                    tp->parse()->value<std::unique_ptr<Word>>().get(), L("A"));
             CHECK(environment().position() == 1);
             return CommandParserPointer(new CommandParserStub(environment()));
         }
@@ -204,18 +207,17 @@ TEST_CASE("Pipeline parser, non-keyword token, single command") {
     e.setIsEof();
 
     auto tp = newTokenParser(e);
-    REQUIRE(tp->parse().hasValue());
-    REQUIRE(tp->parse().value().index() ==
-            tp->parse().value().index<std::unique_ptr<Word>>());
-    checkWord(
-            tp->parse().value().value<std::unique_ptr<Word>>().get(), L("A"));
+    REQUIRE(tp->parse() != nullptr);
+    REQUIRE(tp->parse()->index() ==
+            tp->parse()->index<std::unique_ptr<Word>>());
+    checkWord(tp->parse()->value<std::unique_ptr<Word>>().get(), L("A"));
     CHECK(e.position() == 1);
 
     PipelineParserStub pp(e, std::move(tp));
-    REQUIRE(pp.parse().hasValue());
-    REQUIRE(pp.parse().value() != nullptr);
+    REQUIRE(pp.parse() != nullptr);
+    REQUIRE(*pp.parse() != nullptr);
 
-    const Pipeline &p = *pp.parse().value();
+    const Pipeline &p = **pp.parse();
     CHECK(p.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
     REQUIRE(p.commands().size() == 1);
     checkCommandStub(p.commands().at(0).get());
@@ -228,10 +230,9 @@ TEST_CASE("Pipeline parser, keyword token, single command") {
                 override {
             REQUIRE(tp != nullptr);
             CHECK(tp->state() == State::FINISHED);
-            REQUIRE(tp->parse().hasValue());
-            REQUIRE(tp->parse().value().index() ==
-                    tp->parse().value().index<Keyword>());
-            CHECK(tp->parse().value().value<Keyword>() ==
+            REQUIRE(tp->parse() != nullptr);
+            REQUIRE(tp->parse()->index() == tp->parse()->index<Keyword>());
+            CHECK(tp->parse()->value<Keyword>() ==
                     Keyword::keywordLeftBrace());
             return CommandParserPointer(new CommandParserStub(environment()));
         }
@@ -242,10 +243,10 @@ TEST_CASE("Pipeline parser, keyword token, single command") {
     e.setIsEof();
 
     PipelineParserStub parser(e);
-    REQUIRE(parser.parse().hasValue());
-    REQUIRE(parser.parse().value() != nullptr);
+    REQUIRE(parser.parse() != nullptr);
+    REQUIRE(*parser.parse() != nullptr);
 
-    const Pipeline &p = *parser.parse().value();
+    const Pipeline &p = **parser.parse();
     CHECK(p.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
     REQUIRE(p.commands().size() == 1);
     checkCommandStub(p.commands().at(0).get());
@@ -257,10 +258,10 @@ TEST_CASE("Pipeline parser, negated single command") {
     e.setIsEof();
 
     NegatedPipelineParserStub parser(e);
-    REQUIRE(parser.parse().hasValue());
-    REQUIRE(parser.parse().value() != nullptr);
+    REQUIRE(parser.parse() != nullptr);
+    REQUIRE(*parser.parse() != nullptr);
 
-    const Pipeline &p = *parser.parse().value();
+    const Pipeline &p = **parser.parse();
     CHECK(p.exitStatusType() == Pipeline::ExitStatusType::NEGATED);
     REQUIRE(p.commands().size() == 1);
     checkCommandStub(p.commands().at(0).get());
@@ -271,11 +272,11 @@ TEST_CASE("Pipeline parser, negated three commands") {
     e.appendSource(L("! C| C| C; "));
 
     NegatedPipelineParserStub parser(e);
-    REQUIRE(parser.parse().hasValue());
-    REQUIRE(parser.parse().value() != nullptr);
+    REQUIRE(parser.parse() != nullptr);
+    REQUIRE(*parser.parse() != nullptr);
     CHECK(e.position() == 9);
 
-    const Pipeline &p = *parser.parse().value();
+    const Pipeline &p = **parser.parse();
     CHECK(p.exitStatusType() == Pipeline::ExitStatusType::NEGATED);
     REQUIRE(p.commands().size() == 3);
     checkCommandStub(p.commands().at(0).get());
@@ -288,7 +289,7 @@ TEST_CASE("Pipeline parser, failure in first command") {
     e.appendSource(L("! X"));
 
     NegatedPipelineParserStub parser(e);
-    CHECK_FALSE(parser.parse().hasValue());
+    CHECK(parser.parse() == nullptr);
 }
 
 TEST_CASE("Pipeline parser, failure in third command") {
@@ -296,11 +297,11 @@ TEST_CASE("Pipeline parser, failure in third command") {
     e.appendSource(L("! C| C| X"));
 
     NegatedPipelineParserStub parser(e);
-    REQUIRE(parser.parse().hasValue());
-    REQUIRE(parser.parse().value() != nullptr);
+    REQUIRE(parser.parse() != nullptr);
+    REQUIRE(*parser.parse() != nullptr);
     CHECK(e.position() == 6);
 
-    const Pipeline &p = *parser.parse().value();
+    const Pipeline &p = **parser.parse();
     CHECK(p.exitStatusType() == Pipeline::ExitStatusType::NEGATED);
     REQUIRE(p.commands().size() == 2);
     checkCommandStub(p.commands().at(0).get());
@@ -312,11 +313,11 @@ TEST_CASE("Pipeline parser, pipe followed by linebreak") {
     e.appendSource(L("! C| #comment\n C|\n\n C; "));
 
     NegatedPipelineParserStub parser(e);
-    REQUIRE(parser.parse().hasValue());
-    REQUIRE(parser.parse().value() != nullptr);
+    REQUIRE(parser.parse() != nullptr);
+    REQUIRE(*parser.parse() != nullptr);
     CHECK(e.position() == 21);
 
-    const Pipeline &p = *parser.parse().value();
+    const Pipeline &p = **parser.parse();
     CHECK(p.exitStatusType() == Pipeline::ExitStatusType::NEGATED);
     REQUIRE(p.commands().size() == 3);
     checkCommandStub(p.commands().at(0).get());
@@ -337,16 +338,16 @@ TEST_CASE("Pipeline parser, reset") {
     PipelineParserStub parser(e);
 
     e.appendSource(L("! X"));
-    CHECK_FALSE(parser.parse().hasValue());
+    CHECK(parser.parse() == nullptr);
 
     parser.reset();
     e.setPosition(e.length());
     e.appendSource(L("X C; "));
 
-    REQUIRE(parser.parse().hasValue());
-    REQUIRE(parser.parse().value() != nullptr);
+    REQUIRE(parser.parse() != nullptr);
+    REQUIRE(*parser.parse() != nullptr);
 
-    const Pipeline &p = *parser.parse().value();
+    const Pipeline &p = **parser.parse();
     CHECK(p.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
     REQUIRE(p.commands().size() == 1);
     checkCommandStub(p.commands().at(0).get());

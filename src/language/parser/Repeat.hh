@@ -25,7 +25,7 @@
 #include <utility>
 #include "common/Maybe.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 
 namespace sesh {
 namespace language {
@@ -49,11 +49,12 @@ namespace parser {
 template<
         typename Subparser,
         typename ResultContainer = std::vector<typename Subparser::Result>>
-class Repeat : public NormalParser<ResultContainer> {
+class Repeat : public Parser<ResultContainer> {
 
 private:
 
     Subparser mSubparser;
+    ResultContainer mResults;
 
 public:
 
@@ -66,11 +67,12 @@ public:
     explicit Repeat(Environment &e, Arg &&... arg)
             noexcept(
                     std::is_nothrow_constructible<
-                        NormalParser<ResultContainer>, Environment &>::value &&
+                        Parser<ResultContainer>, Environment &>::value &&
                     std::is_nothrow_constructible<
                         Subparser, Arg &&...>::value) :
-            NormalParser<ResultContainer>(e),
-            mSubparser(std::forward<Arg>(arg)...) { }
+            Parser<ResultContainer>(e),
+            mSubparser(std::forward<Arg>(arg)...),
+            mResults() { }
 
     /**
      * Constructs a new repeat parser. All arguments are forwarded to the
@@ -86,18 +88,17 @@ public:
 private:
 
     void parseImpl() override {
-        if (!this->result().hasValue())
-            this->result().emplace();
-
-        while (auto &subresult = mSubparser.parse()) {
-            this->result().value().push_back(std::move(subresult.value()));
+        while (auto *subresult = mSubparser.parse()) {
+            mResults.push_back(std::move(*subresult));
             mSubparser.reset();
         }
+        this->result() = &mResults;
     }
 
     void resetImpl() noexcept override {
         mSubparser.reset();
-        this->NormalParser<ResultContainer>::resetImpl();
+        mResults.clear();
+        this->Parser<ResultContainer>::resetImpl();
     }
 
 }; // template<typename Subparser> class Repeat

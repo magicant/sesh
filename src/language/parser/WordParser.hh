@@ -47,6 +47,10 @@ namespace parser {
 class WordParser : public Converter<
         Repeat<WordComponentParserImpl>, std::unique_ptr<syntax::Word>> {
 
+private:
+
+    std::unique_ptr<syntax::Word> mResultWord;
+
 public:
 
     /**
@@ -66,6 +70,8 @@ private:
     using ComponentPointer = syntax::Word::ComponentPointer;
 
     void convert(std::vector<ComponentPointer> &&components);
+
+    void resetImpl() noexcept final override;
 
 }; // class WordParser
 

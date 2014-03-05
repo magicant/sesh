@@ -22,12 +22,14 @@
 #include "common/Maybe.hh"
 #include "language/parser/Keyword.hh"
 #include "language/parser/Token.hh"
+#include "language/syntax/Sequence.hh"
 
 using sesh::common::EnumSet;
 using sesh::common::Maybe;
 using sesh::language::parser::Keyword;
 using sesh::language::parser::Token;
 using sesh::language::parser::TokenType;
+using sesh::language::syntax::Sequence;
 
 namespace sesh {
 namespace language {
@@ -49,8 +51,9 @@ bool isClosingKeyword(Keyword k) noexcept {
 } // namespace
 
 SequenceParser::SequenceParser(Environment &e) noexcept :
-        NormalParser<SequenceParserResult>(e),
-        mInnerParser(InnerParser::create<TokenParserPointer>(nullptr)) { }
+        Parser<SequenceParserResult>(e),
+        mInnerParser(InnerParser::create<TokenParserPointer>(nullptr)),
+        mResult() { }
 
 class SequenceParser::InnerParserProcessor {
 
@@ -58,14 +61,14 @@ private:
 
     SequenceParser &mParser;
 
-    bool detectClosingKeyword(const Maybe<Token> &t) noexcept {
-        if (!t.hasValue())
+    bool detectClosingKeyword(const Token *t) noexcept {
+        if (t == nullptr)
             return false;
         if (t->index() != t->index<Keyword>())
             return false;
         if (!isClosingKeyword(t->value<Keyword>()))
             return false;
-        mParser.result()->second.emplace(t->value<Keyword>());
+        mParser.mResult.second.emplace(t->value<Keyword>());
         return true;
     }
 
@@ -86,12 +89,11 @@ public:
     }
 
     bool operator()(AndOrListParserPointer &p) {
-        auto &r = p->parse();
-        if (!r.hasValue())
+        auto *r = p->parse();
+        if (r == nullptr)
             return false;
-        mParser.result().value().first.andOrLists().push_back(
-                std::move(r.value().first));
-        if (!r.value().second)
+        mParser.mResult.first.andOrLists().push_back(std::move(r->first));
+        if (!r->second)
             return false;
         mParser.mInnerParser.emplace<TokenParserPointer>();
         return true;
@@ -100,14 +102,15 @@ public:
 }; // class SequenceParser::InnerParserProcessor
 
 void SequenceParser::parseImpl() {
-    if (!result().hasValue())
-        result().emplace();
     while (mInnerParser.apply(InnerParserProcessor(*this))) { }
+    result() = &mResult;
 }
 
 void SequenceParser::resetImpl() noexcept {
     mInnerParser.emplace<TokenParserPointer>(nullptr);
-    NormalParser<SequenceParserResult>::resetImpl();
+    mResult.first = Sequence();
+    mResult.second.clear();
+    Parser<SequenceParserResult>::resetImpl();
 }
 
 } // namespace parser

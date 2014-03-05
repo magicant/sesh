@@ -57,8 +57,8 @@ TEST_CASE("Specific operator parser, accepted operator") {
     SpecificOperatorParser p(e, Operator::operatorAnd());
     e.appendSource(String(Operator::AND));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
-    CHECK(p.parse().value() == Operator::operatorAnd());
+    REQUIRE(p.parse() != nullptr);
+    CHECK(*p.parse() == Operator::operatorAnd());
     CHECK(e.position() == e.length());
 }
 
@@ -67,14 +67,14 @@ TEST_CASE("Specific operator parser, unaccepted operator") {
     SpecificOperatorParser p(e, Operator::operatorAnd());
     e.appendSource(String(Operator::AND_AND));
     e.setIsEof();
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Specific operator parser, not a operator") {
     SpecificOperatorParserTestEnvironment e;
     SpecificOperatorParser p(e, Operator::operatorAnd());
     e.appendSource(L("-"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 } // namespace parser

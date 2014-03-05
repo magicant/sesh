@@ -41,6 +41,10 @@ namespace parser {
 class RawStringParser : public Converter<
         StringParser, std::unique_ptr<syntax::WordComponent>> {
 
+private:
+
+    std::unique_ptr<syntax::WordComponent> mResultWordComponent;
+
 public:
 
     /**
@@ -55,6 +59,8 @@ public:
 private:
 
     void convert(common::String &&) final override;
+
+    void resetImpl() noexcept final override;
 
 }; // class RawStringParser
 

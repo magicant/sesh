@@ -89,8 +89,6 @@ private:
 
     void parseImpl() final override;
 
-    common::Maybe<CommandPointer> &result() final override;
-
     void resetImpl() noexcept final override;
 
 }; // class CommandParser

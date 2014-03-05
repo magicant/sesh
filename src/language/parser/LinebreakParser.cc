@@ -23,7 +23,7 @@ namespace language {
 namespace parser {
 
 LinebreakParser::LinebreakParser(Environment &e) :
-        NormalParser(e), mInnerParser(e) { }
+        Parser(e), mInnerParser(e), mResult() { }
 
 bool LinebreakParser::innerParserProceeds() {
     mInnerParser.parse();
@@ -33,12 +33,12 @@ bool LinebreakParser::innerParserProceeds() {
 void LinebreakParser::parseImpl() {
     while (innerParserProceeds())
         mInnerParser.reset();
-    result().emplace();
+    result() = &mResult;
 }
 
 void LinebreakParser::resetImpl() noexcept {
     mInnerParser.reset();
-    NormalParser::resetImpl();
+    Parser::resetImpl();
 }
 
 } // namespace parser

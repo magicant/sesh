@@ -38,7 +38,7 @@ CharParser::CharParser(
         Environment &e,
         Predicate<Char> &&isAcceptableChar,
         LineContinuationTreatment lct) :
-        NormalParser(e),
+        Parser(e),
         mIsAcceptableChar(std::move(isAcceptableChar)),
         mLineContinuationTreatment(lct) { }
 
@@ -65,11 +65,11 @@ void CharParser::parseImpl() {
     if (mIsAcceptableChar == nullptr)
         return;
 
-    Char c = CharTraits::to_char_type(i);
-    if (!mIsAcceptableChar(environment(), c))
+    mCurrentChar = CharTraits::to_char_type(i);
+    if (!mIsAcceptableChar(environment(), mCurrentChar))
         return;
 
-    result() = c;
+    result() = &mCurrentChar;
     environment().setPosition(environment().position() + 1);
 }
 

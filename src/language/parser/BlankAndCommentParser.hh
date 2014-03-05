@@ -22,7 +22,7 @@
 
 #include "language/parser/CommentParser.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/StringParser.hh"
 
 namespace sesh {
@@ -34,7 +34,7 @@ namespace parser {
  * parser always succeeds and returns the parsed (possibly empty) blank
  * characters and comment.
  */
-class BlankAndCommentParser : public NormalParser<common::String> {
+class BlankAndCommentParser : public Parser<common::String> {
 
 private:
 

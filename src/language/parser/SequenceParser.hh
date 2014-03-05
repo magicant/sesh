@@ -26,7 +26,7 @@
 #include "common/Variant.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/Keyword.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/TokenParser.hh"
 #include "language/syntax/Sequence.hh"
 
@@ -51,7 +51,7 @@ using SequenceParserResult =
  *
  * This parser stops parsing when it encounters a newline character.
  */
-class SequenceParser : public NormalParser<SequenceParserResult> {
+class SequenceParser : public Parser<SequenceParserResult> {
 
 public:
 
@@ -73,6 +73,8 @@ private:
      * and-or list.
      */
     InnerParser mInnerParser;
+
+    SequenceParserResult mResult;
 
 public:
 

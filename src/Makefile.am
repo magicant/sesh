@@ -127,7 +127,6 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/LinebreakParser.hh \
 	language/parser/NewlineParser.cc \
 	language/parser/NewlineParser.hh \
-	language/parser/NormalParser.hh \
 	language/parser/Parser.hh \
 	language/parser/ParserBase.cc \
 	language/parser/ParserBase.hh \

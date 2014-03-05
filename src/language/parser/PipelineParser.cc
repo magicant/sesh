@@ -20,16 +20,13 @@
 
 #include <memory>
 #include <utility>
-#include "common/Maybe.hh"
 #include "language/parser/LinebreakParser.hh"
-#include "language/parser/NormalParser.hh"
 #include "language/parser/Operator.hh"
 #include "language/parser/Parser.hh"
 #include "language/parser/SpecificOperatorParser.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Pipeline.hh"
 
-using sesh::common::Maybe;
 using sesh::language::parser::LinebreakParser;
 using sesh::language::parser::SpecificOperatorParser;
 using sesh::language::syntax::Command;
@@ -42,7 +39,7 @@ namespace parser {
 namespace {
 
 /** Parses a command preceded by a pipe operator. */
-class PipedCommandParser : public NormalParser<std::unique_ptr<Command>> {
+class PipedCommandParser : public Parser<std::unique_ptr<Command>> {
 
 public:
 
@@ -58,15 +55,15 @@ private:
 public:
 
     explicit PipedCommandParser(CommandParserPointer cp) :
-            NormalParser(cp->environment()),
+            Parser(cp->environment()),
             mPipeOperatorParser(cp->environment(), Operator::operatorPipe()),
             mLinebreakParser(cp->environment()),
             mCommandParser(std::move(cp)) { }
 
     void parseImpl() final override {
-        if (mPipeOperatorParser.parse().hasValue()) {
+        if (mPipeOperatorParser.parse() != nullptr) {
             mLinebreakParser.parse();
-            result() = std::move(mCommandParser->parse());
+            result() = mCommandParser->parse();
         }
     }
 
@@ -74,7 +71,7 @@ public:
         mPipeOperatorParser.reset();
         mLinebreakParser.reset();
         mCommandParser->reset();
-        NormalParser<CommandPointer>::resetImpl();
+        Parser<CommandPointer>::resetImpl();
     }
 
 }; // class PipedCommandParser
@@ -82,7 +79,7 @@ public:
 } // namespace
 
 PipelineParser::PipelineParser(Environment &e, TokenParserPointer &&tp) :
-        NormalParser<PipelinePointer>(e),
+        Parser<PipelinePointer>(e),
         mState(ParseState::create<ParsingFirstToken>()) {
     mState.value<ParsingFirstToken>().tokenParser = std::move(tp);
 }
@@ -103,14 +100,13 @@ public:
         if (state.tokenParser == nullptr)
             state.tokenParser = mParser.createTokenParser();
 
-        Maybe<Token> &mt = state.tokenParser->parse();
-        if (!mt.hasValue())
+        Token *t = state.tokenParser->parse();
+        if (t == nullptr)
             return false;
 
-        Token &t = mt.value();
         Pipeline::ExitStatusType est;
-        if (t.index() == t.index<Keyword>() &&
-                t.value<Keyword>() == Keyword::keywordExclamation()) {
+        if (t->index() == t->index<Keyword>() &&
+                t->value<Keyword>() == Keyword::keywordExclamation()) {
             est = Pipeline::ExitStatusType::NEGATED;
             state.tokenParser->reset();
         } else {
@@ -126,10 +122,10 @@ public:
     }
 
     bool operator()(ParsingFirstCommand &state) {
-        Maybe<CommandPointer> &c = state.commandParser->parse();
-        if (!c.hasValue())
+        CommandPointer *c = state.commandParser->parse();
+        if (c == nullptr)
             return false;
-        state.pipeline->commands().push_back(std::move(c.value()));
+        state.pipeline->commands().push_back(std::move(*c));
         state.commandParser->reset();
 
         ParsingRemainingCommands newState;
@@ -141,12 +137,12 @@ public:
     }
 
     bool operator()(ParsingRemainingCommands &state) {
-        if (Maybe<CommandPointer> &c = state.pipedCommandParser->parse()) {
+        if (CommandPointer *c = state.pipedCommandParser->parse()) {
             state.pipeline->commands().push_back(std::move(*c));
             state.pipedCommandParser->reset();
             return true;
         }
-        mParser.result() = std::move(state.pipeline);
+        mParser.result() = &state.pipeline;
         return false;
     }
 
@@ -158,7 +154,7 @@ void PipelineParser::parseImpl() {
 
 void PipelineParser::resetImpl() noexcept {
     mState.emplace<ParsingFirstToken>();
-    NormalParser<PipelinePointer>::resetImpl();
+    Parser<PipelinePointer>::resetImpl();
 }
 
 } // namespace parser

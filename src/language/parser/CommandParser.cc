@@ -18,10 +18,8 @@
 #include "buildconfig.h"
 #include "CommandParser.hh"
 
-#include "common/Maybe.hh"
 #include "language/parser/Environment.hh"
 
-using sesh::common::Maybe;
 using sesh::language::parser::Environment;
 
 namespace sesh {
@@ -43,11 +41,7 @@ void CommandParser::prepareActualParser() {
 
 void CommandParser::parseImpl() {
     prepareActualParser();
-    mActualParser->parse();
-}
-
-auto CommandParser::result() -> Maybe<CommandPointer> & {
-    return mActualParser->parse();
+    result() = mActualParser->parse();
 }
 
 void CommandParser::resetImpl() noexcept {

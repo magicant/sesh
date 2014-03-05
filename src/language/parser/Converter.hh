@@ -23,7 +23,7 @@
 #include <type_traits>
 #include <utility>
 #include "language/parser/Environment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 
 namespace sesh {
 namespace language {
@@ -31,7 +31,7 @@ namespace parser {
 
 /** Converts the result of another parser into something else. */
 template<typename FromParser, typename ToResult_>
-class Converter : public NormalParser<ToResult_> {
+class Converter : public Parser<ToResult_> {
 
 public:
 
@@ -54,8 +54,7 @@ public:
     explicit Converter(Environment &e, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<
                     FromParser, Arg &&...>::value) :
-            NormalParser<ToResult>(e),
-            mFromParser(std::forward<Arg>(arg)...) { }
+            Parser<ToResult>(e), mFromParser(std::forward<Arg>(arg)...) { }
 
 private:
 
@@ -63,18 +62,19 @@ private:
      * Converts the result of the from-parser.
      *
      * This method is called (only) after the from-parser succeeded. If the
-     * conversion succeeds, this method must set the {@link
-     * NormalParser#result} to a non-empty value, which will be
-     * the result of this parser. Otherwise, if the conversion fails,
-     * the result must be left empty and this parser will fail.
+     * conversion succeeds, this method must set the {@link Parser#result} to a
+     * non-null value, which will be the result of this parser. Otherwise, if
+     * the conversion fails, the result must be left null and this parser will
+     * fail.
      *
-     * @param from the result of the from-parser.
+     * @param from the result of the from-parser. Its lifetime lasts until the
+     * parser is reset or destroyed.
      */
     virtual void convert(FromResult &&from) = 0;
 
     void parseImpl() final override {
-        if (auto &from = mFromParser.parse())
-            convert(std::move(from.value()));
+        if (FromResult *from = mFromParser.parse())
+            convert(std::move(*from));
     }
 
 protected:
@@ -86,7 +86,7 @@ protected:
      */
     void resetImpl() noexcept override {
         mFromParser.reset();
-        NormalParser<ToResult>::resetImpl();
+        Parser<ToResult>::resetImpl();
     }
 
 }; // class Converter

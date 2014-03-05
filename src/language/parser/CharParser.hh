@@ -24,7 +24,7 @@
 #include "common/Maybe.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/LineContinuationTreatment.hh"
-#include "language/parser/NormalParser.hh"
+#include "language/parser/Parser.hh"
 #include "language/parser/Predicate.hh"
 
 namespace sesh {
@@ -37,12 +37,14 @@ namespace parser {
  * The set of characters accepted by this parser is specified by a predicate.
  * Parsing succeeds if the predicate is true for the character.
  */
-class CharParser : public NormalParser<common::Char> {
+class CharParser : public Parser<common::Char> {
 
 private:
 
     Predicate<common::Char> mIsAcceptableChar;
     LineContinuationTreatment mLineContinuationTreatment;
+
+    common::Char mCurrentChar;
 
 public:
 
@@ -51,7 +53,7 @@ public:
             Predicate<common::Char> &&isAcceptableChar,
             LineContinuationTreatment = LineContinuationTreatment::REMOVE);
 
-    using NormalParser::reset;
+    using Parser::reset;
 
     void reset(
             Predicate<common::Char> &&isAcceptableChar,

@@ -101,8 +101,8 @@ TEST_CASE("Simple command word parser, assignment") {
     e.appendSource(L("="));
 
     TokenParserStub p(e, enumSetOf(TokenType::ASSIGNMENT));
-    REQUIRE(p.parse().hasValue());
-    checkAssignment(p.parse().value());
+    REQUIRE(p.parse() != nullptr);
+    checkAssignment(*p.parse());
 }
 
 TEST_CASE("Simple command word parser, assignment & keyword -> assignment") {
@@ -110,8 +110,8 @@ TEST_CASE("Simple command word parser, assignment & keyword -> assignment") {
     e.appendSource(L("="));
 
     TokenParserStub p(e, enumSetOf(TokenType::ASSIGNMENT, TokenType::KEYWORD));
-    REQUIRE(p.parse().hasValue());
-    checkAssignment(p.parse().value());
+    REQUIRE(p.parse() != nullptr);
+    checkAssignment(*p.parse());
 }
 
 TEST_CASE("Simple command word parser, keyword") {
@@ -119,8 +119,8 @@ TEST_CASE("Simple command word parser, keyword") {
     e.appendSource(L("!"));
 
     TokenParserStub p(e, enumSetOf(TokenType::KEYWORD));
-    REQUIRE(p.parse().hasValue());
-    checkKeyword(p.parse().value(), Keyword::EXCLAMATION);
+    REQUIRE(p.parse() != nullptr);
+    checkKeyword(*p.parse(), Keyword::EXCLAMATION);
 }
 
 TEST_CASE("Simple command word parser, assignment & keyword -> keyword") {
@@ -128,8 +128,8 @@ TEST_CASE("Simple command word parser, assignment & keyword -> keyword") {
     e.appendSource(L("!"));
 
     TokenParserStub p(e, enumSetOf(TokenType::ASSIGNMENT, TokenType::KEYWORD));
-    REQUIRE(p.parse().hasValue());
-    checkKeyword(p.parse().value(), Keyword::EXCLAMATION);
+    REQUIRE(p.parse() != nullptr);
+    checkKeyword(*p.parse(), Keyword::EXCLAMATION);
 }
 
 TEST_CASE("Simple command word parser, keyword & word -> keyword") {
@@ -137,8 +137,8 @@ TEST_CASE("Simple command word parser, keyword & word -> keyword") {
     e.appendSource(L("!"));
 
     TokenParserStub p(e, enumSetOf(TokenType::KEYWORD, TokenType::WORD));
-    REQUIRE(p.parse().hasValue());
-    checkKeyword(p.parse().value(), Keyword::EXCLAMATION);
+    REQUIRE(p.parse() != nullptr);
+    checkKeyword(*p.parse(), Keyword::EXCLAMATION);
 }
 
 TEST_CASE("Simple command word parser, word") {
@@ -146,8 +146,8 @@ TEST_CASE("Simple command word parser, word") {
     e.appendSource(L("="));
 
     TokenParserStub p(e, enumSetOf(TokenType::WORD));
-    REQUIRE(p.parse().hasValue());
-    checkWord(p.parse().value(), L("="));
+    REQUIRE(p.parse() != nullptr);
+    checkWord(*p.parse(), L("="));
 }
 
 TEST_CASE("Simple command word parser, all -> word") {
@@ -157,8 +157,8 @@ TEST_CASE("Simple command word parser, all -> word") {
     auto types = enumSetOf(
             TokenType::ASSIGNMENT, TokenType::KEYWORD, TokenType::WORD);
     TokenParserStub p(e, types);
-    REQUIRE(p.parse().hasValue());
-    checkWord(p.parse().value(), L("W"));
+    REQUIRE(p.parse() != nullptr);
+    checkWord(*p.parse(), L("W"));
 }
 
 TEST_CASE("Simple command word parser, all -> empty word") {
@@ -168,7 +168,7 @@ TEST_CASE("Simple command word parser, all -> empty word") {
     auto types = enumSetOf(
             TokenType::ASSIGNMENT, TokenType::KEYWORD, TokenType::WORD);
     TokenParserStub p(e, types);
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Simple command word parser, blank before assignment") {
@@ -176,8 +176,8 @@ TEST_CASE("Simple command word parser, blank before assignment") {
     e.appendSource(L("\t \t="));
 
     TokenParserStub p(e, enumSetOf(TokenType::ASSIGNMENT));
-    REQUIRE(p.parse().hasValue());
-    checkAssignment(p.parse().value());
+    REQUIRE(p.parse() != nullptr);
+    checkAssignment(*p.parse());
 }
 
 TEST_CASE("Simple command word parser, blank before word") {
@@ -185,8 +185,8 @@ TEST_CASE("Simple command word parser, blank before word") {
     e.appendSource(L(" \t ="));
 
     TokenParserStub p(e, enumSetOf(TokenType::WORD));
-    REQUIRE(p.parse().hasValue());
-    checkWord(p.parse().value(), L("="));
+    REQUIRE(p.parse() != nullptr);
+    checkWord(*p.parse(), L("="));
 }
 
 TEST_CASE("Simple command word parser, comment") {
@@ -194,7 +194,7 @@ TEST_CASE("Simple command word parser, comment") {
     e.appendSource(L(" #=\n"));
 
     TokenParserStub p(e, enumSetOf(TokenType::WORD));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Simple command word parser, reset") {
@@ -202,18 +202,18 @@ TEST_CASE("Simple command word parser, reset") {
 
     TokenParserStub p(e, enumSetOf(TokenType::WORD));
     e.appendSource(L(" W"));
-    REQUIRE(p.parse().hasValue());
-    checkWord(p.parse().value(), L("W"));
+    REQUIRE(p.parse() != nullptr);
+    checkWord(*p.parse(), L("W"));
 
     p.reset(enumSetOf(TokenType::ASSIGNMENT));
     e.appendSource(L("\t="));
-    REQUIRE(p.parse().hasValue());
-    checkAssignment(p.parse().value());
+    REQUIRE(p.parse() != nullptr);
+    checkAssignment(*p.parse());
 
     p.reset(enumSetOf(TokenType::WORD));
     e.appendSource(L("\\\n="));
-    REQUIRE(p.parse().hasValue());
-    checkWord(p.parse().value(), L("="));
+    REQUIRE(p.parse() != nullptr);
+    checkWord(*p.parse(), L("="));
 
     // TODO redirection
     // TODO alias substitution

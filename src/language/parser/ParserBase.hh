@@ -126,14 +126,14 @@ private:
      * only when the state is "finished". This method is not const-qualified
      * because it depends on the non-const {@link Parser#result} method.
      */
-    virtual bool isSuccessful() = 0;
+    virtual bool isSuccessful() const noexcept = 0;
 
     /**
      * Clears any intermediate or finished parse results so that a next call to
      * {@link #parseImpl} will start a new parsing. This method is called from
      * {@link #reset}.
      */
-    virtual void resetImpl() noexcept { }
+    virtual void resetImpl() noexcept = 0;
 
 protected:
 

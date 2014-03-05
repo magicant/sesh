@@ -31,7 +31,7 @@ namespace language {
 namespace parser {
 
 /** Parses a specific operator that is specified in the constructor call. */
-class SpecificOperatorParser : public Parser<Operator> {
+class SpecificOperatorParser : public Parser<const Operator> {
 
 private:
 
@@ -46,8 +46,6 @@ public:
             LineContinuationTreatment = LineContinuationTreatment::REMOVE);
 
     void parseImpl() final override;
-
-    common::Maybe<Operator> &result() final override;
 
     void resetImpl() noexcept final override;
 

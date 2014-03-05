@@ -108,7 +108,7 @@ TEST_CASE("Simple command parser, empty") {
     CLocaleTestEnvironment e;
     SimpleCommandParser p(e, createTokenParser(e, EnumSet<TokenType>()));
     e.appendSource(L(";"));
-    CHECK_FALSE(p.parse().hasValue());
+    CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Simple command parser, keyword") {
@@ -117,7 +117,7 @@ TEST_CASE("Simple command parser, keyword") {
             createTokenParser(e, enumSetOf(TokenType::KEYWORD)));
     e.appendSource(L("!"));
     e.setIsEof();
-    CHECK(p.parse().hasValue());
+    CHECK(p.parse() != nullptr);
     CHECK(e.position() == e.length());
 
     auto m = L("keyword `!' cannot be used as command name");
@@ -130,10 +130,10 @@ TEST_CASE("Simple command parser, assignment only") {
             e, createTokenParser( e, enumSetOf(TokenType::ASSIGNMENT)));
     e.appendSource(L("="));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
     CHECK(e.position() == e.length());
-    REQUIRE(p.parse().value() != nullptr);
-    const auto &c = dynamic_cast<SimpleCommand &>(*p.parse().value());
+    REQUIRE(*p.parse() != nullptr);
+    const auto &c = dynamic_cast<SimpleCommand &>(**p.parse());
     CHECK(c.assignments().size() == 1);
     CHECK(c.words().size() == 0);
     // TODO CHECK(c.redirections().size() == 0);
@@ -144,10 +144,10 @@ TEST_CASE("Simple command parser, word only") {
     SimpleCommandParser p(e, createTokenParser(e, enumSetOf(TokenType::WORD)));
     e.appendSource(L("="));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
     CHECK(e.position() == e.length());
-    REQUIRE(p.parse().value() != nullptr);
-    const auto &c = dynamic_cast<SimpleCommand &>(*p.parse().value());
+    REQUIRE(*p.parse() != nullptr);
+    const auto &c = dynamic_cast<SimpleCommand &>(**p.parse());
     CHECK(c.assignments().size() == 0);
     CHECK(c.words().size() == 1);
     // TODO CHECK(c.redirections().size() == 0);
@@ -162,10 +162,10 @@ TEST_CASE("Simple command parser, assignment -> assignment") {
             e, createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
     e.appendSource(L("= ="));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
     CHECK(e.position() == e.length());
-    REQUIRE(p.parse().value() != nullptr);
-    const auto &c = dynamic_cast<SimpleCommand &>(*p.parse().value());
+    REQUIRE(*p.parse() != nullptr);
+    const auto &c = dynamic_cast<SimpleCommand &>(**p.parse());
     CHECK(c.assignments().size() == 2);
     CHECK(c.words().size() == 0);
     // TODO CHECK(c.redirections().size() == 0);
@@ -177,10 +177,10 @@ TEST_CASE("Simple command parser, assignment -> word") {
             e, createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
     e.appendSource(L("= A"));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
     CHECK(e.position() == e.length());
-    REQUIRE(p.parse().value() != nullptr);
-    const auto &c = dynamic_cast<SimpleCommand &>(*p.parse().value());
+    REQUIRE(*p.parse() != nullptr);
+    const auto &c = dynamic_cast<SimpleCommand &>(**p.parse());
     CHECK(c.assignments().size() == 1);
     CHECK(c.words().size() == 1);
     // TODO CHECK(c.redirections().size() == 0);
@@ -194,10 +194,10 @@ TEST_CASE("Simple command parser, word -> word") {
     SimpleCommandParser p(e, createTokenParser(e, enumSetOf(TokenType::WORD)));
     e.appendSource(L("W W"));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
     CHECK(e.position() == e.length());
-    REQUIRE(p.parse().value() != nullptr);
-    const auto &c = dynamic_cast<SimpleCommand &>(*p.parse().value());
+    REQUIRE(*p.parse() != nullptr);
+    const auto &c = dynamic_cast<SimpleCommand &>(**p.parse());
     CHECK(c.assignments().size() == 0);
     CHECK(c.words().size() == 2);
     // TODO CHECK(c.redirections().size() == 0);
@@ -209,10 +209,10 @@ TEST_CASE("Simple command parser, no assignments after word") {
             e, createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
     e.appendSource(L("= = W ="));
     e.setIsEof();
-    REQUIRE(p.parse().hasValue());
+    REQUIRE(p.parse() != nullptr);
     CHECK(e.position() == e.length());
-    REQUIRE(p.parse().value() != nullptr);
-    const auto &c = dynamic_cast<SimpleCommand &>(*p.parse().value());
+    REQUIRE(*p.parse() != nullptr);
+    const auto &c = dynamic_cast<SimpleCommand &>(**p.parse());
     CHECK(c.assignments().size() == 2);
     CHECK(c.words().size() == 2);
     checkWord(c.words().at(0), L("W"));
@@ -255,8 +255,8 @@ TEST_CASE("Simple command parser, need more source") {
 
     REQUIRE(p.parse());
     CHECK(e.position() == e.length());
-    REQUIRE(p.parse().value() != nullptr);
-    const auto &c = dynamic_cast<SimpleCommand &>(*p.parse().value());
+    REQUIRE(*p.parse() != nullptr);
+    const auto &c = dynamic_cast<SimpleCommand &>(**p.parse());
     CHECK(c.assignments().size() == 2);
     CHECK(c.words().size() == 2);
     checkWord(c.words().at(0), L("W"));

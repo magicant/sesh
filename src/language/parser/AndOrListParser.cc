@@ -40,12 +40,11 @@ namespace parser {
 
 namespace {
 
-Maybe<ConditionalPipeline::Condition> toCondition(const Maybe<Operator> &o)
-        noexcept {
-    if (o.hasValue()) {
-        if (o.value() == Operator::operatorAndAnd())
+Maybe<ConditionalPipeline::Condition> toCondition(const Operator *o) noexcept {
+    if (o != nullptr) {
+        if (*o == Operator::operatorAndAnd())
             return createMaybeOf(ConditionalPipeline::Condition::AND_THEN);
-        if (o.value() == Operator::operatorPipePipe())
+        if (*o == Operator::operatorPipePipe())
             return createMaybeOf(ConditionalPipeline::Condition::OR_ELSE);
     }
     return Maybe<ConditionalPipeline::Condition>();
@@ -55,10 +54,11 @@ Maybe<ConditionalPipeline::Condition> toCondition(const Maybe<Operator> &o)
 
 AndOrListParser::ConditionalPipelineParser::ConditionalPipelineParser(
         Environment &e, Parser<PipelinePointer> &pp) :
-        NormalParser<syntax::ConditionalPipeline>(e),
+        Parser(e),
         mConditionParser(createOperatorParser(e)),
         mLinebreakParser(e),
-        mPipelineParser(pp) { }
+        mPipelineParser(pp),
+        mResultPipeline() { }
 
 void AndOrListParser::ConditionalPipelineParser::parseImpl() {
     Maybe<ConditionalPipeline::Condition> condition =
@@ -68,50 +68,52 @@ void AndOrListParser::ConditionalPipelineParser::parseImpl() {
 
     mLinebreakParser.parse();
 
-    Maybe<PipelinePointer> &p = mPipelineParser.get().parse();
-    if (!p.hasValue())
+    PipelinePointer *p = mPipelineParser.get().parse();
+    if (p == nullptr)
         return;
 
-    result().emplace(condition.value(), std::move(p.value()));
+    mResultPipeline.emplace(condition.value(), std::move(*p));
+    result() = &mResultPipeline.value();
 }
 
 void AndOrListParser::ConditionalPipelineParser::resetImpl() noexcept {
     mConditionParser.reset();
     mLinebreakParser.reset();
     mPipelineParser.get().reset();
-    NormalParser<ConditionalPipeline>::resetImpl();
+    mResultPipeline.clear();
+    Parser::resetImpl();
 }
 
 AndOrListParser::AndOrListParser(PipelineParserPointer &&pp) :
-        NormalParser<Result>(pp->environment()),
+        Parser(pp->environment()),
         mPipelineParser(std::move(pp)),
         mConditionalPipelineListParser(
                 environment(), environment(), *mPipelineParser),
-        mSeparatorParser(createOperatorParser(environment())) { }
+        mSeparatorParser(createOperatorParser(environment())),
+        mResult() { }
 
 void AndOrListParser::parseImpl() {
-    if (!result().hasValue()) {
-        Maybe<PipelinePointer> &p = mPipelineParser->parse();
-        if (!p.hasValue())
+    if (mResult.first == nullptr) {
+        PipelinePointer *p = mPipelineParser->parse();
+        if (p == nullptr)
             return;
-        result().emplace(
-                std::unique_ptr<AndOrList>(
-                        new AndOrList(std::move(*p.value()))),
-                false);
+        mResult.first.reset(new AndOrList(std::move(**p)));
         mPipelineParser->reset();
+        mResult.second = false;
+        result() = &mResult;
     }
 
-    AndOrList &aol = *result().value().first;
+    AndOrList &aol = *mResult.first;
     std::vector<ConditionalPipeline> &rest =
-            mConditionalPipelineListParser.parse().value();
+            *mConditionalPipelineListParser.parse();
 
-    if (Maybe<Operator> &o = mSeparatorParser.parse()) {
+    if (const Operator *o = mSeparatorParser.parse()) {
         if (*o == Operator::operatorSemicolon()) {
             aol.synchronicity() = AndOrList::Synchronicity::SEQUENTIAL;
-            result().value().second = true;
+            mResult.second = true;
         } else if (*o == Operator::operatorAnd()) {
             aol.synchronicity() = AndOrList::Synchronicity::ASYNCHRONOUS;
-            result().value().second = true;
+            mResult.second = true;
         } else
             environment().setPosition(mSeparatorParser.begin());
     }
@@ -123,7 +125,8 @@ void AndOrListParser::resetImpl() noexcept {
     mPipelineParser->reset();
     mConditionalPipelineListParser.reset();
     mSeparatorParser.reset();
-    NormalParser<Result>::resetImpl();
+    mResult.first.reset();
+    Parser::resetImpl();
 }
 
 } // namespace parser

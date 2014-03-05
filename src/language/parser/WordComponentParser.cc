@@ -21,12 +21,10 @@
 #include <memory>
 #include <utility>
 #include "common/Char.hh"
-#include "common/Maybe.hh"
 #include "common/String.hh"
 
 using sesh::common::Char;
 using sesh::common::CharTraits;
-using sesh::common::Maybe;
 
 namespace sesh {
 namespace language {
@@ -49,11 +47,7 @@ void WordComponentParser::prepareActualParser() {
 
 void WordComponentParser::parseImpl() {
     prepareActualParser();
-    mActualParser->parse();
-}
-
-auto WordComponentParser::result() -> Maybe<ComponentPointer> & {
-    return mActualParser->parse();
+    result() = mActualParser->parse();
 }
 
 void WordComponentParser::resetImpl() noexcept {
