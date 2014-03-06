@@ -37,8 +37,7 @@ auto CommandParserImpl::createTokenParser() const -> TokenParserPointer {
 
 auto CommandParserImpl::createSimpleCommandParser(TokenParserPointer &&tp)
         const -> CommandParserPointer {
-    return CommandParserPointer(new SimpleCommandParser(
-            environment(), std::move(tp)));
+    return CommandParserPointer(new SimpleCommandParser(std::move(tp)));
 }
 
 } // namespace parser

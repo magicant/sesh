@@ -99,22 +99,21 @@ void checkWord(const std::unique_ptr<Word> &w, const String &value) {
 
 TEST_CASE("Simple command parser, construction and assignment") {
     TestEnvironment e;
-    SimpleCommandParser p1(e, createTokenParser(e, EnumSet<TokenType>()));
+    SimpleCommandParser p1(createTokenParser(e, EnumSet<TokenType>()));
     SimpleCommandParser p2(std::move(p1));
     p1 = std::move(p2);
 }
 
 TEST_CASE("Simple command parser, empty") {
     CLocaleTestEnvironment e;
-    SimpleCommandParser p(e, createTokenParser(e, EnumSet<TokenType>()));
+    SimpleCommandParser p(createTokenParser(e, EnumSet<TokenType>()));
     e.appendSource(L(";"));
     CHECK(p.parse() == nullptr);
 }
 
 TEST_CASE("Simple command parser, keyword") {
     CLocaleDiagnosticTestEnvironment e;
-    SimpleCommandParser p(e,
-            createTokenParser(e, enumSetOf(TokenType::KEYWORD)));
+    SimpleCommandParser p(createTokenParser(e, enumSetOf(TokenType::KEYWORD)));
     e.appendSource(L("!"));
     e.setIsEof();
     CHECK(p.parse() != nullptr);
@@ -127,7 +126,7 @@ TEST_CASE("Simple command parser, keyword") {
 TEST_CASE("Simple command parser, assignment only") {
     CLocaleTestEnvironment e;
     SimpleCommandParser p(
-            e, createTokenParser( e, enumSetOf(TokenType::ASSIGNMENT)));
+            createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
     e.appendSource(L("="));
     e.setIsEof();
     REQUIRE(p.parse() != nullptr);
@@ -141,7 +140,7 @@ TEST_CASE("Simple command parser, assignment only") {
 
 TEST_CASE("Simple command parser, word only") {
     CLocaleTestEnvironment e;
-    SimpleCommandParser p(e, createTokenParser(e, enumSetOf(TokenType::WORD)));
+    SimpleCommandParser p(createTokenParser(e, enumSetOf(TokenType::WORD)));
     e.appendSource(L("="));
     e.setIsEof();
     REQUIRE(p.parse() != nullptr);
@@ -159,7 +158,7 @@ TEST_CASE("Simple command parser, word only") {
 TEST_CASE("Simple command parser, assignment -> assignment") {
     CLocaleTestEnvironment e;
     SimpleCommandParser p(
-            e, createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
+            createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
     e.appendSource(L("= ="));
     e.setIsEof();
     REQUIRE(p.parse() != nullptr);
@@ -174,7 +173,7 @@ TEST_CASE("Simple command parser, assignment -> assignment") {
 TEST_CASE("Simple command parser, assignment -> word") {
     CLocaleTestEnvironment e;
     SimpleCommandParser p(
-            e, createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
+            createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
     e.appendSource(L("= A"));
     e.setIsEof();
     REQUIRE(p.parse() != nullptr);
@@ -191,7 +190,7 @@ TEST_CASE("Simple command parser, assignment -> word") {
 
 TEST_CASE("Simple command parser, word -> word") {
     CLocaleTestEnvironment e;
-    SimpleCommandParser p(e, createTokenParser(e, enumSetOf(TokenType::WORD)));
+    SimpleCommandParser p(createTokenParser(e, enumSetOf(TokenType::WORD)));
     e.appendSource(L("W W"));
     e.setIsEof();
     REQUIRE(p.parse() != nullptr);
@@ -206,7 +205,7 @@ TEST_CASE("Simple command parser, word -> word") {
 TEST_CASE("Simple command parser, no assignments after word") {
     CLocaleTestEnvironment e;
     SimpleCommandParser p(
-            e, createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
+            createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
     e.appendSource(L("= = W ="));
     e.setIsEof();
     REQUIRE(p.parse() != nullptr);
@@ -227,7 +226,7 @@ TEST_CASE("Simple command parser, need more source") {
 
     CLocaleTestEnvironment e;
     SimpleCommandParser p(
-            e, createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
+            createTokenParser(e, enumSetOf(TokenType::ASSIGNMENT)));
 
     CHECK_THROWS_AS(p.parse(), IncompleteParse);
     e.appendSource(L("="));

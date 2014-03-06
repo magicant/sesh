@@ -48,9 +48,9 @@ namespace sesh {
 namespace language {
 namespace parser {
 
-SimpleCommandParser::SimpleCommandParser(
-        Environment &e, TokenParserPointer &&tokenParser) noexcept :
-        Parser(e),
+SimpleCommandParser::SimpleCommandParser(TokenParserPointer &&tokenParser)
+        noexcept :
+        Parser(tokenParser->environment()),
         mTokenParser(std::move(tokenParser)),
         mCommand(),
         mResultCommand() {
