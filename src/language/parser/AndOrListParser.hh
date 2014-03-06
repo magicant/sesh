@@ -73,7 +73,7 @@ private:
 
     public:
 
-        ConditionalPipelineParser(Environment &e, Parser<PipelinePointer> &pp);
+        explicit ConditionalPipelineParser(Parser<PipelinePointer> &pp);
 
     private:
 

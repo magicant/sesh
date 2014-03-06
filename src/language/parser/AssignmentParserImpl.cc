@@ -55,7 +55,6 @@ auto AssignmentParserImpl::createAssignedWordParser(
         const -> WordParserPointer {
     using sesh::language::parser::WordParser;
     return WordParserPointer(new AssignedWordParser(
-            environment(),
             WordParserPointer(new WordParser(
                     environment(), std::move(isAcceptableChar)))));
 }
