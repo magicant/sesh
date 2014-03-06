@@ -148,6 +148,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/SequenceParser.hh \
 	language/parser/SequenceParserImpl.cc \
 	language/parser/SequenceParserImpl.hh \
+	language/parser/SequenceParserResult.hh \
 	language/parser/SimpleCommandParser.cc \
 	language/parser/SimpleCommandParser.hh \
 	language/parser/SourceEnvironment.cc \

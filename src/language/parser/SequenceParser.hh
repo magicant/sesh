@@ -22,26 +22,16 @@
 
 #include <memory>
 #include <utility>
-#include "common/Maybe.hh"
 #include "common/Variant.hh"
 #include "language/parser/Environment.hh"
-#include "language/parser/Keyword.hh"
 #include "language/parser/Parser.hh"
+#include "language/parser/SequenceParserResult.hh"
 #include "language/parser/TokenParser.hh"
 #include "language/syntax/Sequence.hh"
 
 namespace sesh {
 namespace language {
 namespace parser {
-
-/**
- * The result type of the sequence parser. It is a pair of a sequence and an
- * optional keyword. Iff the sequence is followed by one of the following
- * keywords, the maybe object contains the keyword: do, done, elif, else, esac,
- * fi, then, }.
- */
-using SequenceParserResult =
-        std::pair<syntax::Sequence, common::Maybe<Keyword>>;
 
 /**
  * Parses a sequence of and-or lists, possibly followed by a keyword that
