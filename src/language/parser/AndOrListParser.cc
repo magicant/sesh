@@ -53,10 +53,10 @@ Maybe<ConditionalPipeline::Condition> toCondition(const Operator *o) noexcept {
 } // namespace
 
 AndOrListParser::ConditionalPipelineParser::ConditionalPipelineParser(
-        Environment &e, Parser<PipelinePointer> &pp) :
-        Parser(e),
-        mConditionParser(createOperatorParser(e)),
-        mLinebreakParser(e),
+        Parser<PipelinePointer> &pp) :
+        Parser(pp.environment()),
+        mConditionParser(createOperatorParser(environment())),
+        mLinebreakParser(environment()),
         mPipelineParser(pp),
         mResultPipeline() { }
 
@@ -87,8 +87,7 @@ void AndOrListParser::ConditionalPipelineParser::resetImpl() noexcept {
 AndOrListParser::AndOrListParser(PipelineParserPointer &&pp) :
         Parser(pp->environment()),
         mPipelineParser(std::move(pp)),
-        mConditionalPipelineListParser(
-                environment(), environment(), *mPipelineParser),
+        mConditionalPipelineListParser(environment(), *mPipelineParser),
         mSeparatorParser(createOperatorParser(environment())),
         mResult() { }
 
