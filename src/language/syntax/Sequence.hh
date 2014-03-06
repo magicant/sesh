@@ -31,7 +31,9 @@ namespace syntax {
 
 /**
  * A sequence, which is called a "list" in the POSIX standard, is a series of
- * one or more and-or lists.
+ * one or more and-or lists. Despite that definition, an instance of this class
+ * may contain no and-or lists. Users of this class must validate the number of
+ * contained and-or lists.
  */
 class Sequence : public Printable {
 
