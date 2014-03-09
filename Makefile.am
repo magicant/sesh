@@ -97,6 +97,7 @@ src_sesh_SOURCES = \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
 	src/common/Variant.hh \
+	src/helpermacros.h \
 	src/i18n/M.h \
 	src/language/parser/AndOrListParser.cc \
 	src/language/parser/AndOrListParser.hh \
