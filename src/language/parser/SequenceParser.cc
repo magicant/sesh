@@ -20,6 +20,7 @@
 
 #include "common/EnumSet.hh"
 #include "common/Maybe.hh"
+#include "language/parser/Environment.hh"
 #include "language/parser/Keyword.hh"
 #include "language/parser/Token.hh"
 #include "language/syntax/Sequence.hh"
@@ -61,14 +62,15 @@ private:
 
     SequenceParser &mParser;
 
-    bool detectClosingKeyword(const Token *t) noexcept {
+    bool detectClosingKeyword(const Token *t, Environment::Size position)
+            noexcept {
         if (t == nullptr)
             return false;
         if (t->index() != t->index<Keyword>())
             return false;
         if (!isClosingKeyword(t->value<Keyword>()))
             return false;
-        mParser.mResult.second.emplace(t->value<Keyword>());
+        mParser.mResult.second.emplace(t->value<Keyword>(), position);
         return true;
     }
 
@@ -81,7 +83,8 @@ public:
     bool operator()(TokenParserPointer &p) {
         if (p == nullptr)
             p = mParser.createTokenParser();
-        if (detectClosingKeyword(p->parse()))
+        auto *token = p->parse();
+        if (detectClosingKeyword(token, p->begin()))
             return false;
         mParser.mInnerParser.reset(
                 mParser.createAndOrListParser(std::move(p)));

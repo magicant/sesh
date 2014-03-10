@@ -22,7 +22,7 @@
 
 #include <utility>
 #include "common/Maybe.hh"
-#include "language/parser/Keyword.hh"
+#include "language/parser/PositionedKeyword.hh"
 #include "language/syntax/Sequence.hh"
 
 namespace sesh {
@@ -36,7 +36,7 @@ namespace parser {
  * fi, then, }.
  */
 using SequenceParserResult =
-        std::pair<syntax::Sequence, common::Maybe<Keyword>>;
+        std::pair<syntax::Sequence, common::Maybe<PositionedKeyword>>;
 
 } // namespace parser
 } // namespace language
