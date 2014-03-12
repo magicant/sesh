@@ -127,6 +127,10 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/LinebreakParser.hh \
 	language/parser/NewlineParser.cc \
 	language/parser/NewlineParser.hh \
+	language/parser/Operator.cc \
+	language/parser/Operator.hh \
+	language/parser/OperatorParser.cc \
+	language/parser/OperatorParser.hh \
 	language/parser/Parser.hh \
 	language/parser/ParserBase.cc \
 	language/parser/ParserBase.hh \
@@ -134,11 +138,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/PipelineParser.hh \
 	language/parser/PipelineParserImpl.cc \
 	language/parser/PipelineParserImpl.hh \
+	language/parser/PositionedKeyword.hh \
 	language/parser/Predicate.hh \
-	language/parser/Operator.cc \
-	language/parser/Operator.hh \
-	language/parser/OperatorParser.cc \
-	language/parser/OperatorParser.hh \
 	language/parser/RawStringParser.cc \
 	language/parser/RawStringParser.hh \
 	language/parser/Reparse.cc \
@@ -148,6 +149,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/SequenceParser.hh \
 	language/parser/SequenceParserImpl.cc \
 	language/parser/SequenceParserImpl.hh \
+	language/parser/SequenceParserResult.hh \
 	language/parser/SimpleCommandParser.cc \
 	language/parser/SimpleCommandParser.hh \
 	language/parser/SourceEnvironment.cc \

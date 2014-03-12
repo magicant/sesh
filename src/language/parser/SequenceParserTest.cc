@@ -149,7 +149,8 @@ TEST_CASE("Sequence parser, closing keyword") {
     REQUIRE(p.parse() != nullptr);
     CHECK(p.parse()->first.andOrLists().empty());
     REQUIRE(p.parse()->second.hasValue());
-    CHECK(p.parse()->second.value() == Keyword::keywordRightBrace());
+    CHECK(p.parse()->second.value().keyword() == Keyword::keywordRightBrace());
+    CHECK(p.parse()->second.value().position() == 0);
 }
 
 TEST_CASE("Sequence parser, non-closing keyword") {
@@ -196,7 +197,8 @@ TEST_CASE("Sequence parser, closing keyword after and-or lists") {
     REQUIRE(p.parse() != nullptr);
     CHECK(p.parse()->first.andOrLists().size() == 2);
     REQUIRE(p.parse()->second.hasValue());
-    CHECK(p.parse()->second.value() == Keyword::keywordRightBrace());
+    CHECK(p.parse()->second.value().keyword() == Keyword::keywordRightBrace());
+    CHECK(p.parse()->second.value().position() == 4);
     CHECK(e.position() == 5);
 }
 
@@ -286,7 +288,8 @@ TEST_CASE("Sequence parser, reset") {
     REQUIRE(p.parse() != nullptr);
     CHECK(p.parse()->first.andOrLists().size() == 2);
     REQUIRE(p.parse()->second.hasValue());
-    CHECK(p.parse()->second.value() == Keyword::keywordRightBrace());
+    CHECK(p.parse()->second.value().keyword() == Keyword::keywordRightBrace());
+    CHECK(p.parse()->second.value().position() == 6);
     CHECK(e.position() == 7);
 }
 
