@@ -88,7 +88,7 @@ public:
         const SourceBuffer &buffer() const { return *bufferPointer(); }
 
         /** Not very useful... */
-        inline reference operator->() const;
+        inline pointer operator->() const;
 
         reference operator[](difference_type d) const {
             return buffer()[position() + d];
@@ -140,8 +140,8 @@ inline SourceBuffer::ConstIterator::reference operator*(
     return i.buffer()[i.position()];
 }
 
-inline auto SourceBuffer::ConstIterator::operator->() const -> reference {
-    return **this;
+inline auto SourceBuffer::ConstIterator::operator->() const -> pointer {
+    return &**this;
 }
 
 inline SourceBuffer::ConstIterator &operator++(
