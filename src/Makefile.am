@@ -29,6 +29,7 @@ check_PROGRAMS = \
 	language/parser/ConverterTest \
 	language/parser/EnvironmentHelperTest \
 	language/parser/LineContinuationEnvironmentTest \
+	language/parser/LineSequenceParserTest \
 	language/parser/NewlineParserTest \
 	language/parser/ParserTest \
 	language/parser/PipelineParserTest \
@@ -123,6 +124,8 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/parser/LineContinuationEnvironment.cc \
 	language/parser/LineContinuationEnvironment.hh \
 	language/parser/LineContinuationTreatment.hh \
+	language/parser/LineSequenceParser.cc \
+	language/parser/LineSequenceParser.hh \
 	language/parser/LinebreakParser.cc \
 	language/parser/LinebreakParser.hh \
 	language/parser/NewlineParser.cc \
@@ -388,6 +391,26 @@ language_parser_LineContinuationEnvironmentTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc
+language_parser_LineSequenceParserTest_SOURCES = \
+	common/Message.cc \
+	language/parser/CharParser.cc \
+	language/parser/DiagnosticEnvironment.cc \
+	language/parser/EnvironmentHelper.cc \
+	language/parser/IncompleteParse.cc \
+	language/parser/Keyword.cc \
+	language/parser/LineContinuationEnvironment.cc \
+	language/parser/LineSequenceParser.cc \
+	language/parser/LineSequenceParserTest.cc \
+	language/parser/Operator.cc \
+	language/parser/OperatorParser.cc \
+	language/parser/ParserBase.cc \
+	language/parser/SourceEnvironment.cc \
+	language/source/DiagnosticMessage.cc \
+	language/source/LineContinuedSource.cc \
+	language/source/Source.cc \
+	language/source/SourceBuffer.cc \
+	language/syntax/Printer.cc \
+	language/syntax/Sequence.cc
 language_parser_NewlineParserTest_SOURCES = \
 	language/parser/CharParser.cc \
 	language/parser/EnvironmentHelper.cc \
