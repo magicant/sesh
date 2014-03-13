@@ -368,9 +368,46 @@ namespace swap_impl {
 using std::swap;
 
 template<typename T>
-using IsNothrowSwappable = typename std::integral_constant<
-        bool,
-        noexcept(swap(std::declval<T &>(), std::declval<T &>()))>;
+class IsSwappable {
+
+private:
+
+    template<typename U>
+    static auto f(U &) -> decltype(
+            (void) swap(std::declval<U &>(), std::declval<U &>()),
+            std::true_type());
+
+    template<typename>
+    static auto f(...) -> std::false_type;
+
+public:
+
+    using type = decltype(f<T>(std::declval<T &>()));
+
+}; // template<typename T> class IsSwappable
+
+template<typename T, bool = IsSwappable<T>::type::value>
+class IsNothrowSwappableImpl {
+
+public:
+
+    using type = std::false_type;
+
+}; // template<typename, bool> class IsNothrowSwappableImpl
+
+template<typename T>
+class IsNothrowSwappableImpl<T, true> {
+
+public:
+
+    using type = std::integral_constant<
+            bool,
+            noexcept(swap(std::declval<T &>(), std::declval<T &>()))>;
+
+}; // template<typename T> class IsNothrowSwappableImpl<T, true>
+
+template<typename T>
+using IsNothrowSwappable = typename IsNothrowSwappableImpl<T>::type;
 
 template<typename Variant>
 class Swapper {

@@ -988,6 +988,15 @@ TEST_CASE("Double variant swapping with different type") {
 //    swap(v1, v2);
 //}
 
+//TEST_CASE("Double variant throwing swapper") {
+    static_assert(
+            Variant<int, double>::IS_NOTHROW_SWAPPABLE,
+            "int swap never throws");
+    static_assert(
+            !Variant<int, CopyMayThrow>::IS_NOTHROW_SWAPPABLE,
+            "CopyMayThrow swap may throw");
+//}
+
 } // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
