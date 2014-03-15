@@ -31,6 +31,7 @@ AC_ARG_ENABLE([debug-build],
     [enable_debug_build=no])
 
 AC_LANG([C++])
+AS_VAR_IF([enable_debug_build], [[yes]], [[: ${CXXFLAGS=-g}]])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
 AS_VAR_IF([enable_debug_build], [[yes]],
