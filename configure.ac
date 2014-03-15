@@ -24,10 +24,18 @@ AM_INIT_AUTOMAKE([
     -Werror
 ])
 
+AC_ARG_ENABLE([debug-build],
+    [AS_HELP_STRING(
+        [--enable-debug-build], [change build options for debugging Sesh])],
+    [],
+    [enable_debug_build=no])
+
 AC_LANG([C++])
+AS_VAR_IF([enable_debug_build], [[yes]], [[: ${CXXFLAGS=-g}]])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
-AX_APPEND_COMPILE_FLAGS([-pedantic -Wall -Wextra -Wdocumentation])
+AS_VAR_IF([enable_debug_build], [[yes]], [AX_APPEND_COMPILE_FLAGS(
+    [-pedantic -Wall -Wextra -Wdocumentation -Werror])])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
