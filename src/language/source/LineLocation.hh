@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_SourceLineLocation_hh
-#define INCLUDED_language_source_SourceLineLocation_hh
+#ifndef INCLUDED_language_source_LineLocation_hh
+#define INCLUDED_language_source_LineLocation_hh
 
 #include "buildconfig.h"
 
@@ -28,8 +28,8 @@ namespace sesh {
 namespace language {
 namespace source {
 
-/** A source line location is a pair of a source name and a line number. */
-class SourceLineLocation {
+/** A line location is a pair of a source name and a line number. */
+class LineLocation {
 
 private:
 
@@ -40,29 +40,23 @@ private:
 
 public:
 
-    SourceLineLocation(
-            const std::shared_ptr<const common::String> &,
-            std::size_t);
-    SourceLineLocation(
-            std::shared_ptr<const common::String> &&,
-            std::size_t);
+    LineLocation(const std::shared_ptr<const common::String> &, std::size_t);
+    LineLocation(std::shared_ptr<const common::String> &&, std::size_t);
 
-    SourceLineLocation(const SourceLineLocation &) = default;
-    SourceLineLocation(SourceLineLocation &&) = default;
-    SourceLineLocation &operator=(const SourceLineLocation &) = default;
-    SourceLineLocation &operator=(SourceLineLocation &&) = default;
-    ~SourceLineLocation() = default;
+    LineLocation(const LineLocation &) = default;
+    LineLocation(LineLocation &&) = default;
+    LineLocation &operator=(const LineLocation &) = default;
+    LineLocation &operator=(LineLocation &&) = default;
+    ~LineLocation() = default;
 
     const common::String &name() const noexcept { return *mName; }
     const std::size_t &line() const noexcept { return mLine; }
 
 };
 
-bool operator==(const SourceLineLocation &l, const SourceLineLocation &r);
+bool operator==(const LineLocation &l, const LineLocation &r);
 
-inline bool operator!=(
-        const SourceLineLocation &l,
-        const SourceLineLocation &r) {
+inline bool operator!=(const LineLocation &l, const LineLocation &r) {
     return !(l == r);
 }
 
@@ -70,6 +64,6 @@ inline bool operator!=(
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_SourceLineLocation_hh
+#endif // #ifndef INCLUDED_language_source_LineLocation_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

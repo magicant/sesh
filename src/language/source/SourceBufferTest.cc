@@ -27,9 +27,9 @@
 
 namespace {
 
+using sesh::language::source::Location;
 using sesh::language::source::Source;
 using sesh::language::source::SourceBuffer;
-using sesh::language::source::SourceLocation;
 using sesh::language::source::checkSourceString;
 
 using BufferPointer = sesh::language::source::SourceBuffer::Pointer;
@@ -41,7 +41,7 @@ class StringPrependedSource : public Source {
 public:
     StringPrependedSource(Pointer &&p, String &&s) :
             Source(std::move(p), 0, 0, std::move(s)) { }
-    SourceLocation locationInAlternate(Size) const override {
+    Location locationInAlternate(Size) const override {
         throw "unexpected";
     }
 };

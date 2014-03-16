@@ -43,9 +43,9 @@ check_PROGRAMS = \
 	language/parser/WordComponentParserTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
+	language/source/LineLocationTest \
+	language/source/LocationTest \
 	language/source/SourceBufferTest \
-	language/source/SourceLineLocationTest \
-	language/source/SourceLocationTest \
 	language/source/SourceTest \
 	language/syntax/AndOrListTest \
 	language/syntax/AssignmentTest \
@@ -178,14 +178,14 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/LineContinuedSource.hh \
+	language/source/LineLocation.cc \
+	language/source/LineLocation.hh \
+	language/source/Location.cc \
+	language/source/Location.hh \
 	language/source/Source.cc \
 	language/source/Source.hh \
 	language/source/SourceBuffer.cc \
 	language/source/SourceBuffer.hh \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLineLocation.hh \
-	language/source/SourceLocation.cc \
-	language/source/SourceLocation.hh \
 	language/syntax/AndOrList.cc \
 	language/syntax/AndOrList.hh \
 	language/syntax/Assignment.cc \
@@ -595,32 +595,32 @@ language_parser_WordComponentParserTest_SOURCES = \
 language_source_LineAppendedSourceTest_SOURCES = \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSourceTest.cc \
-	language/source/Source.cc \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLocation.cc
+	language/source/LineLocation.cc \
+	language/source/Location.cc \
+	language/source/Source.cc
 language_source_LineContinuedSourceTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/LineContinuedSourceTest.cc \
-	language/source/Source.cc \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLocation.cc
+	language/source/LineLocation.cc \
+	language/source/Location.cc \
+	language/source/Source.cc
+language_source_LineLocationTest_SOURCES = \
+	language/source/LineLocation.cc \
+	language/source/LineLocationTest.cc
+language_source_LocationTest_SOURCES = \
+	language/source/LineLocation.cc \
+	language/source/Location.cc \
+	language/source/LocationTest.cc
 language_source_SourceBufferTest_SOURCES = \
 	language/source/Source.cc \
 	language/source/SourceBuffer.cc \
 	language/source/SourceBufferTest.cc
-language_source_SourceLineLocationTest_SOURCES = \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLineLocationTest.cc
-language_source_SourceLocationTest_SOURCES = \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLocation.cc \
-	language/source/SourceLocationTest.cc
 language_source_SourceTest_SOURCES = \
 	language/source/Source.cc \
 	language/source/SourceTest.cc
 language_syntax_AndOrListTest_SOURCES = \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLocation.cc \
+	language/source/LineLocation.cc \
+	language/source/Location.cc \
 	language/syntax/AndOrList.cc \
 	language/syntax/AndOrListTest.cc \
 	language/syntax/ConditionalPipeline.cc \
@@ -633,19 +633,19 @@ language_syntax_AssignmentTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/Word.cc
 language_syntax_CommandTest_SOURCES = \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLocation.cc \
+	language/source/LineLocation.cc \
+	language/source/Location.cc \
 	language/syntax/CommandTest.cc
 language_syntax_ConditionalPipelineTest_SOURCES = \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLocation.cc \
+	language/source/LineLocation.cc \
+	language/source/Location.cc \
 	language/syntax/ConditionalPipeline.cc \
 	language/syntax/ConditionalPipelineTest.cc \
 	language/syntax/Pipeline.cc \
 	language/syntax/Printer.cc
 language_syntax_PipelineTest_SOURCES = \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLocation.cc \
+	language/source/LineLocation.cc \
+	language/source/Location.cc \
 	language/syntax/Pipeline.cc \
 	language/syntax/PipelineTest.cc \
 	language/syntax/Printer.cc
@@ -657,8 +657,8 @@ language_syntax_RawStringTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/RawStringTest.cc
 language_syntax_SequenceTest_SOURCES = \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLocation.cc \
+	language/source/LineLocation.cc \
+	language/source/Location.cc \
 	language/syntax/AndOrList.cc \
 	language/syntax/ConditionalPipeline.cc \
 	language/syntax/Pipeline.cc \
@@ -666,8 +666,8 @@ language_syntax_SequenceTest_SOURCES = \
 	language/syntax/Sequence.cc \
 	language/syntax/SequenceTest.cc
 language_syntax_SimpleCommandTest_SOURCES = \
-	language/source/SourceLineLocation.cc \
-	language/source/SourceLocation.cc \
+	language/source/LineLocation.cc \
+	language/source/Location.cc \
 	language/syntax/Assignment.cc \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc \
@@ -687,8 +687,8 @@ TESTHEADERS = \
 	language/parser/TokenParserTestHelper.hh \
 	language/parser/WordParserTestHelper.hh \
 	language/source/DiagnosticMessageTestHelper.hh \
-	language/source/SourceLineLocationTestHelper.hh \
-	language/source/SourceLocationTestHelper.hh \
+	language/source/LineLocationTestHelper.hh \
+	language/source/LocationTestHelper.hh \
 	language/source/SourceTestHelper.hh \
 	language/syntax/PrinterTestHelper.hh
 

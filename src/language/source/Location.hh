@@ -15,61 +15,61 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_SourceLocation_hh
-#define INCLUDED_language_source_SourceLocation_hh
+#ifndef INCLUDED_language_source_Location_hh
+#define INCLUDED_language_source_Location_hh
 
 #include "buildconfig.h"
 
 #include <cstddef>
 #include <memory>
 #include "common/String.hh"
-#include "language/source/SourceLineLocation.hh"
+#include "language/source/LineLocation.hh"
 
 namespace sesh {
 namespace language {
 namespace source {
 
-/** A source location is a location in a shell script source file. */
-class SourceLocation {
+/** A location points to a character position in a shell script source file. */
+class Location {
 
 private:
 
-    SourceLineLocation mNameAndLine;
+    LineLocation mNameAndLine;
     /** Counted from 0. */
     std::size_t mColumn;
 
 public:
 
-    SourceLocation(const SourceLineLocation &nameAndLine, std::size_t column);
-    SourceLocation(SourceLineLocation &&nameAndLine, std::size_t column);
+    Location(const LineLocation &nameAndLine, std::size_t column);
+    Location(LineLocation &&nameAndLine, std::size_t column);
 
-    SourceLocation(
+    Location(
             const std::shared_ptr<const common::String> &name,
             std::size_t line,
             std::size_t column);
-    SourceLocation(
+    Location(
             std::shared_ptr<const common::String> &&name,
             std::size_t line,
             std::size_t column);
 
-    SourceLocation(const SourceLocation &) = default;
-    SourceLocation(SourceLocation &&) = default;
-    SourceLocation &operator=(const SourceLocation &) = default;
-    SourceLocation &operator=(SourceLocation &&) = default;
-    ~SourceLocation() = default;
+    Location(const Location &) = default;
+    Location(Location &&) = default;
+    Location &operator=(const Location &) = default;
+    Location &operator=(Location &&) = default;
+    ~Location() = default;
 
-    const SourceLineLocation &nameAndLine() const noexcept {
+    const LineLocation &nameAndLine() const noexcept {
         return mNameAndLine;
     }
     const common::String &name() const noexcept { return mNameAndLine.name(); }
     std::size_t line() const noexcept { return mNameAndLine.line(); }
     std::size_t column() const noexcept { return mColumn; }
 
-}; // class SourceLocation
+}; // class Location
 
-bool operator==(const SourceLocation &l, const SourceLocation &r);
+bool operator==(const Location &l, const Location &r);
 
-inline bool operator!=(const SourceLocation &l, const SourceLocation &r) {
+inline bool operator!=(const Location &l, const Location &r) {
     return !(l == r);
 }
 
@@ -77,6 +77,6 @@ inline bool operator!=(const SourceLocation &l, const SourceLocation &r) {
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_SourceLocation_hh
+#endif // #ifndef INCLUDED_language_source_Location_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

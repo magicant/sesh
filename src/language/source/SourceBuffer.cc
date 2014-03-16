@@ -64,7 +64,7 @@ auto SourceBuffer::cend() const noexcept -> ConstIterator {
     return ConstIterator(shared_from_this(), length());
 }
 
-SourceLocation SourceBuffer::location(Size position) const {
+Location SourceBuffer::location(Size position) const {
     return mSource->location(position);
 }
 

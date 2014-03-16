@@ -23,7 +23,7 @@
 #include <memory>
 #include "common/Char.hh"
 #include "common/String.hh"
-#include "language/source/SourceLocation.hh"
+#include "language/source/Location.hh"
 
 namespace sesh {
 namespace language {
@@ -118,7 +118,7 @@ private:
      * @param position < length of alternate
      * @return source location for the argument position in the alternate
      */
-    virtual SourceLocation locationInAlternate(Size position) const = 0;
+    virtual Location locationInAlternate(Size position) const = 0;
 
 public:
 
@@ -142,7 +142,7 @@ public:
      * @param position < length of this source
      * @return source location for the argument position
      */
-    SourceLocation location(Size position) const;
+    Location location(Size position) const;
 
 };
 

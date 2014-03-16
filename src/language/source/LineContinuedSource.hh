@@ -50,7 +50,7 @@ public:
 
 private:
 
-    SourceLocation locationInAlternate(Size) const override;
+    Location locationInAlternate(Size) const override;
 
 };
 

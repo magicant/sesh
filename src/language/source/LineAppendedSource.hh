@@ -20,8 +20,8 @@
 
 #include "buildconfig.h"
 
+#include "language/source/LineLocation.hh"
 #include "language/source/Source.hh"
-#include "language/source/SourceLineLocation.hh"
 
 namespace sesh {
 namespace language {
@@ -37,10 +37,9 @@ class LineAppendedSource : public Source {
 
 private:
 
-    SourceLineLocation mLineLocation;
+    LineLocation mLineLocation;
 
-    LineAppendedSource(
-            Pointer &&, Size, Size, String &&, SourceLineLocation &&);
+    LineAppendedSource(Pointer &&, Size, Size, String &&, LineLocation &&);
 
 public:
 
@@ -50,7 +49,7 @@ public:
      * the line.
      */
     static LineAppendedSource create(
-            Pointer &&original, String &&line, SourceLineLocation &&);
+            Pointer &&original, String &&line, LineLocation &&);
 
     LineAppendedSource(const LineAppendedSource &) = delete;
     LineAppendedSource(LineAppendedSource &&) = default;
@@ -62,7 +61,7 @@ private:
 
     Size lineBeginInAlternate(Size) const noexcept override;
     Size lineEndInAlternate(Size) const noexcept override;
-    SourceLocation locationInAlternate(Size) const override;
+    Location locationInAlternate(Size) const override;
 
 };
 

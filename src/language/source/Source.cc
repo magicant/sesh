@@ -152,7 +152,7 @@ auto Source::lineEnd(Size position) const noexcept -> Size {
     return original()->lineEnd(position - ld) + ld;
 }
 
-SourceLocation Source::location(Size position) const {
+Location Source::location(Size position) const {
     if (position < begin())
         return original()->location(position);
     if (position < positionAfterAlternate())

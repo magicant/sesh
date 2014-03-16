@@ -30,7 +30,7 @@ namespace source {
 
 class SourceStub : public Source {
     using Source::Source;
-    SourceLocation locationInAlternate(Size) const override {
+    Location locationInAlternate(Size) const override {
         throw "unexpected location";
     }
 };
@@ -84,10 +84,10 @@ void checkSourceLocation(
         const common::String &name,
         Source::Size line,
         Source::Size column) {
-    SourceLocation sl = source.location(position);
-    CHECK(sl.name() == name);
-    CHECK(sl.line() == line);
-    CHECK(sl.column() == column);
+    Location l = source.location(position);
+    CHECK(l.name() == name);
+    CHECK(l.line() == line);
+    CHECK(l.column() == column);
 }
 
 } // namespace source

@@ -15,40 +15,32 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_Command_hh
-#define INCLUDED_language_syntax_Command_hh
+#ifndef INCLUDED_language_source_LineLocationTestHelper_hh
+#define INCLUDED_language_source_LineLocationTestHelper_hh
 
 #include "buildconfig.h"
 
-#include <utility>
-#include "language/syntax/Printable.hh"
+#include <cstddef>
+#include <memory>
+#include "common/Char.hh"
+#include "common/String.hh"
+#include "language/source/LineLocation.hh"
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace source {
 
-/** A command is either a simple or compound command. */
-class Command : public Printable {
+/** For testing only. */
+inline LineLocation dummyLineLocation(
+        const common::Char *name = L("dummy"),
+        std::size_t line = 0) {
+    return LineLocation(std::make_shared<common::String>(name), line);
+}
 
-private:
-
-    // TODO Redirection
-
-public:
-
-    Command() = default;
-    Command(const Command &) = default;
-    Command(Command &&) = default;
-    Command &operator=(const Command &) = default;
-    Command &operator=(Command &&) = default;
-    ~Command() override = default;
-
-}; // class Command
-
-} // namespace syntax
+} // namespace source
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_Command_hh
+#endif // #ifndef INCLUDED_language_source_LineLocationTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -16,34 +16,39 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "SourceLineLocation.hh"
+#include "Location.hh"
 
+#include <stdexcept>
 #include <utility>
 
 namespace sesh {
 namespace language {
 namespace source {
 
-SourceLineLocation::SourceLineLocation(
+Location::Location(
+        const LineLocation &nameAndLine, std::size_t column) :
+        mNameAndLine(nameAndLine), mColumn(column) { }
+
+Location::Location(
+        LineLocation &&nameAndLine, std::size_t column) :
+        mNameAndLine(std::move(nameAndLine)), mColumn(column) { }
+
+Location::Location(
         const std::shared_ptr<const common::String> &name,
-        std::size_t line) :
-        mName(name),
-        mLine(line) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
-}
+        std::size_t line,
+        std::size_t column) :
+        mNameAndLine(name, line),
+        mColumn(column) { }
 
-SourceLineLocation::SourceLineLocation(
+Location::Location(
         std::shared_ptr<const common::String> &&name,
-        std::size_t line) :
-        mName(std::move(name)),
-        mLine(line) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
-}
+        std::size_t line,
+        std::size_t column) :
+        mNameAndLine(std::move(name), line),
+        mColumn(column) { }
 
-bool operator==(const SourceLineLocation &l, const SourceLineLocation &r) {
-    return l.name() == r.name() && l.line() == r.line();
+bool operator==(const Location &l, const Location &r) {
+    return l.nameAndLine() == r.nameAndLine() && l.column() == r.column();
 }
 
 } // namespace source

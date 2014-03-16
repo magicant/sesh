@@ -25,8 +25,8 @@
 #include <memory>
 #include <ostream>
 #include <utility>
+#include "language/source/Location.hh"
 #include "language/source/Source.hh"
-#include "language/source/SourceLocation.hh"
 
 namespace sesh {
 namespace language {
@@ -131,7 +131,7 @@ public:
     ConstIterator begin() const noexcept { return cbegin(); }
     ConstIterator end() const noexcept { return cend(); }
 
-    SourceLocation location(Size position) const;
+    Location location(Size position) const;
 
 };
 
@@ -278,7 +278,7 @@ SourceBuffer::String toString(
         const SourceBuffer::ConstIterator &begin,
         const SourceBuffer::ConstIterator &end);
 
-inline SourceLocation toLocation(const SourceBuffer::ConstIterator &i) {
+inline Location toLocation(const SourceBuffer::ConstIterator &i) {
     return i.buffer().location(i.position());
 }
 
