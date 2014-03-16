@@ -87,7 +87,7 @@ TEST_CASE("Line location, comparison") {
     CHECK(!(ll3 == ll4));
 }
 
-TEST_CASE("Dummy source line location") {
+TEST_CASE("Line location, dummy") {
     LineLocation ll1 = dummyLineLocation();
     LineLocation ll2 = dummyLineLocation(L("test"));
     LineLocation ll3 = dummyLineLocation(L("test"), 777);

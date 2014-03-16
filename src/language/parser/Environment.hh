@@ -25,7 +25,7 @@
 #include "common/ErrorLevel.hh"
 #include "common/Message.hh"
 #include "common/String.hh"
-#include "language/source/SourceBuffer.hh"
+#include "language/source/Buffer.hh"
 
 namespace sesh {
 namespace language {
@@ -47,15 +47,15 @@ public:
     using Size = common::String::size_type;
 
     /** Shared pointer to the underlying source buffer. */
-    virtual const source::SourceBuffer &sourceBuffer() const noexcept = 0;
+    virtual const source::Buffer &buffer() const noexcept = 0;
 
-    /** Current length (end position) of the source buffer. */
+    /** Current length (end position) of the buffer. */
     virtual Size length() const noexcept = 0;
 
-    /** Character at the given position in the source buffer. */
+    /** Character at the given position in the buffer. */
     virtual common::Char at(Size) const = 0;
 
-    /** Current position in the source buffer. */
+    /** Current position in the buffer. */
     virtual Size position() const noexcept = 0;
 
     /** Sets the current position (&lt;= {@link #length}). */
@@ -63,7 +63,7 @@ public:
 
     /**
      * Whether the end of file has been reached. If true, the parser must not
-     * request further source buffer input. Otherwise, the parser may do so by
+     * request further buffer input. Otherwise, the parser may do so by
      * throwing NeedMoreSource when further input is needed to finish parsing.
      */
     virtual bool isEof() const noexcept = 0;
@@ -71,7 +71,7 @@ public:
     /**
      * Checks whether there is a backslash-newline pair (or a line
      * continuation) at the specified position and if so removes it from the
-     * source buffer.
+     * buffer.
      *
      * @return true if the line continuation was removed; false if nothing
      * changed.
@@ -81,7 +81,7 @@ public:
     virtual bool removeLineContinuation(Size) = 0;
 
     /**
-     * Performs alias substitution on the specified range of the source buffer.
+     * Performs alias substitution on the specified range of the buffer.
      * Returns true if the range was actually substituted, in which case all
      * iterators after the begin are invalidated. Returns false if nothing
      * changed.

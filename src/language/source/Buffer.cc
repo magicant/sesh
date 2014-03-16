@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "SourceBuffer.hh"
+#include "Buffer.hh"
 
 #include <memory>
 #include <stdexcept>
@@ -26,52 +26,51 @@ namespace sesh {
 namespace language {
 namespace source {
 
-SourceBuffer::ConstIterator::ConstIterator(
+Buffer::ConstIterator::ConstIterator(
         const ConstPointer &buffer, Size position) noexcept :
         mBuffer(buffer), mPosition(position) { }
 
-SourceBuffer::ConstIterator::ConstIterator(
+Buffer::ConstIterator::ConstIterator(
         ConstPointer &&buffer, Size position) noexcept :
         mBuffer(std::move(buffer)), mPosition(position) { }
 
-auto SourceBuffer::create() -> Pointer {
-    return std::make_shared<SourceBuffer>();
+auto Buffer::create() -> Pointer {
+    return std::make_shared<Buffer>();
 }
 
-auto SourceBuffer::length() const noexcept -> Size {
+auto Buffer::length() const noexcept -> Size {
     if (mSource == nullptr)
         return 0;
     return mSource->length();
 }
 
-auto SourceBuffer::at(Size position) const -> ConstReference {
+auto Buffer::at(Size position) const -> ConstReference {
     if (mSource == nullptr)
         throw std::out_of_range("empty source");
     return mSource->at(position);
 }
 
-auto SourceBuffer::operator[](Size position) const -> ConstReference {
+auto Buffer::operator[](Size position) const -> ConstReference {
     if (mSource == nullptr)
         return L("")[0];
     return (*mSource)[position];
 }
 
-auto SourceBuffer::cbegin() const noexcept -> ConstIterator {
+auto Buffer::cbegin() const noexcept -> ConstIterator {
     return ConstIterator(shared_from_this(), 0);
 }
 
-auto SourceBuffer::cend() const noexcept -> ConstIterator {
+auto Buffer::cend() const noexcept -> ConstIterator {
     return ConstIterator(shared_from_this(), length());
 }
 
-Location SourceBuffer::location(Size position) const {
+Location Buffer::location(Size position) const {
     return mSource->location(position);
 }
 
-SourceBuffer::String toString(
-        const SourceBuffer::ConstIterator &begin,
-        const SourceBuffer::ConstIterator &end) {
-    SourceBuffer::String s;
+Buffer::String toString(
+        const Buffer::ConstIterator &begin, const Buffer::ConstIterator &end) {
+    Buffer::String s;
     s.insert(s.end(), begin, end);
     return s;
 }
@@ -82,7 +81,7 @@ SourceBuffer::String toString(
 
 namespace std {
 
-using ConstIterator = sesh::language::source::SourceBuffer::ConstIterator;
+using ConstIterator = sesh::language::source::Buffer::ConstIterator;
 
 template<>
 void swap<ConstIterator>(ConstIterator &i1, ConstIterator &i2) noexcept {

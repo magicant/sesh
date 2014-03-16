@@ -93,7 +93,7 @@ TEST_CASE("Location, comparison") {
     CHECK(!(l3 == l5));
 }
 
-TEST_CASE("Dummy source location") {
+TEST_CASE("Location, dummy") {
     Location l1 = dummyLocation();
     Location l2 = dummyLocation(L("foo"));
     Location l3 = dummyLocation(L("foo"), 123);

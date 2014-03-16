@@ -22,7 +22,7 @@
 
 #include "common/ErrorLevel.hh"
 #include "common/Message.hh"
-#include "language/source/SourceBuffer.hh"
+#include "language/source/Buffer.hh"
 
 namespace sesh {
 namespace language {
@@ -36,7 +36,7 @@ class DiagnosticMessage {
 
 public:
 
-    using Position = source::SourceBuffer::ConstIterator;
+    using Position = source::Buffer::ConstIterator;
 
 private:
 
