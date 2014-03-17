@@ -184,6 +184,7 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/source/LineLocation.hh \
 	language/source/Location.cc \
 	language/source/Location.hh \
+	language/source/Origin.hh \
 	language/source/Source.cc \
 	language/source/Source.hh \
 	language/syntax/AndOrList.cc \
@@ -689,6 +690,7 @@ TESTHEADERS = \
 	language/source/DiagnosticMessageTestHelper.hh \
 	language/source/LineLocationTestHelper.hh \
 	language/source/LocationTestHelper.hh \
+	language/source/OriginTestHelper.hh \
 	language/source/SourceTestHelper.hh \
 	language/syntax/PrinterTestHelper.hh
 
