@@ -18,6 +18,7 @@
 #include "buildconfig.h"
 #include "LineLocation.hh"
 
+#include <stdexcept>
 #include <utility>
 
 namespace sesh {
