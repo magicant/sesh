@@ -23,7 +23,7 @@
 #include <utility>
 #include "common/Char.hh"
 #include "language/source/LineAppendedSource.hh"
-#include "language/source/LineLocationTestHelper.hh"
+#include "language/source/LocationTestHelper.hh"
 #include "language/source/SourceTestHelper.hh"
 
 namespace {
@@ -164,26 +164,25 @@ TEST_CASE("Line-appended source line end") {
 
 TEST_CASE("Line-appended source location") {
     Source::Pointer s;
-    auto dll = dummyLineLocation;
 
-    s.reset(create(nullptr, L("ab"), dll(L("source 1"), 3)));
-    checkSourceLocation(*s, 0, L("source 1"), 3, 0);
-    checkSourceLocation(*s, 1, L("source 1"), 3, 1);
+    s.reset(create(nullptr, L("ab"), dummyLineLocation(3)));
+    checkSourceLocation(*s, 0, 3, 0);
+    checkSourceLocation(*s, 1, 3, 1);
 
-    s.reset(create(std::move(s), L("c\n"), dll(L("source 2"), 0)));
-    checkSourceLocation(*s, 0, L("source 1"), 3, 0);
-    checkSourceLocation(*s, 1, L("source 1"), 3, 1);
-    checkSourceLocation(*s, 2, L("source 2"), 0, 0);
-    checkSourceLocation(*s, 3, L("source 2"), 0, 1);
+    s.reset(create(std::move(s), L("c\n"), dummyLineLocation(0)));
+    checkSourceLocation(*s, 0, 3, 0);
+    checkSourceLocation(*s, 1, 3, 1);
+    checkSourceLocation(*s, 2, 0, 0);
+    checkSourceLocation(*s, 3, 0, 1);
 
-    s.reset(create(std::move(s), L("def"), dll(L("source 3"), 5)));
-    checkSourceLocation(*s, 0, L("source 1"), 3, 0);
-    checkSourceLocation(*s, 1, L("source 1"), 3, 1);
-    checkSourceLocation(*s, 2, L("source 2"), 0, 0);
-    checkSourceLocation(*s, 3, L("source 2"), 0, 1);
-    checkSourceLocation(*s, 4, L("source 3"), 5, 0);
-    checkSourceLocation(*s, 5, L("source 3"), 5, 1);
-    checkSourceLocation(*s, 6, L("source 3"), 5, 2);
+    s.reset(create(std::move(s), L("def"), dummyLineLocation(5)));
+    checkSourceLocation(*s, 0, 3, 0);
+    checkSourceLocation(*s, 1, 3, 1);
+    checkSourceLocation(*s, 2, 0, 0);
+    checkSourceLocation(*s, 3, 0, 1);
+    checkSourceLocation(*s, 4, 5, 0);
+    checkSourceLocation(*s, 5, 5, 1);
+    checkSourceLocation(*s, 6, 5, 2);
 }
 
 } // namespace

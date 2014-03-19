@@ -27,90 +27,155 @@
 #include "common/String.hh"
 #include "language/source/Location.hh"
 #include "language/source/LocationTestHelper.hh"
+#include "language/source/OriginTestHelper.hh"
 
 namespace {
 
 using sesh::common::String;
+using sesh::language::source::LineLocation;
 using sesh::language::source::Location;
+using sesh::language::source::Origin;
+using sesh::language::source::dummyLineLocation;
 using sesh::language::source::dummyLocation;
+using sesh::language::source::dummyOrigin;
 
-TEST_CASE("Location, construction") {
-    std::shared_ptr<const String> name = std::make_shared<String>(L("12"));
-
-    Location l1(name, 0, 0);
-    Location l2(decltype(name)(name), 1, 1);
-
-    name = std::make_shared<String>(L("34"));
-
-    Location l3(name, 3, 4);
-    Location l4(decltype(name)(name), 1234, 9876);
-
-    CHECK(l1.name() == L("12"));
-    CHECK(l1.line() == 0);
-    CHECK(l1.column() == 0);
-    CHECK(l2.name() == L("12"));
-    CHECK(l2.line() == 1);
-    CHECK(l2.column() == 1);
-    CHECK(l3.name() == L("34"));
-    CHECK(l3.line() == 3);
-    CHECK(l3.column() == 4);
-    CHECK(l4.name() == L("34"));
-    CHECK(l4.line() == 1234);
-    CHECK(l4.column() == 9876);
-
-    l1 = l2;
-    CHECK(l1.line() == 1);
-    l1 = std::move(l3);
-    CHECK(l1.line() == 3);
+template<typename T>
+T copy(const T &v) {
+    return v;
 }
 
-TEST_CASE("Location, constructor null pointer exception") {
-    std::shared_ptr<const String> name(nullptr);
-    CHECK_THROWS_AS(Location(name, 0, 0), std::invalid_argument);
-    CHECK_THROWS_AS(Location(std::move(name), 0, 0), std::invalid_argument);
+TEST_CASE("Line location, construction, no parent") {
+    LineLocation ll1(nullptr, dummyOrigin(), 0);
+    LineLocation ll2 = ll1;
+}
+
+TEST_CASE("Line location, assignment") {
+    LineLocation ll1 = dummyLineLocation();
+    LineLocation ll2 = dummyLineLocation();
+    ll1 = ll2;
+}
+
+TEST_CASE("Location, construction and assignment") {
+    Location l1(dummyLineLocation(), 0);
+    Location l2 = l1;
+    l1 = l2;
+}
+
+TEST_CASE("Line location, construction, with parent") {
+    std::shared_ptr<const Location> parent =
+            std::make_shared<Location>(dummyLocation());
+    LineLocation ll1(copy(parent), dummyOrigin(), 0);
+    (void) ll1;
+}
+
+TEST_CASE("Line location, parent") {
+    LineLocation ll1(nullptr, dummyOrigin(), 0);
+    CHECK(ll1.parent() == nullptr);
+
+    std::shared_ptr<const Location> parent =
+            std::make_shared<Location>(dummyLocation());
+    LineLocation ll2(copy(parent), dummyOrigin(), 0);
+    CHECK(ll2.parent() == parent.get());
+}
+
+TEST_CASE("Line location, origin") {
+    std::shared_ptr<const Origin> origin = dummyOrigin();
+    LineLocation ll1(nullptr, copy(origin), 0);
+    CHECK(&ll1.origin() == origin.get());
+}
+
+TEST_CASE("Line location, line") {
+    LineLocation ll1(nullptr, dummyOrigin(), 0);
+    LineLocation ll2(nullptr, dummyOrigin(), 1);
+    LineLocation ll3(nullptr, dummyOrigin(), 2);
+    CHECK(ll1.line() == 0);
+    CHECK(ll2.line() == 1);
+    CHECK(ll3.line() == 2);
+}
+
+TEST_CASE("Line location, comparison, no parent") {
+    std::shared_ptr<const Location> parent =
+            std::make_shared<Location>(dummyLocation());
+    std::shared_ptr<const Origin> origin = dummyOrigin();
+
+    LineLocation ll1(nullptr, copy(origin), 0);
+    LineLocation ll2(copy(parent), copy(origin), 0);
+    LineLocation ll3(nullptr, dummyOrigin(), 0);
+    LineLocation ll4(nullptr, copy(origin), 1);
+
+    CHECK(ll1 == ll1);
+    CHECK(ll1 == LineLocation(ll1));
+    CHECK(ll2 == ll2);
+    CHECK(ll3 == ll3);
+    CHECK(ll4 == ll4);
+    CHECK_FALSE(ll1 != ll1);
+    CHECK_FALSE(ll2 != ll2);
+    CHECK_FALSE(ll3 != ll3);
+    CHECK_FALSE(ll4 != ll4);
+
+    CHECK_FALSE(ll1 == ll2);
+    CHECK_FALSE(ll1 == ll3);
+    CHECK_FALSE(ll1 == ll4);
+    CHECK(ll1 != ll2);
+    CHECK(ll1 != ll3);
+    CHECK(ll1 != ll4);
+}
+
+TEST_CASE("Location, column") {
+    Location l1(dummyLineLocation(), 0);
+    Location l2(dummyLineLocation(), 1);
+    Location l3(dummyLineLocation(), 2);
+    CHECK(l1.column() == 0);
+    CHECK(l2.column() == 1);
+    CHECK(l3.column() == 2);
 }
 
 TEST_CASE("Location, comparison") {
-    Location l1 = dummyLocation(L("apple"), 0, 0);
-    Location l2 = dummyLocation(L("apple"), 0, 0);
-    Location l3 = dummyLocation(L("banana"), 0, 0);
-    Location l4 = dummyLocation(L("apple"), 1, 0);
-    Location l5 = dummyLocation(L("apple"), 0, 1);
+    Location l1(dummyLineLocation(0), 0);
+    Location l2(dummyLineLocation(1), 0);
+    Location l3(dummyLineLocation(0), 1);
 
     CHECK(l1 == l1);
-    CHECK_FALSE(!(l1 == l1));
-    CHECK(l1 == l2);
-    CHECK_FALSE(!(l1 == l2));
+    CHECK(l1 == Location(l1));
+    CHECK(l2 == l2);
+    CHECK(l3 == l3);
+    CHECK_FALSE(l1 != l1);
+    CHECK_FALSE(l2 != l2);
+    CHECK_FALSE(l3 != l3);
+
+    CHECK_FALSE(l1 == l2);
     CHECK_FALSE(l1 == l3);
-    CHECK(!(l1 == l3));
-    CHECK_FALSE(l1 == l4);
-    CHECK(!(l1 == l4));
-    CHECK_FALSE(l1 == l5);
-    CHECK(!(l1 == l5));
-    CHECK_FALSE(l3 == l4);
-    CHECK(!(l3 == l4));
-    CHECK_FALSE(l3 == l5);
-    CHECK(!(l3 == l5));
+    CHECK(l1 != l2);
+    CHECK(l1 != l3);
 }
 
-TEST_CASE("Location, dummy") {
-    Location l1 = dummyLocation();
-    Location l2 = dummyLocation(L("foo"));
-    Location l3 = dummyLocation(L("foo"), 123);
-    Location l4 = dummyLocation(L("foo"), 123, 456);
+TEST_CASE("Line location, comparison, with parent") {
+    std::shared_ptr<const Origin> origin = dummyOrigin();
 
-    CHECK(l1.name() == L("dummy"));
-    CHECK(l1.line() == 1);
-    CHECK(l1.column() == 1);
-    CHECK(l2.name() == L("foo"));
-    CHECK(l2.line() == 1);
-    CHECK(l2.column() == 1);
-    CHECK(l3.name() == L("foo"));
-    CHECK(l3.line() == 123);
-    CHECK(l3.column() == 1);
-    CHECK(l4.name() == L("foo"));
-    CHECK(l4.line() == 123);
-    CHECK(l4.column() == 456);
+    LineLocation ll1(nullptr, copy(origin), 0);
+    std::shared_ptr<const Location> parent1 =
+            std::make_shared<Location>(ll1, 0);
+    LineLocation ll2(copy(parent1), copy(origin), 0);
+
+    CHECK(ll2 == ll2);
+    CHECK(ll2 == LineLocation(ll2));
+    CHECK_FALSE(ll2 != ll2);
+
+    std::shared_ptr<const Location> parent2 =
+            std::make_shared<Location>(ll2, 0);
+    std::shared_ptr<const Location> parent3 =
+            std::make_shared<Location>(ll2, 0);
+    LineLocation ll3(copy(parent2), copy(origin), 0);
+    LineLocation ll4(copy(parent3), copy(origin), 0);
+    LineLocation ll5(copy(parent3), copy(origin), 0);
+
+    CHECK(ll2 != ll3);
+    CHECK_FALSE(ll2 == ll3);
+
+    CHECK(ll3 == ll4);
+    CHECK(ll4 == ll5);
+    CHECK_FALSE(ll3 != ll4);
+    CHECK_FALSE(ll4 != ll5);
 }
 
 } // namespace

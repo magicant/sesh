@@ -25,30 +25,45 @@ namespace sesh {
 namespace language {
 namespace source {
 
-Location::Location(
-        const LineLocation &nameAndLine, std::size_t column) :
-        mNameAndLine(nameAndLine), mColumn(column) { }
+namespace {
+
+bool equal(const Location *l, const Location *r) noexcept {
+    if (l == nullptr)
+        return r == nullptr;
+    return r != nullptr && *l == *r;
+}
+
+} // namespace
+
+LineLocation::LineLocation(
+        std::shared_ptr<const Location> &&parent, // may be null
+        std::shared_ptr<const Origin> &&origin, // must never be null
+        std::size_t line) :
+        mParent(std::move(parent)),
+        mOrigin(std::move(origin)),
+        mLine(line) {
+    if (mOrigin == nullptr)
+        throw std::invalid_argument("null origin");
+}
+
+bool operator==(const LineLocation &l, const LineLocation &r) noexcept {
+    return l.line() == r.line() &&
+            &l.origin() == &r.origin() &&
+            equal(l.parent(), r.parent());
+}
 
 Location::Location(
-        LineLocation &&nameAndLine, std::size_t column) :
-        mNameAndLine(std::move(nameAndLine)), mColumn(column) { }
-
-Location::Location(
-        const std::shared_ptr<const common::String> &name,
+        std::shared_ptr<const Location> &&parent, // may be null
+        std::shared_ptr<const Origin> &&origin, // must never be null
         std::size_t line,
         std::size_t column) :
-        mNameAndLine(name, line),
+        LineLocation(std::move(parent), std::move(origin), line),
         mColumn(column) { }
 
-Location::Location(
-        std::shared_ptr<const common::String> &&name,
-        std::size_t line,
-        std::size_t column) :
-        mNameAndLine(std::move(name), line),
-        mColumn(column) { }
-
-bool operator==(const Location &l, const Location &r) {
-    return l.nameAndLine() == r.nameAndLine() && l.column() == r.column();
+bool operator==(const Location &l, const Location &r) noexcept {
+    return l.column() == r.column() &&
+            static_cast<const LineLocation &>(l) ==
+            static_cast<const LineLocation &>(r);
 }
 
 } // namespace source

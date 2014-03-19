@@ -25,17 +25,20 @@
 #include "common/Char.hh"
 #include "common/String.hh"
 #include "language/source/Location.hh"
+#include "language/source/OriginTestHelper.hh"
 
 namespace sesh {
 namespace language {
 namespace source {
 
 /** For testing only. */
-inline Location dummyLocation(
-        const common::Char *name = L("dummy"),
-        std::size_t line = 1,
-        std::size_t column = 1) {
-    return Location(std::make_shared<common::String>(name), line, column);
+inline LineLocation dummyLineLocation(std::size_t line = 1) {
+    return LineLocation(nullptr, dummyOrigin(), line);
+}
+
+/** For testing only. */
+inline Location dummyLocation(std::size_t line = 1, std::size_t column = 1) {
+    return Location(dummyLineLocation(line), column);
 }
 
 } // namespace source

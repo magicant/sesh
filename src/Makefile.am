@@ -44,7 +44,6 @@ check_PROGRAMS = \
 	language/source/BufferTest \
 	language/source/LineAppendedSourceTest \
 	language/source/LineContinuedSourceTest \
-	language/source/LineLocationTest \
 	language/source/LocationTest \
 	language/source/SourceTest \
 	language/syntax/AndOrListTest \
@@ -180,8 +179,6 @@ sesh_SOURCES = buildconfig.h main.cc \
 	language/source/LineAppendedSource.hh \
 	language/source/LineContinuedSource.cc \
 	language/source/LineContinuedSource.hh \
-	language/source/LineLocation.cc \
-	language/source/LineLocation.hh \
 	language/source/Location.cc \
 	language/source/Location.hh \
 	language/source/Origin.hh \
@@ -224,6 +221,7 @@ common_TrieTest_SOURCES = \
 common_VariantTest_SOURCES = \
 	common/VariantTest.cc
 language_parser_AndOrListParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/AndOrListParser.cc \
 	language/parser/AndOrListParserTest.cc \
 	language/parser/BlankAndCommentParser.cc \
@@ -249,6 +247,7 @@ language_parser_AndOrListParserTest_SOURCES = \
 	language/syntax/Pipeline.cc \
 	language/syntax/Printer.cc
 language_parser_AssignedWordParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/AssignedWordParser.cc \
 	language/parser/AssignedWordParserTest.cc \
 	language/parser/CharParser.cc \
@@ -264,6 +263,7 @@ language_parser_AssignedWordParserTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/Word.cc
 language_parser_AssignmentParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/AssignmentParser.cc \
 	language/parser/AssignmentParserTest.cc \
 	language/parser/CharParser.cc \
@@ -280,6 +280,7 @@ language_parser_AssignmentParserTest_SOURCES = \
 	language/syntax/Printer.cc \
 	language/syntax/Word.cc
 language_parser_BlankAndCommentParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BlankAndCommentParser.cc \
 	language/parser/BlankAndCommentParserTest.cc \
 	language/parser/CharFilter.cc \
@@ -295,6 +296,7 @@ language_parser_BlankAndCommentParserTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc
 language_parser_BlankCommentNewlineParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BlankAndCommentParser.cc \
 	language/parser/BlankCommentNewlineParser.cc \
 	language/parser/BlankCommentNewlineParserTest.cc \
@@ -312,6 +314,7 @@ language_parser_BlankCommentNewlineParserTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc
 language_parser_CharFilterTest_SOURCES = \
+	common/Message.cc \
 	language/parser/CharFilter.cc \
 	language/parser/CharFilterTest.cc \
 	language/parser/EnvironmentHelper.cc \
@@ -323,6 +326,7 @@ language_parser_CharFilterTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc
 language_parser_CharParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/CharParser.cc \
 	language/parser/CharParserTest.cc \
 	language/parser/EnvironmentHelper.cc \
@@ -334,6 +338,7 @@ language_parser_CharParserTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc
 language_parser_CommandParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BlankAndCommentParser.cc \
 	language/parser/CharFilter.cc \
 	language/parser/CharParser.cc \
@@ -356,6 +361,7 @@ language_parser_CommandParserTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/Word.cc
 language_parser_CommentParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/CharFilter.cc \
 	language/parser/CharParser.cc \
 	language/parser/CommentParser.cc \
@@ -369,6 +375,7 @@ language_parser_CommentParserTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc
 language_parser_ConverterTest_SOURCES = \
+	common/Message.cc \
 	language/parser/ConverterTest.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
@@ -377,6 +384,7 @@ language_parser_ConverterTest_SOURCES = \
 	language/source/Buffer.cc \
 	language/source/Source.cc
 language_parser_EnvironmentHelperTest_SOURCES = \
+	common/Message.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/EnvironmentHelperTest.cc \
 	language/parser/IncompleteParse.cc \
@@ -384,6 +392,7 @@ language_parser_EnvironmentHelperTest_SOURCES = \
 	language/source/Buffer.cc \
 	language/source/Source.cc
 language_parser_LineContinuationEnvironmentTest_SOURCES = \
+	common/Message.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
 	language/parser/LineContinuationEnvironment.cc \
@@ -413,6 +422,7 @@ language_parser_LineSequenceParserTest_SOURCES = \
 	language/syntax/Printer.cc \
 	language/syntax/Sequence.cc
 language_parser_NewlineParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/CharParser.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
@@ -425,6 +435,7 @@ language_parser_NewlineParserTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc
 language_parser_ParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
 	language/parser/ParserBase.cc \
@@ -434,6 +445,7 @@ language_parser_ParserTest_SOURCES = \
 	language/source/Buffer.cc \
 	language/source/Source.cc
 language_parser_PipelineParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BlankAndCommentParser.cc \
 	language/parser/BlankCommentNewlineParser.cc \
 	language/parser/CharFilter.cc \
@@ -463,6 +475,7 @@ language_parser_PipelineParserTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/Word.cc
 language_parser_RawStringParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/CharParser.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
@@ -477,6 +490,7 @@ language_parser_RawStringParserTest_SOURCES = \
 	language/syntax/Printer.cc \
 	language/syntax/RawString.cc
 language_parser_RepeatTest_SOURCES = \
+	common/Message.cc \
 	language/parser/CharParser.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
@@ -488,6 +502,7 @@ language_parser_RepeatTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc
 language_parser_SequenceParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BlankAndCommentParser.cc \
 	language/parser/CharFilter.cc \
 	language/parser/CharParser.cc \
@@ -539,6 +554,7 @@ language_parser_SimpleCommandParserTest_SOURCES = \
 	language/syntax/SimpleCommand.cc \
 	language/syntax/Word.cc
 language_parser_SpecificOperatorParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/CharParser.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
@@ -553,6 +569,7 @@ language_parser_SpecificOperatorParserTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc
 language_parser_TokenParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/BlankAndCommentParser.cc \
 	language/parser/CharFilter.cc \
 	language/parser/CharParser.cc \
@@ -574,6 +591,7 @@ language_parser_TokenParserTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/Word.cc
 language_parser_TrieParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/CharParser.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
@@ -585,6 +603,7 @@ language_parser_TrieParserTest_SOURCES = \
 	language/source/LineContinuedSource.cc \
 	language/source/Source.cc
 language_parser_WordComponentParserTest_SOURCES = \
+	common/Message.cc \
 	language/parser/EnvironmentHelper.cc \
 	language/parser/IncompleteParse.cc \
 	language/parser/ParserBase.cc \
@@ -594,33 +613,31 @@ language_parser_WordComponentParserTest_SOURCES = \
 	language/source/Buffer.cc \
 	language/source/Source.cc
 language_source_BufferTest_SOURCES = \
+	common/Message.cc \
 	language/source/Buffer.cc \
 	language/source/BufferTest.cc \
 	language/source/Source.cc
 language_source_LineAppendedSourceTest_SOURCES = \
+	common/Message.cc \
 	language/source/LineAppendedSource.cc \
 	language/source/LineAppendedSourceTest.cc \
-	language/source/LineLocation.cc \
 	language/source/Location.cc \
 	language/source/Source.cc
 language_source_LineContinuedSourceTest_SOURCES = \
+	common/Message.cc \
 	language/source/LineContinuedSource.cc \
 	language/source/LineContinuedSourceTest.cc \
-	language/source/LineLocation.cc \
 	language/source/Location.cc \
 	language/source/Source.cc
-language_source_LineLocationTest_SOURCES = \
-	language/source/LineLocation.cc \
-	language/source/LineLocationTest.cc
 language_source_LocationTest_SOURCES = \
-	language/source/LineLocation.cc \
+	common/Message.cc \
 	language/source/Location.cc \
 	language/source/LocationTest.cc
 language_source_SourceTest_SOURCES = \
+	common/Message.cc \
 	language/source/Source.cc \
 	language/source/SourceTest.cc
 language_syntax_AndOrListTest_SOURCES = \
-	language/source/LineLocation.cc \
 	language/source/Location.cc \
 	language/syntax/AndOrList.cc \
 	language/syntax/AndOrListTest.cc \
@@ -634,18 +651,15 @@ language_syntax_AssignmentTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/Word.cc
 language_syntax_CommandTest_SOURCES = \
-	language/source/LineLocation.cc \
 	language/source/Location.cc \
 	language/syntax/CommandTest.cc
 language_syntax_ConditionalPipelineTest_SOURCES = \
-	language/source/LineLocation.cc \
 	language/source/Location.cc \
 	language/syntax/ConditionalPipeline.cc \
 	language/syntax/ConditionalPipelineTest.cc \
 	language/syntax/Pipeline.cc \
 	language/syntax/Printer.cc
 language_syntax_PipelineTest_SOURCES = \
-	language/source/LineLocation.cc \
 	language/source/Location.cc \
 	language/syntax/Pipeline.cc \
 	language/syntax/PipelineTest.cc \
@@ -658,7 +672,6 @@ language_syntax_RawStringTest_SOURCES = \
 	language/syntax/RawString.cc \
 	language/syntax/RawStringTest.cc
 language_syntax_SequenceTest_SOURCES = \
-	language/source/LineLocation.cc \
 	language/source/Location.cc \
 	language/syntax/AndOrList.cc \
 	language/syntax/ConditionalPipeline.cc \
@@ -667,7 +680,6 @@ language_syntax_SequenceTest_SOURCES = \
 	language/syntax/Sequence.cc \
 	language/syntax/SequenceTest.cc
 language_syntax_SimpleCommandTest_SOURCES = \
-	language/source/LineLocation.cc \
 	language/source/Location.cc \
 	language/syntax/Assignment.cc \
 	language/syntax/Printer.cc \
@@ -688,7 +700,6 @@ TESTHEADERS = \
 	language/parser/TokenParserTestHelper.hh \
 	language/parser/WordParserTestHelper.hh \
 	language/source/DiagnosticMessageTestHelper.hh \
-	language/source/LineLocationTestHelper.hh \
 	language/source/LocationTestHelper.hh \
 	language/source/OriginTestHelper.hh \
 	language/source/SourceTestHelper.hh \

@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "language/source/LineLocation.hh"
+#include "language/source/Location.hh"
 #include "language/source/Source.hh"
 
 namespace sesh {
