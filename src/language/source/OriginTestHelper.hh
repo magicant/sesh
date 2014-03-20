@@ -36,6 +36,9 @@ public:
             *DUMMY_NAME = L("dummy origin"),
             *DUMMY_DESCRIPTION = L("dummy description");
 
+    // XXX LLVM 3.4 libc++ seems to require a user-provided default constructor
+    OriginStub() noexcept : Origin() { }
+
     common::Message<> name() const override {
         return common::Message<>(DUMMY_NAME);
     }
