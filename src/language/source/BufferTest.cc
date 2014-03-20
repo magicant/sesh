@@ -21,27 +21,27 @@
 #include "catch.hpp"
 
 #include <utility>
+#include "language/source/Buffer.hh"
 #include "language/source/Source.hh"
-#include "language/source/SourceBuffer.hh"
 #include "language/source/SourceTestHelper.hh"
 
 namespace {
 
+using sesh::language::source::Buffer;
+using sesh::language::source::Location;
 using sesh::language::source::Source;
-using sesh::language::source::SourceBuffer;
-using sesh::language::source::SourceLocation;
 using sesh::language::source::checkSourceString;
 
-using BufferPointer = sesh::language::source::SourceBuffer::Pointer;
-using SBCI = sesh::language::source::SourceBuffer::ConstIterator;
+using BufferPointer = sesh::language::source::Buffer::Pointer;
+using SBCI = sesh::language::source::Buffer::ConstIterator;
 using SourcePointer = sesh::language::source::Source::Pointer;
-using String = sesh::language::source::SourceBuffer::String;
+using String = sesh::language::source::Buffer::String;
 
 class StringPrependedSource : public Source {
 public:
     StringPrependedSource(Pointer &&p, String &&s) :
             Source(std::move(p), 0, 0, std::move(s)) { }
-    SourceLocation locationInAlternate(Size) const override {
+    Location locationInAlternate(Size) const override {
         throw "unexpected";
     }
 };
@@ -51,8 +51,8 @@ SourcePointer prepend(SourcePointer &&p, String &&s) {
             new StringPrependedSource(std::move(p), std::move(s)));
 }
 
-BufferPointer createBuffer(SourceBuffer::String &&string) {
-    BufferPointer b = SourceBuffer::create();
+BufferPointer createBuffer(Buffer::String &&string) {
+    BufferPointer b = Buffer::create();
 
     b->substitute([&string](SourcePointer &&p) -> SourcePointer {
         return prepend(std::move(p), std::move(string));
@@ -60,51 +60,50 @@ BufferPointer createBuffer(SourceBuffer::String &&string) {
     return b;
 }
 
-void checkSourceBufferString(
-        const SourceBuffer &sb, const SourceBuffer::String &string) {
-    for (SourceBuffer::Size i = 0; i < string.length(); ++i) {
+void checkBufferString(const Buffer &sb, const Buffer::String &string) {
+    for (Buffer::Size i = 0; i < string.length(); ++i) {
         CHECK(sb.at(i) == string.at(i));
         CHECK(sb[i] == string[i]);
     }
     CHECK_THROWS_AS(sb.at(string.length()), std::out_of_range);
-    CHECK(sb[string.length()] == SourceBuffer::Char());
+    CHECK(sb[string.length()] == Buffer::Char());
 }
 
 } // namespace
 
-TEST_CASE("Source buffer construction and creation") {
-    CHECK_NOTHROW(SourceBuffer());
-    CHECK_NOTHROW(SourceBuffer::create());
+TEST_CASE("Buffer, construction and creation") {
+    CHECK_NOTHROW(Buffer());
+    CHECK_NOTHROW(Buffer::create());
 }
 
-TEST_CASE("Source buffer length") {
-    CHECK(SourceBuffer().length() == 0);
+TEST_CASE("Buffer, length") {
+    CHECK(Buffer().length() == 0);
 }
 
-TEST_CASE("Source buffer substitution, at and operator[]") {
-    SourceBuffer sb;
+TEST_CASE("Buffer, substitution, at and operator[]") {
+    Buffer sb;
 
-    checkSourceBufferString(sb, L(""));
+    checkBufferString(sb, L(""));
     sb.substitute([](SourcePointer &&p) -> SourcePointer {
         CHECK(p == nullptr);
         return prepend(std::move(p), L("Test"));
     });
-    checkSourceBufferString(sb, L("Test"));
+    checkBufferString(sb, L("Test"));
     sb.substitute([](SourcePointer &&p) -> SourcePointer {
         return std::move(p);
     });
-    checkSourceBufferString(sb, L("Test"));
+    checkBufferString(sb, L("Test"));
     sb.substitute([](SourcePointer &&p) -> SourcePointer {
         REQUIRE(p != nullptr);
         CHECK(dynamic_cast<const StringPrependedSource *>(p.get()) != nullptr);
         checkSourceString(*p, L("Test"));
         return std::move(p);
     });
-    checkSourceBufferString(sb, L("Test"));
+    checkBufferString(sb, L("Test"));
 }
 
-TEST_CASE("Source buffer begin and end") {
-    BufferPointer b = SourceBuffer::create();
+TEST_CASE("Buffer, begin and end") {
+    BufferPointer b = Buffer::create();
     CHECK_NOTHROW(b->cbegin());
     CHECK_NOTHROW(b->cend());
     CHECK_NOTHROW(b->begin());
@@ -119,13 +118,13 @@ TEST_CASE("Source buffer begin and end") {
     CHECK_NOTHROW(b->end());
 }
 
-TEST_CASE("Source buffer iterator normal construction") {
+TEST_CASE("Buffer iterator, normal construction") {
     BufferPointer b = createBuffer(L("X"));
     CHECK_NOTHROW(SBCI(b, 0));
     CHECK_NOTHROW(SBCI(b, 1));
 }
 
-TEST_CASE("Source buffer iterator special construction") {
+TEST_CASE("Buffer iterator, special construction") {
     // default constructible
     SBCI i1;
     // copy constructible
@@ -134,7 +133,7 @@ TEST_CASE("Source buffer iterator special construction") {
     SBCI i2move(std::move(i2));
 }
 
-TEST_CASE("Source buffer iterator assignment") {
+TEST_CASE("Buffer iterator, assignment") {
     SBCI i1, i2;
     // copy assignable
     i1 = i2;
@@ -142,7 +141,7 @@ TEST_CASE("Source buffer iterator assignment") {
     i1 = std::move(i2);
 }
 
-TEST_CASE("Source buffer iterator dereferencing") {
+TEST_CASE("Buffer iterator, dereferencing") {
     BufferPointer b = createBuffer(L("ABC"));
     CHECK(*b->cbegin() == L('A'));
 
@@ -155,7 +154,7 @@ TEST_CASE("Source buffer iterator dereferencing") {
     CHECK(&*ci == &*i);
 }
 
-TEST_CASE("Source buffer iterator incrementation") {
+TEST_CASE("Buffer iterator, incrementation") {
     BufferPointer b = createBuffer(L("Test"));
     SBCI i = b->cbegin();
     CHECK_NOTHROW(++i);
@@ -168,7 +167,7 @@ TEST_CASE("Source buffer iterator incrementation") {
     CHECK(*iref == L('t'));
 }
 
-TEST_CASE("Source buffer iterator decrementation") {
+TEST_CASE("Buffer iterator, decrementation") {
     BufferPointer b = createBuffer(L("Test"));
     SBCI i1 = b->cend();
     CHECK(*--i1 == L('t'));
@@ -184,7 +183,7 @@ TEST_CASE("Source buffer iterator decrementation") {
     CHECK(*i1 == L('e'));
 }
 
-TEST_CASE("Source buffer iterator equality") {
+TEST_CASE("Buffer iterator, equality") {
     BufferPointer b = createBuffer(L("ABC"));
     SBCI ci = b->cbegin(), i = b->begin();
     SBCI cend = b->cend(), end = b->end();
@@ -245,7 +244,7 @@ TEST_CASE("Source buffer iterator equality") {
     CHECK_FALSE(SBCI() != SBCI());
 }
 
-TEST_CASE("Source buffer iterator multi-pass guarantee 1") {
+TEST_CASE("Buffer iterator, multi-pass guarantee 1") {
     BufferPointer b = createBuffer(L("ABC"));
     SBCI ci = b->cbegin(), i = b->begin();
     // ci == i
@@ -254,14 +253,14 @@ TEST_CASE("Source buffer iterator multi-pass guarantee 1") {
     CHECK(++ci == ++i);
 }
 
-TEST_CASE("Source buffer iterator multi-pass guarantee 2") {
+TEST_CASE("Buffer iterator, multi-pass guarantee 2") {
     BufferPointer b = createBuffer(L("ABC"));
     SBCI i1 = b->begin();
     SBCI i2 = i1;
     CHECK(((void) ++i2, *i1) == *i1);
 }
 
-TEST_CASE("Source buffer iterator random access") {
+TEST_CASE("Buffer iterator, random access") {
     BufferPointer b = createBuffer(L("Test"));
     SBCI begin = b->cbegin();
     SBCI end = b->cend();
@@ -338,7 +337,7 @@ TEST_CASE("Source buffer iterator random access") {
     CHECK(*i == L('T'));
 }
 
-TEST_CASE("Source buffer iterator inequality") {
+TEST_CASE("Buffer iterator, inequality") {
     BufferPointer b = createBuffer(L("ABC"));
     SBCI begin = b->cbegin();
     SBCI end = b->cend();
@@ -380,7 +379,7 @@ TEST_CASE("Source buffer iterator inequality") {
     CHECK(end >= i);
 }
 
-TEST_CASE("Source buffer iterator index") {
+TEST_CASE("Buffer iterator, index") {
     BufferPointer b = createBuffer(L("Test"));
 
     SBCI i = b->cbegin() + 1;
@@ -396,7 +395,7 @@ TEST_CASE("Source buffer iterator index") {
     CHECK(i[1] == L('t'));
 }
 
-TEST_CASE("Source buffer iterator swapping") {
+TEST_CASE("Buffer iterator, swapping") {
     BufferPointer b1 = createBuffer(L("Test 1"));
     BufferPointer b2 = createBuffer(L("Test 2"));
 
@@ -411,7 +410,7 @@ TEST_CASE("Source buffer iterator swapping") {
     CHECK(i2 == oldI1);
 }
 
-TEST_CASE("Source buffer iterator range to string") {
+TEST_CASE("Buffer iterator, range to string") {
     BufferPointer b = createBuffer(L("string"));
 
     b->substitute([](SourcePointer &&p) -> SourcePointer {

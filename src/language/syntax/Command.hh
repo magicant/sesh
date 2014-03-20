@@ -21,7 +21,6 @@
 #include "buildconfig.h"
 
 #include <utility>
-#include "language/source/SourceLocation.hh"
 #include "language/syntax/Printable.hh"
 
 namespace sesh {

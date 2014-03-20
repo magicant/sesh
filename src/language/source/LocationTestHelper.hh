@@ -15,39 +15,36 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "buildconfig.h"
-#include "SourceLineLocation.hh"
+#ifndef INCLUDED_language_source_LocationTestHelper_hh
+#define INCLUDED_language_source_LocationTestHelper_hh
 
-#include <utility>
+#include "buildconfig.h"
+
+#include <cstddef>
+#include <memory>
+#include "common/Char.hh"
+#include "common/String.hh"
+#include "language/source/Location.hh"
+#include "language/source/OriginTestHelper.hh"
 
 namespace sesh {
 namespace language {
 namespace source {
 
-SourceLineLocation::SourceLineLocation(
-        const std::shared_ptr<const common::String> &name,
-        std::size_t line) :
-        mName(name),
-        mLine(line) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
+/** For testing only. */
+inline LineLocation dummyLineLocation(std::size_t line = 1) {
+    return LineLocation(nullptr, dummyOrigin(), line);
 }
 
-SourceLineLocation::SourceLineLocation(
-        std::shared_ptr<const common::String> &&name,
-        std::size_t line) :
-        mName(std::move(name)),
-        mLine(line) {
-    if (mName == nullptr)
-        throw std::invalid_argument("null name");
-}
-
-bool operator==(const SourceLineLocation &l, const SourceLineLocation &r) {
-    return l.name() == r.name() && l.line() == r.line();
+/** For testing only. */
+inline Location dummyLocation(std::size_t line = 1, std::size_t column = 1) {
+    return Location(dummyLineLocation(line), column);
 }
 
 } // namespace source
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_source_LocationTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

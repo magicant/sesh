@@ -27,8 +27,8 @@
 #include <utility>
 #include "common/String.hh"
 #include "language/parser/SourceEnvironment.hh"
+#include "language/source/Buffer.hh"
 #include "language/source/Source.hh"
-#include "language/source/SourceBuffer.hh"
 #include "language/source/SourceTestHelper.hh"
 
 namespace sesh {
@@ -59,8 +59,8 @@ public:
 
     void checkSource(const common::String &string) {
         for (common::String::size_type i = 0; i < string.length(); ++i)
-            CHECK(sourceBuffer().at(i) == string.at(i));
-        CHECK_THROWS_AS(sourceBuffer().at(string.length()), std::out_of_range);
+            CHECK(buffer().at(i) == string.at(i));
+        CHECK_THROWS_AS(buffer().at(string.length()), std::out_of_range);
     }
 
 }; // class SourceTestEnvironment

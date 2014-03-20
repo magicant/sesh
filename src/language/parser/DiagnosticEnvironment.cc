@@ -34,8 +34,7 @@ namespace parser {
 void DiagnosticEnvironment::addDiagnosticMessage(
         Size position, Message<> &&m, ErrorLevel el) {
     mDiagnosticMessages.emplace_back(
-            DiagnosticMessage::Position(
-                    sourceBuffer().shared_from_this(), position),
+            DiagnosticMessage::Position(buffer().shared_from_this(), position),
             std::move(m),
             el);
 }

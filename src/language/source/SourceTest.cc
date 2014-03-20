@@ -28,8 +28,8 @@
 
 namespace {
 
+using sesh::language::source::Location;
 using sesh::language::source::Source;
-using sesh::language::source::SourceLocation;
 using sesh::language::source::SourceStub;
 using sesh::language::source::checkSourceLineBegin;
 using sesh::language::source::checkSourceLineEnd;

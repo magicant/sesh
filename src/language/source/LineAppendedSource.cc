@@ -31,12 +31,12 @@ LineAppendedSource::LineAppendedSource(
         Size begin,
         Size end,
         String &&alternate,
-        SourceLineLocation &&lineLocation) :
+        LineLocation &&lineLocation) :
         Source(std::move(original), begin, end, std::move(alternate)),
         mLineLocation(std::move(lineLocation)) { }
 
 LineAppendedSource LineAppendedSource::create(
-        Pointer &&original, String &&line, SourceLineLocation &&location) {
+        Pointer &&original, String &&line, LineLocation &&location) {
     Size newlinePosition = line.find(NEWLINE);
     if (newlinePosition != String::npos)
         if (newlinePosition != line.length() - 1)
@@ -66,8 +66,8 @@ auto LineAppendedSource::lineEndInAlternate(Size) const noexcept -> Size {
     return altLength;
 }
 
-SourceLocation LineAppendedSource::locationInAlternate(Size position) const {
-    return SourceLocation(mLineLocation, position);
+Location LineAppendedSource::locationInAlternate(Size position) const {
+    return Location(mLineLocation, position);
 }
 
 } // namespace source

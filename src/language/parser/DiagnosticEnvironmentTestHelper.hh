@@ -62,7 +62,7 @@ public:
         for (const SimpleDiagnosticMessage &sdm : expectedMessages)
             dms.emplace_back(
                     source::DiagnosticMessage::Position(
-                            sourceBuffer().shared_from_this(), sdm.position),
+                            buffer().shared_from_this(), sdm.position),
                     common::Message<>(sdm.message),
                     sdm.errorLevel);
         checkMessages(dms);

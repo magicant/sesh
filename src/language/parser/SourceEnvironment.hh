@@ -22,7 +22,7 @@
 
 #include <functional>
 #include "language/parser/Environment.hh"
-#include "language/source/SourceBuffer.hh"
+#include "language/source/Buffer.hh"
 
 namespace sesh {
 namespace language {
@@ -37,7 +37,7 @@ class SourceEnvironment : public Environment {
 private:
 
     /** The source buffer */
-    source::SourceBuffer::Pointer mBuffer;
+    source::Buffer::Pointer mBuffer;
 
     /** The current position */
     Size mPosition;
@@ -60,7 +60,7 @@ public:
 
     SourceEnvironment();
 
-    const source::SourceBuffer &sourceBuffer() const noexcept final override;
+    const source::Buffer &buffer() const noexcept final override;
     Size length() const noexcept final override;
     common::Char at(Size) const final override;
     Size position() const noexcept final override;

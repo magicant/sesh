@@ -22,6 +22,7 @@
 
 #include <vector>
 #include "catch.hpp"
+#include "language/source/OriginTestHelper.hh"
 #include "language/source/Source.hh"
 
 namespace sesh {
@@ -30,7 +31,7 @@ namespace source {
 
 class SourceStub : public Source {
     using Source::Source;
-    SourceLocation locationInAlternate(Size) const override {
+    Location locationInAlternate(Size) const override {
         throw "unexpected location";
     }
 };
@@ -81,13 +82,12 @@ void checkSourceLineEnd(
 void checkSourceLocation(
         const Source &source,
         Source::Size position,
-        const common::String &name,
         Source::Size line,
         Source::Size column) {
-    SourceLocation sl = source.location(position);
-    CHECK(sl.name() == name);
-    CHECK(sl.line() == line);
-    CHECK(sl.column() == column);
+    Location l = source.location(position);
+    CHECK_NOTHROW((void) dynamic_cast<const OriginStub &>(l.origin()));
+    CHECK(l.line() == line);
+    CHECK(l.column() == column);
 }
 
 } // namespace source

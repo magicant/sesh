@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_SourceBuffer_hh
-#define INCLUDED_language_source_SourceBuffer_hh
+#ifndef INCLUDED_language_source_Buffer_hh
+#define INCLUDED_language_source_Buffer_hh
 
 #include "buildconfig.h"
 
@@ -25,22 +25,22 @@
 #include <memory>
 #include <ostream>
 #include <utility>
+#include "language/source/Location.hh"
 #include "language/source/Source.hh"
-#include "language/source/SourceLocation.hh"
 
 namespace sesh {
 namespace language {
 namespace source {
 
 /**
- * A source buffer wraps a Source object to provide extended functionality.
+ * A buffer wraps a Source object to provide extended functionality.
  *
  * Because the buffer contents may be dynamically modified during parsing, the
  * buffer provides iterators that are not invalidated by modification of buffer
  * contents (unlike normal string iterators). This class enforces use of
  * shared_ptr because iterators need safe pointers.
  */
-class SourceBuffer : public std::enable_shared_from_this<SourceBuffer> {
+class Buffer : public std::enable_shared_from_this<Buffer> {
 
 public:
 
@@ -50,8 +50,8 @@ public:
     using Difference = Source::Difference;
     using ConstReference = Source::ConstReference;
 
-    using Pointer = std::shared_ptr<SourceBuffer>;
-    using ConstPointer = std::shared_ptr<const SourceBuffer>;
+    using Pointer = std::shared_ptr<Buffer>;
+    using ConstPointer = std::shared_ptr<const Buffer>;
 
     /**
      * Random access iterator for the buffer contents. This iterator remembers
@@ -85,7 +85,7 @@ public:
         Size position() const noexcept { return mPosition; }
 
         /** Precondition: the buffer pointer must not be null. */
-        const SourceBuffer &buffer() const { return *bufferPointer(); }
+        const Buffer &buffer() const { return *bufferPointer(); }
 
         /** Not very useful... */
         inline pointer operator->() const;
@@ -103,12 +103,12 @@ private:
 public:
 
     /** Don't call the default constructor directly. Use {@link #create()}. */
-    SourceBuffer() = default;
-    SourceBuffer(const SourceBuffer &) = delete;
-    SourceBuffer(SourceBuffer &&) = delete;
-    SourceBuffer &operator=(const SourceBuffer &) = delete;
-    SourceBuffer &operator=(SourceBuffer &&) = delete;
-    ~SourceBuffer() = default;
+    Buffer() = default;
+    Buffer(const Buffer &) = delete;
+    Buffer(Buffer &&) = delete;
+    Buffer &operator=(const Buffer &) = delete;
+    Buffer &operator=(Buffer &&) = delete;
+    ~Buffer() = default;
 
     static Pointer create();
 
@@ -131,154 +131,150 @@ public:
     ConstIterator begin() const noexcept { return cbegin(); }
     ConstIterator end() const noexcept { return cend(); }
 
-    SourceLocation location(Size position) const;
+    Location location(Size position) const;
 
 };
 
-inline SourceBuffer::ConstIterator::reference operator*(
-        const SourceBuffer::ConstIterator &i) {
+inline Buffer::ConstIterator::reference operator*(
+        const Buffer::ConstIterator &i) {
     return i.buffer()[i.position()];
 }
 
-inline auto SourceBuffer::ConstIterator::operator->() const -> pointer {
+inline auto Buffer::ConstIterator::operator->() const -> pointer {
     return &**this;
 }
 
-inline SourceBuffer::ConstIterator &operator++(
-        SourceBuffer::ConstIterator &i) noexcept {
+inline Buffer::ConstIterator &operator++(Buffer::ConstIterator &i) noexcept {
     ++i.position();
     return i;
 }
 
-inline SourceBuffer::ConstIterator operator++(
-        SourceBuffer::ConstIterator &i, int) noexcept {
+inline Buffer::ConstIterator operator++(Buffer::ConstIterator &i, int)
+        noexcept {
     auto orig = i;
     ++i;
     return orig;
 }
 
-inline SourceBuffer::ConstIterator &operator--(
-        SourceBuffer::ConstIterator &i) noexcept {
+inline Buffer::ConstIterator &operator--(Buffer::ConstIterator &i) noexcept {
     --i.position();
     return i;
 }
 
-inline SourceBuffer::ConstIterator operator--(
-        SourceBuffer::ConstIterator &i, int) noexcept {
+inline Buffer::ConstIterator operator--(Buffer::ConstIterator &i, int)
+        noexcept {
     auto orig = i;
     --i;
     return orig;
 }
 
-inline SourceBuffer::ConstIterator &operator+=(
-        SourceBuffer::ConstIterator &i,
-        SourceBuffer::ConstIterator::difference_type d) noexcept {
+inline Buffer::ConstIterator &operator+=(
+        Buffer::ConstIterator &i, Buffer::ConstIterator::difference_type d)
+        noexcept {
     i.position() += d;
     return i;
 }
 
-inline SourceBuffer::ConstIterator &operator-=(
-        SourceBuffer::ConstIterator &i,
-        SourceBuffer::ConstIterator::difference_type d) noexcept {
+inline Buffer::ConstIterator &operator-=(
+        Buffer::ConstIterator &i, Buffer::ConstIterator::difference_type d)
+        noexcept {
     i.position() -= d;
     return i;
 }
 
-inline SourceBuffer::ConstIterator operator+(
-        const SourceBuffer::ConstIterator &i,
-        SourceBuffer::ConstIterator::difference_type d) noexcept {
-    return SourceBuffer::ConstIterator(i.bufferPointer(), i.position() + d);
+inline Buffer::ConstIterator operator+(
+        const Buffer::ConstIterator &i,
+        Buffer::ConstIterator::difference_type d) noexcept {
+    return Buffer::ConstIterator(i.bufferPointer(), i.position() + d);
 }
 
-inline SourceBuffer::ConstIterator operator+(
-        SourceBuffer::ConstIterator &&i,
-        SourceBuffer::ConstIterator::difference_type d) noexcept {
-    return SourceBuffer::ConstIterator(
+inline Buffer::ConstIterator operator+(
+        Buffer::ConstIterator &&i, Buffer::ConstIterator::difference_type d)
+        noexcept {
+    return Buffer::ConstIterator(
             std::move(i.bufferPointer()), i.position() + d);
 }
 
-inline SourceBuffer::ConstIterator operator+(
-        SourceBuffer::ConstIterator::difference_type d,
-        const SourceBuffer::ConstIterator &i) noexcept {
+inline Buffer::ConstIterator operator+(
+        Buffer::ConstIterator::difference_type d,
+        const Buffer::ConstIterator &i) noexcept {
     return i + d;
 }
 
-inline SourceBuffer::ConstIterator operator+(
-        SourceBuffer::ConstIterator::difference_type d,
-        SourceBuffer::ConstIterator &&i) noexcept {
+inline Buffer::ConstIterator operator+(
+        Buffer::ConstIterator::difference_type d,
+        Buffer::ConstIterator &&i) noexcept {
     return std::move(i) + d;
 }
 
-inline SourceBuffer::ConstIterator operator-(
-        const SourceBuffer::ConstIterator &i,
-        SourceBuffer::ConstIterator::difference_type d) noexcept {
-    return SourceBuffer::ConstIterator(i.bufferPointer(), i.position() - d);
+inline Buffer::ConstIterator operator-(
+        const Buffer::ConstIterator &i,
+        Buffer::ConstIterator::difference_type d) noexcept {
+    return Buffer::ConstIterator(i.bufferPointer(), i.position() - d);
 }
 
-inline SourceBuffer::ConstIterator operator-(
-        SourceBuffer::ConstIterator &&i,
-        SourceBuffer::ConstIterator::difference_type d) noexcept {
-    return SourceBuffer::ConstIterator(
+inline Buffer::ConstIterator operator-(
+        Buffer::ConstIterator &&i, Buffer::ConstIterator::difference_type d)
+        noexcept {
+    return Buffer::ConstIterator(
             std::move(i.bufferPointer()), i.position() - d);
 }
 
-inline SourceBuffer::ConstIterator::difference_type operator-(
-        const SourceBuffer::ConstIterator &i1,
-        const SourceBuffer::ConstIterator &i2) noexcept {
+inline Buffer::ConstIterator::difference_type operator-(
+        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        noexcept {
     return i1.position() - i2.position();
 }
 
 inline bool operator==(
-        const SourceBuffer::ConstIterator &i1,
-        const SourceBuffer::ConstIterator &i2) noexcept {
+        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
     return i1.position() == i2.position();
 }
 
 inline bool operator!=(
-        const SourceBuffer::ConstIterator &i1,
-        const SourceBuffer::ConstIterator &i2) noexcept {
+        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        noexcept {
     return !(i1 == i2);
 }
 
 inline bool operator<(
-        const SourceBuffer::ConstIterator &i1,
-        const SourceBuffer::ConstIterator &i2) noexcept {
+        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
     return i1.position() < i2.position();
 }
 
 inline bool operator<=(
-        const SourceBuffer::ConstIterator &i1,
-        const SourceBuffer::ConstIterator &i2) noexcept {
+        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
     return i1.position() <= i2.position();
 }
 
 inline bool operator>(
-        const SourceBuffer::ConstIterator &i1,
-        const SourceBuffer::ConstIterator &i2) noexcept {
+        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
     return i1.position() > i2.position();
 }
 
 inline bool operator>=(
-        const SourceBuffer::ConstIterator &i1,
-        const SourceBuffer::ConstIterator &i2) noexcept {
+        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2) noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
     return i1.position() >= i2.position();
 }
 
-SourceBuffer::String toString(
-        const SourceBuffer::ConstIterator &begin,
-        const SourceBuffer::ConstIterator &end);
+Buffer::String toString(
+        const Buffer::ConstIterator &begin, const Buffer::ConstIterator &end);
 
-inline SourceLocation toLocation(const SourceBuffer::ConstIterator &i) {
+inline Location toLocation(const Buffer::ConstIterator &i) {
     return i.buffer().location(i.position());
 }
 
@@ -286,7 +282,7 @@ inline SourceLocation toLocation(const SourceBuffer::ConstIterator &i) {
 template<typename Char, typename Traits>
 std::basic_ostream<Char, Traits> &operator<<(
         std::basic_ostream<Char, Traits> &os,
-        const SourceBuffer::ConstIterator &i) {
+        const Buffer::ConstIterator &i) {
     return os << i.bufferPointer() << '@' << i.position();
 }
 
@@ -297,12 +293,12 @@ std::basic_ostream<Char, Traits> &operator<<(
 namespace std {
 
 template<>
-void swap<sesh::language::source::SourceBuffer::ConstIterator>(
-        sesh::language::source::SourceBuffer::ConstIterator &i1,
-        sesh::language::source::SourceBuffer::ConstIterator &i2) noexcept;
+void swap<sesh::language::source::Buffer::ConstIterator>(
+        sesh::language::source::Buffer::ConstIterator &i1,
+        sesh::language::source::Buffer::ConstIterator &i2) noexcept;
 
 } // namespace std
 
-#endif // #ifndef INCLUDED_language_source_SourceBuffer_hh
+#endif // #ifndef INCLUDED_language_source_Buffer_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

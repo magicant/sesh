@@ -20,21 +20,19 @@
 
 #include <cassert>
 #include "common/Char.hh"
-#include "language/source/SourceBuffer.hh"
+#include "language/source/Buffer.hh"
 
 using sesh::common::Char;
-using sesh::language::source::SourceBuffer;
+using sesh::language::source::Buffer;
 
 namespace sesh {
 namespace language {
 namespace parser {
 
 SourceEnvironment::SourceEnvironment() :
-        mBuffer(SourceBuffer::create()),
-        mPosition(),
-        mLength(mBuffer->length()) { }
+        mBuffer(Buffer::create()), mPosition(), mLength(mBuffer->length()) { }
 
-const SourceBuffer &SourceEnvironment::sourceBuffer() const noexcept {
+const Buffer &SourceEnvironment::buffer() const noexcept {
     return *mBuffer;
 }
 
@@ -44,7 +42,7 @@ auto SourceEnvironment::length() const noexcept -> Size {
 
 Char SourceEnvironment::at(Size position) const {
     assert(position < length());
-    return sourceBuffer()[position];
+    return buffer()[position];
 }
 
 auto SourceEnvironment::position() const noexcept -> Size {
