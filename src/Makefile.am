@@ -10,7 +10,7 @@
 
 bin_PROGRAMS = sesh
 
-check_PROGRAMS = \
+TESTPROGRAMS = \
 	common/EnumSetTest \
 	common/MaybeTest \
 	common/MessageTest \
@@ -61,7 +61,7 @@ TESTSCRIPTS = \
 	checkheaderinclude.sh \
 	checkincludebuildconfig.sh
 
-TESTS = $(check_PROGRAMS) $(TESTSCRIPTS)
+TESTS = $(TESTPROGRAMS) $(TESTSCRIPTS)
 
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(SHELL)
@@ -709,3 +709,6 @@ checkheaderinclude.log: checkheaderinclude.sh $(SOURCES)
 checkincludebuildconfig.log: checkincludebuildconfig.sh $(SOURCES)
 
 EXTRA_DIST = $(TESTSCRIPTS) $(TESTHEADERS)
+EXTRA_PROGRAMS = $(TESTPROGRAMS)
+
+CLEANFILES = $(TESTPROGRAMS)
