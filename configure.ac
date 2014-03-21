@@ -38,8 +38,5 @@ AS_VAR_IF([enable_debug_build], [[yes]], [AX_APPEND_COMPILE_FLAGS(
     [-pedantic -Wall -Wextra -Wdocumentation -Werror])])
 
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([
-    Makefile
-    src/Makefile
-])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
