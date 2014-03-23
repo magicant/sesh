@@ -186,6 +186,17 @@ public:
     }
 
     /**
+     * Constructs the value by move-constructing the result of the argument
+     * function, which must return (a reference to) a value of one of the types
+     * that may be contained in this union. This function must not be called
+     * when a value of this union has already been constructed for some type.
+     */
+    template<typename F, typename U>
+    void constructFrom(F &&f) {
+        new (std::addressof(value<U>())) U(std::forward<F>(f)());
+    }
+
+    /**
      * Calls the argument visitor's () operator with the value of the argument
      * index. The value is passed by l-value reference to the () operator.
      */
@@ -517,6 +528,25 @@ public:
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
             VariantBase(index<U>()) {
         value().template construct<U>(std::forward<Arg>(arg)...);
+    }
+
+    /**
+     * Creates a new variant by move-constructing its contained value from the
+     * result of calling the argument function.
+     *
+     * Throws any exception thrown by the argument function or constructor.
+     *
+     * @tparam F the type of the function argument.
+     * @tparam U the type of the new contained value to be constructed.
+     *     (inferred from the return type of the argument function.)
+     * @param f the function that constructs the new contained value.
+     */
+    template<
+            typename F,
+            typename U = typename std::decay<
+                    typename std::result_of<F()>::type>::type>
+    VariantBase(F &&f) : VariantBase(index<U>()) {
+        value().template constructFrom<F, U>(std::forward<F>(f));
     }
 
     /**
