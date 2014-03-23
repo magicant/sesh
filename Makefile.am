@@ -23,6 +23,7 @@ bin_PROGRAMS = src/sesh
 TESTPROGRAMS = \
 	src/async/DelayHolderTest \
 	src/async/DelayTest \
+	src/async/PromiseTest \
 	src/async/ResultTest \
 	src/common/EnumSetTest \
 	src/common/MaybeTest \
@@ -87,6 +88,7 @@ src/checkincludebuildconfig.log: src/checkincludebuildconfig.sh $(SOURCES)
 src_sesh_SOURCES = \
 	src/async/Delay.hh \
 	src/async/DelayHolder.hh \
+	src/async/Promise.hh \
 	src/async/Result.hh \
 	src/buildconfig.h \
 	src/common/Char.hh \
@@ -233,6 +235,8 @@ src_async_DelayHolderTest_SOURCES = \
 	src/async/DelayHolderTest.cc
 src_async_DelayTest_SOURCES = \
 	src/async/DelayTest.cc
+src_async_PromiseTest_SOURCES = \
+	src/async/PromiseTest.cc
 src_async_ResultTest_SOURCES = \
 	src/async/ResultTest.cc
 src_common_EnumSetTest_SOURCES = \
