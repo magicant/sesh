@@ -21,6 +21,7 @@ bin_PROGRAMS = src/sesh
 ### Tests
 
 TESTPROGRAMS = \
+	src/async/DelayTest \
 	src/async/ResultTest \
 	src/common/EnumSetTest \
 	src/common/MaybeTest \
@@ -83,6 +84,7 @@ src/checkincludebuildconfig.log: src/checkincludebuildconfig.sh $(SOURCES)
 ### Source files
 
 src_sesh_SOURCES = \
+	src/async/Delay.hh \
 	src/async/Result.hh \
 	src/buildconfig.h \
 	src/common/Char.hh \
@@ -225,6 +227,8 @@ src_sesh_SOURCES = \
 	src/main.cc
 
 # Header files that are contained in sesh_SOURCES are not listed below.
+src_async_DelayTest_SOURCES = \
+	src/async/DelayTest.cc
 src_async_ResultTest_SOURCES = \
 	src/async/ResultTest.cc
 src_common_EnumSetTest_SOURCES = \
