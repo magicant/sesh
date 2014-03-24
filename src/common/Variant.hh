@@ -908,7 +908,7 @@ using ConditionallyAssignableVariant =
  * decayed types (see std::decay).
  */
 template<typename... T>
-class Variant final : public ConditionallyAssignableVariant<T...> {
+class Variant : public ConditionallyAssignableVariant<T...> {
 
     using Base = ConditionallyAssignableVariant<T...>;
 
