@@ -81,7 +81,8 @@ src/checkincludebuildconfig.log: src/checkincludebuildconfig.sh $(SOURCES)
 
 ### Source files
 
-src_sesh_SOURCES = src/buildconfig.h src/main.cc \
+src_sesh_SOURCES = \
+	src/buildconfig.h \
 	src/common/Char.hh \
 	src/common/Empty.hh \
 	src/common/EnumSet.hh \
@@ -217,7 +218,8 @@ src_sesh_SOURCES = src/buildconfig.h src/main.cc \
 	src/language/syntax/SimpleCommand.hh \
 	src/language/syntax/Word.cc \
 	src/language/syntax/Word.hh \
-	src/language/syntax/WordComponent.hh
+	src/language/syntax/WordComponent.hh \
+	src/main.cc
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_common_EnumSetTest_SOURCES = \
