@@ -92,6 +92,7 @@ src_sesh_SOURCES = \
 	src/async/Result.hh \
 	src/buildconfig.h \
 	src/common/Char.hh \
+	src/common/DirectInitialize.hh \
 	src/common/Empty.hh \
 	src/common/EnumSet.hh \
 	src/common/EnumTraits.hh \
