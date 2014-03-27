@@ -29,6 +29,7 @@ TESTPROGRAMS = \
 	src/common/MaybeTest \
 	src/common/MessageTest \
 	src/common/ReferenceTest \
+	src/common/SharedFunctionTest \
 	src/common/TrieTest \
 	src/common/VariantTest \
 	src/language/parser/AndOrListParserTest \
@@ -102,6 +103,7 @@ src_sesh_SOURCES = \
 	src/common/Message.hh \
 	src/common/OutputStream.hh \
 	src/common/Reference.hh \
+	src/common/SharedFunction.hh \
 	src/common/String.hh \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
@@ -249,6 +251,8 @@ src_common_MessageTest_SOURCES = \
 	src/common/MessageTest.cc
 src_common_ReferenceTest_SOURCES = \
 	src/common/ReferenceTest.cc
+src_common_SharedFunctionTest_SOURCES = \
+	src/common/SharedFunctionTest.cc
 src_common_TrieTest_SOURCES = \
 	src/common/TrieTest.cc
 src_common_VariantTest_SOURCES = \
