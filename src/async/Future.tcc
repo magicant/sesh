@@ -21,9 +21,12 @@
 #include "buildconfig.h"
 #include "Future.hh"
 
+#include <cstddef>
 #include <functional>
+#include <tuple>
 #include <utility>
 #include "common/DirectInitialize.hh"
+#include "common/IntegerSequence.hh"
 #include "common/SharedFunction.hh"
 
 namespace sesh {
@@ -147,11 +150,38 @@ auto createFutureFrom(F &&f) -> Future<typename std::result_of<F()>::type> {
 }
 
 template<typename T, typename... Arg>
+class Constructor {
+
+private:
+
+    std::tuple<Arg &&...> mArguments;
+
+    template<std::size_t... i>
+    T construct(const common::IndexSequence<i...> &) {
+        T t(std::forward<Arg>(std::get<i>(mArguments))...);
+        return t;
+    }
+
+public:
+
+    explicit Constructor(Arg &&... arg) :
+            mArguments(std::forward<Arg>(arg)...) { }
+
+    T operator()() {
+        return construct(common::IndexSequenceFor<Arg...>());
+    }
+
+};
+
+template<typename T, typename... Arg>
 Future<T> createFuture(Arg &&... arg){
+    /* XXX GCC 4.8.2 doesn't support capturing a parameter pack
     return createFutureFrom([&arg...]() -> T {
         T t(std::forward<Arg>(arg)...);
         return t;
     });
+    */
+    return createFutureFrom(Constructor<T, Arg...>(std::forward<Arg>(arg)...));
 }
 
 template<typename T>
