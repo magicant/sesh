@@ -21,10 +21,16 @@ bin_PROGRAMS = src/sesh
 ### Tests
 
 TESTPROGRAMS = \
+	src/async/DelayHolderTest \
+	src/async/DelayTest \
+	src/async/FutureTest \
+	src/async/PromiseTest \
+	src/async/ResultTest \
 	src/common/EnumSetTest \
 	src/common/MaybeTest \
 	src/common/MessageTest \
 	src/common/ReferenceTest \
+	src/common/SharedFunctionTest \
 	src/common/TrieTest \
 	src/common/VariantTest \
 	src/language/parser/AndOrListParserTest \
@@ -81,8 +87,16 @@ src/checkincludebuildconfig.log: src/checkincludebuildconfig.sh $(SOURCES)
 
 ### Source files
 
-src_sesh_SOURCES = src/buildconfig.h src/main.cc \
+src_sesh_SOURCES = \
+	src/async/Delay.hh \
+	src/async/DelayHolder.hh \
+	src/async/Future.hh \
+	src/async/Future.tcc \
+	src/async/Promise.hh \
+	src/async/Result.hh \
+	src/buildconfig.h \
 	src/common/Char.hh \
+	src/common/DirectInitialize.hh \
 	src/common/Empty.hh \
 	src/common/EnumSet.hh \
 	src/common/EnumTraits.hh \
@@ -92,10 +106,12 @@ src_sesh_SOURCES = src/buildconfig.h src/main.cc \
 	src/common/Message.hh \
 	src/common/OutputStream.hh \
 	src/common/Reference.hh \
+	src/common/SharedFunction.hh \
 	src/common/String.hh \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
 	src/common/Variant.hh \
+	src/helpermacros.h \
 	src/i18n/M.h \
 	src/language/parser/AndOrListParser.cc \
 	src/language/parser/AndOrListParser.hh \
@@ -217,9 +233,20 @@ src_sesh_SOURCES = src/buildconfig.h src/main.cc \
 	src/language/syntax/SimpleCommand.hh \
 	src/language/syntax/Word.cc \
 	src/language/syntax/Word.hh \
-	src/language/syntax/WordComponent.hh
+	src/language/syntax/WordComponent.hh \
+	src/main.cc
 
 # Header files that are contained in sesh_SOURCES are not listed below.
+src_async_DelayHolderTest_SOURCES = \
+	src/async/DelayHolderTest.cc
+src_async_DelayTest_SOURCES = \
+	src/async/DelayTest.cc
+src_async_FutureTest_SOURCES = \
+	src/async/FutureTest.cc
+src_async_PromiseTest_SOURCES = \
+	src/async/PromiseTest.cc
+src_async_ResultTest_SOURCES = \
+	src/async/ResultTest.cc
 src_common_EnumSetTest_SOURCES = \
 	src/common/EnumSetTest.cc
 src_common_MaybeTest_SOURCES = \
@@ -229,6 +256,8 @@ src_common_MessageTest_SOURCES = \
 	src/common/MessageTest.cc
 src_common_ReferenceTest_SOURCES = \
 	src/common/ReferenceTest.cc
+src_common_SharedFunctionTest_SOURCES = \
+	src/common/SharedFunctionTest.cc
 src_common_TrieTest_SOURCES = \
 	src/common/TrieTest.cc
 src_common_VariantTest_SOURCES = \

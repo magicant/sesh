@@ -138,6 +138,7 @@ static_assert(
 TEST_CASE("Single variant construction & destruction") {
     Variant<int>(TypeTag<int>());
     Variant<int>(TypeTag<int>(), 123);
+    Variant<int>([] { return 123; });
 
     static_assert(
             noexcept(Variant<int>(TypeTag<int>())),
@@ -177,6 +178,8 @@ TEST_CASE("Double variant construction & destruction") {
 
     Variant<A, B>(TypeTag<A>());
     Variant<A, B>(TypeTag<B>(), 0, 0.0);
+    Variant<A, B>([] { return A(); });
+    Variant<A, B>([] { return B(0, 0.0); });
 
     static_assert(
             noexcept(Variant<A, B>(TypeTag<A>())),
@@ -230,6 +233,10 @@ TEST_CASE("Quad variant construction & destruction") {
     Variant<A, B, C, D>(TypeTag<B>());
     Variant<A, B, C, D>(TypeTag<C>());
     Variant<A, B, C, D>(TypeTag<D>());
+    Variant<A, B, C, D>([] { return A(); });
+    Variant<A, B, C, D>([] { return B(); });
+    Variant<A, B, C, D>([] { return C(); });
+    Variant<A, B, C, D>([] { return D(); });
 }
 
 TEST_CASE("Double variant value") {
@@ -237,7 +244,7 @@ TEST_CASE("Double variant value") {
     const float F1 = 456.0f, F2 = 567.0f;
 
     Variant<int, float> i(TypeTag<int>(), I1);
-    Variant<int, float> f(TypeTag<float>(), F1);
+    Variant<int, float> f([=] { return F1; });
 
     CHECK(i.value<int>() == I1);
     CHECK(f.value<float>() == F1);
@@ -254,7 +261,7 @@ TEST_CASE("Double variant constant value") {
     const float F = 456.0;
 
     const Variant<int, float> i(TypeTag<int>(), I);
-    const Variant<int, float> f(TypeTag<float>(), F);
+    const Variant<int, float> f([=] { return F; });
 
     CHECK(i.value<int>() == I);
     CHECK(f.value<float>() == F);

@@ -36,6 +36,7 @@ AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
 AS_VAR_IF([enable_debug_build], [[yes]], [AX_APPEND_COMPILE_FLAGS(
     [-pedantic -Wall -Wextra -Wdocumentation -Werror])])
+AX_GCC_BUILTIN([__builtin_unreachable])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])
