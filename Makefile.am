@@ -101,6 +101,7 @@ src_sesh_SOURCES = \
 	src/common/EnumSet.hh \
 	src/common/EnumTraits.hh \
 	src/common/ErrorLevel.hh \
+	src/common/IntegerSequence.hh \
 	src/common/Maybe.hh \
 	src/common/Message.cc \
 	src/common/Message.hh \
