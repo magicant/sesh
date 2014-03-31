@@ -706,6 +706,25 @@ public:
     }
 
     /**
+     * Widening copy constructor.
+     *
+     * The copy constructor of the currently contained type in the argument is
+     * used to initialize the value of the new variant.
+     *
+     * Propagates any exception thrown by the constructor.
+     *
+     * @tparam U Types that may be contained in the argument variant. All
+     * <code>U</code>s must be contained in <code>T</code>s and
+     * copy-constructible.
+     */
+    template<typename... U>
+    VariantBase(const VariantBase<U...> &v)
+            noexcept(VariantBase<U...>::IS_NOTHROW_COPY_CONSTRUCTIBLE) :
+            VariantBase(v.template convertIndex<T...>()) {
+        v.apply(constructor(value()));
+    }
+
+    /**
      * Move constructor.
      *
      * The move (or copy) constructor of the currently contained type in the
@@ -718,6 +737,25 @@ public:
     VariantBase(VariantBase &&v) noexcept(IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
             VariantBase(v.index()) {
         std::move(v).apply(constructor(value()));
+    }
+
+    /**
+     * Widening move constructor.
+     *
+     * The move (or copy) constructor of the currently contained type in the
+     * argument is used to initialize the value of the new variant.
+     *
+     * Propagates any exception thrown by the constructor.
+     *
+     * @tparam U Types that may be contained in the argument variant. All
+     * <code>U</code>s must be contained in <code>T</code>s and
+     * move-constructible.
+     */
+    template<typename... U>
+    VariantBase(VariantBase<U...> &&v)
+            noexcept(VariantBase<U...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
+            VariantBase(v.template convertIndex<T...>()) {
+        std::move(v).apply(constructor(this->value()));
     }
 
 private:
@@ -959,38 +997,6 @@ public:
             Variant::IS_NOTHROW_DESTRUCTIBLE ==
                 std::is_nothrow_destructible<Base>::value,
             "IS_NOTHROW_DESTRUCTIBLE is wrong");
-
-    /**
-     * Copy-constructs this variant.
-     *
-     * Propagates any exception thrown by the constructor.
-     *
-     * @tparam U Types that may be contained in the argument variant. All
-     * <code>U</code>s must be contained in <code>T</code>s and
-     * copy-constructible.
-     */
-    template<typename... U>
-    Variant(const Variant<U...> &v)
-            noexcept(Variant<U...>::IS_NOTHROW_COPY_CONSTRUCTIBLE) :
-            Base(v.template convertIndex<T...>()) {
-        v.apply(constructor(this->value()));
-    }
-
-    /**
-     * Move-constructs this variant.
-     *
-     * Propagates any exception thrown by the constructor.
-     *
-     * @tparam U Types that may be contained in the argument variant. All
-     * <code>U</code>s must be contained in <code>T</code>s and
-     * move-constructible.
-     */
-    template<typename... U>
-    Variant(Variant<U...> &&v)
-            noexcept(Variant<U...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
-            Base(v.template convertIndex<T...>()) {
-        std::move(v).apply(constructor(this->value()));
-    }
 
     /**
      * Copy-assigns to this variant.
