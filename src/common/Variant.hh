@@ -505,13 +505,6 @@ public:
         return Value::template convertIndex<INDEX_BASE, U...>(index());
     }
 
-protected:
-
-    /** Initializes the index but leaves the value unconstructed. */
-    VariantBase(Index index) noexcept : mIndex(index) { }
-
-public:
-
     /**
      * Creates a new variant by constructing its contained value by calling the
      * constructor of <code>U</code> with forwarded arguments.
@@ -526,7 +519,7 @@ public:
     template<typename U, typename... Arg>
     VariantBase(TypeTag<U>, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
-            VariantBase(index<U>()) {
+            mIndex(index<U>()) {
         value().template construct<U>(std::forward<Arg>(arg)...);
     }
 
@@ -545,7 +538,7 @@ public:
             typename F,
             typename U = typename std::decay<
                     typename std::result_of<F()>::type>::type>
-    VariantBase(F &&f) : VariantBase(index<U>()) {
+    VariantBase(F &&f) : mIndex(index<U>()) {
         value().template constructFrom<F, U>(std::forward<F>(f));
     }
 
@@ -701,7 +694,7 @@ public:
      * Requirements: All the contained types must be copy-constructible.
      */
     VariantBase(const VariantBase &v) noexcept(IS_NOTHROW_COPY_CONSTRUCTIBLE) :
-            VariantBase(v.index()) {
+            mIndex(v.index()) {
         v.apply(constructor(value()));
     }
 
@@ -720,7 +713,7 @@ public:
     template<typename... U>
     VariantBase(const VariantBase<U...> &v)
             noexcept(VariantBase<U...>::IS_NOTHROW_COPY_CONSTRUCTIBLE) :
-            VariantBase(v.template convertIndex<T...>()) {
+            mIndex(v.template convertIndex<T...>()) {
         v.apply(constructor(value()));
     }
 
@@ -735,7 +728,7 @@ public:
      * Requirements: All the contained types must be move-constructible.
      */
     VariantBase(VariantBase &&v) noexcept(IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
-            VariantBase(v.index()) {
+            mIndex(v.index()) {
         std::move(v).apply(constructor(value()));
     }
 
@@ -754,7 +747,7 @@ public:
     template<typename... U>
     VariantBase(VariantBase<U...> &&v)
             noexcept(VariantBase<U...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
-            VariantBase(v.template convertIndex<T...>()) {
+            mIndex(v.template convertIndex<T...>()) {
         std::move(v).apply(constructor(this->value()));
     }
 

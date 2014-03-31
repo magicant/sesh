@@ -84,6 +84,12 @@ struct Exception : public std::exception {
 struct DefaultMayThrow {
     DefaultMayThrow() noexcept(false) { }
 };
+struct DefaultThrows {
+    DefaultThrows() { throw Exception(); }
+    ~DefaultThrows() noexcept(false) {
+        FAIL("DefaultThrows destructor must not be called");
+    }
+};
 struct CopyMayThrow {
     CopyMayThrow() = default;
     CopyMayThrow(const CopyMayThrow &) noexcept(false) { }
@@ -152,6 +158,14 @@ TEST_CASE("Single variant construction & destruction") {
     CHECK(actions.size() == 2);
     CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
     CHECK(actions.at(1) == Action::DESTRUCTION);
+
+    CHECK_THROWS_AS(
+            Variant<DefaultThrows>(TypeTag<DefaultThrows>()),
+            Exception);
+    CHECK_THROWS_AS(
+            Variant<DefaultThrows>(
+                    []() -> DefaultThrows { throw Exception(); }),
+            Exception);
 }
 
 //TEST_CASE("Single variant throwing destructor") {
