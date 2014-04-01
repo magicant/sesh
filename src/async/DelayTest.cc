@@ -22,12 +22,12 @@
 
 #include <exception>
 #include "async/Delay.hh"
-#include "async/Result.hh"
+#include "common/Try.hh"
 
 namespace {
 
 using sesh::async::Delay;
-using sesh::async::Result;
+using sesh::common::Try;
 
 TEST_CASE("Delay, set successful result and callback") {
     Delay<int> s;
@@ -35,7 +35,7 @@ TEST_CASE("Delay, set successful result and callback") {
     s.setResultFrom([] { return 42; });
 
     unsigned callCount = 0;
-    s.setCallback([&callCount](Result<int> &&r) {
+    s.setCallback([&callCount](Try<int> &&r) {
         ++callCount;
         CHECK(*r == 42);
     });
@@ -46,7 +46,7 @@ TEST_CASE("Delay, set callback and successful result") {
     Delay<int> s;
 
     unsigned callCount = 0;
-    s.setCallback([&callCount](Result<int> &&r) {
+    s.setCallback([&callCount](Try<int> &&r) {
         CHECK(*r == 42);
         ++callCount;
     });
@@ -62,7 +62,7 @@ TEST_CASE("Delay, set exception and callback") {
     s.setResultFrom([]() -> int { throw 42; });
 
     unsigned callCount = 0;
-    s.setCallback([&callCount](Result<int> &&r) {
+    s.setCallback([&callCount](Try<int> &&r) {
         ++callCount;
         try {
             *r;
@@ -77,7 +77,7 @@ TEST_CASE("Delay, set callback and exception") {
     Delay<int> s;
 
     unsigned callCount = 0;
-    s.setCallback([&callCount](Result<int> &&r) {
+    s.setCallback([&callCount](Try<int> &&r) {
         try {
             *r;
         } catch (int i) {

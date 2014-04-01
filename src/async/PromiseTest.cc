@@ -23,13 +23,13 @@
 #include <utility>
 #include "async/Delay.hh"
 #include "async/Promise.hh"
-#include "async/Result.hh"
+#include "common/Try.hh"
 
 namespace {
 
 using sesh::async::Delay;
 using sesh::async::Promise;
-using sesh::async::Result;
+using sesh::common::Try;
 
 TEST_CASE("Promise, default construction and invalidness") {
     Promise<Promise<int>> p;
@@ -56,7 +56,7 @@ TEST_CASE("Promise, setting result") {
     std::move(p).setResultFrom([] { return 1; });
 
     int i = 0;
-    delay->setCallback([&i](Result<int> &&r) { i = *r; });
+    delay->setCallback([&i](Try<int> &&r) { i = *r; });
     CHECK(i == 1);
 }
 

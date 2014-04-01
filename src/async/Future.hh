@@ -29,7 +29,7 @@
 #include "async/Delay.hh"
 #include "async/DelayHolder.hh"
 #include "async/Promise.hh"
-#include "async/Result.hh"
+#include "common/Try.hh"
 
 namespace sesh {
 namespace async {
@@ -75,7 +75,7 @@ public:
     template<
             typename F,
             typename G = typename std::decay<F>::type,
-            typename R = typename std::result_of<G(Result<T> &&)>::type>
+            typename R = typename std::result_of<G(common::Try<T> &&)>::type>
     Future<R> then(F &&) &&;
 
     /**

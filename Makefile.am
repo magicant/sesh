@@ -25,13 +25,13 @@ TESTPROGRAMS = \
 	src/async/DelayTest \
 	src/async/FutureTest \
 	src/async/PromiseTest \
-	src/async/ResultTest \
 	src/common/EnumSetTest \
 	src/common/MaybeTest \
 	src/common/MessageTest \
 	src/common/ReferenceTest \
 	src/common/SharedFunctionTest \
 	src/common/TrieTest \
+	src/common/TryTest \
 	src/common/VariantTest \
 	src/language/parser/AndOrListParserTest \
 	src/language/parser/AssignedWordParserTest \
@@ -93,7 +93,6 @@ src_sesh_SOURCES = \
 	src/async/Future.hh \
 	src/async/Future.tcc \
 	src/async/Promise.hh \
-	src/async/Result.hh \
 	src/buildconfig.h \
 	src/common/Char.hh \
 	src/common/DirectInitialize.hh \
@@ -111,6 +110,7 @@ src_sesh_SOURCES = \
 	src/common/String.hh \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
+	src/common/Try.hh \
 	src/common/Variant.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
@@ -246,8 +246,6 @@ src_async_FutureTest_SOURCES = \
 	src/async/FutureTest.cc
 src_async_PromiseTest_SOURCES = \
 	src/async/PromiseTest.cc
-src_async_ResultTest_SOURCES = \
-	src/async/ResultTest.cc
 src_common_EnumSetTest_SOURCES = \
 	src/common/EnumSetTest.cc
 src_common_MaybeTest_SOURCES = \
@@ -261,6 +259,8 @@ src_common_SharedFunctionTest_SOURCES = \
 	src/common/SharedFunctionTest.cc
 src_common_TrieTest_SOURCES = \
 	src/common/TrieTest.cc
+src_common_TryTest_SOURCES = \
+	src/common/TryTest.cc
 src_common_VariantTest_SOURCES = \
 	src/common/VariantTest.cc
 src_language_parser_AndOrListParserTest_SOURCES = \

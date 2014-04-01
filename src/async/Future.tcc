@@ -63,7 +63,7 @@ public:
             mFunction(std::forward<F>(function)),
             mReceiver(std::move(receiver)) { }
 
-    void operator()(Result<From> &&r) {
+    void operator()(common::Try<From> &&r) {
         std::move(mReceiver).setResultFrom(
                 [this, &r] { return mFunction(std::move(r)); });
     }
@@ -96,7 +96,7 @@ public:
             mFunction(std::forward<F>(function)),
             mReceiver(std::move(receiver)) { }
 
-    void operator()(Result<From> &&r) {
+    void operator()(common::Try<From> &&r) {
         std::move(mReceiver).setResultFrom(
                 [this, &r] { return mFunction(std::move(*r)); });
     }
@@ -129,7 +129,7 @@ public:
             mFunction(std::forward<F>(function)),
             mReceiver(std::move(receiver)) { }
 
-    void operator()(Result<T> &&r) {
+    void operator()(common::Try<T> &&r) {
         std::move(mReceiver).setResultFrom([this, &r]() -> T {
             if (r.hasValue())
                 return std::move(*r);
@@ -163,7 +163,7 @@ public:
     explicit Forwarder(Promise<T> &&receiver) noexcept :
             mReceiver(std::move(receiver)) { }
 
-    void operator()(Result<T> &&r) {
+    void operator()(common::Try<T> &&r) {
         std::move(mReceiver).setResultFrom([&r] { return *r; });
     }
 
@@ -248,7 +248,7 @@ public:
     explicit Unwrapper(Promise<T> &&receiver) noexcept :
             mReceiver(std::move(receiver)) { }
 
-    void operator()(Result<Future<T>> &&r) {
+    void operator()(common::Try<Future<T>> &&r) {
         if (r.hasValue())
             return std::move(*r).forward(std::move(mReceiver));
 
