@@ -71,7 +71,7 @@ public:
 
 template<typename From>
 template<typename F, typename Function, typename To>
-Future<To> FutureBase<From>::then(F &&function) && {
+Future<To> FutureBase<From>::map(F &&function) && {
     using C = Composer<From, To, F, Function>;
     std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
     std::move(*this).setCallback(common::SharedFunction<C>(

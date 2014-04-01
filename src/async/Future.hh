@@ -80,7 +80,7 @@ public:
             typename F,
             typename G = typename std::decay<F>::type,
             typename R = typename std::result_of<G(T &&)>::type>
-    Future<R> then(F &&) &&;
+    Future<R> map(F &&) &&;
 
     /**
      * Sets a callback function that recovers this future from an exception.

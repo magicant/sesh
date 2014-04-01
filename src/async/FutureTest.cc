@@ -85,7 +85,7 @@ TEST_CASE("Create promise/future pair") {
     CHECK(i == 123);
 }
 
-TEST_CASE("Future, then, success, movable function") {
+TEST_CASE("Future, map, success, movable function") {
     class MovableFunction {
     private:
         int &mI;
@@ -102,7 +102,7 @@ TEST_CASE("Future, then, success, movable function") {
     Future<int> f1(delay);
 
     int i = 0;
-    Future<double> f2 = std::move(f1).then(MovableFunction(i));
+    Future<double> f2 = std::move(f1).map(MovableFunction(i));
 
     double d = 0.0;
     std::move(f2).setCallback([&d](Result<double> &&r) { d = *r; });
@@ -114,13 +114,13 @@ TEST_CASE("Future, then, success, movable function") {
     CHECK(d == 2.0);
 }
 
-TEST_CASE("Future, then, success, copyable constant function") {
+TEST_CASE("Future, map, success, copyable constant function") {
     const auto delay = std::make_shared<Delay<int>>();
     Future<int> f1(delay);
 
     int i = 0;
     const auto f = [&i](int &&v) -> double { i = v; return 2.0; };
-    Future<double> f2 = std::move(f1).then(f);
+    Future<double> f2 = std::move(f1).map(f);
 
     double d = 0.0;
     std::move(f2).setCallback([&d](Result<double> &&r) { d = *r; });
@@ -132,12 +132,12 @@ TEST_CASE("Future, then, success, copyable constant function") {
     CHECK(d == 2.0);
 }
 
-TEST_CASE("Future, then, failure propagation") {
+TEST_CASE("Future, map, failure propagation") {
     const auto delay = std::make_shared<Delay<int>>();
     Future<int> f1(delay);
 
     const auto f = [](int &&) -> char { FAIL("unexpected"); return 'a'; };
-    Future<char> f2 = std::move(f1).then(f);
+    Future<char> f2 = std::move(f1).map(f);
 
     double d = 0.0;
     std::move(f2).setCallback([&d](Result<char> &&r) {
@@ -153,13 +153,13 @@ TEST_CASE("Future, then, failure propagation") {
     CHECK(d == 2.0);
 }
 
-TEST_CASE("Future, then, failure in callback") {
+TEST_CASE("Future, map, failure in callback") {
     const auto delay = std::make_shared<Delay<int>>();
     Future<int> f1(delay);
 
     int i = 0;
     const auto f = [&i](int &&v) -> char { i = v; throw 2.0; };
-    Future<char> f2 = std::move(f1).then(f);
+    Future<char> f2 = std::move(f1).map(f);
 
     double d = 0.0;
     std::move(f2).setCallback([&d](Result<char> &&r) {
@@ -357,7 +357,7 @@ TEST_CASE("Future, unwrap, failure in first") {
 
 TEST_CASE("Future, unwrap, failure in second") {
     double d = 0.0;
-    createFutureOf(0).then([](int &&) -> Future<int> {
+    createFutureOf(0).map([](int &&) -> Future<int> {
         throw 1.0;
     }).unwrap().setCallback([&d](Result<int> &&r) {
         try {
