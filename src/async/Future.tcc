@@ -49,6 +49,39 @@ std::pair<Promise<T>, Future<T>> createPromiseFuturePair() {
 }
 
 template<typename From, typename To, typename F, typename Function>
+class Composer {
+
+private:
+
+    Function mFunction;
+    Promise<To> mReceiver;
+
+public:
+
+    Composer(F &&function, Promise<To> &&receiver) :
+            mFunction(std::forward<F>(function)),
+            mReceiver(std::move(receiver)) { }
+
+    void operator()(Result<From> &&r) {
+        std::move(mReceiver).setResultFrom(
+                [this, &r] { return mFunction(std::move(r)); });
+    }
+
+};
+
+template<typename From>
+template<typename F, typename Function, typename To>
+Future<To> FutureBase<From>::then(F &&function) && {
+    using C = Composer<From, To, F, Function>;
+    std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
+    std::move(*this).setCallback(common::SharedFunction<C>(
+            common::DIRECT_INITIALIZE,
+            std::forward<F>(function),
+            std::move(pf.first)));
+    return std::move(pf.second);
+}
+
+template<typename From, typename To, typename F, typename Function>
 class Mapper {
 
 private:

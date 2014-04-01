@@ -62,6 +62,25 @@ public:
     /**
      * Sets a callback function that converts the result to another result.
      *
+     * The argument callback will be called when this future receives a result,
+     * either successful or unsuccessful. The result of the callback will
+     * become the result of the future returned from this method. If the
+     * callback throws an exception, that will be propagated to the returned
+     * future.
+     *
+     * @tparam F parameter type of the callback function
+     * @tparam G object type of the callback
+     * @tparam R result type of the callback
+     */
+    template<
+            typename F,
+            typename G = typename std::decay<F>::type,
+            typename R = typename std::result_of<G(Result<T> &&)>::type>
+    Future<R> then(F &&) &&;
+
+    /**
+     * Sets a callback function that converts the result to another result.
+     *
      * The argument callback will be called when this future receives a result.
      * The result of the callback will become the result of the future returned
      * from this method.

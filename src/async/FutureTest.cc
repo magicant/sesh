@@ -85,6 +85,45 @@ TEST_CASE("Create promise/future pair") {
     CHECK(i == 123);
 }
 
+TEST_CASE("Future, then, success") {
+    const auto delay = std::make_shared<Delay<int>>();
+    Future<int> f1(delay);
+
+    int i = 0;
+    const auto f = [&i](Result<int> &&v) -> double { i = *v; return 2.0; };
+    Future<double> f2 = std::move(f1).then(f);
+
+    double d = 0.0;
+    std::move(f2).setCallback([&d](Result<double> &&r) { d = *r; });
+
+    CHECK(i == 0);
+    CHECK(d == 0.0);
+    delay->setResultFrom([] { return 1; });
+    CHECK(i == 1);
+    CHECK(d == 2.0);
+}
+
+TEST_CASE("Future, then, failure") {
+    const auto delay = std::make_shared<Delay<int>>();
+    Future<int> f1(delay);
+
+    const auto f = [](Result<int> &&) -> char { throw 2.0; };
+    Future<char> f2 = std::move(f1).then(f);
+
+    double d = 0.0;
+    std::move(f2).setCallback([&d](Result<char> &&r) {
+        try {
+            *r;
+        } catch (double v) {
+            d = v;
+        }
+    });
+
+    CHECK(d == 0.0);
+    delay->setResultFrom([] { return 1; });
+    CHECK(d == 2.0);
+}
+
 TEST_CASE("Future, map, success, movable function") {
     class MovableFunction {
     private:
