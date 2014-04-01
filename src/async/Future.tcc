@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <functional>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 #include "common/DirectInitialize.hh"
 #include "common/IntegerSequence.hh"
