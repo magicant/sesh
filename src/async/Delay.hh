@@ -24,8 +24,8 @@
 #include <exception>
 #include <functional>
 #include <utility>
-#include "async/Result.hh"
 #include "common/Maybe.hh"
+#include "common/Try.hh"
 #include "common/Variant.hh"
 
 namespace sesh {
@@ -49,11 +49,11 @@ class Delay {
 
 public:
 
-    using Callback = std::function<void(Result<T> &&)>;
+    using Callback = std::function<void(common::Try<T> &&)>;
 
 private:
 
-    common::Maybe<Result<T>> mResult;
+    common::Maybe<common::Try<T>> mResult;
     Callback mCallback;
 
     void fireIfReady() {
@@ -81,7 +81,7 @@ public:
         try {
             mResult.emplace(std::forward<F>(f));
         } catch (...) {
-            mResult.emplace(Result<T>::of(std::current_exception()));
+            mResult.emplace(common::Try<T>::of(std::current_exception()));
         }
 
         fireIfReady();

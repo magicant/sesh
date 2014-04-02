@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_async_Result_hh
-#define INCLUDED_async_Result_hh
+#ifndef INCLUDED_common_Try_hh
+#define INCLUDED_common_Try_hh
 
 #include "buildconfig.h"
 
@@ -26,14 +26,14 @@
 #include "common/Variant.hh"
 
 namespace sesh {
-namespace async {
+namespace common {
 
 /**
- * Result of an asynchronous computation. It is either a value of the parameter
- * type or an exception.
+ * Result of a computation that may fail with an exception. It is either a
+ * value of the template parameter type or an exception.
  */
 template<typename T>
-class Result : public common::Variant<T, std::exception_ptr> {
+class Try : public common::Variant<T, std::exception_ptr> {
 
 public:
 
@@ -42,9 +42,9 @@ public:
     /** Checks if this value has an actual result rather than an exception. */
     bool hasValue() const noexcept {
         switch (this->index()) {
-        case Result::template index<T>():
+        case Try::template index<T>():
             return true;
-        case Result::template index<std::exception_ptr>():
+        case Try::template index<std::exception_ptr>():
             return false;
         }
         UNREACHABLE();
@@ -57,9 +57,9 @@ public:
     /** Returns a reference to the result value or throws the exception. */
     T &operator*() {
         switch (this->index()) {
-        case Result::template index<T>():
+        case Try::template index<T>():
             return this->template value<T>();
-        case Result::template index<std::exception_ptr>():
+        case Try::template index<std::exception_ptr>():
             std::rethrow_exception(this->template value<std::exception_ptr>());
         }
         UNREACHABLE();
@@ -68,9 +68,9 @@ public:
     /** Returns a reference to the result value or throws the exception. */
     const T &operator*() const {
         switch (this->index()) {
-        case Result::template index<T>():
+        case Try::template index<T>():
             return this->template value<T>();
-        case Result::template index<std::exception_ptr>():
+        case Try::template index<std::exception_ptr>():
             std::rethrow_exception(this->template value<std::exception_ptr>());
         }
         UNREACHABLE();
@@ -86,11 +86,11 @@ public:
         return std::addressof(**this);
     }
 
-}; // template<typename T> class Result
+}; // template<typename T> class Try
 
-} // namespace async
+} // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_async_Result_hh
+#endif // #ifndef INCLUDED_common_Try_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
