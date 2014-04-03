@@ -71,7 +71,8 @@ TESTPROGRAMS = \
 	src/language/syntax/RawStringTest \
 	src/language/syntax/SequenceTest \
 	src/language/syntax/SimpleCommandTest \
-	src/language/syntax/WordTest
+	src/language/syntax/WordTest \
+	src/os/io/FileDescriptorTest
 
 TESTSCRIPTS = \
 	src/checkheaderinclude.sh \
@@ -237,7 +238,8 @@ src_sesh_SOURCES = \
 	src/language/syntax/WordComponent.hh \
 	src/main.cc \
 	src/os/api.c \
-	src/os/api.h
+	src/os/api.h \
+	src/os/io/FileDescriptor.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_DelayHolderTest_SOURCES = \
@@ -737,6 +739,8 @@ src_language_syntax_WordTest_SOURCES = \
 	src/language/syntax/RawString.cc \
 	src/language/syntax/Word.cc \
 	src/language/syntax/WordTest.cc
+src_os_io_FileDescriptorTest_SOURCES = \
+	src/os/io/FileDescriptorTest.cc
 
 TESTHEADERS = \
 	src/language/parser/AssignmentParserTestHelper.hh \
