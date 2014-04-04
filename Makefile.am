@@ -235,7 +235,9 @@ src_sesh_SOURCES = \
 	src/language/syntax/Word.cc \
 	src/language/syntax/Word.hh \
 	src/language/syntax/WordComponent.hh \
-	src/main.cc
+	src/main.cc \
+	src/os/api.c \
+	src/os/api.h
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_DelayHolderTest_SOURCES = \
