@@ -266,7 +266,6 @@ TEST_CASE("Future, recover from exception") {
             CHECK(d == 1.0);
             return 1;
         }
-        throw 2.0;
     };
     Future<int> f2 = std::move(f1).recover(f);
 

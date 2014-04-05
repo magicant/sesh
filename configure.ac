@@ -36,15 +36,16 @@ AS_VAR_IF([enable_debug_build], [[yes]], [[: ${CFLAGS=-g}]])
 AC_PROG_CC_C99
 AC_SYS_LARGEFILE
 AS_VAR_IF([enable_debug_build], [[yes]], [AX_APPEND_COMPILE_FLAGS(
-    [-pedantic -Wall -Wextra -Wdocumentation -Werror])])
+    [-pedantic -Wall -Wextra -Wunreachable-code -Wdocumentation -Werror])])
 
 AC_LANG([C++])
 AS_VAR_IF([enable_debug_build], [[yes]], [[: ${CXXFLAGS=-g}]])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
 AS_VAR_IF([enable_debug_build], [[yes]], [AX_APPEND_COMPILE_FLAGS(
-    [-pedantic -Wall -Wextra -Wdocumentation -Werror])])
-AX_GCC_BUILTIN([__builtin_unreachable])
+    [-pedantic -Wall -Wextra -Wunreachable-code -Wdocumentation])])
+AX_GCC_BUILTIN([__builtin_unreachable]) # must be tested w/o -Werror
+AS_VAR_IF([enable_debug_build], [[yes]], [AX_APPEND_COMPILE_FLAGS([-Werror])])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])
