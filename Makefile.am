@@ -237,6 +237,7 @@ src_sesh_SOURCES = \
 	src/language/syntax/Word.hh \
 	src/language/syntax/WordComponent.hh \
 	src/main.cc \
+	src/os/Api.hh \
 	src/os/api.c \
 	src/os/api.h \
 	src/os/io/FileDescriptor.hh
