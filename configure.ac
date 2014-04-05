@@ -23,12 +23,20 @@ AM_INIT_AUTOMAKE([
     -Wall
     -Werror
 ])
+AM_PROG_CC_C_O
 
 AC_ARG_ENABLE([debug-build],
     [AS_HELP_STRING(
         [--enable-debug-build], [change build options for debugging Sesh])],
     [],
     [enable_debug_build=no])
+
+AC_LANG([C])
+AS_VAR_IF([enable_debug_build], [[yes]], [[: ${CFLAGS=-g}]])
+AC_PROG_CC_C99
+AC_SYS_LARGEFILE
+AS_VAR_IF([enable_debug_build], [[yes]], [AX_APPEND_COMPILE_FLAGS(
+    [-pedantic -Wall -Wextra -Wdocumentation -Werror])])
 
 AC_LANG([C++])
 AS_VAR_IF([enable_debug_build], [[yes]], [[: ${CXXFLAGS=-g}]])
