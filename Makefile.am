@@ -243,7 +243,8 @@ src_sesh_SOURCES = \
 	src/os/RealApi.hh \
 	src/os/api.c \
 	src/os/api.h \
-	src/os/io/FileDescriptor.hh
+	src/os/io/FileDescriptor.hh \
+	src/os/io/FileDescriptorSet.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_DelayHolderTest_SOURCES = \
