@@ -27,9 +27,93 @@ extern "C" {
 /** A direct wrapper for the POSIX close function. */
 int sesh_osapi_close(int fd);
 
+/** An abstract wrapper of the POSIX fd_set type. */
+struct sesh_osapi_fd_set;
+
+/** Allocates a new uninitialized sesh_osapi_fd_set object. */
+struct sesh_osapi_fd_set *sesh_osapi_fd_set_new(void);
+
+/** Deletes a sesh_osapi_fd_set object. */
+void sesh_osapi_fd_set_delete(struct sesh_osapi_fd_set *);
+
+/** A direct wrapper of the POSIX FD_ISSET function. */
+int sesh_osapi_fd_isset(int fd, struct sesh_osapi_fd_set *);
+
+/** A direct wrapper of the POSIX FD_SET function. */
+void sesh_osapi_fd_set(int fd, struct sesh_osapi_fd_set *);
+
+/** A direct wrapper of the POSIX FD_CLR function. */
+void sesh_osapi_fd_clr(int fd, struct sesh_osapi_fd_set *);
+
+/** A direct wrapper of the POSIX FD_ZERO function. */
+void sesh_osapi_fd_zero(struct sesh_osapi_fd_set *);
+
+/** An abstract wrapper of the POSIX sigset_t type. */
+struct sesh_osapi_sigset;
+
+/** Allocates a new uninitialized sesh_osapi_sigset object. */
+struct sesh_osapi_sigset *sesh_osapi_sigset_new(void);
+
+/** Deletes a sesh_osapi_sigset object. */
+void sesh_osapi_sigset_delete(struct sesh_osapi_sigset *);
+
+/** A direct wrapper of the POSIX sigismember function. */
+int sesh_osapi_sigismember(
+        const struct sesh_osapi_sigset *, int signal_number);
+
+/** A direct wrapper of the POSIX sigaddset function. */
+int sesh_osapi_sigaddset(struct sesh_osapi_sigset *, int signal_number);
+
+/** A direct wrapper of the POSIX sigdelset function. */
+int sesh_osapi_sigdelset(struct sesh_osapi_sigset *, int signal_number);
+
+/** A direct wrapper of the POSIX sigfillset function. */
+int sesh_osapi_sigfillset(struct sesh_osapi_sigset *);
+
+/** A direct wrapper of the POSIX sigemptyset function. */
+int sesh_osapi_sigemptyset(struct sesh_osapi_sigset *);
+
+/**
+ * A direct wrapper for the POSIX pselect function.
+ *
+ * @param timeout in nanoseconds. A negative value means no timeout.
+ */
+int sesh_osapi_pselect(
+        int fd_bound,
+        struct sesh_osapi_fd_set *read_fds,
+        struct sesh_osapi_fd_set *write_fds,
+        struct sesh_osapi_fd_set *error_fds,
+        long long timeout,
+        const struct sesh_osapi_sigset *signal_mask);
+
 #if __cplusplus
 } // extern "C"
 #endif
+
+#if __cplusplus >= 201103L
+
+#include <memory>
+#include <type_traits>
+
+namespace std {
+
+template<>
+struct default_delete<struct ::sesh_osapi_fd_set> {
+    void operator()(struct ::sesh_osapi_fd_set *p) const {
+        ::sesh_osapi_fd_set_delete(p);
+    }
+};
+
+template<>
+struct default_delete<struct ::sesh_osapi_sigset> {
+    void operator()(struct ::sesh_osapi_sigset *p) const {
+        ::sesh_osapi_sigset_delete(p);
+    }
+};
+
+} // namespace std
+
+#endif // #if __cplusplus >= 201103L
 
 #endif // #ifndef INCLUDED_os_api_h
 
