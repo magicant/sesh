@@ -245,7 +245,8 @@ src_sesh_SOURCES = \
 	src/os/api.h \
 	src/os/io/FileDescriptor.hh \
 	src/os/io/FileDescriptorSet.hh \
-	src/os/signaling/SignalNumber.hh
+	src/os/signaling/SignalNumber.hh \
+	src/os/signaling/SignalNumberSet.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_DelayHolderTest_SOURCES = \
