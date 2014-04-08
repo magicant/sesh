@@ -18,16 +18,76 @@
 #include "buildconfig.h"
 #include "RealApi.hh"
 
+#include <memory>
+#include <new>
 #include <system_error>
 #include "common/ErrnoHelper.hh"
 #include "os/api.h"
 #include "os/io/FileDescriptor.hh"
+#include "os/io/FileDescriptorSet.hh"
 
 using sesh::common::errnoCondition;
 using sesh::os::io::FileDescriptor;
+using sesh::os::io::FileDescriptorSet;
 
 namespace sesh {
 namespace os {
+
+namespace {
+
+class RealFileDescriptorSet : public FileDescriptorSet {
+
+private:
+
+    /** May be null when empty. */
+    std::unique_ptr<struct sesh_osapi_fd_set> mSet;
+
+    void allocateIfNull() {
+        if (mSet != nullptr)
+            return;
+        mSet.reset(sesh_osapi_fd_set_new());
+        if (mSet == nullptr)
+            throw std::bad_alloc();
+    }
+
+    void setImpl(FileDescriptor::Value fd) {
+        allocateIfNull();
+        sesh_osapi_fd_set(fd, mSet.get());
+    }
+
+    void resetImpl(FileDescriptor::Value fd) {
+        if (mSet != nullptr)
+            sesh_osapi_fd_clr(fd, mSet.get());
+    }
+
+public:
+
+    /** @return may be null. */
+    struct sesh_osapi_fd_set *get() const {
+        return mSet.get();
+    }
+
+    bool test(FileDescriptor::Value fd) const override {
+        return mSet != nullptr && sesh_osapi_fd_isset(fd, mSet.get());
+    }
+
+    FileDescriptorSet &set(FileDescriptor::Value fd, bool value) override {
+        if (value)
+            setImpl(fd);
+        else
+            resetImpl(fd);
+        return *this;
+    }
+
+    FileDescriptorSet &reset() override {
+        if (mSet != nullptr)
+            sesh_osapi_fd_zero(mSet.get());
+        return *this;
+    }
+
+}; // class RealFileDescriptorSet
+
+} // namespace
 
 std::error_condition RealApi::close(FileDescriptor &fd) const {
     if (sesh_osapi_close(fd.value()) == 0) {
