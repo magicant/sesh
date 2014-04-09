@@ -168,6 +168,11 @@ std::unique_ptr<FileDescriptorSet> RealApi::createFileDescriptorSet() const {
     return set;
 }
 
+std::unique_ptr<SignalNumberSet> RealApi::createSignalNumberSet() const {
+    std::unique_ptr<SignalNumberSet> set(new RealSignalNumberSet);
+    return set;
+}
+
 } // namespace os
 } // namespace sesh
 

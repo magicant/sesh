@@ -24,6 +24,7 @@
 #include <system_error>
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/signaling/SignalNumberSet.hh"
 
 namespace sesh {
 namespace os {
@@ -44,6 +45,10 @@ class Api {
 
     /** Returns a unique pointer to a new empty file descriptor set. */
     virtual std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet()
+            const = 0;
+
+    /** Returns a unique pointer to a new empty signal number set. */
+    virtual std::unique_ptr<signaling::SignalNumberSet> createSignalNumberSet()
             const = 0;
 
 }; // class Api
