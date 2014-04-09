@@ -20,8 +20,10 @@
 
 #include "buildconfig.h"
 
+#include <memory>
 #include <system_error>
 #include "os/io/FileDescriptor.hh"
+#include "os/io/FileDescriptorSet.hh"
 
 namespace sesh {
 namespace os {
@@ -39,6 +41,10 @@ class Api {
      * On failure, the file descriptor may be left still valid.
      */
     virtual std::error_condition close(io::FileDescriptor &) const = 0;
+
+    /** Returns a unique pointer to a new empty file descriptor set. */
+    virtual std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet()
+            const = 0;
 
 }; // class Api
 

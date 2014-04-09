@@ -101,6 +101,11 @@ std::error_condition RealApi::close(FileDescriptor &fd) const {
     return ec;
 }
 
+std::unique_ptr<FileDescriptorSet> RealApi::createFileDescriptorSet() const {
+    std::unique_ptr<FileDescriptorSet> set(new RealFileDescriptorSet);
+    return set;
+}
+
 } // namespace os
 } // namespace sesh
 

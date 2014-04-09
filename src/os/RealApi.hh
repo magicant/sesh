@@ -29,6 +29,9 @@ class RealApi : public Api {
 
     std::error_condition close(io::FileDescriptor &) const override;
 
+    std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet() const
+            override;
+
 }; // class RealApi
 
 } // namespace os
