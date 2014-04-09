@@ -25,10 +25,14 @@
 #include "os/api.h"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/SignalNumberSet.hh"
 
 using sesh::common::errnoCondition;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
+using sesh::os::signaling::SignalNumber;
+using sesh::os::signaling::SignalNumberSet;
 
 namespace sesh {
 namespace os {
@@ -86,6 +90,64 @@ public:
     }
 
 }; // class RealFileDescriptorSet
+
+class RealSignalNumberSet : public SignalNumberSet {
+
+private:
+
+    /** May be null when empty. */
+    std::unique_ptr<struct sesh_osapi_sigset> mSet;
+
+    void allocateIfNull() {
+        if (mSet != nullptr)
+            return;
+        mSet.reset(sesh_osapi_sigset_new());
+        if (mSet == nullptr)
+            throw std::bad_alloc();
+    }
+
+    void setImpl(SignalNumber n) {
+        allocateIfNull();
+        sesh_osapi_sigaddset(mSet.get(), n);
+    }
+
+    void resetImpl(SignalNumber n) {
+        if (mSet != nullptr)
+            sesh_osapi_sigdelset(mSet.get(), n);
+    }
+
+public:
+
+    /** @return may be null. */
+    struct sesh_osapi_sigset *get() const {
+        return mSet.get();
+    }
+
+    bool test(SignalNumber n) override {
+        return mSet != nullptr && sesh_osapi_sigismember(mSet.get(), n);
+    }
+
+    SignalNumberSet &set(SignalNumber n, bool value) override {
+        if (value)
+            setImpl(n);
+        else
+            resetImpl(n);
+        return *this;
+    }
+
+    SignalNumberSet &set() override {
+        allocateIfNull();
+        sesh_osapi_sigfillset(mSet.get());
+        return *this;
+    }
+
+    SignalNumberSet &reset() override {
+        if (mSet != nullptr)
+            sesh_osapi_sigemptyset(mSet.get());
+        return *this;
+    }
+
+}; // class RealSignalNumberSet
 
 } // namespace
 
