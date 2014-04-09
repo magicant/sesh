@@ -27,6 +27,10 @@ namespace os {
 
 class RealApi : public Api {
 
+private:
+
+    RealApi() = default;
+
     std::error_condition close(io::FileDescriptor &) const override;
 
     std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet() const
@@ -34,6 +38,10 @@ class RealApi : public Api {
 
     std::unique_ptr<signaling::SignalNumberSet> createSignalNumberSet() const
             override;
+
+public:
+
+    static const Api &INSTANCE;
 
 }; // class RealApi
 

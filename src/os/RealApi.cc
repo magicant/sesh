@@ -173,6 +173,8 @@ std::unique_ptr<SignalNumberSet> RealApi::createSignalNumberSet() const {
     return set;
 }
 
+const Api &RealApi::INSTANCE = RealApi();
+
 } // namespace os
 } // namespace sesh
 
