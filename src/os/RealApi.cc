@@ -173,6 +173,32 @@ std::unique_ptr<SignalNumberSet> RealApi::createSignalNumberSet() const {
     return set;
 }
 
+std::error_condition RealApi::pselect(
+            FileDescriptor::Value fdBound,
+            FileDescriptorSet *readFds,
+            FileDescriptorSet *writeFds,
+            FileDescriptorSet *errorFds,
+            std::chrono::nanoseconds timeout,
+            const SignalNumberSet *signalMask) const {
+    RealFileDescriptorSet
+            *realReadFds = static_cast<RealFileDescriptorSet *>(readFds),
+            *realWriteFds = static_cast<RealFileDescriptorSet *>(writeFds),
+            *realErrorFds = static_cast<RealFileDescriptorSet *>(errorFds);
+    const RealSignalNumberSet *realSignalMask =
+            static_cast<const RealSignalNumberSet *>(signalMask);
+
+    int pselectResult = sesh_osapi_pselect(
+            fdBound,
+            realReadFds == nullptr ? nullptr : realReadFds->get(),
+            realWriteFds == nullptr ? nullptr : realWriteFds->get(),
+            realErrorFds == nullptr ? nullptr : realErrorFds->get(),
+            timeout.count(),
+            realSignalMask == nullptr ? nullptr : realSignalMask->get());
+    if (pselectResult == 0)
+        return std::error_condition();
+    return errnoCondition();
+}
+
 const Api &RealApi::INSTANCE = RealApi();
 
 } // namespace os

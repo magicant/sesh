@@ -39,6 +39,14 @@ private:
     std::unique_ptr<signaling::SignalNumberSet> createSignalNumberSet() const
             override;
 
+    std::error_condition pselect(
+            io::FileDescriptor::Value fdBound,
+            io::FileDescriptorSet *readFds,
+            io::FileDescriptorSet *writeFds,
+            io::FileDescriptorSet *errorFds,
+            std::chrono::nanoseconds timeout,
+            const signaling::SignalNumberSet *signalMask) const override;
+
 public:
 
     static const Api &INSTANCE;
