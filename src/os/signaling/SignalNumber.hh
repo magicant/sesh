@@ -15,47 +15,22 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_RealApi_hh
-#define INCLUDED_os_RealApi_hh
+#ifndef INCLUDED_os_signaling_SignalNumber_hh
+#define INCLUDED_os_signaling_SignalNumber_hh
 
 #include "buildconfig.h"
 
-#include "os/Api.hh"
-
 namespace sesh {
 namespace os {
+namespace signaling {
 
-class RealApi : public Api {
+/** The type of signal numbers. */
+using SignalNumber = int;
 
-private:
-
-    RealApi() = default;
-
-    std::error_condition close(io::FileDescriptor &) const override;
-
-    std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet() const
-            override;
-
-    std::unique_ptr<signaling::SignalNumberSet> createSignalNumberSet() const
-            override;
-
-    std::error_condition pselect(
-            io::FileDescriptor::Value fdBound,
-            io::FileDescriptorSet *readFds,
-            io::FileDescriptorSet *writeFds,
-            io::FileDescriptorSet *errorFds,
-            std::chrono::nanoseconds timeout,
-            const signaling::SignalNumberSet *signalMask) const override;
-
-public:
-
-    static const Api &INSTANCE;
-
-}; // class RealApi
-
+} // namespace signaling
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_RealApi_hh
+#endif // #ifndef INCLUDED_os_signaling_SignalNumber_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
