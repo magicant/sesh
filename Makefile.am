@@ -250,6 +250,14 @@ src_sesh_SOURCES = \
 	src/os/capi.c \
 	src/os/capi.h \
 	src/os/capitypes.h \
+	src/os/event/ErrorFileDescriptor.hh \
+	src/os/event/FileDescriptorCondition.hh \
+	src/os/event/ReadableFileDescriptor.hh \
+	src/os/event/Signal.hh \
+	src/os/event/Timeout.hh \
+	src/os/event/Trigger.hh \
+	src/os/event/UserProvidedTrigger.hh \
+	src/os/event/WritableFileDescriptor.hh \
 	src/os/io/FileDescriptor.hh \
 	src/os/io/FileDescriptorSet.hh \
 	src/os/signaling/HandlerConfiguration.cc \
