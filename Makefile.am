@@ -246,6 +246,9 @@ src_sesh_SOURCES = \
 	src/os/capitypes.h \
 	src/os/io/FileDescriptor.hh \
 	src/os/io/FileDescriptorSet.hh \
+	src/os/signaling/SignalErrorCategory.cc \
+	src/os/signaling/SignalErrorCategory.hh \
+	src/os/signaling/SignalErrorCode.hh \
 	src/os/signaling/SignalNumber.hh \
 	src/os/signaling/SignalNumberSet.hh
 
