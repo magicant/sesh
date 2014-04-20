@@ -123,6 +123,11 @@ public:
         return mSet.get();
     }
 
+    struct sesh_osapi_sigset *getOrAllocate() {
+        allocateIfNull();
+        return get();
+    }
+
     bool test(SignalNumber n) override {
         return mSet != nullptr && sesh_osapi_sigismember(mSet.get(), n);
     }
@@ -197,6 +202,39 @@ class ApiImpl : public Api {
                 timeout.count(),
                 signalMaskImpl == nullptr ? nullptr : signalMaskImpl->get());
         if (pselectResult == 0)
+            return std::error_code();
+        return errnoCode();
+    }
+
+    std::error_code sigprocmask(
+            MaskChangeHow how,
+            const signaling::SignalNumberSet *newMask,
+            signaling::SignalNumberSet *oldMask) const final override {
+        enum sesh_osapi_sigprocmask_how howImpl;
+
+        switch (how) {
+        case MaskChangeHow::BLOCK:
+            howImpl = SESH_OSAPI_SIG_BLOCK;
+            break;
+        case MaskChangeHow::UNBLOCK:
+            howImpl = SESH_OSAPI_SIG_UNBLOCK;
+            break;
+        case MaskChangeHow::SET_MASK:
+            howImpl = SESH_OSAPI_SIG_SETMASK;
+            break;
+        }
+
+        const SignalNumberSetImpl *newMaskImpl =
+                static_cast<const SignalNumberSetImpl *>(newMask);
+        SignalNumberSetImpl *oldMaskImpl =
+                static_cast<SignalNumberSetImpl *>(oldMask);
+
+        int sigprocmaskResult = sesh_osapi_sigprocmask(
+                howImpl,
+                newMaskImpl == nullptr ? nullptr : newMaskImpl->get(),
+                oldMaskImpl == nullptr ? nullptr :
+                        oldMaskImpl->getOrAllocate());
+        if (sigprocmaskResult == 0)
             return std::error_code();
         return errnoCode();
     }

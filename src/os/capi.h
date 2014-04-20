@@ -86,6 +86,20 @@ int sesh_osapi_pselect(
         long long timeout,
         const struct sesh_osapi_sigset *signal_mask);
 
+enum sesh_osapi_sigprocmask_how {
+    SESH_OSAPI_SIG_BLOCK,
+    SESH_OSAPI_SIG_UNBLOCK,
+    SESH_OSAPI_SIG_SETMASK,
+};
+
+/**
+ * A direct wrapper for the POSIX sigprocmask function.
+ */
+int sesh_osapi_sigprocmask(
+        enum sesh_osapi_sigprocmask_how how,
+        const struct sesh_osapi_sigset *new_mask,
+        struct sesh_osapi_sigset *old_mask);
+
 #if __cplusplus
 } // extern "C"
 #endif

@@ -72,6 +72,20 @@ public:
             std::chrono::nanoseconds timeout,
             const signaling::SignalNumberSet *signalMask) const = 0;
 
+    enum class MaskChangeHow { BLOCK, UNBLOCK, SET_MASK };
+
+    /**
+     * Changes the signal blocking mask.
+     *
+     * The pointer arguments to signal number sets may be null. Non-null
+     * pointers passed to this function must be obtained from the {@link
+     * #createSignalNumberSet} functions called for the same {@code *this}.
+     */
+    virtual std::error_code sigprocmask(
+            MaskChangeHow,
+            const signaling::SignalNumberSet *newMask,
+            signaling::SignalNumberSet *oldMask) const = 0;
+
     /** Reference to the only instance of real API implementation. */
     static const Api &INSTANCE;
 

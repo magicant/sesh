@@ -117,4 +117,24 @@ int sesh_osapi_pselect(
             signal_mask != NULL ? &signal_mask->value : NULL);
 }
 
+int sesh_osapi_sigprocmask(
+        enum sesh_osapi_sigprocmask_how how,
+        const struct sesh_osapi_sigset *new_mask,
+        struct sesh_osapi_sigset *old_mask) {
+    int apiHow;
+
+    apiHow = -1; // dummy initialization to dumb warning
+
+    switch (how) {
+    case SESH_OSAPI_SIG_BLOCK:   apiHow = SIG_BLOCK;   break;
+    case SESH_OSAPI_SIG_UNBLOCK: apiHow = SIG_UNBLOCK; break;
+    case SESH_OSAPI_SIG_SETMASK: apiHow = SIG_SETMASK; break;
+    }
+
+    return sigprocmask(
+            apiHow,
+            new_mask != NULL ? &new_mask->value : NULL,
+            old_mask != NULL ? &old_mask->value : NULL);
+}
+
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
