@@ -33,6 +33,8 @@ namespace os {
 /** Abstraction of POSIX API. */
 class Api {
 
+public:
+
     /**
      * Closes the given file descriptor. This function may block on some
      * conditions; refer to the POSIX standard for details.
