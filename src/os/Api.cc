@@ -28,7 +28,7 @@
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::common::errnoCondition;
+using sesh::common::errnoCode;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumber;
@@ -151,14 +151,14 @@ public:
 
 class ApiImpl : public Api {
 
-    std::error_condition close(FileDescriptor &fd) const final override {
+    std::error_code close(FileDescriptor &fd) const final override {
         if (sesh_osapi_close(fd.value()) == 0) {
             fd.clear();
-            return std::error_condition();
+            return std::error_code();
         }
 
-        std::error_condition ec = errnoCondition();
-        if (ec == std::make_error_condition(std::errc::bad_file_descriptor))
+        std::error_code ec = errnoCode();
+        if (ec == std::errc::bad_file_descriptor)
             fd.clear();
         return ec;
     }
@@ -175,7 +175,7 @@ class ApiImpl : public Api {
         return set;
     }
 
-    std::error_condition pselect(
+    std::error_code pselect(
                 FileDescriptor::Value fdBound,
                 FileDescriptorSet *readFds,
                 FileDescriptorSet *writeFds,
@@ -197,8 +197,8 @@ class ApiImpl : public Api {
                 timeout.count(),
                 signalMaskImpl == nullptr ? nullptr : signalMaskImpl->get());
         if (pselectResult == 0)
-            return std::error_condition();
-        return errnoCondition();
+            return std::error_code();
+        return errnoCode();
     }
 
 }; // class ApiImpl

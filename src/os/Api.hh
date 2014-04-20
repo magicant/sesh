@@ -42,7 +42,7 @@ class Api {
      *
      * On failure, the file descriptor may be left still valid.
      */
-    virtual std::error_condition close(io::FileDescriptor &) const = 0;
+    virtual std::error_code close(io::FileDescriptor &) const = 0;
 
     /** Returns a unique pointer to a new empty file descriptor set. */
     virtual std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet()
@@ -62,7 +62,7 @@ class Api {
      *
      * @param timeout A negative value means no timeout.
      */
-    virtual std::error_condition pselect(
+    virtual std::error_code pselect(
             io::FileDescriptor::Value fdBound,
             io::FileDescriptorSet *readFds,
             io::FileDescriptorSet *writeFds,
