@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "RealApi.hh"
+#include "Api.hh"
 
 #include <memory>
 #include <new>
@@ -39,7 +39,7 @@ namespace os {
 
 namespace {
 
-class RealFileDescriptorSet : public FileDescriptorSet {
+class FileDescriptorSetImpl : public FileDescriptorSet {
 
 private:
 
@@ -89,9 +89,9 @@ public:
         return *this;
     }
 
-}; // class RealFileDescriptorSet
+}; // class FileDescriptorSetImpl
 
-class RealSignalNumberSet : public SignalNumberSet {
+class SignalNumberSetImpl : public SignalNumberSet {
 
 private:
 
@@ -147,59 +147,65 @@ public:
         return *this;
     }
 
-}; // class RealSignalNumberSet
+}; // class SignalNumberSetImpl
+
+class ApiImpl : public Api {
+
+    std::error_condition close(FileDescriptor &fd) const final override {
+        if (sesh_osapi_close(fd.value()) == 0) {
+            fd.clear();
+            return std::error_condition();
+        }
+
+        std::error_condition ec = errnoCondition();
+        if (ec == std::make_error_condition(std::errc::bad_file_descriptor))
+            fd.clear();
+        return ec;
+    }
+
+    std::unique_ptr<FileDescriptorSet> createFileDescriptorSet() const
+            final override {
+        std::unique_ptr<FileDescriptorSet> set(new FileDescriptorSetImpl);
+        return set;
+    }
+
+    std::unique_ptr<SignalNumberSet> createSignalNumberSet() const
+            final override {
+        std::unique_ptr<SignalNumberSet> set(new SignalNumberSetImpl);
+        return set;
+    }
+
+    std::error_condition pselect(
+                FileDescriptor::Value fdBound,
+                FileDescriptorSet *readFds,
+                FileDescriptorSet *writeFds,
+                FileDescriptorSet *errorFds,
+                std::chrono::nanoseconds timeout,
+                const SignalNumberSet *signalMask) const final override {
+        FileDescriptorSetImpl
+                *readFdsImpl = static_cast<FileDescriptorSetImpl *>(readFds),
+                *writeFdsImpl = static_cast<FileDescriptorSetImpl *>(writeFds),
+                *errorFdsImpl = static_cast<FileDescriptorSetImpl *>(errorFds);
+        const SignalNumberSetImpl *signalMaskImpl =
+                static_cast<const SignalNumberSetImpl *>(signalMask);
+
+        int pselectResult = sesh_osapi_pselect(
+                fdBound,
+                readFds == nullptr ? nullptr : readFdsImpl->get(),
+                writeFds == nullptr ? nullptr : writeFdsImpl->get(),
+                errorFds == nullptr ? nullptr : errorFdsImpl->get(),
+                timeout.count(),
+                signalMaskImpl == nullptr ? nullptr : signalMaskImpl->get());
+        if (pselectResult == 0)
+            return std::error_condition();
+        return errnoCondition();
+    }
+
+}; // class ApiImpl
 
 } // namespace
 
-std::error_condition RealApi::close(FileDescriptor &fd) const {
-    if (sesh_osapi_close(fd.value()) == 0) {
-        fd.clear();
-        return std::error_condition();
-    }
-
-    std::error_condition ec = errnoCondition();
-    if (ec == std::make_error_condition(std::errc::bad_file_descriptor))
-        fd.clear();
-    return ec;
-}
-
-std::unique_ptr<FileDescriptorSet> RealApi::createFileDescriptorSet() const {
-    std::unique_ptr<FileDescriptorSet> set(new RealFileDescriptorSet);
-    return set;
-}
-
-std::unique_ptr<SignalNumberSet> RealApi::createSignalNumberSet() const {
-    std::unique_ptr<SignalNumberSet> set(new RealSignalNumberSet);
-    return set;
-}
-
-std::error_condition RealApi::pselect(
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
-            std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) const {
-    RealFileDescriptorSet
-            *realReadFds = static_cast<RealFileDescriptorSet *>(readFds),
-            *realWriteFds = static_cast<RealFileDescriptorSet *>(writeFds),
-            *realErrorFds = static_cast<RealFileDescriptorSet *>(errorFds);
-    const RealSignalNumberSet *realSignalMask =
-            static_cast<const RealSignalNumberSet *>(signalMask);
-
-    int pselectResult = sesh_osapi_pselect(
-            fdBound,
-            realReadFds == nullptr ? nullptr : realReadFds->get(),
-            realWriteFds == nullptr ? nullptr : realWriteFds->get(),
-            realErrorFds == nullptr ? nullptr : realErrorFds->get(),
-            timeout.count(),
-            realSignalMask == nullptr ? nullptr : realSignalMask->get());
-    if (pselectResult == 0)
-        return std::error_condition();
-    return errnoCondition();
-}
-
-const Api &RealApi::INSTANCE = RealApi();
+const Api &Api::INSTANCE = ApiImpl();
 
 } // namespace os
 } // namespace sesh

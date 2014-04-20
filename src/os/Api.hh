@@ -70,6 +70,9 @@ class Api {
             std::chrono::nanoseconds timeout,
             const signaling::SignalNumberSet *signalMask) const = 0;
 
+    /** Reference to the only instance of real API implementation. */
+    static const Api &INSTANCE;
+
 }; // class Api
 
 } // namespace os
