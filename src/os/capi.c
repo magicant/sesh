@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "api.h"
+#include "capi.h"
 
 #include <signal.h>
 #include <stdlib.h>

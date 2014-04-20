@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_api_h
-#define INCLUDED_os_api_h
+#ifndef INCLUDED_os_capi_h
+#define INCLUDED_os_capi_h
 
 #include "buildconfig.h"
 
@@ -115,6 +115,6 @@ struct default_delete<struct ::sesh_osapi_sigset> {
 
 #endif // #if __cplusplus >= 201103L
 
-#endif // #ifndef INCLUDED_os_api_h
+#endif // #ifndef INCLUDED_os_capi_h
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

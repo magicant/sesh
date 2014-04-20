@@ -22,7 +22,7 @@
 #include <new>
 #include <system_error>
 #include "common/ErrnoHelper.hh"
-#include "os/api.h"
+#include "os/capi.h"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/SignalNumber.hh"
