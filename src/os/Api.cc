@@ -52,6 +52,7 @@ private:
         mSet.reset(sesh_osapi_fd_set_new());
         if (mSet == nullptr)
             throw std::bad_alloc();
+        sesh_osapi_fd_zero(mSet.get());
     }
 
     void setImpl(FileDescriptor::Value fd) {
@@ -104,6 +105,7 @@ private:
         mSet.reset(sesh_osapi_sigset_new());
         if (mSet == nullptr)
             throw std::bad_alloc();
+        sesh_osapi_sigemptyset(mSet.get());
     }
 
     void setImpl(SignalNumber n) {
