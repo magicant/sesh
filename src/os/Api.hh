@@ -23,8 +23,11 @@
 #include <chrono>
 #include <memory>
 #include <system_error>
+#include "common/Variant.hh"
+#include "os/capitypes.h"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 namespace sesh {
@@ -85,6 +88,23 @@ public:
             MaskChangeHow,
             const signaling::SignalNumberSet *newMask,
             signaling::SignalNumberSet *oldMask) const = 0;
+
+    class Default { };
+    class Ignore { };
+
+    using SignalAction =
+            common::Variant<Default, Ignore, sesh_osapi_signal_handler *>;
+
+    /**
+     * Changes and/or queries the signal handler setting for a signal.
+     *
+     * This function currently allows setting the signal handler function only.
+     * The {@code sa_mask} set and {@code sa_flags} are considered empty.
+     */
+    virtual std::error_code sigaction(
+            signaling::SignalNumber,
+            const SignalAction *newAction,
+            SignalAction *oldAction) const = 0;
 
     /** Reference to the only instance of real API implementation. */
     static const Api &INSTANCE;

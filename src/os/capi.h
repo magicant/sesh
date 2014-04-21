@@ -20,6 +20,8 @@
 
 #include "buildconfig.h"
 
+#include "os/capitypes.h"
+
 #if __cplusplus
 extern "C" {
 #endif
@@ -99,6 +101,26 @@ int sesh_osapi_sigprocmask(
         enum sesh_osapi_sigprocmask_how how,
         const struct sesh_osapi_sigset *new_mask,
         struct sesh_osapi_sigset *old_mask);
+
+enum sesh_osapi_signal_action_type {
+    /** Signal-specific default action. */
+    SESH_OSAPI_SIG_DFL,
+    /** Ignoring the signal. */
+    SESH_OSAPI_SIG_IGN,
+    /** User-provided handler. A non-null handler must be provided. */
+    SESH_OSAPI_SIG_HANDLER,
+};
+
+struct sesh_osapi_signal_action {
+    enum sesh_osapi_signal_action_type type;
+    sesh_osapi_signal_handler *handler;
+};
+
+/** A direct wrapper for the POSIX sigaction function. */
+int sesh_osapi_sigaction(
+        int signal_number,
+        const struct sesh_osapi_signal_action *,
+        struct sesh_osapi_signal_action *);
 
 #if __cplusplus
 } // extern "C"

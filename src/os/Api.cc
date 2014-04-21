@@ -34,10 +34,43 @@ using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
+using SignalAction = sesh::os::Api::SignalAction;
+
 namespace sesh {
 namespace os {
 
 namespace {
+
+void convert(const SignalAction &from, struct sesh_osapi_signal_action &to) {
+    switch (from.index()) {
+    case SignalAction::index<Api::Default>():
+        to.type = SESH_OSAPI_SIG_DFL;
+        to.handler = nullptr;
+        break;
+    case SignalAction::index<Api::Ignore>():
+        to.type = SESH_OSAPI_SIG_IGN;
+        to.handler = nullptr;
+        break;
+    case SignalAction::index<sesh_osapi_signal_handler *>():
+        to.type = SESH_OSAPI_SIG_HANDLER;
+        to.handler = from.value<sesh_osapi_signal_handler *>();
+        break;
+    }
+}
+
+void convert(const struct sesh_osapi_signal_action &from, SignalAction &to) {
+    switch (from.type) {
+    case SESH_OSAPI_SIG_DFL:
+        to.emplace<Api::Default>();
+        break;
+    case SESH_OSAPI_SIG_IGN:
+        to.emplace<Api::Ignore>();
+        break;
+    case SESH_OSAPI_SIG_HANDLER:
+        to.emplace<sesh_osapi_signal_handler *>(from.handler);
+        break;
+    }
+}
 
 class FileDescriptorSetImpl : public FileDescriptorSet {
 
@@ -218,6 +251,29 @@ class ApiImpl : public Api {
         if (sigprocmaskResult == 0)
             return std::error_code();
         return errnoCode();
+    }
+
+    std::error_code sigaction(
+            signaling::SignalNumber n,
+            const SignalAction *newAction,
+            SignalAction *oldAction) const final override {
+        struct sesh_osapi_signal_action newActionImpl, oldActionImpl;
+
+        if (newAction != nullptr)
+            convert(*newAction, newActionImpl);
+
+        int sigactionResult = sesh_osapi_sigaction(
+                n,
+                newAction == nullptr ? nullptr : &newActionImpl,
+                oldAction == nullptr ? nullptr : &oldActionImpl);
+
+        if (sigactionResult != 0)
+            return errnoCode();
+
+        if (oldAction != nullptr)
+            convert(oldActionImpl, *oldAction);
+
+        return std::error_code();
     }
 
 }; // class ApiImpl
