@@ -96,61 +96,41 @@ class SignalNumberSetImpl : public SignalNumberSet {
 
 private:
 
-    /** May be null when empty. */
+    /** Never null */
     std::unique_ptr<struct sesh_osapi_sigset> mSet;
 
-    void allocateIfNull() {
-        if (mSet != nullptr)
-            return;
-        mSet.reset(sesh_osapi_sigset_new());
+public:
+
+    SignalNumberSetImpl() : mSet(sesh_osapi_sigset_new()) {
         if (mSet == nullptr)
             throw std::bad_alloc();
         sesh_osapi_sigemptyset(mSet.get());
     }
 
-    void setImpl(SignalNumber n) {
-        allocateIfNull();
-        sesh_osapi_sigaddset(mSet.get(), n);
-    }
-
-    void resetImpl(SignalNumber n) {
-        if (mSet != nullptr)
-            sesh_osapi_sigdelset(mSet.get(), n);
-    }
-
-public:
-
-    /** @return may be null. */
+    /** @return Never null. */
     struct sesh_osapi_sigset *get() const {
         return mSet.get();
     }
 
-    struct sesh_osapi_sigset *getOrAllocate() {
-        allocateIfNull();
-        return get();
-    }
-
     bool test(SignalNumber n) override {
-        return mSet != nullptr && sesh_osapi_sigismember(mSet.get(), n);
+        return sesh_osapi_sigismember(mSet.get(), n);
     }
 
     SignalNumberSet &set(SignalNumber n, bool value) override {
         if (value)
-            setImpl(n);
+            sesh_osapi_sigaddset(mSet.get(), n);
         else
-            resetImpl(n);
+            sesh_osapi_sigdelset(mSet.get(), n);
         return *this;
     }
 
     SignalNumberSet &set() override {
-        allocateIfNull();
         sesh_osapi_sigfillset(mSet.get());
         return *this;
     }
 
     SignalNumberSet &reset() override {
-        if (mSet != nullptr)
-            sesh_osapi_sigemptyset(mSet.get());
+        sesh_osapi_sigemptyset(mSet.get());
         return *this;
     }
 
@@ -234,8 +214,7 @@ class ApiImpl : public Api {
         int sigprocmaskResult = sesh_osapi_sigprocmask(
                 howImpl,
                 newMaskImpl == nullptr ? nullptr : newMaskImpl->get(),
-                oldMaskImpl == nullptr ? nullptr :
-                        oldMaskImpl->getOrAllocate());
+                oldMaskImpl == nullptr ? nullptr : oldMaskImpl->get());
         if (sigprocmaskResult == 0)
             return std::error_code();
         return errnoCode();
