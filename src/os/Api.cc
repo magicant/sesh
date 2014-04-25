@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <new>
+#include <stdexcept>
 #include <system_error>
 #include "common/ErrnoHelper.hh"
 #include "os/capi.h"
@@ -88,12 +89,19 @@ private:
         sesh_osapi_fd_zero(mSet.get());
     }
 
+    void throwIfOutOfDomain(FileDescriptor::Value fd) {
+        if (fd >= sesh_osapi_fd_setsize())
+            throw std::domain_error("too large file descriptor");
+    }
+
     void setImpl(FileDescriptor::Value fd) {
+        throwIfOutOfDomain(fd);
         allocateIfNull();
         sesh_osapi_fd_set(fd, mSet.get());
     }
 
     void resetImpl(FileDescriptor::Value fd) {
+        throwIfOutOfDomain(fd);
         if (mSet != nullptr)
             sesh_osapi_fd_clr(fd, mSet.get());
     }
@@ -110,7 +118,8 @@ public:
     }
 
     bool test(FileDescriptor::Value fd) const override {
-        return mSet != nullptr && sesh_osapi_fd_isset(fd, mSet.get());
+        return fd < sesh_osapi_fd_setsize() &&
+                mSet != nullptr && sesh_osapi_fd_isset(fd, mSet.get());
     }
 
     FileDescriptorSet &set(FileDescriptor::Value fd, bool value) override {
