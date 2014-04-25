@@ -29,6 +29,9 @@ extern "C" {
 /** A direct wrapper for the POSIX close function. */
 int sesh_osapi_close(int fd);
 
+/** Returns {@code FD_SETSIZE}. */
+int sesh_osapi_fd_setsize(void);
+
 /** An abstract wrapper of the POSIX fd_set type. */
 struct sesh_osapi_fd_set;
 

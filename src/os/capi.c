@@ -27,6 +27,10 @@ int sesh_osapi_close(int fd) {
     return close(fd);
 }
 
+int sesh_osapi_fd_setsize(void) {
+    return FD_SETSIZE;
+}
+
 struct sesh_osapi_fd_set {
     fd_set value;
 };

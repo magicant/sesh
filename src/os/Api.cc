@@ -100,6 +100,10 @@ private:
 
 public:
 
+    FileDescriptor::Value maxValue() const override {
+        return sesh_osapi_fd_setsize() - 1;
+    }
+
     /** @return may be null. */
     struct sesh_osapi_fd_set *get() const {
         return mSet.get();

@@ -38,6 +38,9 @@ public:
     FileDescriptorSet &operator=(FileDescriptorSet &&) = default;
     virtual ~FileDescriptorSet() = default;
 
+    /** Returns the maximum value that can be contained in this set. */
+    virtual FileDescriptor::Value maxValue() const = 0;
+
     /** Checks if the given file descriptor is included in this set. */
     virtual bool test(FileDescriptor::Value) const = 0;
 
