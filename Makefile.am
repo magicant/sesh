@@ -763,7 +763,8 @@ TESTHEADERS = \
 	src/language/source/LocationTestHelper.hh \
 	src/language/source/OriginTestHelper.hh \
 	src/language/source/SourceTestHelper.hh \
-	src/language/syntax/PrinterTestHelper.hh
+	src/language/syntax/PrinterTestHelper.hh \
+	src/os/test_helper/UnimplementedApi.hh
 
 ### Documentation
 
