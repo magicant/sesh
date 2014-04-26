@@ -158,7 +158,7 @@ public:
         return mSet.get();
     }
 
-    bool test(SignalNumber n) override {
+    bool test(SignalNumber n) const override {
         return sesh_osapi_sigismember(mSet.get(), n);
     }
 

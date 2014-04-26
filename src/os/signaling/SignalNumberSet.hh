@@ -39,7 +39,7 @@ public:
     virtual ~SignalNumberSet() = default;
 
     /** Checks if the given signal number is included in this set. */
-    virtual bool test(signaling::SignalNumber) = 0;
+    virtual bool test(signaling::SignalNumber) const = 0;
 
     /** Adds/removes a signal number to/from this set. */
     virtual SignalNumberSet &set(signaling::SignalNumber, bool = true) = 0;
