@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_api_h
-#define INCLUDED_os_api_h
+#ifndef INCLUDED_os_capi_h
+#define INCLUDED_os_capi_h
 
 #include "buildconfig.h"
+
+#include "os/capitypes.h"
 
 #if __cplusplus
 extern "C" {
@@ -26,6 +28,9 @@ extern "C" {
 
 /** A direct wrapper for the POSIX close function. */
 int sesh_osapi_close(int fd);
+
+/** Returns {@code FD_SETSIZE}. */
+int sesh_osapi_fd_setsize(void);
 
 /** An abstract wrapper of the POSIX fd_set type. */
 struct sesh_osapi_fd_set;
@@ -86,6 +91,40 @@ int sesh_osapi_pselect(
         long long timeout,
         const struct sesh_osapi_sigset *signal_mask);
 
+enum sesh_osapi_sigprocmask_how {
+    SESH_OSAPI_SIG_BLOCK,
+    SESH_OSAPI_SIG_UNBLOCK,
+    SESH_OSAPI_SIG_SETMASK,
+};
+
+/**
+ * A direct wrapper for the POSIX sigprocmask function.
+ */
+int sesh_osapi_sigprocmask(
+        enum sesh_osapi_sigprocmask_how how,
+        const struct sesh_osapi_sigset *new_mask,
+        struct sesh_osapi_sigset *old_mask);
+
+enum sesh_osapi_signal_action_type {
+    /** Signal-specific default action. */
+    SESH_OSAPI_SIG_DFL,
+    /** Ignoring the signal. */
+    SESH_OSAPI_SIG_IGN,
+    /** User-provided handler. A non-null handler must be provided. */
+    SESH_OSAPI_SIG_HANDLER,
+};
+
+struct sesh_osapi_signal_action {
+    enum sesh_osapi_signal_action_type type;
+    sesh_osapi_signal_handler *handler;
+};
+
+/** A direct wrapper for the POSIX sigaction function. */
+int sesh_osapi_sigaction(
+        int signal_number,
+        const struct sesh_osapi_signal_action *,
+        struct sesh_osapi_signal_action *);
+
 #if __cplusplus
 } // extern "C"
 #endif
@@ -115,6 +154,6 @@ struct default_delete<struct ::sesh_osapi_sigset> {
 
 #endif // #if __cplusplus >= 201103L
 
-#endif // #ifndef INCLUDED_os_api_h
+#endif // #ifndef INCLUDED_os_capi_h
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

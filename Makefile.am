@@ -238,11 +238,11 @@ src_sesh_SOURCES = \
 	src/language/syntax/Word.hh \
 	src/language/syntax/WordComponent.hh \
 	src/main.cc \
+	src/os/Api.cc \
 	src/os/Api.hh \
-	src/os/RealApi.cc \
-	src/os/RealApi.hh \
-	src/os/api.c \
-	src/os/api.h \
+	src/os/capi.c \
+	src/os/capi.h \
+	src/os/capitypes.h \
 	src/os/io/FileDescriptor.hh \
 	src/os/io/FileDescriptorSet.hh \
 	src/os/signaling/SignalNumber.hh \

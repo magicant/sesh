@@ -23,8 +23,11 @@
 #include <chrono>
 #include <memory>
 #include <system_error>
+#include "common/Variant.hh"
+#include "os/capitypes.h"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 namespace sesh {
@@ -32,6 +35,8 @@ namespace os {
 
 /** Abstraction of POSIX API. */
 class Api {
+
+public:
 
     /**
      * Closes the given file descriptor. This function may block on some
@@ -42,7 +47,7 @@ class Api {
      *
      * On failure, the file descriptor may be left still valid.
      */
-    virtual std::error_condition close(io::FileDescriptor &) const = 0;
+    virtual std::error_code close(io::FileDescriptor &) const = 0;
 
     /** Returns a unique pointer to a new empty file descriptor set. */
     virtual std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet()
@@ -62,13 +67,47 @@ class Api {
      *
      * @param timeout A negative value means no timeout.
      */
-    virtual std::error_condition pselect(
+    virtual std::error_code pselect(
             io::FileDescriptor::Value fdBound,
             io::FileDescriptorSet *readFds,
             io::FileDescriptorSet *writeFds,
             io::FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const signaling::SignalNumberSet *signalMask) const = 0;
+
+    enum class MaskChangeHow { BLOCK, UNBLOCK, SET_MASK };
+
+    /**
+     * Changes the signal blocking mask.
+     *
+     * The pointer arguments to signal number sets may be null. Non-null
+     * pointers passed to this function must be obtained from the {@link
+     * #createSignalNumberSet} functions called for the same {@code *this}.
+     */
+    virtual std::error_code sigprocmask(
+            MaskChangeHow,
+            const signaling::SignalNumberSet *newMask,
+            signaling::SignalNumberSet *oldMask) const = 0;
+
+    class Default { };
+    class Ignore { };
+
+    using SignalAction =
+            common::Variant<Default, Ignore, sesh_osapi_signal_handler *>;
+
+    /**
+     * Changes and/or queries the signal handler setting for a signal.
+     *
+     * This function currently allows setting the signal handler function only.
+     * The {@code sa_mask} set and {@code sa_flags} are considered empty.
+     */
+    virtual std::error_code sigaction(
+            signaling::SignalNumber,
+            const SignalAction *newAction,
+            SignalAction *oldAction) const = 0;
+
+    /** Reference to the only instance of real API implementation. */
+    static const Api &INSTANCE;
 
 }; // class Api
 

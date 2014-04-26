@@ -38,10 +38,16 @@ public:
     FileDescriptorSet &operator=(FileDescriptorSet &&) = default;
     virtual ~FileDescriptorSet() = default;
 
+    /** Returns the maximum value that can be contained in this set. */
+    virtual FileDescriptor::Value maxValue() const = 0;
+
     /** Checks if the given file descriptor is included in this set. */
     virtual bool test(FileDescriptor::Value) const = 0;
 
-    /** Adds/removes a file descriptor to/from this set. */
+    /**
+     * Adds/removes a file descriptor to/from this set.
+     * @throws std::domain_error the value is too large.
+     */
     virtual FileDescriptorSet &set(FileDescriptor::Value, bool = true) = 0;
 
     /** Removes a file descriptor from this set. */

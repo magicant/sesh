@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "api.h"
+#include "capi.h"
 
 #include <signal.h>
 #include <stdlib.h>
@@ -25,6 +25,10 @@
 
 int sesh_osapi_close(int fd) {
     return close(fd);
+}
+
+int sesh_osapi_fd_setsize(void) {
+    return FD_SETSIZE;
 }
 
 struct sesh_osapi_fd_set {
@@ -115,6 +119,79 @@ int sesh_osapi_pselect(
             error_fds != NULL ? &error_fds->value : NULL,
             timeout_spec_p,
             signal_mask != NULL ? &signal_mask->value : NULL);
+}
+
+int sesh_osapi_sigprocmask(
+        enum sesh_osapi_sigprocmask_how how,
+        const struct sesh_osapi_sigset *new_mask,
+        struct sesh_osapi_sigset *old_mask) {
+    int apiHow;
+
+    apiHow = -1; // dummy initialization to dumb warning
+
+    switch (how) {
+    case SESH_OSAPI_SIG_BLOCK:   apiHow = SIG_BLOCK;   break;
+    case SESH_OSAPI_SIG_UNBLOCK: apiHow = SIG_UNBLOCK; break;
+    case SESH_OSAPI_SIG_SETMASK: apiHow = SIG_SETMASK; break;
+    }
+
+    return sigprocmask(
+            apiHow,
+            new_mask != NULL ? &new_mask->value : NULL,
+            old_mask != NULL ? &old_mask->value : NULL);
+}
+
+static void to_sigaction(
+        const struct sesh_osapi_signal_action *a, struct sigaction *sa) {
+    switch (a->type) {
+    case SESH_OSAPI_SIG_DFL:
+        sa->sa_handler = SIG_DFL;
+        break;
+    case SESH_OSAPI_SIG_IGN:
+        sa->sa_handler = SIG_IGN;
+        break;
+    case SESH_OSAPI_SIG_HANDLER:
+        sa->sa_handler = a->handler;
+        break;
+    }
+    sigemptyset(&sa->sa_mask);
+    sa->sa_flags = 0;
+}
+
+static void from_sigaction(
+        const struct sigaction *sa, struct sesh_osapi_signal_action *a) {
+    if (sa->sa_handler == SIG_DFL) {
+        a->type = SESH_OSAPI_SIG_DFL;
+        a->handler = NULL;
+    } else if (sa->sa_handler == SIG_IGN) {
+        a->type = SESH_OSAPI_SIG_IGN;
+        a->handler = NULL;
+    } else {
+        a->type = SESH_OSAPI_SIG_HANDLER;
+        a->handler = sa->sa_handler;
+    }
+}
+
+int sesh_osapi_sigaction(
+        int signal_number,
+        const struct sesh_osapi_signal_action *new_action,
+        struct sesh_osapi_signal_action *old_action) {
+    struct sigaction new_sigaction, old_sigaction;
+
+    if (new_action != NULL)
+        to_sigaction(new_action, &new_sigaction);
+    if (old_action != NULL)
+        sigemptyset(&old_sigaction.sa_mask);
+
+    int result = sigaction(
+            signal_number,
+            new_action == NULL ? NULL : &new_sigaction,
+            old_action == NULL ? NULL : &old_sigaction);
+
+    if (result == 0 && old_action != NULL)
+        from_sigaction(&old_sigaction, old_action);
+
+    return result;
 }
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
