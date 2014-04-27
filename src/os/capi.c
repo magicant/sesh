@@ -92,6 +92,11 @@ int sesh_osapi_sigemptyset(struct sesh_osapi_sigset *set) {
     return sigemptyset(&set->value);
 }
 
+void sesh_osapi_sigcopyset(
+        struct sesh_osapi_sigset *to, const struct sesh_osapi_sigset *from) {
+    *to = *from;
+}
+
 int sesh_osapi_pselect(
         int fd_bound,
         struct sesh_osapi_fd_set *read_fds,

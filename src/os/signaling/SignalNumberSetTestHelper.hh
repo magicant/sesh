@@ -66,6 +66,10 @@ public:
         return reinitialize(true);
     }
 
+    std::unique_ptr<SignalNumberSet> clone() const override {
+        return std::unique_ptr<SignalNumberSet>(new auto(*this));
+    }
+
     void insertAll(const SignalNumberSetFake &that) {
         SignalNumberSetFake result;
 

@@ -153,6 +153,18 @@ public:
         sesh_osapi_sigemptyset(mSet.get());
     }
 
+    SignalNumberSetImpl(const SignalNumberSetImpl &other) :
+            mSet(sesh_osapi_sigset_new()) {
+        if (mSet == nullptr)
+            throw std::bad_alloc();
+        sesh_osapi_sigcopyset(mSet.get(), other.get());
+    }
+
+    SignalNumberSetImpl(SignalNumberSetImpl &&) = default;
+    SignalNumberSetImpl &operator=(const SignalNumberSetImpl &) = delete;
+    SignalNumberSetImpl &operator=(SignalNumberSetImpl &&) = default;
+    ~SignalNumberSetImpl() = default;
+
     /** @return Never null. */
     struct sesh_osapi_sigset *get() const {
         return mSet.get();
@@ -178,6 +190,10 @@ public:
     SignalNumberSet &reset() override {
         sesh_osapi_sigemptyset(mSet.get());
         return *this;
+    }
+
+    std::unique_ptr<SignalNumberSet> clone() const override {
+        return std::unique_ptr<SignalNumberSet>(new auto(*this));
     }
 
 }; // class SignalNumberSetImpl
