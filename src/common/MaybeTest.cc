@@ -258,6 +258,9 @@ TEST_CASE("Maybe assignment") {
     Maybe<long> m1;
     const Maybe<long> m2(123L);
 
+    m1 = m1;
+    CHECK_FALSE(m1.hasValue());
+
     m1 = m2;
     REQUIRE(m1.hasValue());
     CHECK(m1.value() == 123L);
