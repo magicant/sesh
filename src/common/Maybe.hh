@@ -196,7 +196,11 @@ public:
      * @tparam U the type of the assigned object.
      * @param v the assigned object.
      */
-    template<typename U>
+    template<
+            typename U,
+            typename = typename std::enable_if<
+                    std::is_constructible<T, U &&>::value &&
+                    std::is_assignable<T, U &&>::value>::type>
     Maybe &operator=(U &&v)
             noexcept(std::is_nothrow_constructible<T, U &&>::value &&
                     std::is_nothrow_assignable<T, U &&>::value) {
