@@ -106,6 +106,7 @@ src_sesh_SOURCES = \
 	src/common/Maybe.hh \
 	src/common/Message.cc \
 	src/common/Message.hh \
+	src/common/Nop.hh \
 	src/common/OutputStream.hh \
 	src/common/Reference.hh \
 	src/common/SharedFunction.hh \
