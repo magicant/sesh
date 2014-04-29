@@ -72,7 +72,8 @@ TESTPROGRAMS = \
 	src/language/syntax/SequenceTest \
 	src/language/syntax/SimpleCommandTest \
 	src/language/syntax/WordTest \
-	src/os/io/FileDescriptorTest
+	src/os/io/FileDescriptorTest \
+	src/os/signaling/HandlerConfigurationTest
 
 TESTSCRIPTS = \
 	src/checkheaderinclude.sh \
@@ -247,6 +248,8 @@ src_sesh_SOURCES = \
 	src/os/capitypes.h \
 	src/os/io/FileDescriptor.hh \
 	src/os/io/FileDescriptorSet.hh \
+	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfiguration.hh \
 	src/os/signaling/SignalErrorCategory.cc \
 	src/os/signaling/SignalErrorCategory.hh \
 	src/os/signaling/SignalErrorCode.hh \
@@ -753,6 +756,11 @@ src_language_syntax_WordTest_SOURCES = \
 	src/language/syntax/WordTest.cc
 src_os_io_FileDescriptorTest_SOURCES = \
 	src/os/io/FileDescriptorTest.cc
+src_os_signaling_HandlerConfigurationTest_SOURCES = \
+	src/os/Api.cc \
+	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationTest.cc \
+	src/os/signaling/SignalErrorCategory.cc
 
 TESTHEADERS = \
 	src/language/parser/AssignmentParserTestHelper.hh \
