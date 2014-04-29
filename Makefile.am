@@ -239,6 +239,7 @@ src_sesh_SOURCES = \
 	src/language/syntax/Word.hh \
 	src/language/syntax/WordComponent.hh \
 	src/main.cc \
+	src/os/Api.cc \
 	src/os/Api.hh \
 	src/os/ApiImpl.cc \
 	src/os/capi.c \
