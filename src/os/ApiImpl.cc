@@ -147,14 +147,14 @@ private:
 
 public:
 
-    SignalNumberSetImpl() : mSet(sesh_osapi_sigset_new()) {
+    SignalNumberSetImpl() : SignalNumberSet(), mSet(sesh_osapi_sigset_new()) {
         if (mSet == nullptr)
             throw std::bad_alloc();
         sesh_osapi_sigemptyset(mSet.get());
     }
 
     SignalNumberSetImpl(const SignalNumberSetImpl &other) :
-            mSet(sesh_osapi_sigset_new()) {
+            SignalNumberSet(other), mSet(sesh_osapi_sigset_new()) {
         if (mSet == nullptr)
             throw std::bad_alloc();
         sesh_osapi_sigcopyset(mSet.get(), other.get());
