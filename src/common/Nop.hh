@@ -15,29 +15,35 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_common_Nop_hh
+#define INCLUDED_common_Nop_hh
+
 #include "buildconfig.h"
-#include "OperatorParser.hh"
-
-#include <memory>
-#include "common/Nop.hh"
-#include "language/parser/Operator.hh"
-
-using sesh::common::Nop;
 
 namespace sesh {
-namespace language {
-namespace parser {
+namespace common {
 
-OperatorParser createOperatorParser(
-        Environment &e, LineContinuationTreatment lct) {
-    return OperatorParser(
-            e,
-            std::shared_ptr<OperatorParser::Trie>(&Operator::TRIE, Nop()),
-            lct);
-}
+/**
+ * An empty function object class.
+ * @see Empty
+ */
+class Nop {
 
-} // namespace parser
-} // namespace language
+public:
+
+    /** Constructor that does nothing. */
+    template<typename... Arg>
+    constexpr explicit Nop(Arg &&...) noexcept { }
+
+    /** Function call operator that does nothing. */
+    template<typename... Arg>
+    void operator()(Arg &&...) const volatile noexcept { }
+
+}; // class Nop
+
+} // namespace common
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_common_Nop_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

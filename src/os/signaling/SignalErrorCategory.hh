@@ -15,29 +15,24 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_os_signaling_SignalErrorCategory_hh
+#define INCLUDED_os_signaling_SignalErrorCategory_hh
+
 #include "buildconfig.h"
-#include "OperatorParser.hh"
 
-#include <memory>
-#include "common/Nop.hh"
-#include "language/parser/Operator.hh"
-
-using sesh::common::Nop;
+#include <system_error>
 
 namespace sesh {
-namespace language {
-namespace parser {
+namespace os {
+namespace signaling {
 
-OperatorParser createOperatorParser(
-        Environment &e, LineContinuationTreatment lct) {
-    return OperatorParser(
-            e,
-            std::shared_ptr<OperatorParser::Trie>(&Operator::TRIE, Nop()),
-            lct);
-}
+/** The error category for {@link SignalErrorCode}. */
+extern const std::error_category &SIGNAL_ERROR_CATEGORY;
 
-} // namespace parser
-} // namespace language
+} // namespace signaling
+} // namespace os
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_os_signaling_SignalErrorCategory_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

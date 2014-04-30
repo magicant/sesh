@@ -23,7 +23,10 @@
 namespace sesh {
 namespace common {
 
-/** An empty class. */
+/**
+ * An empty class.
+ * @see Nop
+ */
 class Empty {
 };
 

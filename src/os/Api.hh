@@ -89,6 +89,11 @@ public:
             const signaling::SignalNumberSet *newMask,
             signaling::SignalNumberSet *oldMask) const = 0;
 
+    /** Convenience wrapper for {@link #sigprocmask}. */
+    std::error_code sigprocmaskBlock(signaling::SignalNumber) const;
+    /** Convenience wrapper for {@link #sigprocmask}. */
+    std::error_code sigprocmaskUnblock(signaling::SignalNumber) const;
+
     class Default { };
     class Ignore { };
 

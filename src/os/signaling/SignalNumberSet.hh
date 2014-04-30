@@ -20,6 +20,7 @@
 
 #include "buildconfig.h"
 
+#include <memory>
 #include "os/signaling/SignalNumber.hh"
 
 namespace sesh {
@@ -54,6 +55,9 @@ public:
 
     /** Clears this set. */
     virtual SignalNumberSet &reset() = 0;
+
+    /** Creates a copy of this instance. */
+    virtual std::unique_ptr<SignalNumberSet> clone() const = 0;
 
     /** Reference to a single entry of a set. */
     class Reference {

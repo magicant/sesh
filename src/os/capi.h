@@ -78,6 +78,10 @@ int sesh_osapi_sigfillset(struct sesh_osapi_sigset *);
 /** A direct wrapper of the POSIX sigemptyset function. */
 int sesh_osapi_sigemptyset(struct sesh_osapi_sigset *);
 
+/** Copies a signal set value. */
+void sesh_osapi_sigcopyset(
+        struct sesh_osapi_sigset *, const struct sesh_osapi_sigset *);
+
 /**
  * A direct wrapper for the POSIX pselect function.
  *

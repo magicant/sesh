@@ -26,6 +26,7 @@
 #include "async/Delay.hh"
 #include "async/Future.hh"
 #include "async/Promise.hh"
+#include "common/Nop.hh"
 #include "common/Try.hh"
 
 namespace {
@@ -38,6 +39,7 @@ using sesh::async::createFuture;
 using sesh::async::createFutureFrom;
 using sesh::async::createFutureOf;
 using sesh::async::createPromiseFuturePair;
+using sesh::common::Nop;
 using sesh::common::Try;
 
 struct MoveOnly {
@@ -60,7 +62,7 @@ TEST_CASE("Future, construction and validness") {
 TEST_CASE("Future, invalidness after setting callback") {
     const auto delay = std::make_shared<Delay<int>>();
     Future<int> f(delay);
-    std::move(f).setCallback([](Try<int> &&) {});
+    std::move(f).setCallback(Nop());
     CHECK_FALSE(f.isValid());
 }
 

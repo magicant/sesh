@@ -16,28 +16,35 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "OperatorParser.hh"
+#include "SignalErrorCategory.hh"
 
-#include <memory>
-#include "common/Nop.hh"
-#include "language/parser/Operator.hh"
-
-using sesh::common::Nop;
+#include <string>
+#include <system_error>
 
 namespace sesh {
-namespace language {
-namespace parser {
+namespace os {
+namespace signaling {
 
-OperatorParser createOperatorParser(
-        Environment &e, LineContinuationTreatment lct) {
-    return OperatorParser(
-            e,
-            std::shared_ptr<OperatorParser::Trie>(&Operator::TRIE, Nop()),
-            lct);
-}
+class SignalErrorCategory : public std::error_category {
 
-} // namespace parser
-} // namespace language
+public:
+
+    const char *name() const noexcept final override {
+        return "signal";
+    }
+
+    /** Always returns "?". */
+    std::string message(int) const final override {
+        return "?";
+    }
+
+}; // class SignalErrorCategory
+
+const std::error_category &SIGNAL_ERROR_CATEGORY =
+        SignalErrorCategory();
+
+} // namespace signaling
+} // namespace os
 } // namespace sesh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

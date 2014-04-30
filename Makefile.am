@@ -72,7 +72,8 @@ TESTPROGRAMS = \
 	src/language/syntax/SequenceTest \
 	src/language/syntax/SimpleCommandTest \
 	src/language/syntax/WordTest \
-	src/os/io/FileDescriptorTest
+	src/os/io/FileDescriptorTest \
+	src/os/signaling/HandlerConfigurationTest
 
 TESTSCRIPTS = \
 	src/checkheaderinclude.sh \
@@ -106,6 +107,7 @@ src_sesh_SOURCES = \
 	src/common/Maybe.hh \
 	src/common/Message.cc \
 	src/common/Message.hh \
+	src/common/Nop.hh \
 	src/common/OutputStream.hh \
 	src/common/Reference.hh \
 	src/common/SharedFunction.hh \
@@ -240,11 +242,17 @@ src_sesh_SOURCES = \
 	src/main.cc \
 	src/os/Api.cc \
 	src/os/Api.hh \
+	src/os/ApiImpl.cc \
 	src/os/capi.c \
 	src/os/capi.h \
 	src/os/capitypes.h \
 	src/os/io/FileDescriptor.hh \
 	src/os/io/FileDescriptorSet.hh \
+	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfiguration.hh \
+	src/os/signaling/SignalErrorCategory.cc \
+	src/os/signaling/SignalErrorCategory.hh \
+	src/os/signaling/SignalErrorCode.hh \
 	src/os/signaling/SignalNumber.hh \
 	src/os/signaling/SignalNumberSet.hh
 
@@ -748,6 +756,11 @@ src_language_syntax_WordTest_SOURCES = \
 	src/language/syntax/WordTest.cc
 src_os_io_FileDescriptorTest_SOURCES = \
 	src/os/io/FileDescriptorTest.cc
+src_os_signaling_HandlerConfigurationTest_SOURCES = \
+	src/os/Api.cc \
+	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationTest.cc \
+	src/os/signaling/SignalErrorCategory.cc
 
 TESTHEADERS = \
 	src/language/parser/AssignmentParserTestHelper.hh \
@@ -759,7 +772,11 @@ TESTHEADERS = \
 	src/language/source/LocationTestHelper.hh \
 	src/language/source/OriginTestHelper.hh \
 	src/language/source/SourceTestHelper.hh \
-	src/language/syntax/PrinterTestHelper.hh
+	src/language/syntax/PrinterTestHelper.hh \
+	src/os/signaling/SignalNumberSetTestHelper.hh \
+	src/os/test_helper/SigactionApiFake.hh \
+	src/os/test_helper/SignalMaskApiFake.hh \
+	src/os/test_helper/UnimplementedApi.hh
 
 ### Documentation
 
