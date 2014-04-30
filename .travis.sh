@@ -20,6 +20,6 @@ case $1#${CC} in
   (--run#*)
     autoreconf -i
     sh configure
-    make distcheck
+    make VERBOSE=1 distcheck
     ;;
 esac

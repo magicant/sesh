@@ -7,5 +7,5 @@ done
 cd *-*/
 
 sh configure --disable-dependency-tracking --enable-debug-build
-trap 'cat test-suite.log' EXIT
-make -k LOG_COMPILER='$(SHELL) $(top_srcdir)/../.jenkins-log.sh' check
+make -k LOG_COMPILER='$(SHELL) $(top_srcdir)/../.jenkins-log.sh' VERBOSE=1 \
+  check

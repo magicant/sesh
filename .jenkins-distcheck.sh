@@ -7,4 +7,4 @@ done
 cd *-*/
 
 sh configure
-make -k distcheck
+make -k VERBOSE=1 distcheck
