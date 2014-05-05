@@ -57,8 +57,8 @@ public:
         if (n == INVALID_SIGNAL_NUMBER)
             return std::make_error_code(std::errc::invalid_argument);
 
-        auto d = [] { return Api::Default(); };
-        Action &a = mActions.emplace(n, d).first->second;
+        Action &a =
+                mActions.emplace(n, Action::of(Api::Default())).first->second;
         if (oldAction != nullptr)
             *oldAction = a;
         if (newAction != nullptr)

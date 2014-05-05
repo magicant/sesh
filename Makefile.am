@@ -103,6 +103,7 @@ src_sesh_SOURCES = \
 	src/common/EnumTraits.hh \
 	src/common/ErrnoHelper.hh \
 	src/common/ErrorLevel.hh \
+	src/common/FunctionalInitialize.hh \
 	src/common/IntegerSequence.hh \
 	src/common/Maybe.hh \
 	src/common/Message.cc \
