@@ -191,7 +191,7 @@ TEST_CASE_METHOD(
         "Handler configuration: trap to default w/o handler") {
     std::error_code e = c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Default>(),
+            HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(e.value() == 0);
     CHECK(actions().at(5).index() == Action::index<Default>());
@@ -202,7 +202,7 @@ TEST_CASE_METHOD(
         "Handler configuration: trap to default and add handler") {
     c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Default>(),
+            HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
     SignalNumber v = 0;
     auto handlerResult = c->addHandler(5, [&v](SignalNumber n) { v = n; });
@@ -222,7 +222,7 @@ TEST_CASE_METHOD(
     auto handlerResult = c->addHandler(5, [&v](SignalNumber n) { v += n; });
     std::error_code e = c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Default>(),
+            HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
 
     CHECK(e.value() == 0);
@@ -240,7 +240,7 @@ TEST_CASE_METHOD(
         "Handler configuration: successful ignore w/o handler") {
     std::error_code e = c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Handler>(),
+            HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FAIL_IF_IGNORED);
     CHECK(e.value() == 0);
     CHECK(actions().at(5).index() == Action::index<Ignore>());
@@ -249,11 +249,11 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         Fixture<SignalApiFake>,
         "Handler configuration: failed ignore w/o handler") {
-    actions().emplace(5, Action::create<Ignore>());
+    actions().emplace(5, Ignore());
 
     std::error_code e = c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Handler>(),
+            HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FAIL_IF_IGNORED);
     CHECK(e == SignalErrorCode::INITIALLY_IGNORED);
 }
@@ -261,12 +261,12 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         Fixture<SignalApiFake>,
         "Handler configuration: failed ignore w/ handler") {
-    actions().emplace(5, Action::create<Ignore>());
+    actions().emplace(5, Ignore());
     c->addHandler(5, Nop());
 
     std::error_code e = c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Handler>(),
+            HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FAIL_IF_IGNORED);
     CHECK(e == SignalErrorCode::INITIALLY_IGNORED);
 }
@@ -274,11 +274,11 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         Fixture<SignalApiFake>,
         "Handler configuration: forced ignore w/o handler") {
-    actions().emplace(5, Action::create<Ignore>());
+    actions().emplace(5, Ignore());
 
     std::error_code e = c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Handler>(),
+            HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(e.value() == 0);
     CHECK(actions().at(5).index() == Action::index<Ignore>());
@@ -289,7 +289,7 @@ TEST_CASE_METHOD(
         "Handler configuration: ignore and add handler") {
     c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Handler>(),
+            HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FORCE);
     SignalNumber v = 0;
     auto handlerResult = c->addHandler(5, [&v](SignalNumber n) { v = n; });
@@ -311,7 +311,7 @@ TEST_CASE_METHOD(
     c->addHandler(5, Nop());
     c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Handler>(),
+            HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FORCE);
     Action &a = actions().at(5);
     REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
@@ -323,9 +323,7 @@ TEST_CASE_METHOD(
     SignalNumber v = 0;
     HandlerConfiguration::Handler h = [&v](SignalNumber n) { v = n; };
     std::error_code e = c->setTrap(
-            5,
-            TrapAction::of(std::move(h)),
-            HandlerConfiguration::SettingPolicy::FORCE);
+            5, std::move(h), HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(e.value() == 0);
 
     Action &a = actions().at(5);
@@ -337,7 +335,7 @@ TEST_CASE_METHOD(
 
     e = c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Default>(),
+            HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(e.value() == 0);
     CHECK(a.index() == Action::index<Default>());
@@ -348,10 +346,7 @@ TEST_CASE_METHOD(
         "Handler configuration: trap and add another handler") {
     SignalNumber v1 = 0, v2 = 0;
     HandlerConfiguration::Handler h = [&v1](SignalNumber n) { v1 = n; };
-    c->setTrap(
-            5,
-            TrapAction::of(std::move(h)),
-            HandlerConfiguration::SettingPolicy::FORCE);
+    c->setTrap(5, std::move(h), HandlerConfiguration::SettingPolicy::FORCE);
     c->addHandler(5, [&v2](SignalNumber n) { v2 = n; });
 
     Action &a = actions().at(5);
@@ -369,10 +364,7 @@ TEST_CASE_METHOD(
     SignalNumber v1 = 0, v2 = 0;
     HandlerConfiguration::Handler h = [&v1](SignalNumber n) { v1 = n; };
     c->addHandler(5, [&v2](SignalNumber n) { v2 = n; });
-    c->setTrap(
-            5,
-            TrapAction::of(std::move(h)),
-            HandlerConfiguration::SettingPolicy::FORCE);
+    c->setTrap(5, std::move(h), HandlerConfiguration::SettingPolicy::FORCE);
 
     Action &a = actions().at(5);
     REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
@@ -388,13 +380,13 @@ TEST_CASE_METHOD(
         "Handler configuration: signal is blocked when trap is set") {
     c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Handler>(Nop()),
+            HandlerConfiguration::Handler(Nop()),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(signalMask().test(5));
 
     c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Default>(),
+            HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK_FALSE(signalMask().test(5));
 }
@@ -406,13 +398,13 @@ TEST_CASE_METHOD(
 
     c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Handler>(Nop()),
+            HandlerConfiguration::Handler(Nop()),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(signalMask().test(5));
 
     c->setTrap(
             5,
-            TrapAction::create<HandlerConfiguration::Default>(),
+            HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(signalMask().test(5));
 }
@@ -422,7 +414,7 @@ TEST_CASE_METHOD(
         "Handler configuration: trapping invalid signal") {
     std::error_code e = c->setTrap(
             INVALID_SIGNAL_NUMBER,
-            TrapAction::create<HandlerConfiguration::Handler>(),
+            HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(e == std::errc::invalid_argument);
 }
@@ -458,11 +450,11 @@ TEST_CASE_METHOD(
     signalMask().set(2);
     c->setTrap(
             2,
-            TrapAction::create<HandlerConfiguration::Handler>(),
+            HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FORCE);
     c->setTrap(
             3,
-            TrapAction::create<HandlerConfiguration::Handler>(),
+            HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FORCE);
 
     const SignalNumberSet *set = c->maskForPselect();
@@ -473,11 +465,11 @@ TEST_CASE_METHOD(
 
     c->setTrap(
             2,
-            TrapAction::create<HandlerConfiguration::Default>(),
+            HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
     c->setTrap(
             3,
-            TrapAction::create<HandlerConfiguration::Default>(),
+            HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
 
     set = c->maskForPselect();

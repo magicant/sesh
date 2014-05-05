@@ -318,11 +318,11 @@ TEST_CASE("Double variant apply with explicit result type") {
         std::string operator()(const double &v) { return std::to_string(v); }
     };
 
-    auto vi = Variant<int, double>::of(3);
+    Variant<int, double> vi = 3;
     std::string si = vi.apply<Visitor, std::string>(Visitor());
     CHECK(si == "3");
 
-    auto vd = Variant<int, double>::of(1.5);
+    Variant<int, double> vd = 1.5;
     std::string sd = vd.apply<Visitor, std::string>(Visitor());
     CHECK(sd == "1.500000");
 }
@@ -335,11 +335,11 @@ struct TemplateVisitor {
 };
 
 TEST_CASE("Double variant apply with inferred result type") {
-    auto vi = Variant<int, double>::of(3);
+    Variant<int, double> vi = 3;
     std::string si = vi.apply(TemplateVisitor());
     CHECK(si == "3");
 
-    auto vd = Variant<int, double>::of(1.5);
+    Variant<int, double> vd = 1.5;
     std::string sd = vd.apply(TemplateVisitor());
     CHECK(sd == "1.500000");
 }
@@ -950,8 +950,8 @@ TEST_CASE("Double variant create") {
 TEST_CASE("Double variant of") {
     int intArray[] = {19};
 
-    auto v1 = Variant<int *, const char *>::of(intArray);
-    auto v2 = Variant<int *, const char *>::of("char array");
+    Variant<int *, const char *> v1 = intArray;
+    Variant<int *, const char *> v2 = "char array";
 
     REQUIRE(v1.index() == v1.index<int *>());
     CHECK(v1.value<int *>() == intArray);
@@ -960,7 +960,7 @@ TEST_CASE("Double variant of") {
 
     std::vector<Action> actions;
     {
-        auto v3 = Variant<int, Stub>::of(Stub(actions));
+        Variant<int, Stub> v3 = Stub(actions);
         CHECK(v3.index() == v3.index<Stub>());
     }
     CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
@@ -968,7 +968,7 @@ TEST_CASE("Double variant of") {
 
     {
         Stub s(actions);
-        auto v4 = Variant<int, Stub>::of(s);
+        Variant<int, Stub> v4 = s;
         CHECK(v4.index() == v4.index<Stub>());
     }
     CHECK(contains(actions, Action::COPY_CONSTRUCTION));
@@ -990,8 +990,8 @@ TEST_CASE("Double variant result of") {
 TEST_CASE("Double variant swapping with same type") {
     using std::swap; // test against the swappable concept
 
-    auto v1 = Variant<int, double>::of(7);
-    auto v2 = Variant<int, double>::of(13);
+    Variant<int, double> v1 = 7;
+    Variant<int, double> v2 = 13;
     swap(v1, v2);
     REQUIRE(v1.index() == v1.index<int>());
     CHECK(v1.value<int>() == 13);
@@ -1010,8 +1010,8 @@ TEST_CASE("Double variant swapping with same type") {
 TEST_CASE("Double variant swapping with different type") {
     using std::swap; // test against the swappable concept
 
-    auto v1 = Variant<int, double>::of(5);
-    auto v2 = Variant<int, double>::of(13.5);
+    Variant<int, double> v1 = 5;
+    Variant<int, double> v2 = 13.5;
 
     swap(v1, v2);
     REQUIRE(v1.index() == v1.index<double>());

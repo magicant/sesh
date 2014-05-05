@@ -1121,23 +1121,6 @@ public:
     }
 
     /**
-     * Creates a new variant that contains the argument. The variant is
-     * initialized by calling the copy or move constructor of <code>U</code>.
-     *
-     * Propagates any exception thrown by the constructor.
-     *
-     * @tparam U the (usually inferred) type of the new contained value.
-     * @tparam V the actual type of the new contained value.
-     * @param v a reference to the original value
-     */
-    template<typename U, typename V = typename std::decay<U>::type>
-    static Variant of(U &&v)
-            noexcept(std::is_nothrow_constructible<V, U &&>::value &&
-                    std::is_nothrow_destructible<V>::value) {
-        return Variant(TypeTag<V>(), std::forward<U>(v));
-    }
-
-    /**
      * Creates a new variant by move-constructing its contained value from the
      * result of calling the argument function.
      *

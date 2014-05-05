@@ -82,7 +82,7 @@ public:
         try {
             mResult.emplace(common::FUNCTIONAL_INITIALIZE, std::forward<F>(f));
         } catch (...) {
-            mResult.emplace(common::Try<T>::of(std::current_exception()));
+            mResult.emplace(std::current_exception());
         }
 
         fireIfReady();
