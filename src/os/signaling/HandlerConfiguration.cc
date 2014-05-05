@@ -77,7 +77,7 @@ public:
 private:
 
     std::list<Handler> mHandlers;
-    TrapAction mTrapAction = TrapAction::create<TrapDefault>();
+    TrapAction mTrapAction = TrapDefault();
 
 public:
 
@@ -133,11 +133,11 @@ extern "C" void nativeCatchSignal(int);
 SignalAction actionForType(ActionType type) {
     switch (type) {
     case ActionType::DEFAULT:
-        return SignalAction::create<Api::Default>();
+        return Api::Default();
     case ActionType::IGNORE:
-        return SignalAction::create<Api::Ignore>();
+        return Api::Ignore();
     case ActionType::HANDLER:
-        return SignalAction::of(nativeCatchSignal);
+        return nativeCatchSignal;
     }
     UNREACHABLE();
 }
@@ -164,7 +164,7 @@ public:
      */
     std::error_code sigaction(
             const Api &api, SignalNumber n, const SignalAction *newAction) {
-        SignalAction oldAction = SignalAction::create<Api::Default>();
+        SignalAction oldAction = Api::Default();
         std::error_code e = api.sigaction(n, newAction, &oldAction);
         if (!mInitialAction.hasValue())
             mInitialAction.emplace(std::move(oldAction));
@@ -298,10 +298,11 @@ public:
 
         if (std::error_code e = updateConfiguration(n, data)) {
             canceler();
-            return AddHandlerResult::of(e);
+            return e;
         }
-        return AddHandlerResult::of<Canceler>(SharedFunction<HandlerCanceler>(
-                DirectInitialize(), n, *this, std::move(canceler)));
+        return AddHandlerResult::create<Canceler>(
+                SharedFunction<HandlerCanceler>(
+                        DirectInitialize(), n, *this, std::move(canceler)));
     }
 
     std::error_code setTrap(SignalNumber n, TrapAction &&a, SettingPolicy p)

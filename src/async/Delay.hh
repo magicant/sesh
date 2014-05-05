@@ -24,6 +24,7 @@
 #include <exception>
 #include <functional>
 #include <utility>
+#include "common/FunctionalInitialize.hh"
 #include "common/Maybe.hh"
 #include "common/Try.hh"
 #include "common/Variant.hh"
@@ -79,9 +80,9 @@ public:
         assert(!mResult.hasValue());
 
         try {
-            mResult.emplace(std::forward<F>(f));
+            mResult.emplace(common::FUNCTIONAL_INITIALIZE, std::forward<F>(f));
         } catch (...) {
-            mResult.emplace(common::Try<T>::of(std::current_exception()));
+            mResult.emplace(std::current_exception());
         }
 
         fireIfReady();

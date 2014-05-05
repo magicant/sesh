@@ -26,10 +26,12 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "common/FunctionalInitialize.hh"
 #include "common/Variant.hh"
 
 namespace {
 
+using sesh::common::FUNCTIONAL_INITIALIZE;
 using sesh::common::Variant;
 using sesh::common::variant_impl::TypeTag;
 
@@ -144,7 +146,8 @@ static_assert(
 TEST_CASE("Single variant construction & destruction") {
     Variant<int>(TypeTag<int>());
     Variant<int>(TypeTag<int>(), 123);
-    Variant<int>([] { return 123; });
+    Variant<int>(123);
+    Variant<int>(FUNCTIONAL_INITIALIZE, [] { return 123; });
 
     static_assert(
             noexcept(Variant<int>(TypeTag<int>())),
@@ -164,6 +167,7 @@ TEST_CASE("Single variant construction & destruction") {
             Exception);
     CHECK_THROWS_AS(
             Variant<DefaultThrows>(
+                    FUNCTIONAL_INITIALIZE,
                     []() -> DefaultThrows { throw Exception(); }),
             Exception);
 }
@@ -192,8 +196,10 @@ TEST_CASE("Double variant construction & destruction") {
 
     Variant<A, B>(TypeTag<A>());
     Variant<A, B>(TypeTag<B>(), 0, 0.0);
-    Variant<A, B>([] { return A(); });
-    Variant<A, B>([] { return B(0, 0.0); });
+    Variant<A, B>{A()};
+    Variant<A, B>{B(0, 0.0)};
+    Variant<A, B>(FUNCTIONAL_INITIALIZE, [] { return A(); });
+    Variant<A, B>(FUNCTIONAL_INITIALIZE, [] { return B(0, 0.0); });
 
     static_assert(
             noexcept(Variant<A, B>(TypeTag<A>())),
@@ -247,10 +253,14 @@ TEST_CASE("Quad variant construction & destruction") {
     Variant<A, B, C, D>(TypeTag<B>());
     Variant<A, B, C, D>(TypeTag<C>());
     Variant<A, B, C, D>(TypeTag<D>());
-    Variant<A, B, C, D>([] { return A(); });
-    Variant<A, B, C, D>([] { return B(); });
-    Variant<A, B, C, D>([] { return C(); });
-    Variant<A, B, C, D>([] { return D(); });
+    Variant<A, B, C, D>{A()};
+    Variant<A, B, C, D>{B()};
+    Variant<A, B, C, D>{C()};
+    Variant<A, B, C, D>{D()};
+    Variant<A, B, C, D>(FUNCTIONAL_INITIALIZE, [] { return A(); });
+    Variant<A, B, C, D>(FUNCTIONAL_INITIALIZE, [] { return B(); });
+    Variant<A, B, C, D>(FUNCTIONAL_INITIALIZE, [] { return C(); });
+    Variant<A, B, C, D>(FUNCTIONAL_INITIALIZE, [] { return D(); });
 }
 
 TEST_CASE("Double variant value") {
@@ -258,7 +268,7 @@ TEST_CASE("Double variant value") {
     const float F1 = 456.0f, F2 = 567.0f;
 
     Variant<int, float> i(TypeTag<int>(), I1);
-    Variant<int, float> f([=] { return F1; });
+    Variant<int, float> f(FUNCTIONAL_INITIALIZE, [=] { return F1; });
 
     CHECK(i.value<int>() == I1);
     CHECK(f.value<float>() == F1);
@@ -275,7 +285,7 @@ TEST_CASE("Double variant constant value") {
     const float F = 456.0;
 
     const Variant<int, float> i(TypeTag<int>(), I);
-    const Variant<int, float> f([=] { return F; });
+    const Variant<int, float> f(FUNCTIONAL_INITIALIZE, [=] { return F; });
 
     CHECK(i.value<int>() == I);
     CHECK(f.value<float>() == F);
@@ -308,11 +318,11 @@ TEST_CASE("Double variant apply with explicit result type") {
         std::string operator()(const double &v) { return std::to_string(v); }
     };
 
-    auto vi = Variant<int, double>::of(3);
+    Variant<int, double> vi = 3;
     std::string si = vi.apply<Visitor, std::string>(Visitor());
     CHECK(si == "3");
 
-    auto vd = Variant<int, double>::of(1.5);
+    Variant<int, double> vd = 1.5;
     std::string sd = vd.apply<Visitor, std::string>(Visitor());
     CHECK(sd == "1.500000");
 }
@@ -325,11 +335,11 @@ struct TemplateVisitor {
 };
 
 TEST_CASE("Double variant apply with inferred result type") {
-    auto vi = Variant<int, double>::of(3);
+    Variant<int, double> vi = 3;
     std::string si = vi.apply(TemplateVisitor());
     CHECK(si == "3");
 
-    auto vd = Variant<int, double>::of(1.5);
+    Variant<int, double> vd = 1.5;
     std::string sd = vd.apply(TemplateVisitor());
     CHECK(sd == "1.500000");
 }
@@ -940,8 +950,8 @@ TEST_CASE("Double variant create") {
 TEST_CASE("Double variant of") {
     int intArray[] = {19};
 
-    auto v1 = Variant<int *, const char *>::of(intArray);
-    auto v2 = Variant<int *, const char *>::of("char array");
+    Variant<int *, const char *> v1 = intArray;
+    Variant<int *, const char *> v2 = "char array";
 
     REQUIRE(v1.index() == v1.index<int *>());
     CHECK(v1.value<int *>() == intArray);
@@ -950,7 +960,7 @@ TEST_CASE("Double variant of") {
 
     std::vector<Action> actions;
     {
-        auto v3 = Variant<int, Stub>::of(Stub(actions));
+        Variant<int, Stub> v3 = Stub(actions);
         CHECK(v3.index() == v3.index<Stub>());
     }
     CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
@@ -958,17 +968,30 @@ TEST_CASE("Double variant of") {
 
     {
         Stub s(actions);
-        auto v4 = Variant<int, Stub>::of(s);
+        Variant<int, Stub> v4 = s;
         CHECK(v4.index() == v4.index<Stub>());
     }
     CHECK(contains(actions, Action::COPY_CONSTRUCTION));
 }
 
+TEST_CASE("Double variant result of") {
+    int i = 42;
+    double d = 123.0;
+    Variant<int, double> vi =
+            Variant<int, double>::resultOf([&i] { return i; });
+    Variant<int, double> vd =
+            Variant<int, double>::resultOf([&d] { return d; });
+    REQUIRE(vi.index() == vi.index<int>());
+    CHECK(vi.value<int>() == 42);
+    REQUIRE(vd.index() == vd.index<double>());
+    CHECK(vd.value<double>() == 123.0);
+}
+
 TEST_CASE("Double variant swapping with same type") {
     using std::swap; // test against the swappable concept
 
-    auto v1 = Variant<int, double>::of(7);
-    auto v2 = Variant<int, double>::of(13);
+    Variant<int, double> v1 = 7;
+    Variant<int, double> v2 = 13;
     swap(v1, v2);
     REQUIRE(v1.index() == v1.index<int>());
     CHECK(v1.value<int>() == 13);
@@ -987,8 +1010,8 @@ TEST_CASE("Double variant swapping with same type") {
 TEST_CASE("Double variant swapping with different type") {
     using std::swap; // test against the swappable concept
 
-    auto v1 = Variant<int, double>::of(5);
-    auto v2 = Variant<int, double>::of(13.5);
+    Variant<int, double> v1 = 5;
+    Variant<int, double> v2 = 13.5;
 
     swap(v1, v2);
     REQUIRE(v1.index() == v1.index<double>());

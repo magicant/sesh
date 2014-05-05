@@ -27,6 +27,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "common/FunctionalInitialize.hh"
 
 namespace sesh {
 namespace common {
@@ -50,6 +51,24 @@ class ForAll<Predicate, Head, Tail...> :
                 Predicate<Head>::value,
                 ForAll<Predicate, Tail...>,
                 std::false_type>::type { };
+
+/**
+ * Defined to be (a subclass of) std::true_type or std::false_type depending on
+ * the template parameter types. The Boolean will be true if and only if
+ * {@code T} is the same type as one (or more) of {@code U}s.
+ */
+template<typename T, typename... U>
+class IsAnyOf;
+
+template<typename T>
+class IsAnyOf<T> : public std::false_type { };
+
+template<typename T, typename Head, typename... Tail>
+class IsAnyOf<T, Head, Tail...> :
+        public std::conditional<
+                std::is_same<T, Head>::value,
+                std::true_type,
+                IsAnyOf<T, Tail...>>::type { };
 
 /** Integral type that identifies the type of the active value of a variant. */
 using Index = unsigned;
@@ -524,6 +543,25 @@ public:
     }
 
     /**
+     * Creates a new variant by copy- or move-constructing its contained value
+     * from the argument.
+     *
+     * Throws any exception thrown by the constructor.
+     *
+     * @tparam U the argument type.
+     * @tparam V the type of the new contained value to be constructed.
+     *     (inferred from the argument type.)
+     * @param v the argument forwarded to the constructor.
+     */
+    template<
+            typename U,
+            typename V = typename std::decay<U>::type,
+            typename = typename std::enable_if<IsAnyOf<V, T...>::value>::type>
+    VariantBase(U &&v)
+            noexcept(std::is_nothrow_constructible<V, U &&>::value) :
+            VariantBase(TypeTag<V>(), std::forward<U>(v)) { }
+
+    /**
      * Creates a new variant by move-constructing its contained value from the
      * result of calling the argument function.
      *
@@ -538,7 +576,7 @@ public:
             typename F,
             typename U = typename std::decay<
                     typename std::result_of<F()>::type>::type>
-    VariantBase(F &&f) : mIndex(index<U>()) {
+    VariantBase(FunctionalInitialize, F &&f) : mIndex(index<U>()) {
         value().template constructFrom<F, U>(std::forward<F>(f));
     }
 
@@ -1083,20 +1121,22 @@ public:
     }
 
     /**
-     * Creates a new variant that contains the argument. The variant is
-     * initialized by calling the copy or move constructor of <code>U</code>.
+     * Creates a new variant by move-constructing its contained value from the
+     * result of calling the argument function.
      *
-     * Propagates any exception thrown by the constructor.
+     * Throws any exception thrown by the argument function or constructor.
      *
-     * @tparam U the (usually inferred) type of the new contained value.
-     * @tparam V the actual type of the new contained value.
-     * @param v a reference to the original value
+     * @tparam F the type of the function argument.
+     * @tparam U the type of the new contained value to be constructed.
+     *     (inferred from the return type of the argument function.)
+     * @param f the function that constructs the new contained value.
      */
-    template<typename U, typename V = typename std::decay<U>::type>
-    static Variant of(U &&v)
-            noexcept(std::is_nothrow_constructible<V, U &&>::value &&
-                    std::is_nothrow_destructible<V>::value) {
-        return Variant(TypeTag<V>(), std::forward<U>(v));
+    template<
+            typename F,
+            typename U = typename std::decay<
+                    typename std::result_of<F()>::type>::type>
+    static Variant resultOf(F &&f) {
+        return Variant(FUNCTIONAL_INITIALIZE, std::forward<F>(f));
     }
 
 };
