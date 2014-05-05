@@ -146,6 +146,7 @@ static_assert(
 TEST_CASE("Single variant construction & destruction") {
     Variant<int>(TypeTag<int>());
     Variant<int>(TypeTag<int>(), 123);
+    Variant<int>(123);
     Variant<int>(FUNCTIONAL_INITIALIZE, [] { return 123; });
 
     static_assert(
@@ -195,6 +196,8 @@ TEST_CASE("Double variant construction & destruction") {
 
     Variant<A, B>(TypeTag<A>());
     Variant<A, B>(TypeTag<B>(), 0, 0.0);
+    Variant<A, B>{A()};
+    Variant<A, B>{B(0, 0.0)};
     Variant<A, B>(FUNCTIONAL_INITIALIZE, [] { return A(); });
     Variant<A, B>(FUNCTIONAL_INITIALIZE, [] { return B(0, 0.0); });
 
@@ -250,6 +253,10 @@ TEST_CASE("Quad variant construction & destruction") {
     Variant<A, B, C, D>(TypeTag<B>());
     Variant<A, B, C, D>(TypeTag<C>());
     Variant<A, B, C, D>(TypeTag<D>());
+    Variant<A, B, C, D>{A()};
+    Variant<A, B, C, D>{B()};
+    Variant<A, B, C, D>{C()};
+    Variant<A, B, C, D>{D()};
     Variant<A, B, C, D>(FUNCTIONAL_INITIALIZE, [] { return A(); });
     Variant<A, B, C, D>(FUNCTIONAL_INITIALIZE, [] { return B(); });
     Variant<A, B, C, D>(FUNCTIONAL_INITIALIZE, [] { return C(); });

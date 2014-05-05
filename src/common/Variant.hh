@@ -52,6 +52,24 @@ class ForAll<Predicate, Head, Tail...> :
                 ForAll<Predicate, Tail...>,
                 std::false_type>::type { };
 
+/**
+ * Defined to be (a subclass of) std::true_type or std::false_type depending on
+ * the template parameter types. The Boolean will be true if and only if
+ * {@code T} is the same type as one (or more) of {@code U}s.
+ */
+template<typename T, typename... U>
+class IsAnyOf;
+
+template<typename T>
+class IsAnyOf<T> : public std::false_type { };
+
+template<typename T, typename Head, typename... Tail>
+class IsAnyOf<T, Head, Tail...> :
+        public std::conditional<
+                std::is_same<T, Head>::value,
+                std::true_type,
+                IsAnyOf<T, Tail...>>::type { };
+
 /** Integral type that identifies the type of the active value of a variant. */
 using Index = unsigned;
 
@@ -523,6 +541,25 @@ public:
             mIndex(index<U>()) {
         value().template construct<U>(std::forward<Arg>(arg)...);
     }
+
+    /**
+     * Creates a new variant by copy- or move-constructing its contained value
+     * from the argument.
+     *
+     * Throws any exception thrown by the constructor.
+     *
+     * @tparam U the argument type.
+     * @tparam V the type of the new contained value to be constructed.
+     *     (inferred from the argument type.)
+     * @param v the argument forwarded to the constructor.
+     */
+    template<
+            typename U,
+            typename V = typename std::decay<U>::type,
+            typename = typename std::enable_if<IsAnyOf<V, T...>::value>::type>
+    VariantBase(U &&v)
+            noexcept(std::is_nothrow_constructible<V, U &&>::value) :
+            VariantBase(TypeTag<V>(), std::forward<U>(v)) { }
 
     /**
      * Creates a new variant by move-constructing its contained value from the
