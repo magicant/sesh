@@ -24,6 +24,7 @@
 #include <iterator>
 #include <set>
 #include <utility>
+#include "common/ContainerHelper.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
@@ -47,7 +48,7 @@ private:
 public:
 
     bool test(SignalNumber n) const override {
-        return (mSet.find(n) != mSet.end()) == mIsPositive;
+        return common::contains(mSet, n) == mIsPositive;
     }
 
     SignalNumberSet &set(SignalNumber n, bool v = true) override {
