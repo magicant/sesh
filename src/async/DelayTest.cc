@@ -21,6 +21,7 @@
 #include "catch.hpp"
 
 #include <exception>
+#include <tuple>
 #include "async/Delay.hh"
 #include "common/Try.hh"
 
@@ -29,7 +30,21 @@ namespace {
 using sesh::async::Delay;
 using sesh::common::Try;
 
-TEST_CASE("Delay, set successful result and callback") {
+TEST_CASE("Delay, set successful result and callback, by value") {
+    using T = std::tuple<int, float, char>;
+    Delay<T> s;
+
+    s.setResult(42, 3.0f, 'a');
+
+    unsigned callCount = 0;
+    s.setCallback([&callCount](Try<T> &&r) {
+        ++callCount;
+        CHECK(*r == std::make_tuple(42, 3.0f, 'a'));
+    });
+    CHECK(callCount == 1);
+}
+
+TEST_CASE("Delay, set successful result and callback, by function") {
     Delay<int> s;
 
     s.setResultFrom([] { return 42; });
@@ -52,11 +67,34 @@ TEST_CASE("Delay, set callback and successful result") {
     });
     CHECK(callCount == 0);
 
-    s.setResultFrom([] { return 42; });
+    s.setResult(42);
     CHECK(callCount == 1);
 }
 
-TEST_CASE("Delay, set exception and callback") {
+TEST_CASE("Delay, set exception and callback, by copy") {
+    class Thrower {
+    public:
+        Thrower() noexcept = default;
+        Thrower(const Thrower &) { throw 42; }
+    };
+
+    Delay<Thrower> s;
+
+    s.setResult(Thrower());
+
+    unsigned callCount = 0;
+    s.setCallback([&callCount](Try<Thrower> &&r) {
+        ++callCount;
+        try {
+            *r;
+        } catch (int i) {
+            CHECK(i == 42);
+        }
+    });
+    CHECK(callCount == 1);
+}
+
+TEST_CASE("Delay, set exception and callback, by function") {
     Delay<int> s;
 
     s.setResultFrom([]() -> int { throw 42; });

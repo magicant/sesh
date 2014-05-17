@@ -65,6 +65,31 @@ private:
 public:
 
     /**
+     * Sets the result of this delay object by constructing T with the
+     * arguments. If the constructor throws, the result is set to the exception
+     * thrown.
+     *
+     * The behavior is undefined if the result has already been set.
+     *
+     * If a callback function has already been set, it is called immediately
+     * with the result set.
+     */
+    template<typename... Arg>
+    void setResult(Arg &&... arg) {
+        assert(!mResult.hasValue());
+
+        try {
+            mResult.emplace(
+                    common::variant_impl::TypeTag<T>(),
+                    std::forward<Arg>(arg)...);
+        } catch (...) {
+            mResult.emplace(std::current_exception());
+        }
+
+        fireIfReady();
+    }
+
+    /**
      * Sets the result of this delay object to the result of a call to the
      * argument function, which must be callable with no arguments and return a
      * value of T. If the function throws, the result is set to the exception
