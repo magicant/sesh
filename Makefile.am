@@ -252,6 +252,8 @@ src_sesh_SOURCES = \
 	src/os/capitypes.h \
 	src/os/event/ErrorFileDescriptor.hh \
 	src/os/event/FileDescriptorCondition.hh \
+	src/os/event/Proactor.cc \
+	src/os/event/Proactor.hh \
 	src/os/event/ReadableFileDescriptor.hh \
 	src/os/event/Signal.hh \
 	src/os/event/Timeout.hh \
