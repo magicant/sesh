@@ -164,7 +164,7 @@ public:
             mReceiver(std::move(receiver)) { }
 
     void operator()(common::Try<T> &&r) {
-        std::move(mReceiver).setResultFrom([&r] { return *r; });
+        std::move(mReceiver).setResultFrom([&r] { return std::move(*r); });
     }
 
 };

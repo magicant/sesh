@@ -347,7 +347,7 @@ TEST_CASE("Future, create from exception") {
     CHECK(called);
 }
 
-TEST_CASE("Future, forward, success") {
+TEST_CASE("Future, forward, success, int") {
     std::pair<Promise<int>, Future<int>> pf1 = createPromiseFuturePair<int>();
     std::pair<Promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
     std::move(pf1.first).setResultFrom([] { return 123; });
@@ -356,6 +356,11 @@ TEST_CASE("Future, forward, success") {
     int i = 0;
     std::move(pf2.second).setCallback([&i](Try<int> &&r) { i = *r; });
     CHECK(i == 123);
+}
+
+TEST_CASE("Future, forward, success, move only object") {
+    auto pf = createPromiseFuturePair<MoveOnly>();
+    std::move(pf.second).forward(std::move(pf.first));
 }
 
 TEST_CASE("Future, forward, failure") {
