@@ -775,6 +775,7 @@ TESTHEADERS = \
 	src/language/source/SourceTestHelper.hh \
 	src/language/syntax/PrinterTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh \
+	src/os/test_helper/NowApiStub.hh \
 	src/os/test_helper/SigactionApiFake.hh \
 	src/os/test_helper/SignalMaskApiFake.hh \
 	src/os/test_helper/UnimplementedApi.hh
