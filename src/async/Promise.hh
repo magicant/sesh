@@ -50,6 +50,20 @@ public:
     using DelayHolder<T>::DelayHolder;
 
     /**
+     * Sets the result of the associated future by constructing T with the
+     * arguments. If the constructor throws, the result is set to the exception
+     * thrown. After the result is set, this promise will have no associated
+     * future.
+     *
+     * The behavior is undefined if this promise has no associated future.
+     */
+    template<typename... Arg>
+    void setResult(Arg &&... arg) {
+        this->delay().setResult(std::forward<Arg>(arg)...);
+        this->invalidate();
+    }
+
+    /**
      * Sets the result of the associated future to the result of the argument
      * function, which must be callable with no arguments and return a value of
      * T. If the function throws, the result is set to the exception thrown.
