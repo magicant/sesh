@@ -28,6 +28,14 @@ namespace test_helper {
 
 class UnimplementedApi : public Api {
 
+    SystemClockTime systemClockNow() const noexcept {
+        throw "unimplemented systemClockNow";
+    }
+
+    SteadyClockTime steadyClockNow() const noexcept {
+        throw "unimplemented steadyClockNow";
+    }
+
     std::error_code close(io::FileDescriptor &) const override {
         throw "unimplemented close";
     }
