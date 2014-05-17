@@ -38,6 +38,15 @@ class Api {
 
 public:
 
+    using SystemClockTime = std::chrono::system_clock::time_point;
+    using SteadyClockTime = std::chrono::steady_clock::time_point;
+
+    /** Returns the current time. */
+    virtual SystemClockTime systemClockNow() const noexcept = 0;
+
+    /** Returns the current time. */
+    virtual SteadyClockTime steadyClockNow() const noexcept = 0;
+
     /**
      * Closes the given file descriptor. This function may block on some
      * conditions; refer to the POSIX standard for details.

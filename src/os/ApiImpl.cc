@@ -17,6 +17,7 @@
 
 #include "buildconfig.h"
 
+#include <chrono>
 #include <memory>
 #include <new>
 #include <stdexcept>
@@ -199,6 +200,14 @@ public:
 }; // class SignalNumberSetImpl
 
 class ApiImpl : public Api {
+
+    SystemClockTime systemClockNow() const noexcept final override {
+        return std::chrono::system_clock::now();
+    }
+
+    SteadyClockTime steadyClockNow() const noexcept final override {
+        return std::chrono::steady_clock::now();
+    }
 
     std::error_code close(FileDescriptor &fd) const final override {
         if (sesh_osapi_close(fd.value()) == 0) {
