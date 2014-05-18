@@ -35,14 +35,6 @@ private:
 
 public:
 
-    void setSystemClockNow(SystemClockTime now) noexcept {
-        mSystemClockNow = now;
-    }
-
-    void setSteadyClockNow(SteadyClockTime now) noexcept {
-        mSteadyClockNow = now;
-    }
-
     SystemClockTime &mutableSystemClockNow() noexcept {
         return mSystemClockNow;
     }
