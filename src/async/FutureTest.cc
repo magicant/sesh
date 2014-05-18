@@ -359,8 +359,15 @@ TEST_CASE("Future, forward, success, int") {
 }
 
 TEST_CASE("Future, forward, success, move only object") {
-    auto pf = createPromiseFuturePair<MoveOnly>();
-    std::move(pf.second).forward(std::move(pf.first));
+    auto pf1 = createPromiseFuturePair<MoveOnly>();
+    auto pf2 = createPromiseFuturePair<MoveOnly>();
+    std::move(pf1.first).setResult(MoveOnly());
+    std::move(pf1.second).forward(std::move(pf2.first));
+
+    bool called = false;
+    std::move(pf2.second).setCallback(
+            [&called](Try<MoveOnly> &&) { called = true; });
+    CHECK(called);
 }
 
 TEST_CASE("Future, forward, failure") {
