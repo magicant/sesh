@@ -74,13 +74,13 @@ TEST_CASE("Future, setting callback") {
     std::move(f).setCallback([&i](Try<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResultFrom([] { return 1; });
+    delay->setResult(1);
     CHECK(i == 1);
 }
 
 TEST_CASE("Create promise/future pair") {
     std::pair<Promise<int>, Future<int>> &&pf = createPromiseFuturePair<int>();
-    std::move(pf.first).setResultFrom([] { return 123; });
+    std::move(pf.first).setResult(123);
 
     int i = 0;
     std::move(pf.second).setCallback([&i](Try<int> &&r) { i = *r; });
@@ -100,7 +100,7 @@ TEST_CASE("Future, then, success") {
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResultFrom([] { return 1; });
+    delay->setResult(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
@@ -122,7 +122,7 @@ TEST_CASE("Future, then, failure") {
     });
 
     CHECK(d == 0.0);
-    delay->setResultFrom([] { return 1; });
+    delay->setResult(1);
     CHECK(d == 2.0);
 }
 
@@ -150,7 +150,7 @@ TEST_CASE("Future, map, success, movable function") {
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResultFrom([] { return 1; });
+    delay->setResult(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
@@ -168,7 +168,7 @@ TEST_CASE("Future, map, success, copyable constant function") {
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResultFrom([] { return 1; });
+    delay->setResult(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
@@ -213,7 +213,7 @@ TEST_CASE("Future, map, failure in callback") {
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResultFrom([] { return 1; });
+    delay->setResult(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
@@ -237,7 +237,7 @@ TEST_CASE("Future, recover, success, movable function") {
     std::move(f2).setCallback([&i](Try<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResultFrom([] { return 1; });
+    delay->setResult(1);
     CHECK(i == 1);
 }
 
@@ -254,7 +254,7 @@ TEST_CASE("Future, recover, success, copyable constant function") {
     std::move(f2).setCallback([&i](Try<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResultFrom([] { return 1; });
+    delay->setResult(1);
     CHECK(i == 1);
 }
 
@@ -347,15 +347,20 @@ TEST_CASE("Future, create from exception") {
     CHECK(called);
 }
 
-TEST_CASE("Future, forward, success") {
+TEST_CASE("Future, forward, success, int") {
     std::pair<Promise<int>, Future<int>> pf1 = createPromiseFuturePair<int>();
     std::pair<Promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
-    std::move(pf1.first).setResultFrom([] { return 123; });
+    std::move(pf1.first).setResult(123);
     std::move(pf1.second).forward(std::move(pf2.first));
 
     int i = 0;
     std::move(pf2.second).setCallback([&i](Try<int> &&r) { i = *r; });
     CHECK(i == 123);
+}
+
+TEST_CASE("Future, forward, success, move only object") {
+    auto pf = createPromiseFuturePair<MoveOnly>();
+    std::move(pf.second).forward(std::move(pf.first));
 }
 
 TEST_CASE("Future, forward, failure") {

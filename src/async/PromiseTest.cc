@@ -46,11 +46,24 @@ TEST_CASE("Promise, construction and validness") {
 TEST_CASE("Promise, invalidness after setting result") {
     const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
     Promise<int> p(delay);
-    std::move(p).setResultFrom([] { return 0; });
+    std::move(p).setResult(0);
     CHECK_FALSE(p.isValid());
 }
 
-TEST_CASE("Promise, setting result") {
+TEST_CASE("Promise, setting result by construction") {
+    using P = std::pair<int, double>;
+    const std::shared_ptr<Delay<P>> delay = std::make_shared<Delay<P>>();
+    Promise<P> p(delay);
+    std::move(p).setResult(1, 2.0);
+
+    int i = 0;
+    double d = 0.0;
+    delay->setCallback([&i, &d](Try<P> &&r) { std::tie(i, d) = *r; });
+    CHECK(i == 1);
+    CHECK(d == 2.0);
+}
+
+TEST_CASE("Promise, setting result by function") {
     const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
     Promise<int> p(delay);
     std::move(p).setResultFrom([] { return 1; });
