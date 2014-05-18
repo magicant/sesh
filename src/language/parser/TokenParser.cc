@@ -37,16 +37,6 @@ namespace sesh {
 namespace language {
 namespace parser {
 
-namespace {
-
-template<typename V>
-void emplace(Maybe<Token> &t, V &&v) {
-    using sesh::common::variant_impl::TypeTag;
-    t.emplace(TypeTag<typename std::decay<V>::type>(), std::forward<V>(v));
-}
-
-} // namespace
-
 TokenParser::TokenParser(
         Environment &e, EnumSet<TokenType> acceptableTokenTypes) noexcept :
         Parser(e),

@@ -27,6 +27,7 @@
 #include "common/FunctionalInitialize.hh"
 #include "common/Maybe.hh"
 #include "common/Try.hh"
+#include "common/TypeTag.hh"
 #include "common/Variant.hh"
 
 namespace sesh {
@@ -79,9 +80,7 @@ public:
         assert(!mResult.hasValue());
 
         try {
-            mResult.emplace(
-                    common::variant_impl::TypeTag<T>(),
-                    std::forward<Arg>(arg)...);
+            mResult.emplace(common::TypeTag<T>(), std::forward<Arg>(arg)...);
         } catch (...) {
             mResult.emplace(std::current_exception());
         }

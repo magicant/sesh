@@ -27,13 +27,14 @@
 #include <utility>
 #include <vector>
 #include "common/FunctionalInitialize.hh"
+#include "common/TypeTag.hh"
 #include "common/Variant.hh"
 
 namespace {
 
 using sesh::common::FUNCTIONAL_INITIALIZE;
+using sesh::common::TypeTag;
 using sesh::common::Variant;
-using sesh::common::variant_impl::TypeTag;
 
 enum class Action {
     STANDARD_CONSTRUCTION,
