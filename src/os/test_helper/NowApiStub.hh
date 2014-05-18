@@ -43,6 +43,14 @@ public:
         mSteadyClockNow = now;
     }
 
+    SystemClockTime &mutableSystemClockNow() noexcept {
+        return mSystemClockNow;
+    }
+
+    SteadyClockTime &mutableSteadyClockNow() noexcept {
+        return mSteadyClockNow;
+    }
+
     SystemClockTime systemClockNow() const noexcept override {
         return mSystemClockNow;
     }
