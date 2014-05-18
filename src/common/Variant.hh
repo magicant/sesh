@@ -28,6 +28,7 @@
 #include <type_traits>
 #include <utility>
 #include "common/FunctionalInitialize.hh"
+#include "common/TypeTag.hh"
 
 namespace sesh {
 namespace common {
@@ -271,15 +272,6 @@ public:
     }
 
 };
-
-/**
- * A type tag is a dummy object that is passed to a variant constructor to tell
- * the type of the object to be created and contained in the variant.
- *
- * @tparam T type of the object to be created and contained in the variant.
- */
-template<typename T>
-class TypeTag { };
 
 /** A visitor that constructs a value of a target union. */
 template<typename Union>

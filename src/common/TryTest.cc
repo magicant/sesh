@@ -22,12 +22,12 @@
 
 #include <exception>
 #include "common/Try.hh"
-#include "common/Variant.hh"
+#include "common/TypeTag.hh"
 
 namespace {
 
 using sesh::common::Try;
-using sesh::common::variant_impl::TypeTag;
+using sesh::common::TypeTag;
 
 TEST_CASE("Try, construction") {
     Try<int> r1(TypeTag<int>(), 5);

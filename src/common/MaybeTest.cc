@@ -25,12 +25,12 @@
 #include <string>
 #include <utility>
 #include "common/Maybe.hh"
-#include "common/Variant.hh"
+#include "common/TypeTag.hh"
 
 namespace {
 
 using sesh::common::Maybe;
-using sesh::common::variant_impl::TypeTag;
+using sesh::common::TypeTag;
 
 enum class Action {
     STANDARD_CONSTRUCTION,

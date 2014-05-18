@@ -23,6 +23,7 @@
 #include "common/EnumSet.hh"
 #include "common/Maybe.hh"
 #include "common/String.hh"
+#include "common/TypeTag.hh"
 #include "language/parser/CharPredicates.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/Keyword.hh"
@@ -31,6 +32,7 @@
 using sesh::common::EnumSet;
 using sesh::common::Maybe;
 using sesh::common::String;
+using sesh::common::TypeTag;
 using sesh::language::syntax::Word;
 
 namespace sesh {
@@ -41,7 +43,6 @@ namespace {
 
 template<typename V>
 void emplace(Maybe<Token> &t, V &&v) {
-    using sesh::common::variant_impl::TypeTag;
     t.emplace(TypeTag<typename std::decay<V>::type>(), std::forward<V>(v));
 }
 

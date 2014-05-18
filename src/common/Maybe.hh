@@ -23,6 +23,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include "common/TypeTag.hh"
 #include "common/Variant.hh"
 
 namespace sesh {
@@ -57,7 +58,7 @@ private:
 public:
 
     /** Constructs a maybe object that contains nothing. */
-    Maybe() noexcept : mValue(variant_impl::TypeTag<Nil>()) { }
+    Maybe() noexcept : mValue(TypeTag<Nil>()) { }
 
     /**
      * Constructs a non-empty maybe object by directly constructing the
@@ -69,7 +70,7 @@ public:
      * @param arg arguments to the contained object's constructor.
      */
     template<typename... Arg>
-    Maybe(variant_impl::TypeTag<T> tag, Arg &&... arg)
+    Maybe(TypeTag<T> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<T, Arg...>::value) :
             mValue(tag, std::forward<Arg>(arg)...) { }
     // XXX support initializer_list?
@@ -79,14 +80,14 @@ public:
      * object.
      */
     Maybe(const T &v) noexcept(std::is_nothrow_copy_constructible<T>::value) :
-            mValue(variant_impl::TypeTag<T>(), v) { }
+            mValue(TypeTag<T>(), v) { }
 
     /**
      * Constructs a non-empty maybe object by move-constructing the contained
      * object.
      */
     Maybe(T &&v) noexcept(std::is_nothrow_move_constructible<T>::value) :
-            mValue(variant_impl::TypeTag<T>(), std::move(v)) { }
+            mValue(TypeTag<T>(), std::move(v)) { }
 
     Maybe(const Maybe &) = default;
     Maybe(Maybe &&) = default;
@@ -307,7 +308,7 @@ bool operator<(const Maybe<T> &a, const Maybe<T> &b)
 template<typename T, typename... Arg>
 Maybe<T> createMaybe(Arg &&... arg)
         noexcept(std::is_nothrow_constructible<T, Arg &&...>::value) {
-    return Maybe<T>(variant_impl::TypeTag<T>(), std::forward<Arg>(arg)...);
+    return Maybe<T>(TypeTag<T>(), std::forward<Arg>(arg)...);
 }
 
 /**
@@ -323,9 +324,9 @@ Maybe<T> createMaybe(Arg &&... arg)
  */
 template<typename T, typename U = typename std::decay<T>::type>
 Maybe<U> createMaybeOf(T &&v)
-        noexcept(std::is_nothrow_constructible<
-                Maybe<U>, variant_impl::TypeTag<U>, T &&>::value) {
-    return Maybe<U>(variant_impl::TypeTag<U>(), std::forward<T>(v));
+        noexcept(std::is_nothrow_constructible<Maybe<U>, TypeTag<U>, T &&>::
+                value) {
+    return Maybe<U>(TypeTag<U>(), std::forward<T>(v));
 }
 
 } // namespace common
