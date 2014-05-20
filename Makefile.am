@@ -25,6 +25,7 @@ TESTPROGRAMS = \
 	src/async/DelayTest \
 	src/async/FutureTest \
 	src/async/PromiseTest \
+	src/common/ContainerHelperTest \
 	src/common/EnumSetTest \
 	src/common/MaybeTest \
 	src/common/MessageTest \
@@ -72,6 +73,7 @@ TESTPROGRAMS = \
 	src/language/syntax/SequenceTest \
 	src/language/syntax/SimpleCommandTest \
 	src/language/syntax/WordTest \
+	src/os/event/AwaiterTimeoutTest \
 	src/os/io/FileDescriptorTest \
 	src/os/signaling/HandlerConfigurationTest
 
@@ -97,6 +99,7 @@ src_sesh_SOURCES = \
 	src/async/Promise.hh \
 	src/buildconfig.h \
 	src/common/Char.hh \
+	src/common/ContainerHelper.hh \
 	src/common/DirectInitialize.hh \
 	src/common/Empty.hh \
 	src/common/EnumSet.hh \
@@ -248,6 +251,18 @@ src_sesh_SOURCES = \
 	src/os/capi.c \
 	src/os/capi.h \
 	src/os/capitypes.h \
+	src/os/event/Awaiter.cc \
+	src/os/event/Awaiter.hh \
+	src/os/event/ErrorFileDescriptor.hh \
+	src/os/event/FileDescriptorCondition.hh \
+	src/os/event/Proactor.cc \
+	src/os/event/Proactor.hh \
+	src/os/event/ReadableFileDescriptor.hh \
+	src/os/event/Signal.hh \
+	src/os/event/Timeout.hh \
+	src/os/event/Trigger.hh \
+	src/os/event/UserProvidedTrigger.hh \
+	src/os/event/WritableFileDescriptor.hh \
 	src/os/io/FileDescriptor.hh \
 	src/os/io/FileDescriptorSet.hh \
 	src/os/signaling/HandlerConfiguration.cc \
@@ -267,6 +282,8 @@ src_async_FutureTest_SOURCES = \
 	src/async/FutureTest.cc
 src_async_PromiseTest_SOURCES = \
 	src/async/PromiseTest.cc
+src_common_ContainerHelperTest_SOURCES = \
+	src/common/ContainerHelperTest.cc
 src_common_EnumSetTest_SOURCES = \
 	src/common/EnumSetTest.cc
 src_common_MaybeTest_SOURCES = \
@@ -756,6 +773,10 @@ src_language_syntax_WordTest_SOURCES = \
 	src/language/syntax/RawString.cc \
 	src/language/syntax/Word.cc \
 	src/language/syntax/WordTest.cc
+src_os_event_AwaiterTimeoutTest_SOURCES = \
+	src/os/event/Awaiter.cc \
+	src/os/event/AwaiterTimeoutTest.cc \
+	src/os/event/Proactor.cc
 src_os_io_FileDescriptorTest_SOURCES = \
 	src/os/io/FileDescriptorTest.cc
 src_os_signaling_HandlerConfigurationTest_SOURCES = \
@@ -775,8 +796,10 @@ TESTHEADERS = \
 	src/language/source/OriginTestHelper.hh \
 	src/language/source/SourceTestHelper.hh \
 	src/language/syntax/PrinterTestHelper.hh \
+	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh \
 	src/os/test_helper/NowApiStub.hh \
+	src/os/test_helper/PselectApiStub.hh \
 	src/os/test_helper/SigactionApiFake.hh \
 	src/os/test_helper/SignalMaskApiFake.hh \
 	src/os/test_helper/UnimplementedApi.hh

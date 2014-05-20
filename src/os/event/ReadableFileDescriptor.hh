@@ -15,48 +15,31 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_test_helper_NowApiStub_hh
-#define INCLUDED_os_test_helper_NowApiStub_hh
+#ifndef INCLUDED_os_event_ReadableFileDescriptor_hh
+#define INCLUDED_os_event_ReadableFileDescriptor_hh
 
 #include "buildconfig.h"
 
-#include "os/test_helper/UnimplementedApi.hh"
+#include "os/event/FileDescriptorCondition.hh"
 
 namespace sesh {
 namespace os {
-namespace test_helper {
+namespace event {
 
-class NowApiStub : public virtual UnimplementedApi {
+/**
+ * Represents an event triggered by a file descriptor becoming ready for
+ * non-blocking reading.
+ */
+class ReadableFileDescriptor : public FileDescriptorCondition {
 
-private:
+    using FileDescriptorCondition::FileDescriptorCondition;
 
-    SystemClockTime mSystemClockNow;
-    SteadyClockTime mSteadyClockNow;
+}; // class ReadableFileDescriptor
 
-public:
-
-    SystemClockTime &mutableSystemClockNow() noexcept {
-        return mSystemClockNow;
-    }
-
-    SteadyClockTime &mutableSteadyClockNow() noexcept {
-        return mSteadyClockNow;
-    }
-
-    SystemClockTime systemClockNow() const noexcept override {
-        return mSystemClockNow;
-    }
-
-    SteadyClockTime steadyClockNow() const noexcept override {
-        return mSteadyClockNow;
-    }
-
-}; // class NowApiStub
-
-} // namespace test_helper
+} // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_test_helper_NowApiStub_hh
+#endif // #ifndef INCLUDED_os_event_ReadableFileDescriptor_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

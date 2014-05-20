@@ -26,6 +26,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "common/ContainerHelper.hh"
 #include "common/FunctionalInitialize.hh"
 #include "common/TypeTag.hh"
 #include "common/Variant.hh"
@@ -35,6 +36,7 @@ namespace {
 using sesh::common::FUNCTIONAL_INITIALIZE;
 using sesh::common::TypeTag;
 using sesh::common::Variant;
+using sesh::common::contains;
 
 enum class Action {
     STANDARD_CONSTRUCTION,
@@ -134,11 +136,6 @@ struct NonMoveAssignable {
 struct NonDestructible {
     ~NonDestructible() noexcept(false) { }
 };
-
-template<typename Container, typename Value>
-bool contains(const Container &c, const Value &v) {
-    return std::find(c.cbegin(), c.cend(), v) != c.cend();
-}
 
 static_assert(
         sizeof(Variant<>) > 0,

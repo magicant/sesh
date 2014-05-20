@@ -38,8 +38,10 @@ class Api {
 
 public:
 
-    using SystemClockTime = std::chrono::system_clock::time_point;
-    using SteadyClockTime = std::chrono::steady_clock::time_point;
+    using SystemClockTime = std::chrono::time_point<
+            std::chrono::system_clock, std::chrono::nanoseconds>;
+    using SteadyClockTime = std::chrono::time_point<
+            std::chrono::steady_clock, std::chrono::nanoseconds>;
 
     /** Returns the current time. */
     virtual SystemClockTime systemClockNow() const noexcept = 0;

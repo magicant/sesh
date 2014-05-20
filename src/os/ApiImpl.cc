@@ -202,11 +202,13 @@ public:
 class ApiImpl : public Api {
 
     SystemClockTime systemClockNow() const noexcept final override {
-        return std::chrono::system_clock::now();
+        return std::chrono::time_point_cast<SystemClockTime::duration>(
+                SystemClockTime::clock::now());
     }
 
     SteadyClockTime steadyClockNow() const noexcept final override {
-        return std::chrono::steady_clock::now();
+        return std::chrono::time_point_cast<SteadyClockTime::duration>(
+                SteadyClockTime::clock::now());
     }
 
     std::error_code close(FileDescriptor &fd) const final override {

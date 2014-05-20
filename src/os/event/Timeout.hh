@@ -15,48 +15,52 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_test_helper_NowApiStub_hh
-#define INCLUDED_os_test_helper_NowApiStub_hh
+#ifndef INCLUDED_os_event_Timeout_hh
+#define INCLUDED_os_event_Timeout_hh
 
 #include "buildconfig.h"
 
-#include "os/test_helper/UnimplementedApi.hh"
+#include <chrono>
 
 namespace sesh {
 namespace os {
-namespace test_helper {
+namespace event {
 
-class NowApiStub : public virtual UnimplementedApi {
-
-private:
-
-    SystemClockTime mSystemClockNow;
-    SteadyClockTime mSteadyClockNow;
+/**
+ * A timeout event trigger.
+ *
+ * @see Trigger
+ */
+class Timeout {
 
 public:
 
-    SystemClockTime &mutableSystemClockNow() noexcept {
-        return mSystemClockNow;
-    }
+    using Interval = std::chrono::nanoseconds;
 
-    SteadyClockTime &mutableSteadyClockNow() noexcept {
-        return mSteadyClockNow;
-    }
+private:
 
-    SystemClockTime systemClockNow() const noexcept override {
-        return mSystemClockNow;
-    }
+    Interval mInterval;
 
-    SteadyClockTime steadyClockNow() const noexcept override {
-        return mSteadyClockNow;
-    }
+public:
 
-}; // class NowApiStub
+    constexpr explicit Timeout(Interval i) noexcept : mInterval(i) { }
 
-} // namespace test_helper
+    constexpr Interval interval() const noexcept { return mInterval; }
+
+};
+
+constexpr inline bool operator==(const Timeout &l, const Timeout &r) noexcept {
+    return l.interval() == r.interval();
+}
+
+constexpr inline bool operator<(const Timeout &l, const Timeout &r) noexcept {
+    return l.interval() < r.interval();
+}
+
+} // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_test_helper_NowApiStub_hh
+#endif // #ifndef INCLUDED_os_event_Timeout_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

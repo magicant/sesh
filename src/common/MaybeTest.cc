@@ -24,6 +24,7 @@
 #include <exception>
 #include <string>
 #include <utility>
+#include "common/ContainerHelper.hh"
 #include "common/Maybe.hh"
 #include "common/TypeTag.hh"
 
@@ -31,6 +32,7 @@ namespace {
 
 using sesh::common::Maybe;
 using sesh::common::TypeTag;
+using sesh::common::contains;
 
 enum class Action {
     STANDARD_CONSTRUCTION,
@@ -101,11 +103,6 @@ struct DestructorThrows {
 };
 
 void swap(MoveOnly &, MoveOnly &) noexcept { }
-
-template<typename Container, typename Value>
-bool contains(const Container &c, const Value &v) {
-    return std::find(c.cbegin(), c.cend(), v) != c.cend();
-}
 
 TEST_CASE("Maybe empty construction") {
     Maybe<int> m1;

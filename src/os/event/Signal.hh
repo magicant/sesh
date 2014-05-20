@@ -15,48 +15,51 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_test_helper_NowApiStub_hh
-#define INCLUDED_os_test_helper_NowApiStub_hh
+#ifndef INCLUDED_os_event_Signal_hh
+#define INCLUDED_os_event_Signal_hh
 
 #include "buildconfig.h"
 
-#include "os/test_helper/UnimplementedApi.hh"
+#include "os/signaling/SignalNumber.hh"
 
 namespace sesh {
 namespace os {
-namespace test_helper {
+namespace event {
 
-class NowApiStub : public virtual UnimplementedApi {
+/**
+ * A signal event trigger.
+ *
+ * @see Trigger
+ */
+class Signal {
 
 private:
 
-    SystemClockTime mSystemClockNow;
-    SteadyClockTime mSteadyClockNow;
+    signaling::SignalNumber mNumber;
 
 public:
 
-    SystemClockTime &mutableSystemClockNow() noexcept {
-        return mSystemClockNow;
+    constexpr explicit Signal(signaling::SignalNumber n) noexcept :
+            mNumber(n) { }
+
+    constexpr signaling::SignalNumber number() const noexcept {
+        return mNumber;
     }
 
-    SteadyClockTime &mutableSteadyClockNow() noexcept {
-        return mSteadyClockNow;
-    }
+}; // class Signal
 
-    SystemClockTime systemClockNow() const noexcept override {
-        return mSystemClockNow;
-    }
+constexpr inline bool operator==(const Signal &l, const Signal &r) noexcept {
+    return l.number() == r.number();
+}
 
-    SteadyClockTime steadyClockNow() const noexcept override {
-        return mSteadyClockNow;
-    }
+constexpr inline bool operator<(const Signal &l, const Signal &r) noexcept {
+    return l.number() < r.number();
+}
 
-}; // class NowApiStub
-
-} // namespace test_helper
+} // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_test_helper_NowApiStub_hh
+#endif // #ifndef INCLUDED_os_event_Signal_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

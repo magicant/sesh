@@ -15,48 +15,25 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_test_helper_NowApiStub_hh
-#define INCLUDED_os_test_helper_NowApiStub_hh
-
 #include "buildconfig.h"
+#include "Proactor.hh"
 
-#include "os/test_helper/UnimplementedApi.hh"
+#include <vector>
+#include <utility>
 
 namespace sesh {
 namespace os {
-namespace test_helper {
+namespace event {
 
-class NowApiStub : public virtual UnimplementedApi {
+async::Future<Trigger> Proactor::expect(Trigger &&t) {
+    std::vector<Trigger> ts;
+    ts.reserve(1);
+    ts.push_back(std::move(t));
+    return expect(std::move(ts));
+}
 
-private:
-
-    SystemClockTime mSystemClockNow;
-    SteadyClockTime mSteadyClockNow;
-
-public:
-
-    SystemClockTime &mutableSystemClockNow() noexcept {
-        return mSystemClockNow;
-    }
-
-    SteadyClockTime &mutableSteadyClockNow() noexcept {
-        return mSteadyClockNow;
-    }
-
-    SystemClockTime systemClockNow() const noexcept override {
-        return mSystemClockNow;
-    }
-
-    SteadyClockTime steadyClockNow() const noexcept override {
-        return mSteadyClockNow;
-    }
-
-}; // class NowApiStub
-
-} // namespace test_helper
+} // namespace event
 } // namespace os
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_os_test_helper_NowApiStub_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

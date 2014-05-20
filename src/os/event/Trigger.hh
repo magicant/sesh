@@ -15,48 +15,36 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_test_helper_NowApiStub_hh
-#define INCLUDED_os_test_helper_NowApiStub_hh
+#ifndef INCLUDED_os_event_Trigger_hh
+#define INCLUDED_os_event_Trigger_hh
 
 #include "buildconfig.h"
 
-#include "os/test_helper/UnimplementedApi.hh"
+#include "common/Variant.hh"
+#include "os/event/ErrorFileDescriptor.hh"
+#include "os/event/ReadableFileDescriptor.hh"
+#include "os/event/Signal.hh"
+#include "os/event/Timeout.hh"
+#include "os/event/UserProvidedTrigger.hh"
+#include "os/event/WritableFileDescriptor.hh"
 
 namespace sesh {
 namespace os {
-namespace test_helper {
+namespace event {
 
-class NowApiStub : public virtual UnimplementedApi {
+/** A trigger describes the cause of an event. */
+using Trigger = common::Variant<
+        Timeout,
+        ReadableFileDescriptor,
+        WritableFileDescriptor,
+        ErrorFileDescriptor,
+        Signal,
+        UserProvidedTrigger>;
 
-private:
-
-    SystemClockTime mSystemClockNow;
-    SteadyClockTime mSteadyClockNow;
-
-public:
-
-    SystemClockTime &mutableSystemClockNow() noexcept {
-        return mSystemClockNow;
-    }
-
-    SteadyClockTime &mutableSteadyClockNow() noexcept {
-        return mSteadyClockNow;
-    }
-
-    SystemClockTime systemClockNow() const noexcept override {
-        return mSystemClockNow;
-    }
-
-    SteadyClockTime steadyClockNow() const noexcept override {
-        return mSteadyClockNow;
-    }
-
-}; // class NowApiStub
-
-} // namespace test_helper
+} // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_test_helper_NowApiStub_hh
+#endif // #ifndef INCLUDED_os_event_Trigger_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
