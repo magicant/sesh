@@ -796,6 +796,7 @@ TESTHEADERS = \
 	src/language/source/OriginTestHelper.hh \
 	src/language/source/SourceTestHelper.hh \
 	src/language/syntax/PrinterTestHelper.hh \
+	src/os/event/AwaiterTestHelper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh \
 	src/os/test_helper/NowApiStub.hh \
