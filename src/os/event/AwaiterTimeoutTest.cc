@@ -93,7 +93,7 @@ void checkEmpty(
         const FileDescriptorSet *fds,
         FileDescriptor::Value fdBound,
         const std::string &info) {
-    checkEqual(fds, {}, fdBound, info);
+    checkEqual(fds, std::set<FileDescriptor::Value>{}, fdBound, info);
 }
 
 TEST_CASE_METHOD(
