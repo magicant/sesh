@@ -799,6 +799,7 @@ TESTHEADERS = \
 	src/os/event/AwaiterTestHelper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh \
+	src/os/test_helper/FileDescriptorSetApi.hh \
 	src/os/test_helper/NowApiStub.hh \
 	src/os/test_helper/PselectApiStub.hh \
 	src/os/test_helper/SigactionApiFake.hh \

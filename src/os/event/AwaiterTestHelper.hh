@@ -21,11 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include <string>
-#include "common/ContainerHelper.hh"
 #include "os/event/Awaiter.hh"
-#include "os/io/FileDescriptor.hh"
-#include "os/io/FileDescriptorSet.hh"
 #include "os/test_helper/NowApiStub.hh"
 #include "os/test_helper/PselectApiStub.hh"
 
@@ -49,31 +45,6 @@ protected:
 class PselectAndNowApiStub :
         public test_helper::PselectApiStub, public test_helper::NowApiStub {
 };
-
-inline void checkEqual(
-        const io::FileDescriptorSet *fds,
-        const std::set<io::FileDescriptor::Value> &fdValues,
-        io::FileDescriptor::Value fdBound,
-        const std::string &info) {
-    INFO(info);
-
-    if (fds == nullptr) {
-        CHECK(fdValues.empty());
-        return;
-    }
-
-    for (io::FileDescriptor::Value fd = 0; fd < fdBound; ++fd) {
-        INFO("fd=" << fd);
-        CHECK(fds->test(fd) == common::contains(fdValues, fd));
-    }
-}
-
-inline void checkEmpty(
-        const io::FileDescriptorSet *fds,
-        io::FileDescriptor::Value fdBound,
-        const std::string &info) {
-    checkEqual(fds, std::set<io::FileDescriptor::Value>{}, fdBound, info);
-}
 
 } // namespace event
 } // namespace os

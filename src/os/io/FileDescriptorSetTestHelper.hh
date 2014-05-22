@@ -64,6 +64,10 @@ public:
         return *this;
     }
 
+    FileDescriptor::Value bound() const {
+        return empty() ? 0 : *rbegin() + 1;
+    }
+
 }; // class FileDescriptorSetFake
 
 } // namespace io

@@ -46,7 +46,6 @@ using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
-using sesh::os::event::checkEmpty;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
