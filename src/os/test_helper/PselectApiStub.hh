@@ -21,13 +21,13 @@
 #include "buildconfig.h"
 
 #include <functional>
-#include "os/test_helper/UnimplementedApi.hh"
+#include "os/test_helper/FileDescriptorSetApi.hh"
 
 namespace sesh {
 namespace os {
 namespace test_helper {
 
-class PselectApiStub : public virtual UnimplementedApi {
+class PselectApiStub : public virtual FileDescriptorSetApi {
 
 public:
 
