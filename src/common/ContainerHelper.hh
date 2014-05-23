@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace sesh {
 namespace common {
@@ -75,6 +76,31 @@ auto find(const Container &c, const Element &e)
                     typename Container::const_iterator>::value,
                 typename Container::const_iterator>::type {
     return std::find(std::begin(c), std::end(c), e);
+}
+
+/**
+ * Searches the given container for an element that meets the given predicate.
+ *
+ * @return An iterator pointing to the first found element, or a past-the-end
+ * iterator if not found.
+ */
+template<typename Container, typename UnaryPredicate>
+auto find_if(Container &c, UnaryPredicate &&p) -> decltype(std::begin(c)) {
+    return std::find_if(
+            std::begin(c), std::end(c), std::forward<UnaryPredicate>(p));
+}
+
+/**
+ * Searches the given container for an element that does not meet the given
+ * predicate.
+ *
+ * @return An iterator pointing to the first found element, or a past-the-end
+ * iterator if not found.
+ */
+template<typename Container, typename UnaryPredicate>
+auto find_if_not(Container &c, UnaryPredicate &&p) -> decltype(std::begin(c)) {
+    return std::find_if_not(
+            std::begin(c), std::end(c), std::forward<UnaryPredicate>(p));
 }
 
 /** Checks if the given range contains the given element. */
