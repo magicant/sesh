@@ -46,7 +46,7 @@ public:
     }
 
     std::pair<iterator, bool> insert(FileDescriptor::Value fd) {
-        if (fd >= MAX_VALUE)
+        if (fd > MAX_VALUE)
             throw std::domain_error("too large file descriptor");
         return std::set<FileDescriptor::Value>::insert(fd);
     }
