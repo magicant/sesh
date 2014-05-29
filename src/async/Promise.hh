@@ -77,6 +77,15 @@ public:
         this->invalidate();
     }
 
+    /**
+     * Sets the result of the associated future to the current exception. This
+     * function can be used in a catch clause only.
+     */
+    void failWithCurrentException() && {
+        this->delay().setResultToCurrentException();
+        this->invalidate();
+    }
+
 }; // template<typename T> class Promise
 
 } // namespace async
