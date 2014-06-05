@@ -37,6 +37,26 @@
 #include "os/test_helper/PselectApiStub.hh"
 #include "os/test_helper/UnimplementedApi.hh"
 
+/*
+namespace std {
+
+template<typename Char, typename Traits, typename R, typename P>
+std::ostream &operator<<(
+        std::basic_ostream<Char, Traits> &s, std::chrono::duration<R, P> d) {
+    s << std::chrono::duration_cast<std::chrono::nanoseconds>(d).count() <<
+            " ns";
+    return s;
+}
+
+template<typename Char, typename Traits, typename C, typename D>
+std::ostream &operator<<(
+        std::basic_ostream<Char, Traits> &s, std::chrono::time_point<C, D> t) {
+    return s << t.time_since_epoch() << " since epoch";
+}
+
+}
+*/
+
 namespace {
 
 using sesh::async::Future;
@@ -82,6 +102,45 @@ public:
     TimeoutTest();
 
 }; // class TimeoutTest
+
+TEST_CASE_METHOD(
+        AwaiterTestFixture<PselectAndNowApiStub>, "Awaiter: timeout 0") {
+    auto startTime = TimePoint(std::chrono::seconds(0));
+    mutableSteadyClockNow() = startTime;
+    Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(0)));
+    bool callbackCalled = false;
+    std::move(f).setCallback(
+            [this, startTime, &callbackCalled](Try<Trigger> &&t) {
+        REQUIRE(t.hasValue());
+        CHECK(t->index() == Trigger::index<Timeout>());
+        CHECK(t->value<Timeout>().interval() == std::chrono::seconds(0));
+        CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
+        callbackCalled = true;
+    });
+    CHECK_FALSE(callbackCalled);
+
+    implementation() = [this](
+            const PselectApiStub &,
+            FileDescriptor::Value fdBound,
+            FileDescriptorSet *readFds,
+            FileDescriptorSet *writeFds,
+            FileDescriptorSet *errorFds,
+            std::chrono::nanoseconds timeout,
+            const SignalNumberSet *signalMask) -> std::error_code {
+        checkEmpty(readFds, fdBound, "readFds");
+        checkEmpty(writeFds, fdBound, "writeFds");
+        checkEmpty(errorFds, fdBound, "errorFds");
+        CHECK(timeout == std::chrono::seconds(0));
+        CHECK(signalMask == nullptr);
+        mutableSteadyClockNow() += std::chrono::seconds(1);
+        implementation() = nullptr;
+        return std::error_code();
+    };
+    mutableSteadyClockNow() += std::chrono::seconds(1);
+    a.awaitEvents();
+    CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
+    CHECK(callbackCalled);
+}
 
 template<int durationInSecondsInt>
 TimeoutTest<durationInSecondsInt>::TimeoutTest() {

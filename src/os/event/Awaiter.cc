@@ -22,17 +22,25 @@
 #include <cassert>
 #include <chrono>
 #include <map>
+#include <memory>
 #include <tuple>
 #include <utility>
 #include <vector>
 #include "async/Future.hh"
 #include "async/Promise.hh"
+#include "common/ContainerHelper.hh"
+#include "helpermacros.h"
 #include "os/Api.hh"
 #include "os/event/Trigger.hh"
+#include "os/io/FileDescriptor.hh"
+#include "os/io/FileDescriptorSet.hh"
 
 using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::createPromiseFuturePair;
+using sesh::common::find_if;
+using sesh::os::io::FileDescriptor;
+using sesh::os::io::FileDescriptorSet;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
 using Clock = TimePoint::clock;
@@ -60,6 +68,11 @@ Timeout minTimeout(const std::vector<Trigger> &ts) {
     return timeoutOrMax(*i);
 }
 
+struct FdSetTriple {
+    FileDescriptor::Value bound = 0;
+    std::unique_ptr<FileDescriptorSet> readFds, writeFds, errorFds;
+};
+
 class PendingEvent {
 
 private:
@@ -71,7 +84,13 @@ public:
 
     PendingEvent(std::vector<Trigger> &&triggers, Promise<Trigger> &&promise);
 
+    void addFdsToAwait(const Api &, FdSetTriple &) const;
+
     void fireTimeout();
+
+    bool testConditionAndFire(const FdSetTriple &);
+
+    void failWithCurrentException();
 
 }; // class OrderedTrigger
 
@@ -102,8 +121,86 @@ PendingEvent::PendingEvent(
         mTriggers(std::move(triggers)),
         mPromise(std::move(promise)) { }
 
+void addFd(
+        const Api &api,
+        std::unique_ptr<FileDescriptorSet> &fds,
+        FileDescriptor::Value fd) {
+    if (fds == nullptr)
+        fds = api.createFileDescriptorSet();
+    fds->set(fd);
+}
+
+void addFdToAwait(const Api &api, const Trigger &t, FdSetTriple &fds) {
+    switch (t.index()) {
+    case Trigger::index<ReadableFileDescriptor>():
+        addFd(api, fds.readFds, t.value<ReadableFileDescriptor>().value());
+        fds.bound = std::max(
+                fds.bound, t.value<ReadableFileDescriptor>().value() + 1);
+        break;
+    case Trigger::index<WritableFileDescriptor>():
+        addFd(api, fds.writeFds, t.value<WritableFileDescriptor>().value());
+        fds.bound = std::max(
+                fds.bound, t.value<WritableFileDescriptor>().value() + 1);
+        break;
+    case Trigger::index<ErrorFileDescriptor>():
+        addFd(api, fds.errorFds, t.value<ErrorFileDescriptor>().value());
+        fds.bound = std::max(
+                fds.bound, t.value<ErrorFileDescriptor>().value() + 1);
+        break;
+    case Trigger::index<Timeout>():
+    case Trigger::index<Signal>():
+    case Trigger::index<UserProvidedTrigger>():
+        break;
+    }
+}
+
+void PendingEvent::addFdsToAwait(const Api &api, FdSetTriple &fds) const {
+    for (const Trigger &t : mTriggers)
+        addFdToAwait(api, t, fds);
+}
+
 void PendingEvent::fireTimeout() {
     std::move(mPromise).setResult(minTimeout(mTriggers));
+}
+
+bool contains(
+        const std::unique_ptr<FileDescriptorSet> &fds,
+        FileDescriptor::Value fd) {
+    return fds != nullptr && fds->test(fd);
+}
+
+bool testCondition(const Trigger &t, const FdSetTriple &fds) {
+    switch (t.index()) {
+    case Trigger::index<Timeout>():
+        return false;
+    case Trigger::index<ReadableFileDescriptor>():
+        return contains(
+                fds.readFds, t.value<ReadableFileDescriptor>().value());
+    case Trigger::index<WritableFileDescriptor>():
+        return contains(
+                fds.writeFds, t.value<WritableFileDescriptor>().value());
+    case Trigger::index<ErrorFileDescriptor>():
+        return contains(
+                fds.errorFds, t.value<ErrorFileDescriptor>().value());
+    case Trigger::index<Signal>():
+    case Trigger::index<UserProvidedTrigger>():
+        return false; // FIXME
+    }
+    UNREACHABLE();
+}
+
+bool PendingEvent::testConditionAndFire(const FdSetTriple &fds) {
+    auto i = find_if(
+            mTriggers,
+            [&fds](const Trigger &t) { return testCondition(t, fds); });
+    if (i == mTriggers.end())
+        return false;
+    std::move(mPromise).setResult(std::move(*i));
+    return true;
+}
+
+void PendingEvent::failWithCurrentException() {
+    std::move(mPromise).failWithCurrentException();
 }
 
 AwaiterImpl::AwaiterImpl(const Api &api) :
@@ -137,8 +234,24 @@ Future<Trigger> AwaiterImpl::expectImpl(
     return std::move(promiseAndFuture.second);
 }
 
+FdSetTriple computeFdsToAwaitAndRemoveErroredEvents(
+        const Api &api, std::multimap<TimePoint, PendingEvent> &events) {
+    FdSetTriple fds;
+    for (auto i = events.begin(); i != events.end(); ) {
+        auto &event = i->second;
+        try {
+            event.addFdsToAwait(api, fds);
+            ++i;
+        } catch (...) {
+            event.failWithCurrentException();
+            i = events.erase(i);
+        }
+    }
+    return fds;
+}
+
 void AwaiterImpl::awaitEvents() {
-    while (!mPendingEvents.empty()) {
+    while (!mPendingEvents.empty()) { // TODO refactor
         auto i = mPendingEvents.begin();
         TimePoint nextTimeLimit = i->first;
         TimePoint now = mApi.steadyClockNow();
@@ -153,8 +266,28 @@ void AwaiterImpl::awaitEvents() {
             timeout = nextTimeLimit - now;
         else
             timeout = TimePoint::duration(-1);
-        mApi.pselect(0, nullptr, nullptr, nullptr, timeout, nullptr);
-        //FIXME
+
+        FdSetTriple fds =
+                computeFdsToAwaitAndRemoveErroredEvents(mApi, mPendingEvents);
+
+        if (mPendingEvents.empty())
+            break;
+
+        mApi.pselect(
+                fds.bound,
+                fds.readFds.get(),
+                fds.writeFds.get(),
+                fds.errorFds.get(),
+                timeout,
+                nullptr); //FIXME
+
+        for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
+            PendingEvent &e = i->second;
+            if (e.testConditionAndFire(fds))
+                i = mPendingEvents.erase(i);
+            else
+                ++i;
+        }
     }
 }
 
