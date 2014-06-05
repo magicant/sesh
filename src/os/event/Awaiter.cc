@@ -68,31 +68,55 @@ Timeout minTimeout(const std::vector<Trigger> &ts) {
     return timeoutOrMax(*i);
 }
 
-struct FdSetTriple {
-    FileDescriptor::Value bound = 0;
-    std::unique_ptr<FileDescriptorSet> readFds, writeFds, errorFds;
+struct PendingEvent {
+    std::vector<Trigger> triggers;
+    Promise<Trigger> promise;
 };
 
-class PendingEvent {
+class PselectArgument {
 
 private:
 
-    std::vector<Trigger> mTriggers;
-    Promise<Trigger> mPromise;
+    FileDescriptor::Value mFdBound;
+    std::unique_ptr<FileDescriptorSet> mReadFds, mWriteFds, mErrorFds;
+    TimePoint::duration mTimeout;
+
+    void addFd(
+            std::unique_ptr<FileDescriptorSet> &fds,
+            FileDescriptor::Value fd,
+            const Api &api);
 
 public:
 
-    PendingEvent(std::vector<Trigger> &&triggers, Promise<Trigger> &&promise);
+    explicit PselectArgument(TimePoint::duration timeout) noexcept;
 
-    void addFdsToAwait(const Api &, FdSetTriple &) const;
+    /**
+     * Updates this p-select argument according to the given trigger. May throw
+     * some exception.
+     */
+    void add(const Trigger &, const Api &);
 
-    void fireTimeout();
+    /**
+     * Updates this p-select argument according to the given event. This
+     * function may fire the event directly if applicable.
+     * @return true iff the event was fired.
+     */
+    bool addOrFire(PendingEvent &, const Api &);
 
-    bool testConditionAndFire(const FdSetTriple &);
+    /** Calls the p-select API function with this argument. */
+    std::error_code call(const Api &api);
 
-    void failWithCurrentException();
+    /** Tests if this p-select call result matches the given trigger. */
+    bool matches(const Trigger &) const;
 
-}; // class OrderedTrigger
+    /**
+     * Applies this p-select call result to the argument event. If the result
+     * matches the event, the event is fired.
+     * @return true iff the event was fired.
+     */
+    bool applyResult(PendingEvent &) const;
+
+}; // class PselectArgument
 
 class AwaiterImpl : public Awaiter {
 
@@ -107,6 +131,15 @@ private:
 
     Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
 
+    bool fireTimeouts(TimePoint now);
+
+    /** @return min for infinity */
+    TimePoint::duration durationToNextTimeout(TimePoint now) const;
+
+    PselectArgument computeArgumentRemovingFailedEvents(TimePoint now);
+
+    void applyResultRemovingDoneEvents(const PselectArgument &);
+
 public:
 
     explicit AwaiterImpl(const Api &);
@@ -115,52 +148,63 @@ public:
 
 }; // class AwaiterImpl
 
-PendingEvent::PendingEvent(
-        std::vector<Trigger> &&triggers,
-        Promise<Trigger> &&promise) :
-        mTriggers(std::move(triggers)),
-        mPromise(std::move(promise)) { }
+PselectArgument::PselectArgument(TimePoint::duration timeout) noexcept :
+        mFdBound(0),
+        mReadFds(),
+        mWriteFds(),
+        mErrorFds(),
+        mTimeout(timeout) { }
 
-void addFd(
-        const Api &api,
+void PselectArgument::addFd(
         std::unique_ptr<FileDescriptorSet> &fds,
-        FileDescriptor::Value fd) {
+        FileDescriptor::Value fd,
+        const Api &api) {
     if (fds == nullptr)
         fds = api.createFileDescriptorSet();
     fds->set(fd);
+
+    mFdBound = std::max(mFdBound, fd + 1);
 }
 
-void addFdToAwait(const Api &api, const Trigger &t, FdSetTriple &fds) {
+void PselectArgument::add(const Trigger &t, const Api &api) {
     switch (t.index()) {
-    case Trigger::index<ReadableFileDescriptor>():
-        addFd(api, fds.readFds, t.value<ReadableFileDescriptor>().value());
-        fds.bound = std::max(
-                fds.bound, t.value<ReadableFileDescriptor>().value() + 1);
-        break;
-    case Trigger::index<WritableFileDescriptor>():
-        addFd(api, fds.writeFds, t.value<WritableFileDescriptor>().value());
-        fds.bound = std::max(
-                fds.bound, t.value<WritableFileDescriptor>().value() + 1);
-        break;
-    case Trigger::index<ErrorFileDescriptor>():
-        addFd(api, fds.errorFds, t.value<ErrorFileDescriptor>().value());
-        fds.bound = std::max(
-                fds.bound, t.value<ErrorFileDescriptor>().value() + 1);
-        break;
     case Trigger::index<Timeout>():
+        return;
+    case Trigger::index<ReadableFileDescriptor>():
+        addFd(mReadFds, t.value<ReadableFileDescriptor>().value(), api);
+        return;
+    case Trigger::index<WritableFileDescriptor>():
+        addFd(mWriteFds, t.value<WritableFileDescriptor>().value(), api);
+        return;
+    case Trigger::index<ErrorFileDescriptor>():
+        addFd(mErrorFds, t.value<ErrorFileDescriptor>().value(), api);
+        return;
     case Trigger::index<Signal>():
     case Trigger::index<UserProvidedTrigger>():
-        break;
+        throw "unexpected trigger type"; // TODO
+    }
+    UNREACHABLE();
+}
+
+bool PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
+    try {
+        for (Trigger &t : e.triggers)
+            add(t, api);
+        return false;
+    } catch (...) {
+        std::move(e.promise).failWithCurrentException();
+        return true;
     }
 }
 
-void PendingEvent::addFdsToAwait(const Api &api, FdSetTriple &fds) const {
-    for (const Trigger &t : mTriggers)
-        addFdToAwait(api, t, fds);
-}
-
-void PendingEvent::fireTimeout() {
-    std::move(mPromise).setResult(minTimeout(mTriggers));
+std::error_code PselectArgument::call(const Api &api) {
+    return api.pselect(
+            mFdBound,
+            mReadFds.get(),
+            mWriteFds.get(),
+            mErrorFds.get(),
+            mTimeout,
+            nullptr); //TODO
 }
 
 bool contains(
@@ -169,44 +213,36 @@ bool contains(
     return fds != nullptr && fds->test(fd);
 }
 
-bool testCondition(const Trigger &t, const FdSetTriple &fds) {
+bool PselectArgument::matches(const Trigger &t) const {
     switch (t.index()) {
     case Trigger::index<Timeout>():
         return false;
     case Trigger::index<ReadableFileDescriptor>():
-        return contains(
-                fds.readFds, t.value<ReadableFileDescriptor>().value());
+        return contains(mReadFds, t.value<ReadableFileDescriptor>().value());
     case Trigger::index<WritableFileDescriptor>():
-        return contains(
-                fds.writeFds, t.value<WritableFileDescriptor>().value());
+        return contains(mWriteFds, t.value<WritableFileDescriptor>().value());
     case Trigger::index<ErrorFileDescriptor>():
-        return contains(
-                fds.errorFds, t.value<ErrorFileDescriptor>().value());
+        return contains(mErrorFds, t.value<ErrorFileDescriptor>().value());
     case Trigger::index<Signal>():
     case Trigger::index<UserProvidedTrigger>():
-        return false; // FIXME
+        return false; // TODO
     }
     UNREACHABLE();
 }
 
-bool PendingEvent::testConditionAndFire(const FdSetTriple &fds) {
+bool PselectArgument::applyResult(PendingEvent &e) const {
     auto i = find_if(
-            mTriggers,
-            [&fds](const Trigger &t) { return testCondition(t, fds); });
-    if (i == mTriggers.end())
+            e.triggers, [this](const Trigger &t) { return matches(t); });
+    if (i == e.triggers.end())
         return false;
-    std::move(mPromise).setResult(std::move(*i));
+    std::move(e.promise).setResult(std::move(*i));
     return true;
-}
-
-void PendingEvent::failWithCurrentException() {
-    std::move(mPromise).failWithCurrentException();
 }
 
 AwaiterImpl::AwaiterImpl(const Api &api) :
         mApi(api), mPendingEvents() { }
 
-TimePoint timeLimit(const Api &api, Timeout timeout) {
+TimePoint computeTimeLimit(Timeout timeout, const Api &api) {
     if (timeout.interval() < Timeout::Interval::zero())
         timeout = Timeout(Timeout::Interval::zero());
 
@@ -225,69 +261,81 @@ Future<Trigger> AwaiterImpl::expectImpl(
     if (triggers.empty())
         return std::move(promiseAndFuture.second);
 
+    TimePoint timeLimit = computeTimeLimit(minTimeout(triggers), mApi);
     mPendingEvents.emplace(
-            std::piecewise_construct,
-            std::make_tuple(timeLimit(mApi, minTimeout(triggers))),
-            std::forward_as_tuple(
-                    std::move(triggers),
-                    std::move(promiseAndFuture.first)));
+            timeLimit,
+            PendingEvent{
+                    std::move(triggers), std::move(promiseAndFuture.first)});
     return std::move(promiseAndFuture.second);
 }
 
-FdSetTriple computeFdsToAwaitAndRemoveErroredEvents(
-        const Api &api, std::multimap<TimePoint, PendingEvent> &events) {
-    FdSetTriple fds;
-    for (auto i = events.begin(); i != events.end(); ) {
-        auto &event = i->second;
-        try {
-            event.addFdsToAwait(api, fds);
+bool fireIfTimedOut(PendingEvent &e, TimePoint timeLimit, TimePoint now) {
+    if (timeLimit > now)
+        return false;
+    std::move(e.promise).setResult(minTimeout(e.triggers));
+    return true;
+}
+
+bool AwaiterImpl::fireTimeouts(TimePoint now) {
+    bool fired = false;
+    for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
+        if (fireIfTimedOut(i->second, i->first, now)) {
+            i = mPendingEvents.erase(i);
+            fired = true;
+        } else
             ++i;
-        } catch (...) {
-            event.failWithCurrentException();
-            i = events.erase(i);
-        }
     }
-    return fds;
+    return fired;
+}
+
+TimePoint::duration AwaiterImpl::durationToNextTimeout(TimePoint now) const {
+    if (mPendingEvents.empty())
+        return TimePoint::duration::min();
+
+    TimePoint nextTimeLimit = mPendingEvents.begin()->first;
+    if (nextTimeLimit == TimePoint::max())
+        return TimePoint::duration::min();
+    if (nextTimeLimit <= now)
+        return TimePoint::duration::zero();
+    return nextTimeLimit - now;
+}
+
+PselectArgument AwaiterImpl::computeArgumentRemovingFailedEvents(
+        TimePoint now) {
+    PselectArgument argument(durationToNextTimeout(now));
+    for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
+        if (argument.addOrFire(i->second, mApi))
+            i = mPendingEvents.erase(i);
+        else
+            ++i;
+    }
+    return argument;
+}
+
+void AwaiterImpl::applyResultRemovingDoneEvents(const PselectArgument &a) {
+    for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
+        if (a.applyResult(i->second))
+            i = mPendingEvents.erase(i);
+        else
+            ++i;
+    }
 }
 
 void AwaiterImpl::awaitEvents() {
-    while (!mPendingEvents.empty()) { // TODO refactor
-        auto i = mPendingEvents.begin();
-        TimePoint nextTimeLimit = i->first;
+    while (!mPendingEvents.empty()) {
         TimePoint now = mApi.steadyClockNow();
-        if (nextTimeLimit <= now) {
-            i->second.fireTimeout();
-            mPendingEvents.erase(i);
+        if (fireTimeouts(now))
             continue;
-        }
 
-        TimePoint::duration timeout;
-        if (nextTimeLimit < TimePoint::max())
-            timeout = nextTimeLimit - now;
-        else
-            timeout = TimePoint::duration(-1);
-
-        FdSetTriple fds =
-                computeFdsToAwaitAndRemoveErroredEvents(mApi, mPendingEvents);
+        PselectArgument argument = computeArgumentRemovingFailedEvents(now);
 
         if (mPendingEvents.empty())
             break;
 
-        mApi.pselect(
-                fds.bound,
-                fds.readFds.get(),
-                fds.writeFds.get(),
-                fds.errorFds.get(),
-                timeout,
-                nullptr); //FIXME
+        std::error_code e = argument.call(mApi);
+        (void) e; // TODO
 
-        for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
-            PendingEvent &e = i->second;
-            if (e.testConditionAndFire(fds))
-                i = mPendingEvents.erase(i);
-            else
-                ++i;
-        }
+        applyResultRemovingDoneEvents(argument);
     }
 }
 
