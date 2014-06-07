@@ -73,7 +73,11 @@ TESTPROGRAMS = \
 	src/language/syntax/SequenceTest \
 	src/language/syntax/SimpleCommandTest \
 	src/language/syntax/WordTest \
+	src/os/event/AwaiterErrorFileDescriptorTest \
+	src/os/event/AwaiterFileDescriptorTest \
+	src/os/event/AwaiterReadableFileDescriptorTest \
 	src/os/event/AwaiterTimeoutTest \
+	src/os/event/AwaiterWritableFileDescriptorTest \
 	src/os/io/FileDescriptorTest \
 	src/os/signaling/HandlerConfigurationTest
 
@@ -773,9 +777,25 @@ src_language_syntax_WordTest_SOURCES = \
 	src/language/syntax/RawString.cc \
 	src/language/syntax/Word.cc \
 	src/language/syntax/WordTest.cc
+src_os_event_AwaiterErrorFileDescriptorTest_SOURCES = \
+	src/os/event/Awaiter.cc \
+	src/os/event/AwaiterErrorFileDescriptorTest.cc \
+	src/os/event/Proactor.cc
+src_os_event_AwaiterFileDescriptorTest_SOURCES = \
+	src/os/event/Awaiter.cc \
+	src/os/event/AwaiterFileDescriptorTest.cc \
+	src/os/event/Proactor.cc
+src_os_event_AwaiterReadableFileDescriptorTest_SOURCES = \
+	src/os/event/Awaiter.cc \
+	src/os/event/AwaiterReadableFileDescriptorTest.cc \
+	src/os/event/Proactor.cc
 src_os_event_AwaiterTimeoutTest_SOURCES = \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterTimeoutTest.cc \
+	src/os/event/Proactor.cc
+src_os_event_AwaiterWritableFileDescriptorTest_SOURCES = \
+	src/os/event/Awaiter.cc \
+	src/os/event/AwaiterWritableFileDescriptorTest.cc \
 	src/os/event/Proactor.cc
 src_os_io_FileDescriptorTest_SOURCES = \
 	src/os/io/FileDescriptorTest.cc
@@ -796,8 +816,10 @@ TESTHEADERS = \
 	src/language/source/OriginTestHelper.hh \
 	src/language/source/SourceTestHelper.hh \
 	src/language/syntax/PrinterTestHelper.hh \
+	src/os/event/AwaiterTestHelper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh \
+	src/os/test_helper/FileDescriptorSetApi.hh \
 	src/os/test_helper/NowApiStub.hh \
 	src/os/test_helper/PselectApiStub.hh \
 	src/os/test_helper/SigactionApiFake.hh \

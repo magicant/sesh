@@ -22,99 +22,74 @@
 
 #include <chrono>
 #include <set>
-#include <string>
 #include <system_error>
 #include <utility>
 #include "async/Future.hh"
-#include "common/ContainerHelper.hh"
 #include "common/Try.hh"
+#include "os/Api.hh"
 #include "os/event/Awaiter.hh"
-#include "os/event/ReadableFileDescriptor.hh"
+#include "os/event/AwaiterTestHelper.hh"
 #include "os/event/Timeout.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/SignalNumberSet.hh"
-#include "os/test_helper/NowApiStub.hh"
 #include "os/test_helper/PselectApiStub.hh"
 #include "os/test_helper/UnimplementedApi.hh"
+
+/*
+namespace std {
+
+template<typename Char, typename Traits, typename R, typename P>
+std::ostream &operator<<(
+        std::basic_ostream<Char, Traits> &s, std::chrono::duration<R, P> d) {
+    s << std::chrono::duration_cast<std::chrono::nanoseconds>(d).count() <<
+            " ns";
+    return s;
+}
+
+template<typename Char, typename Traits, typename C, typename D>
+std::ostream &operator<<(
+        std::basic_ostream<Char, Traits> &s, std::chrono::time_point<C, D> t) {
+    return s << t.time_since_epoch() << " since epoch";
+}
+
+}
+*/
 
 namespace {
 
 using sesh::async::Future;
 using sesh::common::Try;
-using sesh::common::contains;
 using sesh::os::event::Awaiter;
-using sesh::os::event::ReadableFileDescriptor;
+using sesh::os::event::AwaiterTestFixture;
+using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
-using sesh::os::event::createAwaiter;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
-using sesh::os::test_helper::NowApiStub;
 using sesh::os::test_helper::PselectApiStub;
 using sesh::os::test_helper::UnimplementedApi;
 
-using TimePoint = NowApiStub::SteadyClockTime;
-
-template<typename Api>
-class Fixture : protected Api {
-
-private:
-
-    std::unique_ptr<Awaiter> mAwaiter = createAwaiter(*this);
-
-protected:
-
-    Awaiter &a = *mAwaiter;
-
-}; // template<typename Api> class Fixture
-
-void checkEqual(
-        const FileDescriptorSet *fds,
-        const std::set<FileDescriptor::Value> &fdValues,
-        FileDescriptor::Value fdBound,
-        const std::string &info) {
-    INFO(info);
-
-    if (fds == nullptr) {
-        CHECK(fdValues.empty());
-        return;
-    }
-
-    for (FileDescriptor::Value fd = 0; fd < fdBound; ++fd) {
-        INFO("fd=" << fd);
-        CHECK(fds->test(fd) == contains(fdValues, fd));
-    }
-}
-
-void checkEmpty(
-        const FileDescriptorSet *fds,
-        FileDescriptor::Value fdBound,
-        const std::string &info) {
-    checkEqual(fds, std::set<FileDescriptor::Value>{}, fdBound, info);
-}
+using TimePoint = sesh::os::Api::SteadyClockTime;
 
 TEST_CASE_METHOD(
-        Fixture<UnimplementedApi>,
+        AwaiterTestFixture<UnimplementedApi>,
         "Awaiter: doesn't wait if no events are pending") {
     a.awaitEvents();
 }
 
 TEST_CASE_METHOD(
-        Fixture<UnimplementedApi>,
+        AwaiterTestFixture<UnimplementedApi>,
         "Awaiter: does nothing for empty trigger set") {
     Future<Trigger> f = a.expect(std::vector<Trigger>{});
     std::move(f).setCallback([](Try<Trigger> &&) { FAIL("callback called"); });
     a.awaitEvents();
 }
 
-class PselectAndNowApiStub : public PselectApiStub, public NowApiStub {
-};
-
 template<int durationInSecondsInt>
-class TimeoutTest : protected Fixture<PselectAndNowApiStub> {
+class TimeoutTest : protected AwaiterTestFixture<PselectAndNowApiStub> {
 
 protected:
 
@@ -127,6 +102,45 @@ public:
     TimeoutTest();
 
 }; // class TimeoutTest
+
+TEST_CASE_METHOD(
+        AwaiterTestFixture<PselectAndNowApiStub>, "Awaiter: timeout 0") {
+    auto startTime = TimePoint(std::chrono::seconds(0));
+    mutableSteadyClockNow() = startTime;
+    Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(0)));
+    bool callbackCalled = false;
+    std::move(f).setCallback(
+            [this, startTime, &callbackCalled](Try<Trigger> &&t) {
+        REQUIRE(t.hasValue());
+        CHECK(t->index() == Trigger::index<Timeout>());
+        CHECK(t->value<Timeout>().interval() == std::chrono::seconds(0));
+        CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
+        callbackCalled = true;
+    });
+    CHECK_FALSE(callbackCalled);
+
+    implementation() = [this](
+            const PselectApiStub &,
+            FileDescriptor::Value fdBound,
+            FileDescriptorSet *readFds,
+            FileDescriptorSet *writeFds,
+            FileDescriptorSet *errorFds,
+            std::chrono::nanoseconds timeout,
+            const SignalNumberSet *signalMask) -> std::error_code {
+        checkEmpty(readFds, fdBound, "readFds");
+        checkEmpty(writeFds, fdBound, "writeFds");
+        checkEmpty(errorFds, fdBound, "errorFds");
+        CHECK(timeout == std::chrono::seconds(0));
+        CHECK(signalMask == nullptr);
+        mutableSteadyClockNow() += std::chrono::seconds(1);
+        implementation() = nullptr;
+        return std::error_code();
+    };
+    mutableSteadyClockNow() += std::chrono::seconds(1);
+    a.awaitEvents();
+    CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
+    CHECK(callbackCalled);
+}
 
 template<int durationInSecondsInt>
 TimeoutTest<durationInSecondsInt>::TimeoutTest() {
@@ -171,7 +185,9 @@ TEST_CASE_METHOD(TimeoutTest<1>, "Awaiter: timeout 1") { }
 
 TEST_CASE_METHOD(TimeoutTest<2>, "Awaiter: timeout 2") { }
 
-TEST_CASE_METHOD(Fixture<PselectAndNowApiStub>, "Awaiter: negative timeout") {
+TEST_CASE_METHOD(
+        AwaiterTestFixture<PselectAndNowApiStub>,
+        "Awaiter: negative timeout") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(-10)));
@@ -209,7 +225,7 @@ TEST_CASE_METHOD(Fixture<PselectAndNowApiStub>, "Awaiter: negative timeout") {
 }
 
 TEST_CASE_METHOD(
-        Fixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<PselectAndNowApiStub>,
         "Awaiter: duplicate timeouts in one trigger set") {
     std::vector<Trigger> triggers;
     triggers.push_back(Timeout(std::chrono::seconds(10)));
@@ -253,7 +269,8 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<PselectAndNowApiStub>, "Awaiter: two simultaneous timeouts") {
+        AwaiterTestFixture<PselectAndNowApiStub>,
+        "Awaiter: two simultaneous timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(1000));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f1 = a.expect(Timeout(std::chrono::seconds(10)));
@@ -322,7 +339,8 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<PselectAndNowApiStub>, "Awaiter: two successive timeouts") {
+        AwaiterTestFixture<PselectAndNowApiStub>,
+        "Awaiter: two successive timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(100)));
