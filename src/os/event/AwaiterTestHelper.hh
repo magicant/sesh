@@ -22,6 +22,7 @@
 
 #include <memory>
 #include "os/event/Awaiter.hh"
+#include "os/signaling/HandlerConfiguration.hh"
 #include "os/test_helper/NowApiStub.hh"
 #include "os/test_helper/PselectApiStub.hh"
 
@@ -34,7 +35,8 @@ class AwaiterTestFixture : protected Api {
 
 private:
 
-    std::unique_ptr<Awaiter> mAwaiter = createAwaiter(*this);
+    std::unique_ptr<Awaiter> mAwaiter = createAwaiter(
+            *this, signaling::HandlerConfiguration::create(*this));
 
 protected:
 

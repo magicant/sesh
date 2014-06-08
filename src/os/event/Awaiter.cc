@@ -34,6 +34,7 @@
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/signaling/HandlerConfiguration.hh"
 
 using sesh::async::Future;
 using sesh::async::Promise;
@@ -41,6 +42,7 @@ using sesh::async::createPromiseFuturePair;
 using sesh::common::find_if;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
+using sesh::os::signaling::HandlerConfiguration;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
 using Clock = TimePoint::clock;
@@ -127,6 +129,7 @@ public:
 private:
 
     const Api &mApi;
+    std::shared_ptr<HandlerConfiguration> mHandlerConfiguration;
     std::multimap<TimeLimit, PendingEvent> mPendingEvents;
 
     Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
@@ -142,7 +145,7 @@ private:
 
 public:
 
-    explicit AwaiterImpl(const Api &);
+    AwaiterImpl(const Api &, std::shared_ptr<HandlerConfiguration> &&hc);
 
     void awaitEvents() final override;
 
@@ -239,8 +242,11 @@ bool PselectArgument::applyResult(PendingEvent &e) const {
     return true;
 }
 
-AwaiterImpl::AwaiterImpl(const Api &api) :
-        mApi(api), mPendingEvents() { }
+AwaiterImpl::AwaiterImpl(
+        const Api &api, std::shared_ptr<HandlerConfiguration> &&hc) :
+        mApi(api), mHandlerConfiguration(std::move(hc)), mPendingEvents() {
+    assert(mHandlerConfiguration != nullptr);
+}
 
 TimePoint computeTimeLimit(Timeout timeout, const Api &api) {
     if (timeout.interval() < Timeout::Interval::zero())
@@ -341,8 +347,10 @@ void AwaiterImpl::awaitEvents() {
 
 } // namespace
 
-std::unique_ptr<Awaiter> createAwaiter(const Api &api) {
-    return std::unique_ptr<Awaiter>(new AwaiterImpl(api));
+std::unique_ptr<Awaiter> createAwaiter(
+        const Api &api,
+        std::shared_ptr<HandlerConfiguration> &&hc) {
+    return std::unique_ptr<Awaiter>(new AwaiterImpl(api, std::move(hc)));
 }
 
 } // namespace event
