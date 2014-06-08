@@ -357,6 +357,8 @@ void AwaiterImpl::awaitEvents() {
                 mApi, mHandlerConfiguration->maskForPselect());
         (void) e; // TODO
 
+        mHandlerConfiguration->callHandlers();
+
         applyResultRemovingDoneEvents(argument);
     }
 }
