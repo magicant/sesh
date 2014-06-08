@@ -29,6 +29,7 @@
 #include "async/Future.hh"
 #include "async/Promise.hh"
 #include "common/ContainerHelper.hh"
+#include "common/Variant.hh"
 #include "helpermacros.h"
 #include "os/Api.hh"
 #include "os/event/Trigger.hh"
@@ -40,6 +41,7 @@
 using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::createPromiseFuturePair;
+using sesh::common::Variant;
 using sesh::common::find_if;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
@@ -55,26 +57,20 @@ namespace event {
 
 namespace {
 
-Timeout timeoutOrMax(const Trigger &t) noexcept {
-    if (t.index() == Trigger::index<Timeout>())
-        return t.value<Timeout>();
-    else
-        return Timeout(Timeout::Interval::max());
-}
-
-/** @param ts non-empty trigger set. */
-Timeout minTimeout(const std::vector<Trigger> &ts) {
-    auto c = [](const Trigger &l, const Trigger &r) {
-        return timeoutOrMax(l) < timeoutOrMax(r);
-    };
-    auto i = std::min_element(ts.begin(), ts.end(), c);
-    assert(i != ts.end());
-    return timeoutOrMax(*i);
-}
+using FileDescriptorTrigger = Variant<
+        ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
 
 struct PendingEvent {
-    std::vector<Trigger> triggers;
+
+    Timeout timeout;
+    std::vector<FileDescriptorTrigger> triggers;
     Promise<Trigger> promise;
+
+    explicit PendingEvent(Promise<Trigger> p) :
+            timeout(Timeout::Interval::max()),
+            triggers(),
+            promise(std::move(p)) { }
+
 };
 
 class PselectArgument {
@@ -98,7 +94,7 @@ public:
      * Updates this p-select argument according to the given trigger. May throw
      * some exception.
      */
-    void add(const Trigger &, const Api &);
+    void add(const FileDescriptorTrigger &, const Api &);
 
     /**
      * Updates this p-select argument according to the given event. This
@@ -111,7 +107,7 @@ public:
     std::error_code call(const Api &api, const SignalNumberSet *);
 
     /** Tests if this p-select call result matches the given trigger. */
-    bool matches(const Trigger &) const;
+    bool matches(const FileDescriptorTrigger &) const;
 
     /**
      * Applies this p-select call result to the argument event. If the result
@@ -171,29 +167,24 @@ void PselectArgument::addFd(
     mFdBound = std::max(mFdBound, fd + 1);
 }
 
-void PselectArgument::add(const Trigger &t, const Api &api) {
+void PselectArgument::add(const FileDescriptorTrigger &t, const Api &api) {
     switch (t.index()) {
-    case Trigger::index<Timeout>():
-        return;
-    case Trigger::index<ReadableFileDescriptor>():
+    case FileDescriptorTrigger::index<ReadableFileDescriptor>():
         addFd(mReadFds, t.value<ReadableFileDescriptor>().value(), api);
         return;
-    case Trigger::index<WritableFileDescriptor>():
+    case FileDescriptorTrigger::index<WritableFileDescriptor>():
         addFd(mWriteFds, t.value<WritableFileDescriptor>().value(), api);
         return;
-    case Trigger::index<ErrorFileDescriptor>():
+    case FileDescriptorTrigger::index<ErrorFileDescriptor>():
         addFd(mErrorFds, t.value<ErrorFileDescriptor>().value(), api);
         return;
-    case Trigger::index<Signal>():
-    case Trigger::index<UserProvidedTrigger>():
-        throw "unexpected trigger type"; // TODO
     }
     UNREACHABLE();
 }
 
 bool PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
     try {
-        for (Trigger &t : e.triggers)
+        for (FileDescriptorTrigger &t : e.triggers)
             add(t, api);
         return false;
     } catch (...) {
@@ -219,26 +210,22 @@ bool contains(
     return fds != nullptr && fds->test(fd);
 }
 
-bool PselectArgument::matches(const Trigger &t) const {
+bool PselectArgument::matches(const FileDescriptorTrigger &t) const {
     switch (t.index()) {
-    case Trigger::index<Timeout>():
-        return false;
-    case Trigger::index<ReadableFileDescriptor>():
+    case FileDescriptorTrigger::index<ReadableFileDescriptor>():
         return contains(mReadFds, t.value<ReadableFileDescriptor>().value());
-    case Trigger::index<WritableFileDescriptor>():
+    case FileDescriptorTrigger::index<WritableFileDescriptor>():
         return contains(mWriteFds, t.value<WritableFileDescriptor>().value());
-    case Trigger::index<ErrorFileDescriptor>():
+    case FileDescriptorTrigger::index<ErrorFileDescriptor>():
         return contains(mErrorFds, t.value<ErrorFileDescriptor>().value());
-    case Trigger::index<Signal>():
-    case Trigger::index<UserProvidedTrigger>():
-        return false; // TODO
     }
     UNREACHABLE();
 }
 
 bool PselectArgument::applyResult(PendingEvent &e) const {
+    using namespace std::placeholders;
     auto i = find_if(
-            e.triggers, [this](const Trigger &t) { return matches(t); });
+            e.triggers, std::bind(&PselectArgument::matches, this, _1));
     if (i == e.triggers.end())
         return false;
     std::move(e.promise).setResult(std::move(*i));
@@ -249,6 +236,29 @@ AwaiterImpl::AwaiterImpl(
         const Api &api, std::shared_ptr<HandlerConfiguration> &&hc) :
         mApi(api), mHandlerConfiguration(std::move(hc)), mPendingEvents() {
     assert(mHandlerConfiguration != nullptr);
+}
+
+void registerTrigger(Trigger &&t, PendingEvent &e) {
+    switch (t.index()) {
+    case Trigger::index<Timeout>():
+        e.timeout = std::min(e.timeout, t.value<Timeout>());
+        return;
+    case Trigger::index<ReadableFileDescriptor>():
+        e.triggers.push_back(t.value<ReadableFileDescriptor>());
+        return;
+    case Trigger::index<WritableFileDescriptor>():
+        e.triggers.push_back(t.value<WritableFileDescriptor>());
+        return;
+    case Trigger::index<ErrorFileDescriptor>():
+        e.triggers.push_back(t.value<ErrorFileDescriptor>());
+        return;
+    case Trigger::index<Signal>():
+        // TODO
+        return;
+    case Trigger::index<UserProvidedTrigger>():
+        // TODO
+        return;
+    }
 }
 
 TimePoint computeTimeLimit(Timeout timeout, const Api &api) {
@@ -270,18 +280,20 @@ Future<Trigger> AwaiterImpl::expectImpl(
     if (triggers.empty())
         return std::move(promiseAndFuture.second);
 
-    TimePoint timeLimit = computeTimeLimit(minTimeout(triggers), mApi);
-    mPendingEvents.emplace(
-            timeLimit,
-            PendingEvent{
-                    std::move(triggers), std::move(promiseAndFuture.first)});
+    PendingEvent event(std::move(promiseAndFuture.first));
+    for (Trigger &t : triggers)
+        registerTrigger(std::move(t), event);
+
+    TimePoint timeLimit = computeTimeLimit(event.timeout, mApi);
+    mPendingEvents.emplace(timeLimit, std::move(event));
+
     return std::move(promiseAndFuture.second);
 }
 
 bool fireIfTimedOut(PendingEvent &e, TimePoint timeLimit, TimePoint now) {
     if (timeLimit > now)
         return false;
-    std::move(e.promise).setResult(minTimeout(e.triggers));
+    std::move(e.promise).setResult(e.timeout);
     return true;
 }
 
