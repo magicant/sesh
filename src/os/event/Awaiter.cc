@@ -146,7 +146,7 @@ private:
 
     const Api &mApi;
     std::shared_ptr<HandlerConfiguration> mHandlerConfiguration;
-    std::multimap<TimeLimit, PendingEvent> mPendingEvents;
+    std::multimap<TimeLimit, std::shared_ptr<PendingEvent>> mPendingEvents;
 
     Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
 
@@ -283,19 +283,19 @@ AwaiterImpl::AwaiterImpl(
     assert(mHandlerConfiguration != nullptr);
 }
 
-void registerTrigger(Trigger &&t, PendingEvent &e) {
+void registerTrigger(Trigger &&t, std::shared_ptr<PendingEvent> &e) {
     switch (t.index()) {
     case Trigger::index<Timeout>():
-        e.timeout() = std::min(e.timeout(), t.value<Timeout>());
+        e->timeout() = std::min(e->timeout(), t.value<Timeout>());
         return;
     case Trigger::index<ReadableFileDescriptor>():
-        e.addTrigger(t.value<ReadableFileDescriptor>());
+        e->addTrigger(t.value<ReadableFileDescriptor>());
         return;
     case Trigger::index<WritableFileDescriptor>():
-        e.addTrigger(t.value<WritableFileDescriptor>());
+        e->addTrigger(t.value<WritableFileDescriptor>());
         return;
     case Trigger::index<ErrorFileDescriptor>():
-        e.addTrigger(t.value<ErrorFileDescriptor>());
+        e->addTrigger(t.value<ErrorFileDescriptor>());
         return;
     case Trigger::index<Signal>():
         // TODO
@@ -325,11 +325,12 @@ Future<Trigger> AwaiterImpl::expectImpl(
     if (triggers.empty())
         return std::move(promiseAndFuture.second);
 
-    PendingEvent event(std::move(promiseAndFuture.first));
+    auto event =
+            std::make_shared<PendingEvent>(std::move(promiseAndFuture.first));
     for (Trigger &t : triggers)
         registerTrigger(std::move(t), event);
 
-    TimePoint timeLimit = computeTimeLimit(event.timeout(), mApi);
+    TimePoint timeLimit = computeTimeLimit(event->timeout(), mApi);
     mPendingEvents.emplace(timeLimit, std::move(event));
 
     return std::move(promiseAndFuture.second);
@@ -345,7 +346,7 @@ bool fireIfTimedOut(PendingEvent &e, TimePoint timeLimit, TimePoint now) {
 bool AwaiterImpl::fireTimeouts(TimePoint now) {
     bool fired = false;
     for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
-        if (fireIfTimedOut(i->second, i->first, now)) {
+        if (fireIfTimedOut(*i->second, i->first, now)) {
             i = mPendingEvents.erase(i);
             fired = true;
         } else
@@ -370,7 +371,7 @@ PselectArgument AwaiterImpl::computeArgumentRemovingFailedEvents(
         TimePoint now) {
     PselectArgument argument(durationToNextTimeout(now));
     for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
-        if (argument.addOrFire(i->second, mApi))
+        if (argument.addOrFire(*i->second, mApi))
             i = mPendingEvents.erase(i);
         else
             ++i;
@@ -380,7 +381,7 @@ PselectArgument AwaiterImpl::computeArgumentRemovingFailedEvents(
 
 void AwaiterImpl::applyResultRemovingDoneEvents(const PselectArgument &a) {
     for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
-        if (a.applyResult(i->second))
+        if (a.applyResult(*i->second))
             i = mPendingEvents.erase(i);
         else
             ++i;
