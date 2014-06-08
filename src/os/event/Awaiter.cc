@@ -35,6 +35,7 @@
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfiguration.hh"
+#include "os/signaling/SignalNumberSet.hh"
 
 using sesh::async::Future;
 using sesh::async::Promise;
@@ -43,6 +44,7 @@ using sesh::common::find_if;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfiguration;
+using sesh::os::signaling::SignalNumberSet;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
 using Clock = TimePoint::clock;
@@ -106,7 +108,7 @@ public:
     bool addOrFire(PendingEvent &, const Api &);
 
     /** Calls the p-select API function with this argument. */
-    std::error_code call(const Api &api);
+    std::error_code call(const Api &api, const SignalNumberSet *);
 
     /** Tests if this p-select call result matches the given trigger. */
     bool matches(const Trigger &) const;
@@ -200,14 +202,15 @@ bool PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
     }
 }
 
-std::error_code PselectArgument::call(const Api &api) {
+std::error_code PselectArgument::call(
+        const Api &api, const SignalNumberSet *signalMask) {
     return api.pselect(
             mFdBound,
             mReadFds.get(),
             mWriteFds.get(),
             mErrorFds.get(),
             mTimeout,
-            nullptr); //TODO
+            signalMask);
 }
 
 bool contains(
@@ -338,7 +341,8 @@ void AwaiterImpl::awaitEvents() {
         if (mPendingEvents.empty())
             break;
 
-        std::error_code e = argument.call(mApi);
+        std::error_code e = argument.call(
+                mApi, mHandlerConfiguration->maskForPselect());
         (void) e; // TODO
 
         applyResultRemovingDoneEvents(argument);
