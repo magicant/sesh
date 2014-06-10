@@ -67,13 +67,14 @@ private:
     Timeout mTimeout;
     std::vector<FileDescriptorTrigger> mTriggers;
     Promise<Trigger> mPromise;
+    std::vector<HandlerConfiguration::Canceler> mCancelers;
 
 public:
 
     explicit PendingEvent(Promise<Trigger> p);
     PendingEvent(PendingEvent &&) = default;
     PendingEvent &operator=(PendingEvent &&) = default;
-    ~PendingEvent() = default;
+    ~PendingEvent();
 
     Timeout &timeout() noexcept { return mTimeout; }
 
@@ -85,6 +86,8 @@ public:
 
     void fire(Trigger &&);
     void failWithCurrentException();
+
+    void addCanceler(HandlerConfiguration::Canceler &&c);
 
 };
 
@@ -167,7 +170,13 @@ public:
 PendingEvent::PendingEvent(Promise<Trigger> p) :
         mTimeout(Timeout::Interval::max()),
         mTriggers(),
-        mPromise(std::move(p)) { }
+        mPromise(std::move(p)),
+        mCancelers() { }
+
+PendingEvent::~PendingEvent() {
+    for (HandlerConfiguration::Canceler &c : mCancelers)
+        (void) c();
+}
 
 void PendingEvent::addTrigger(const FileDescriptorTrigger &t) {
     mTriggers.push_back(t);
@@ -179,6 +188,10 @@ void PendingEvent::fire(Trigger &&t) {
 
 void PendingEvent::failWithCurrentException() {
     std::move(mPromise).failWithCurrentException();
+}
+
+void PendingEvent::addCanceler(HandlerConfiguration::Canceler &&c) {
+    mCancelers.push_back(std::move(c));
 }
 
 PselectArgument::PselectArgument(TimePoint::duration timeout) noexcept :
