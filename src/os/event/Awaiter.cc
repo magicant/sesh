@@ -60,16 +60,31 @@ namespace {
 using FileDescriptorTrigger = Variant<
         ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
 
-struct PendingEvent {
+class PendingEvent {
 
-    Timeout timeout;
-    std::vector<FileDescriptorTrigger> triggers;
-    Promise<Trigger> promise;
+private:
 
-    explicit PendingEvent(Promise<Trigger> p) :
-            timeout(Timeout::Interval::max()),
-            triggers(),
-            promise(std::move(p)) { }
+    Timeout mTimeout;
+    std::vector<FileDescriptorTrigger> mTriggers;
+    Promise<Trigger> mPromise;
+
+public:
+
+    explicit PendingEvent(Promise<Trigger> p);
+    PendingEvent(PendingEvent &&) = default;
+    PendingEvent &operator=(PendingEvent &&) = default;
+    ~PendingEvent() = default;
+
+    Timeout &timeout() noexcept { return mTimeout; }
+
+    const std::vector<FileDescriptorTrigger> &triggers() const noexcept {
+        return mTriggers;
+    }
+
+    void addTrigger(const FileDescriptorTrigger &t);
+
+    void fire(Trigger &&);
+    void failWithCurrentException();
 
 };
 
@@ -149,6 +164,23 @@ public:
 
 }; // class AwaiterImpl
 
+PendingEvent::PendingEvent(Promise<Trigger> p) :
+        mTimeout(Timeout::Interval::max()),
+        mTriggers(),
+        mPromise(std::move(p)) { }
+
+void PendingEvent::addTrigger(const FileDescriptorTrigger &t) {
+    mTriggers.push_back(t);
+}
+
+void PendingEvent::fire(Trigger &&t) {
+    std::move(mPromise).setResult(std::move(t));
+}
+
+void PendingEvent::failWithCurrentException() {
+    std::move(mPromise).failWithCurrentException();
+}
+
 PselectArgument::PselectArgument(TimePoint::duration timeout) noexcept :
         mFdBound(0),
         mReadFds(),
@@ -184,11 +216,11 @@ void PselectArgument::add(const FileDescriptorTrigger &t, const Api &api) {
 
 bool PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
     try {
-        for (FileDescriptorTrigger &t : e.triggers)
+        for (const FileDescriptorTrigger &t : e.triggers())
             add(t, api);
         return false;
     } catch (...) {
-        std::move(e.promise).failWithCurrentException();
+        e.failWithCurrentException();
         return true;
     }
 }
@@ -225,10 +257,10 @@ bool PselectArgument::matches(const FileDescriptorTrigger &t) const {
 bool PselectArgument::applyResult(PendingEvent &e) const {
     using namespace std::placeholders;
     auto i = find_if(
-            e.triggers, std::bind(&PselectArgument::matches, this, _1));
-    if (i == e.triggers.end())
+            e.triggers(), std::bind(&PselectArgument::matches, this, _1));
+    if (i == e.triggers().end())
         return false;
-    std::move(e.promise).setResult(std::move(*i));
+    e.fire(std::move(*i));
     return true;
 }
 
@@ -241,16 +273,16 @@ AwaiterImpl::AwaiterImpl(
 void registerTrigger(Trigger &&t, PendingEvent &e) {
     switch (t.index()) {
     case Trigger::index<Timeout>():
-        e.timeout = std::min(e.timeout, t.value<Timeout>());
+        e.timeout() = std::min(e.timeout(), t.value<Timeout>());
         return;
     case Trigger::index<ReadableFileDescriptor>():
-        e.triggers.push_back(t.value<ReadableFileDescriptor>());
+        e.addTrigger(t.value<ReadableFileDescriptor>());
         return;
     case Trigger::index<WritableFileDescriptor>():
-        e.triggers.push_back(t.value<WritableFileDescriptor>());
+        e.addTrigger(t.value<WritableFileDescriptor>());
         return;
     case Trigger::index<ErrorFileDescriptor>():
-        e.triggers.push_back(t.value<ErrorFileDescriptor>());
+        e.addTrigger(t.value<ErrorFileDescriptor>());
         return;
     case Trigger::index<Signal>():
         // TODO
@@ -284,7 +316,7 @@ Future<Trigger> AwaiterImpl::expectImpl(
     for (Trigger &t : triggers)
         registerTrigger(std::move(t), event);
 
-    TimePoint timeLimit = computeTimeLimit(event.timeout, mApi);
+    TimePoint timeLimit = computeTimeLimit(event.timeout(), mApi);
     mPendingEvents.emplace(timeLimit, std::move(event));
 
     return std::move(promiseAndFuture.second);
@@ -293,7 +325,7 @@ Future<Trigger> AwaiterImpl::expectImpl(
 bool fireIfTimedOut(PendingEvent &e, TimePoint timeLimit, TimePoint now) {
     if (timeLimit > now)
         return false;
-    std::move(e.promise).setResult(e.timeout);
+    e.fire(e.timeout());
     return true;
 }
 
