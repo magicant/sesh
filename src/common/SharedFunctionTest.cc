@@ -116,6 +116,14 @@ TEST_CASE("Shared function: insertion to std::function") {
     CHECK(d == 0.0);
 }
 
+TEST_CASE("Shared function: create") {
+    int i = 0;
+    double d = 1.0;
+    SharedFunction<FunctionStub> f =
+            SharedFunction<FunctionStub>::create(i, d);
+    CHECK(f(0.0, 42) == 'A');
+}
+
 TEST_CASE("Shared function: make shared function") {
     int (*pointer)(int) = id<int>;
     const SharedFunction<int(*const)(int)> &sf = makeSharedFunction(pointer);
