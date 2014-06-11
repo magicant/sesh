@@ -84,6 +84,8 @@ public:
 
     void addTrigger(const FileDescriptorTrigger &t);
 
+    bool hasFired() const noexcept { return !mPromise.isValid(); }
+
     void fire(Trigger &&);
     void failWithCurrentException();
 
@@ -129,7 +131,8 @@ public:
 
     /**
      * Applies this p-select call result to the argument event. If the result
-     * matches the event, the event is fired.
+     * matches the event, the event is fired. If the event has already been
+     * fired, this function has no side effect.
      * @return true iff the event was fired.
      */
     bool applyResult(PendingEvent &) const;
@@ -183,11 +186,13 @@ void PendingEvent::addTrigger(const FileDescriptorTrigger &t) {
 }
 
 void PendingEvent::fire(Trigger &&t) {
-    std::move(mPromise).setResult(std::move(t));
+    if (!hasFired())
+        std::move(mPromise).setResult(std::move(t));
 }
 
 void PendingEvent::failWithCurrentException() {
-    std::move(mPromise).failWithCurrentException();
+    if (!hasFired())
+        std::move(mPromise).failWithCurrentException();
 }
 
 void PendingEvent::addCanceler(HandlerConfiguration::Canceler &&c) {
@@ -268,6 +273,9 @@ bool PselectArgument::matches(const FileDescriptorTrigger &t) const {
 }
 
 bool PselectArgument::applyResult(PendingEvent &e) const {
+    if (e.hasFired())
+        return true;
+
     using namespace std::placeholders;
     auto i = find_if(
             e.triggers(), std::bind(&PselectArgument::matches, this, _1));
@@ -381,7 +389,8 @@ PselectArgument AwaiterImpl::computeArgumentRemovingFailedEvents(
 
 void AwaiterImpl::applyResultRemovingDoneEvents(const PselectArgument &a) {
     for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
-        if (a.applyResult(*i->second))
+        PendingEvent &e = *i->second;
+        if (a.applyResult(e))
             i = mPendingEvents.erase(i);
         else
             ++i;
