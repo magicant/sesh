@@ -136,8 +136,9 @@ public:
 };
 
 template<typename T>
-template<typename F, typename Function>
+template<typename F, typename>
 Future<T> FutureBase<T>::recover(F &&function) && {
+    using Function = typename std::decay<F>::type;
     using C = Recoverer<T, F, Function>;
     std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
     std::move(*this).setCallback(common::SharedFunction<C>::create(
