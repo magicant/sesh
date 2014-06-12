@@ -111,6 +111,23 @@ TEST_CASE("Delay, set exception and callback, by function") {
     CHECK(callCount == 1);
 }
 
+TEST_CASE("Delay, set exception and callback, by exception") {
+    Delay<int> s;
+
+    s.setResultException(std::make_exception_ptr(0.0));
+
+    unsigned callCount = 0;
+    s.setCallback([&callCount](Try<int> &&r) {
+        try {
+            *r;
+        } catch (double d) {
+            CHECK(d == 0.0);
+            ++callCount;
+        }
+    });
+    CHECK(callCount == 1);
+}
+
 TEST_CASE("Delay, set callback and exception") {
     Delay<int> s;
 

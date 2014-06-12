@@ -73,6 +73,42 @@ TEST_CASE("Promise, setting result by function") {
     CHECK(i == 1);
 }
 
+TEST_CASE("Promise, setting result to exception") {
+    const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
+    Promise<int> p(delay);
+    std::move(p).fail(std::make_exception_ptr('\1'));
+
+    char c = '\0';
+    delay->setCallback([&c](Try<int> &&r) {
+        try {
+            *r;
+        } catch (char c2) {
+            c = c2;
+        }
+    });
+    CHECK(c == '\1');
+}
+
+TEST_CASE("Promise, setting result to current exception") {
+    const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
+    Promise<int> p(delay);
+    try {
+        throw '\1';
+    } catch (...) {
+        std::move(p).failWithCurrentException();
+    }
+
+    char c = '\0';
+    delay->setCallback([&c](Try<int> &&r) {
+        try {
+            *r;
+        } catch (char c2) {
+            c = c2;
+        }
+    });
+    CHECK(c == '\1');
+}
+
 } // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

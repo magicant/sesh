@@ -20,6 +20,7 @@
 
 #include "buildconfig.h"
 
+#include <exception>
 #include <functional>
 #include <utility>
 #include "async/DelayHolder.hh"
@@ -78,12 +79,20 @@ public:
     }
 
     /**
+     * Sets the result of the associated future to the given exception. The
+     * behavior is undefined if the exception pointer is null.
+     */
+    void fail(const std::exception_ptr &e) && {
+        this->delay().setResultException(e);
+        this->invalidate();
+    }
+
+    /**
      * Sets the result of the associated future to the current exception. This
      * function can be used in a catch clause only.
      */
     void failWithCurrentException() && {
-        this->delay().setResultToCurrentException();
-        this->invalidate();
+        std::move(*this).fail(std::current_exception());
     }
 
 }; // template<typename T> class Promise

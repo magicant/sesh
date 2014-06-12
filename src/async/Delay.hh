@@ -113,17 +113,17 @@ public:
     }
 
     /**
-     * Sets the result of this delay object to the current exception.
+     * Sets the result of this delay object to the given exception.
      *
-     * The behavior is undefined if {@code std::current_exception()} returns a
-     * null pointer.
+     * The behavior is undefined if the exception pointer is null.
      *
      * If a callback function has already been set, it is called immediately
      * with the result set.
      */
-    void setResultToCurrentException() {
+    void setResultException(const std::exception_ptr &e) {
         assert(!mResult.hasValue());
-        mResult.emplace(std::current_exception());
+        assert(e);
+        mResult.emplace(e);
         fireIfReady();
     }
 

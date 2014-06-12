@@ -220,8 +220,7 @@ auto createFutureOf(T &&t) -> Future<typename std::decay<T>::type> {
 template<typename T>
 Future<T> createFailedFuture(std::exception_ptr e) {
     std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
-    std::move(pf.first).setResultFrom(
-            [e]() -> T { std::rethrow_exception(e); });
+    std::move(pf.first).fail(e);
     return std::move(pf.second);
 }
 
@@ -246,10 +245,7 @@ public:
         if (r.hasValue())
             return std::move(*r).forward(std::move(mReceiver));
 
-        std::exception_ptr &e = r.template value<std::exception_ptr>();
-        std::move(mReceiver).setResultFrom([e]() -> T {
-            std::rethrow_exception(e);
-        });
+        std::move(mReceiver).fail(r.template value<std::exception_ptr>());
     }
 
 };
