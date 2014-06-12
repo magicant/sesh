@@ -68,6 +68,18 @@ public:
     /**
      * Constructs a shared function that wraps a new instance of F.
      *
+     * The wrapped F object is constructed by std::make_shared.
+     *
+     * @param arg arguments that are passed to std::make_shared.
+     */
+    template<typename... Arg>
+    static SharedFunction create(Arg &&... arg) {
+        return SharedFunction(DIRECT_INITIALIZE, std::forward<Arg>(arg)...);
+    }
+
+    /**
+     * Constructs a shared function that wraps a new instance of F.
+     *
      * The wrapped F object is constructed by std::allocate_shared.
      *
      * @param arg arguments that are passed to std::allocate_shared.

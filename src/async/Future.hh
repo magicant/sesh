@@ -117,11 +117,13 @@ public:
      *
      * @tparam F Parameter type of the callback function. It must be callable
      * with an exception pointer parameter and return a return of type T.
-     * @tparam G Object type of the callback.
      */
     template<
             typename F,
-            typename G = typename std::decay<F>::type>
+            typename = typename std::enable_if<std::is_same<
+                    T,
+                    typename std::result_of<F(std::exception_ptr)>::type
+            >::value>::type>
     Future<T> recover(F &&) &&;
 
     /**

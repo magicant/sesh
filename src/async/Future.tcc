@@ -75,10 +75,8 @@ template<typename F, typename Function, typename To>
 Future<To> FutureBase<From>::then(F &&function) && {
     using C = Composer<From, To, F, Function>;
     std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
-    std::move(*this).setCallback(common::SharedFunction<C>(
-            common::DIRECT_INITIALIZE,
-            std::forward<F>(function),
-            std::move(pf.first)));
+    std::move(*this).setCallback(common::SharedFunction<C>::create(
+            std::forward<F>(function), std::move(pf.first)));
     return std::move(pf.second);
 }
 
@@ -108,10 +106,8 @@ template<typename F, typename Function, typename To>
 Future<To> FutureBase<From>::map(F &&function) && {
     using C = Mapper<From, To, F, Function>;
     std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
-    std::move(*this).setCallback(common::SharedFunction<C>(
-            common::DIRECT_INITIALIZE,
-            std::forward<F>(function),
-            std::move(pf.first)));
+    std::move(*this).setCallback(common::SharedFunction<C>::create(
+            std::forward<F>(function), std::move(pf.first)));
     return std::move(pf.second);
 }
 
@@ -140,14 +136,13 @@ public:
 };
 
 template<typename T>
-template<typename F, typename Function>
+template<typename F, typename>
 Future<T> FutureBase<T>::recover(F &&function) && {
+    using Function = typename std::decay<F>::type;
     using C = Recoverer<T, F, Function>;
     std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
-    std::move(*this).setCallback(common::SharedFunction<C>(
-            common::DIRECT_INITIALIZE,
-            std::forward<F>(function),
-            std::move(pf.first)));
+    std::move(*this).setCallback(common::SharedFunction<C>::create(
+            std::forward<F>(function), std::move(pf.first)));
     return std::move(pf.second);
 }
 
@@ -171,8 +166,8 @@ public:
 
 template<typename T>
 void FutureBase<T>::forward(Promise<T> &&receiver) && {
-    std::move(*this).setCallback(common::SharedFunction<Forwarder<T>>(
-            common::DIRECT_INITIALIZE, std::move(receiver)));
+    std::move(*this).setCallback(
+            common::SharedFunction<Forwarder<T>>::create(std::move(receiver)));
 }
 
 template<typename F>
@@ -226,8 +221,7 @@ auto createFutureOf(T &&t) -> Future<typename std::decay<T>::type> {
 template<typename T>
 Future<T> createFailedFuture(std::exception_ptr e) {
     std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
-    std::move(pf.first).setResultFrom(
-            [e]() -> T { std::rethrow_exception(e); });
+    std::move(pf.first).fail(e);
     return std::move(pf.second);
 }
 
@@ -252,10 +246,7 @@ public:
         if (r.hasValue())
             return std::move(*r).forward(std::move(mReceiver));
 
-        std::exception_ptr &e = r.template value<std::exception_ptr>();
-        std::move(mReceiver).setResultFrom([e]() -> T {
-            std::rethrow_exception(e);
-        });
+        std::move(mReceiver).fail(r.template value<std::exception_ptr>());
     }
 
 };
@@ -263,8 +254,8 @@ public:
 template<typename T>
 Future<T> Future<Future<T>>::unwrap() && {
     std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
-    std::move(*this).setCallback(common::SharedFunction<Unwrapper<T>>(
-            common::DIRECT_INITIALIZE, std::move(pf.first)));
+    std::move(*this).setCallback(
+            common::SharedFunction<Unwrapper<T>>::create(std::move(pf.first)));
     return std::move(pf.second);
 }
 
