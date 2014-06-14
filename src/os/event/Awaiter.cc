@@ -23,12 +23,14 @@
 #include <chrono>
 #include <map>
 #include <memory>
+#include <system_error>
 #include <tuple>
 #include <utility>
 #include <vector>
 #include "async/Future.hh"
 #include "async/Promise.hh"
 #include "common/ContainerHelper.hh"
+#include "common/SharedFunction.hh"
 #include "common/Variant.hh"
 #include "helpermacros.h"
 #include "os/Api.hh"
@@ -36,16 +38,19 @@
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfiguration.hh"
+#include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::createPromiseFuturePair;
+using sesh::common::SharedFunction;
 using sesh::common::Variant;
 using sesh::common::find_if;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfiguration;
+using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
@@ -92,6 +97,20 @@ public:
     void addCanceler(HandlerConfiguration::Canceler &&c);
 
 };
+
+class SignalHandler {
+
+private:
+
+    std::weak_ptr<PendingEvent> mEvent;
+
+public:
+
+    SignalHandler(const std::shared_ptr<PendingEvent> &) noexcept;
+
+    void operator()(SignalNumber);
+
+}; // class SignalHandler
 
 class PselectArgument {
 
@@ -199,6 +218,14 @@ void PendingEvent::addCanceler(HandlerConfiguration::Canceler &&c) {
     mCancelers.push_back(std::move(c));
 }
 
+SignalHandler::SignalHandler(const std::shared_ptr<PendingEvent> &e) noexcept :
+        mEvent(e) { }
+
+void SignalHandler::operator()(SignalNumber n) {
+    if (std::shared_ptr<PendingEvent> e = mEvent.lock())
+        e->fire(Signal(n));
+}
+
 PselectArgument::PselectArgument(TimePoint::duration timeout) noexcept :
         mFdBound(0),
         mReadFds(),
@@ -291,7 +318,23 @@ AwaiterImpl::AwaiterImpl(
     assert(mHandlerConfiguration != nullptr);
 }
 
-void registerTrigger(Trigger &&t, std::shared_ptr<PendingEvent> &e) {
+void registerSignalTrigger(
+        Signal s, std::shared_ptr<PendingEvent> &e, HandlerConfiguration &hc) {
+    auto result = hc.addHandler(
+            s.number(), SharedFunction<SignalHandler>::create(e));
+    switch (result.index()) {
+    case decltype(result)::index<HandlerConfiguration::Canceler>():
+        return e->addCanceler(
+                std::move(result.value<HandlerConfiguration::Canceler>()));
+    case decltype(result)::index<std::error_code>():
+        throw std::system_error(result.value<std::error_code>());
+    }
+}
+
+void registerTrigger(
+        Trigger &&t,
+        std::shared_ptr<PendingEvent> &e,
+        HandlerConfiguration &hc) {
     switch (t.index()) {
     case Trigger::index<Timeout>():
         e->timeout() = std::min(e->timeout(), t.value<Timeout>());
@@ -306,7 +349,7 @@ void registerTrigger(Trigger &&t, std::shared_ptr<PendingEvent> &e) {
         e->addTrigger(t.value<ErrorFileDescriptor>());
         return;
     case Trigger::index<Signal>():
-        // TODO
+        registerSignalTrigger(t.value<Signal>(), e, hc);
         return;
     case Trigger::index<UserProvidedTrigger>():
         // TODO
@@ -336,7 +379,7 @@ Future<Trigger> AwaiterImpl::expectImpl(
     auto event =
             std::make_shared<PendingEvent>(std::move(promiseAndFuture.first));
     for (Trigger &t : triggers)
-        registerTrigger(std::move(t), event);
+        registerTrigger(std::move(t), event, *mHandlerConfiguration);
 
     TimePoint timeLimit = computeTimeLimit(event->timeout(), mApi);
     mPendingEvents.emplace(timeLimit, std::move(event));
