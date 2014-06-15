@@ -50,8 +50,8 @@ public:
      * Note that the future's callback will never be called if the trigger set
      * is empty.
      *
-     * This function returns a future that has not yet received a result even
-     * if any trigger condition is already met on the call to the function.
+     * This function returns a future that has not yet received a result unless
+     * the argument includes an already-filled user-provided trigger.
      *
      * Any {@link UserProvidedTrigger} contained in the trigger set must have
      * been constructed by the constructor that takes a future argument. If a
