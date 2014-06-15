@@ -35,6 +35,7 @@ namespace {
 using sesh::async::Future;
 using sesh::async::createFailedFutureOf;
 using sesh::async::createFutureOf;
+using sesh::async::createPromiseFuturePair;
 using sesh::common::Try;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::PselectAndNowApiStub;
@@ -85,8 +86,31 @@ TEST_CASE_METHOD(
     CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
 }
 
-// TODO one user-provided trigger (result)
-// TODO two user-provided triggers in one trigger set
+TEST_CASE_METHOD(
+        AwaiterTestFixture<PselectAndNowApiStub>,
+        "Awaiter: two user-provided triggers in one trigger set") {
+    auto startTime = TimePoint(std::chrono::seconds(0));
+    mutableSteadyClockNow() = startTime;
+
+    using UPT = UserProvidedTrigger;
+    std::shared_ptr<void> result = std::make_shared<int>(2);
+    std::vector<Trigger> triggers;
+    triggers.push_back(UPT(createPromiseFuturePair<UPT::Result>().second));
+    triggers.push_back(UPT(createFutureOf(result)));
+
+    Future<Trigger> f = a.expect(std::move(triggers));
+    std::move(f).setCallback([this, &result](Try<Trigger> &&t) {
+        REQUIRE(t.hasValue());
+        REQUIRE(t->index() == Trigger::index<UserProvidedTrigger>());
+        CHECK(t->value<UserProvidedTrigger>().result() == result);
+        mutableSteadyClockNow() += std::chrono::seconds(2);
+    });
+
+    mutableSteadyClockNow() += std::chrono::seconds(10);
+    a.awaitEvents();
+    CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
+}
+
 // TODO two user-provided triggers in two trigger sets
 
 } // namespace
