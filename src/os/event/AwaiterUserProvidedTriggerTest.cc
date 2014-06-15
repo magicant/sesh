@@ -111,7 +111,26 @@ TEST_CASE_METHOD(
     CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
 }
 
-// TODO two user-provided triggers in two trigger sets
+TEST_CASE_METHOD(
+        AwaiterTestFixture<PselectAndNowApiStub>,
+        "Awaiter: two user-provided triggers in two trigger sets") {
+    std::shared_ptr<void> expected = std::make_shared<int>(0);
+    auto f1 = a.expect(UserProvidedTrigger(createFutureOf(expected)));
+    auto f2 = std::move(f1).map([this](Trigger &&t) -> std::shared_ptr<void> {
+        REQUIRE(t.index() == Trigger::index<UserProvidedTrigger>());
+        return std::move(t.value<UserProvidedTrigger>().result());
+    });
+    auto f3 = a.expect(UserProvidedTrigger(std::move(f2)));
+    std::shared_ptr<void> actual;
+    std::move(f3).setCallback([&actual](Try<Trigger> &&t) {
+        REQUIRE(t.hasValue());
+        REQUIRE(t->index() == Trigger::index<UserProvidedTrigger>());
+        actual = t->value<UserProvidedTrigger>().result();
+    });
+
+    a.awaitEvents();
+    CHECK(actual.get() == expected.get());
+}
 
 } // namespace
 
