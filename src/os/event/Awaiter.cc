@@ -177,7 +177,7 @@ private:
     /** @return min for infinity */
     TimePoint::duration durationToNextTimeout(TimePoint now) const;
 
-    PselectArgument computeArgumentRemovingFailedEvents(TimePoint now);
+    PselectArgument computeArgumentRemovingDoneEvents(TimePoint now);
 
     void applyResultRemovingDoneEvents(const PselectArgument &);
 
@@ -260,6 +260,9 @@ void PselectArgument::add(const FileDescriptorTrigger &t, const Api &api) {
 }
 
 bool PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
+    if (e.hasFired())
+        return true;
+
     try {
         for (const FileDescriptorTrigger &t : e.triggers())
             add(t, api);
@@ -418,7 +421,7 @@ TimePoint::duration AwaiterImpl::durationToNextTimeout(TimePoint now) const {
     return nextTimeLimit - now;
 }
 
-PselectArgument AwaiterImpl::computeArgumentRemovingFailedEvents(
+PselectArgument AwaiterImpl::computeArgumentRemovingDoneEvents(
         TimePoint now) {
     PselectArgument argument(durationToNextTimeout(now));
     for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
@@ -446,7 +449,7 @@ void AwaiterImpl::awaitEvents() {
         if (fireTimeouts(now))
             continue;
 
-        PselectArgument argument = computeArgumentRemovingFailedEvents(now);
+        PselectArgument argument = computeArgumentRemovingDoneEvents(now);
 
         if (mPendingEvents.empty())
             break;
