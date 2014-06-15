@@ -23,6 +23,7 @@
 #include <memory>
 #include "os/Api.hh"
 #include "os/event/Proactor.hh"
+#include "os/signaling/HandlerConfiguration.hh"
 
 namespace sesh {
 namespace os {
@@ -53,7 +54,17 @@ public:
 
 }; // class Awaiter
 
-std::unique_ptr<Awaiter> createAwaiter(const Api &);
+/**
+ * Creates a new awaiter.
+ *
+ * @param api API the new awaiter depends on. This must be the same API
+ * instance as the one the handler configuration depends on.
+ * @param hc non-null pointer to a handler configuration the new awaiter
+ * depends on. The awaiter never modifies any trap configuration.
+ */
+std::unique_ptr<Awaiter> createAwaiter(
+        const Api &api,
+        std::shared_ptr<signaling::HandlerConfiguration> &&hc);
 
 } // namespace event
 } // namespace os
