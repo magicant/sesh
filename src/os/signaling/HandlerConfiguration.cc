@@ -30,7 +30,6 @@
 #include "os/signaling/SignalErrorCode.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::common::DirectInitialize;
 using sesh::common::Maybe;
 using sesh::common::SharedFunction;
 using sesh::common::createMaybeOf;
@@ -301,8 +300,8 @@ public:
             return e;
         }
         return AddHandlerResult::create<Canceler>(
-                SharedFunction<HandlerCanceler>(
-                        DirectInitialize(), n, *this, std::move(canceler)));
+                SharedFunction<HandlerCanceler>::create(
+                        n, *this, std::move(canceler)));
     }
 
     std::error_code setTrap(SignalNumber n, TrapAction &&a, SettingPolicy p)

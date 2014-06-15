@@ -26,7 +26,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "common/DirectInitialize.hh"
 #include "common/IntegerSequence.hh"
 #include "common/SharedFunction.hh"
 
