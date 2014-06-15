@@ -33,6 +33,7 @@
 namespace {
 
 using sesh::async::Future;
+using sesh::async::createFailedFutureOf;
 using sesh::async::createFutureOf;
 using sesh::common::Try;
 using sesh::os::event::AwaiterTestFixture;
@@ -62,7 +63,28 @@ TEST_CASE_METHOD(
     CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
 }
 
-// TODO one user-provided trigger (failed future)
+TEST_CASE_METHOD(
+        AwaiterTestFixture<PselectAndNowApiStub>,
+        "Awaiter: one user-provided trigger (failed future)") {
+    auto startTime = TimePoint(std::chrono::seconds(0));
+    mutableSteadyClockNow() = startTime;
+
+    Future<Trigger> f = a.expect(UserProvidedTrigger(
+                createFailedFutureOf<std::shared_ptr<void>>(7)));
+    std::move(f).setCallback([this](Try<Trigger> &&t) {
+        try {
+            *t;
+        } catch (int i) {
+            CHECK(i == 7);
+            mutableSteadyClockNow() += std::chrono::seconds(2);
+        }
+    });
+
+    mutableSteadyClockNow() += std::chrono::seconds(10);
+    a.awaitEvents();
+    CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
+}
+
 // TODO one user-provided trigger (result)
 // TODO two user-provided triggers in one trigger set
 // TODO two user-provided triggers in two trigger sets

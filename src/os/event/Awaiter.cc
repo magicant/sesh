@@ -341,8 +341,13 @@ void registerUserProvidedTrigger(
     using Result = UserProvidedTrigger::Result;
     std::weak_ptr<PendingEvent> w = e;
     std::move(t.future()).setCallback([w](Try<Result> &&t) {
-        if (std::shared_ptr<PendingEvent> e = w.lock())
-            e->fire(UserProvidedTrigger(std::move(*t)));
+        if (std::shared_ptr<PendingEvent> e = w.lock()) {
+            try {
+                e->fire(UserProvidedTrigger(std::move(*t)));
+            } catch (...) {
+                e->failWithCurrentException();
+            }
+        }
     });
 }
 
