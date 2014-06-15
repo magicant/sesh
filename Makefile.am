@@ -78,6 +78,7 @@ TESTPROGRAMS = \
 	src/os/event/AwaiterReadableFileDescriptorTest \
 	src/os/event/AwaiterSignalTest \
 	src/os/event/AwaiterTimeoutTest \
+	src/os/event/AwaiterUserProvidedTriggerTest \
 	src/os/event/AwaiterWritableFileDescriptorTest \
 	src/os/io/FileDescriptorTest \
 	src/os/signaling/HandlerConfigurationTest
@@ -810,6 +811,13 @@ src_os_event_AwaiterTimeoutTest_SOURCES = \
 	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterTimeoutTest.cc \
+	src/os/event/Proactor.cc \
+	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/SignalErrorCategory.cc
+src_os_event_AwaiterUserProvidedTriggerTest_SOURCES = \
+	src/os/Api.cc \
+	src/os/event/Awaiter.cc \
+	src/os/event/AwaiterUserProvidedTriggerTest.cc \
 	src/os/event/Proactor.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/SignalErrorCategory.cc
