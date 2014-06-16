@@ -31,6 +31,7 @@
 #include "async/Promise.hh"
 #include "common/ContainerHelper.hh"
 #include "common/SharedFunction.hh"
+#include "common/Try.hh"
 #include "common/Variant.hh"
 #include "helpermacros.h"
 #include "os/Api.hh"
@@ -45,6 +46,7 @@ using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::createPromiseFuturePair;
 using sesh::common::SharedFunction;
+using sesh::common::Try;
 using sesh::common::Variant;
 using sesh::common::find_if;
 using sesh::os::io::FileDescriptor;
@@ -177,7 +179,7 @@ private:
     /** @return min for infinity */
     TimePoint::duration durationToNextTimeout(TimePoint now) const;
 
-    PselectArgument computeArgumentRemovingFailedEvents(TimePoint now);
+    PselectArgument computeArgumentRemovingDoneEvents(TimePoint now);
 
     void applyResultRemovingDoneEvents(const PselectArgument &);
 
@@ -260,6 +262,9 @@ void PselectArgument::add(const FileDescriptorTrigger &t, const Api &api) {
 }
 
 bool PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
+    if (e.hasFired())
+        return true;
+
     try {
         for (const FileDescriptorTrigger &t : e.triggers())
             add(t, api);
@@ -331,6 +336,21 @@ void registerSignalTrigger(
     }
 }
 
+void registerUserProvidedTrigger(
+        UserProvidedTrigger &&t, std::shared_ptr<PendingEvent> &e) {
+    using Result = UserProvidedTrigger::Result;
+    std::weak_ptr<PendingEvent> w = e;
+    std::move(t.future()).setCallback([w](Try<Result> &&t) {
+        if (std::shared_ptr<PendingEvent> e = w.lock()) {
+            try {
+                e->fire(UserProvidedTrigger(std::move(*t)));
+            } catch (...) {
+                e->failWithCurrentException();
+            }
+        }
+    });
+}
+
 void registerTrigger(
         Trigger &&t,
         std::shared_ptr<PendingEvent> &e,
@@ -352,7 +372,8 @@ void registerTrigger(
         registerSignalTrigger(t.value<Signal>(), e, hc);
         return;
     case Trigger::index<UserProvidedTrigger>():
-        // TODO
+        registerUserProvidedTrigger(
+                std::move(t.value<UserProvidedTrigger>()), e);
         return;
     }
 }
@@ -418,7 +439,7 @@ TimePoint::duration AwaiterImpl::durationToNextTimeout(TimePoint now) const {
     return nextTimeLimit - now;
 }
 
-PselectArgument AwaiterImpl::computeArgumentRemovingFailedEvents(
+PselectArgument AwaiterImpl::computeArgumentRemovingDoneEvents(
         TimePoint now) {
     PselectArgument argument(durationToNextTimeout(now));
     for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
@@ -446,7 +467,7 @@ void AwaiterImpl::awaitEvents() {
         if (fireTimeouts(now))
             continue;
 
-        PselectArgument argument = computeArgumentRemovingFailedEvents(now);
+        PselectArgument argument = computeArgumentRemovingDoneEvents(now);
 
         if (mPendingEvents.empty())
             break;
