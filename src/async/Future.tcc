@@ -49,7 +49,7 @@ std::pair<Promise<T>, Future<T>> createPromiseFuturePair() {
             std::forward_as_tuple(delay));
 }
 
-template<typename From, typename To, typename Function>
+template<typename To, typename Function>
 class Composer {
 
 private:
@@ -64,9 +64,10 @@ public:
             mFunction(std::forward<F>(function)),
             mReceiver(std::move(receiver)) { }
 
-    void operator()(common::Try<From> &&r) {
+    template<typename From>
+    void operator()(From &&r) {
         std::move(mReceiver).setResultFrom(
-                [this, &r] { return mFunction(std::move(r)); });
+                [this, &r] { return mFunction(std::forward<From>(r)); });
     }
 
 };
@@ -74,7 +75,7 @@ public:
 template<typename From>
 template<typename Function, typename To>
 void FutureBase<From>::then(Function &&f, Promise<To> &&p) && {
-    using C = Composer<From, To, typename std::decay<Function>::type>;
+    using C = Composer<To, typename std::decay<Function>::type>;
     std::move(*this).setCallback(common::SharedFunction<C>::create(
             std::forward<Function>(f), std::move(p)));
 }
@@ -87,7 +88,7 @@ Future<To> FutureBase<From>::then(Function &&f) && {
     return std::move(pf.second);
 }
 
-template<typename From, typename To, typename Function>
+template<typename Function>
 class Mapper {
 
 private:
@@ -99,7 +100,9 @@ public:
     template<typename F>
     Mapper(F &&function) : mFunction(std::forward<F>(function)) { }
 
-    To operator()(common::Try<From> &&r) {
+    template<typename From>
+    auto operator()(common::Try<From> &&r)
+            -> decltype(mFunction(std::move(*r))) {
         return mFunction(std::move(*r));
     }
 
@@ -108,7 +111,7 @@ public:
 template<typename From>
 template<typename Function, typename To>
 void FutureBase<From>::map(Function &&f, Promise<To> &&p) && {
-    using M = Mapper<From, To, typename std::decay<Function>::type>;
+    using M = Mapper<typename std::decay<Function>::type>;
     std::move(*this).then(M(std::forward<Function>(f)), std::move(p));
 }
 
@@ -120,7 +123,7 @@ Future<To> FutureBase<From>::map(Function &&f) && {
     return std::move(pf.second);
 }
 
-template<typename T, typename Function>
+template<typename Function>
 class Recoverer {
 
 private:
@@ -132,6 +135,7 @@ public:
     template<typename F>
     Recoverer(F &&function) : mFunction(std::forward<F>(function)) { }
 
+    template<typename T>
     T operator()(common::Try<T> &&r) {
         if (r.hasValue())
             return std::move(*r);
@@ -143,7 +147,7 @@ public:
 template<typename T>
 template<typename F, typename>
 void FutureBase<T>::recover(F &&function, Promise<T> &&p) && {
-    using R = Recoverer<T, typename std::decay<F>::type>;
+    using R = Recoverer<typename std::decay<F>::type>;
     std::move(*this).then(R(std::forward<F>(function)), std::move(p));
 }
 
