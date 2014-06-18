@@ -26,6 +26,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "common/Identity.hh"
 #include "common/IntegerSequence.hh"
 #include "common/SharedFunction.hh"
 
@@ -155,27 +156,8 @@ Future<T> FutureBase<T>::recover(F &&function) && {
 }
 
 template<typename T>
-class Forwarder {
-
-private:
-
-    Promise<T> mReceiver;
-
-public:
-
-    explicit Forwarder(Promise<T> &&receiver) noexcept :
-            mReceiver(std::move(receiver)) { }
-
-    void operator()(common::Try<T> &&r) {
-        std::move(mReceiver).setResultFrom([&r] { return std::move(*r); });
-    }
-
-};
-
-template<typename T>
 void FutureBase<T>::forward(Promise<T> &&receiver) && {
-    std::move(*this).setCallback(
-            common::SharedFunction<Forwarder<T>>::create(std::move(receiver)));
+    std::move(*this).map(common::Identity(), std::move(receiver));
 }
 
 template<typename F>
