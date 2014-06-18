@@ -125,21 +125,16 @@ class Recoverer {
 private:
 
     Function mFunction;
-    Promise<T> mReceiver;
 
 public:
 
     template<typename F>
-    Recoverer(F &&function, Promise<T> &&receiver) :
-            mFunction(std::forward<F>(function)),
-            mReceiver(std::move(receiver)) { }
+    Recoverer(F &&function) : mFunction(std::forward<F>(function)) { }
 
-    void operator()(common::Try<T> &&r) {
-        std::move(mReceiver).setResultFrom([this, &r]() -> T {
-            if (r.hasValue())
-                return std::move(*r);
-            return mFunction(r.template value<std::exception_ptr>());
-        });
+    T operator()(common::Try<T> &&r) {
+        if (r.hasValue())
+            return std::move(*r);
+        return mFunction(r.template value<std::exception_ptr>());
     }
 
 };
@@ -148,8 +143,7 @@ template<typename T>
 template<typename F, typename>
 void FutureBase<T>::recover(F &&function, Promise<T> &&p) && {
     using R = Recoverer<T, typename std::decay<F>::type>;
-    std::move(*this).setCallback(common::SharedFunction<R>::create(
-            std::forward<F>(function), std::move(p)));
+    std::move(*this).then(R(std::forward<F>(function)), std::move(p));
 }
 
 template<typename T>
