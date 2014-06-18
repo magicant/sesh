@@ -72,11 +72,17 @@ public:
 
 template<typename From>
 template<typename Function, typename To>
-Future<To> FutureBase<From>::then(Function &&f) && {
+void FutureBase<From>::then(Function &&f, Promise<To> &&p) && {
     using C = Composer<From, To, typename std::decay<Function>::type>;
-    std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
     std::move(*this).setCallback(common::SharedFunction<C>::create(
-            std::forward<Function>(f), std::move(pf.first)));
+            std::forward<Function>(f), std::move(p)));
+}
+
+template<typename From>
+template<typename Function, typename To>
+Future<To> FutureBase<From>::then(Function &&f) && {
+    std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
+    std::move(*this).then(std::forward<Function>(f), std::move(pf.first));
     return std::move(pf.second);
 }
 

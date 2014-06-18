@@ -63,6 +63,20 @@ public:
      * Sets a callback function that converts the result to another result.
      *
      * The argument callback will be called when this future receives a result,
+     * either successful or unsuccessful. The result of the callback will be
+     * set to the argument promise. If the callback throws an exception, that
+     * will be propagated to the promise.
+     *
+     * @tparam F type of the callback function
+     * @tparam R result type of the callback
+     */
+    template<typename F, typename R>
+    void then(F &&, Promise<R> &&) &&;
+
+    /**
+     * Sets a callback function that converts the result to another result.
+     *
+     * The argument callback will be called when this future receives a result,
      * either successful or unsuccessful. The result of the callback will
      * become the result of the future returned from this method. If the
      * callback throws an exception, that will be propagated to the returned

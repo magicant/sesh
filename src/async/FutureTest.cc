@@ -87,7 +87,27 @@ TEST_CASE("Create promise/future pair") {
     CHECK(i == 123);
 }
 
-TEST_CASE("Future, then, success") {
+TEST_CASE("Future, then, to promise, success") {
+    const auto delay = std::make_shared<Delay<int>>();
+    Future<int> f1(delay);
+    std::pair<Promise<double>, Future<double>> pf2 =
+            createPromiseFuturePair<double>();
+
+    int i = 0;
+    const auto f = [&i](Try<int> &&v) -> double { i = *v; return 2.0; };
+    std::move(f1).then(f, std::move(pf2.first));
+
+    double d = 0.0;
+    std::move(pf2.second).setCallback([&d](Try<double> &&r) { d = *r; });
+
+    CHECK(i == 0);
+    CHECK(d == 0.0);
+    delay->setResult(1);
+    CHECK(i == 1);
+    CHECK(d == 2.0);
+}
+
+TEST_CASE("Future, then, returning future, success") {
     const auto delay = std::make_shared<Delay<int>>();
     Future<int> f1(delay);
 
@@ -105,7 +125,7 @@ TEST_CASE("Future, then, success") {
     CHECK(d == 2.0);
 }
 
-TEST_CASE("Future, then, failure") {
+TEST_CASE("Future, then, returning future, failure") {
     const auto delay = std::make_shared<Delay<int>>();
     Future<int> f1(delay);
 
