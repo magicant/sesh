@@ -449,7 +449,15 @@ TEST_CASE("Future, forward, failure") {
     CHECK(d == 1.0);
 }
 
-TEST_CASE("Future, unwrap, success") {
+TEST_CASE("Future, unwrap, to promise, success") {
+    std::pair<Promise<int>, Future<int>> pf = createPromiseFuturePair<int>();
+    createFutureOf(createFutureOf(123)).unwrap(std::move(pf.first));
+    int i = 0;
+    std::move(pf.second).setCallback([&i](Try<int> &&r) { i = *r; });
+    CHECK(i == 123);
+}
+
+TEST_CASE("Future, unwrap, returning future, success") {
     Future<int> f = createFutureOf(createFutureOf(123)).unwrap();
     int i = 0;
     std::move(f).setCallback([&i](Try<int> &&r) { i = *r; });

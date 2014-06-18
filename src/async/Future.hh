@@ -221,6 +221,12 @@ public:
     using FutureBase<Future<T>>::FutureBase;
 
     /**
+     * Unwraps this nested future. The argument promise will receive the same
+     * result as the inner future.
+     */
+    void unwrap(Promise<T> &&) &&;
+
+    /**
      * Unwraps this nested future. The returned future will receive the same
      * result as the inner future.
      */

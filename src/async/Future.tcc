@@ -271,10 +271,15 @@ public:
 };
 
 template<typename T>
+void Future<Future<T>>::unwrap(Promise<T> &&p) && {
+    std::move(*this).setCallback(
+            common::SharedFunction<Unwrapper<T>>::create(std::move(p)));
+}
+
+template<typename T>
 Future<T> Future<Future<T>>::unwrap() && {
     std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
-    std::move(*this).setCallback(
-            common::SharedFunction<Unwrapper<T>>::create(std::move(pf.first)));
+    std::move(*this).unwrap(std::move(pf.first));
     return std::move(pf.second);
 }
 
