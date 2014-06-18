@@ -95,6 +95,23 @@ public:
      * Sets a callback function that converts the result to another result.
      *
      * The argument callback will be called when this future receives a result.
+     * The result of the callback will be set to the argument promise.
+     *
+     * If this future receives an exception, the callback will not be called
+     * and the exception will be propagated to the promise.
+     *
+     * If the callback throws an exception, that will be propagated alike.
+     *
+     * @tparam F type of the callback function
+     * @tparam R result type of the callback
+     */
+    template<typename F, typename R>
+    void map(F &&, Promise<R> &&) &&;
+
+    /**
+     * Sets a callback function that converts the result to another result.
+     *
+     * The argument callback will be called when this future receives a result.
      * The result of the callback will become the result of the future returned
      * from this method.
      *

@@ -146,7 +146,27 @@ TEST_CASE("Future, then, returning future, failure") {
     CHECK(d == 2.0);
 }
 
-TEST_CASE("Future, map, success, movable function") {
+TEST_CASE("Future, map, to promise, success") {
+    const auto delay = std::make_shared<Delay<int>>();
+    Future<int> f1(delay);
+    std::pair<Promise<double>, Future<double>> pf2 =
+            createPromiseFuturePair<double>();
+
+    int i = 0;
+    const auto f = [&i](int &&j) -> double { i = j; return 2.0; };
+    std::move(f1).map(f, std::move(pf2.first));
+
+    double d = 0.0;
+    std::move(pf2.second).setCallback([&d](Try<double> &&r) { d = *r; });
+
+    CHECK(i == 0);
+    CHECK(d == 0.0);
+    delay->setResult(1);
+    CHECK(i == 1);
+    CHECK(d == 2.0);
+}
+
+TEST_CASE("Future, map, returning future, success, movable function") {
     class MovableFunction {
     private:
         int &mI;
@@ -175,7 +195,8 @@ TEST_CASE("Future, map, success, movable function") {
     CHECK(d == 2.0);
 }
 
-TEST_CASE("Future, map, success, copyable constant function") {
+TEST_CASE(
+        "Future, map, returning future, success, copyable constant function") {
     const auto delay = std::make_shared<Delay<int>>();
     Future<int> f1(delay);
 
@@ -193,7 +214,7 @@ TEST_CASE("Future, map, success, copyable constant function") {
     CHECK(d == 2.0);
 }
 
-TEST_CASE("Future, map, failure propagation") {
+TEST_CASE("Future, map, returning future, failure propagation") {
     const auto delay = std::make_shared<Delay<int>>();
     Future<int> f1(delay);
 
