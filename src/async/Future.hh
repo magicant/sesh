@@ -169,7 +169,7 @@ public:
      * exception, that will be propagated to the returned future.
      *
      * @tparam F Parameter type of the callback function. It must be callable
-     * with an exception pointer parameter and return a return of type T.
+     * with an exception pointer parameter and return a result of type T.
      */
     template<
             typename F,
