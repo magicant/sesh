@@ -92,18 +92,14 @@ class Mapper {
 private:
 
     Function mFunction;
-    Promise<To> mReceiver;
 
 public:
 
     template<typename F>
-    Mapper(F &&function, Promise<To> &&receiver) :
-            mFunction(std::forward<F>(function)),
-            mReceiver(std::move(receiver)) { }
+    Mapper(F &&function) : mFunction(std::forward<F>(function)) { }
 
-    void operator()(common::Try<From> &&r) {
-        std::move(mReceiver).setResultFrom(
-                [this, &r] { return mFunction(std::move(*r)); });
+    To operator()(common::Try<From> &&r) {
+        return mFunction(std::move(*r));
     }
 
 };
@@ -112,8 +108,7 @@ template<typename From>
 template<typename Function, typename To>
 void FutureBase<From>::map(Function &&f, Promise<To> &&p) && {
     using M = Mapper<From, To, typename std::decay<Function>::type>;
-    std::move(*this).setCallback(common::SharedFunction<M>::create(
-            std::forward<Function>(f), std::move(p)));
+    std::move(*this).then(M(std::forward<Function>(f)), std::move(p));
 }
 
 template<typename From>
