@@ -68,14 +68,13 @@ public:
      * callback throws an exception, that will be propagated to the returned
      * future.
      *
-     * @tparam F parameter type of the callback function
-     * @tparam G object type of the callback
+     * @tparam F type of the callback function
      * @tparam R result type of the callback
      */
     template<
             typename F,
-            typename G = typename std::decay<F>::type,
-            typename R = typename std::result_of<G(common::Try<T> &&)>::type>
+            typename R = typename std::result_of<
+                    typename std::decay<F>::type(common::Try<T> &&)>::type>
     Future<R> then(F &&) &&;
 
     /**
@@ -91,14 +90,13 @@ public:
      *
      * If the callback throws an exception, that will be propagated alike.
      *
-     * @tparam F parameter type of the callback function
-     * @tparam G object type of the callback
+     * @tparam F type of the callback function
      * @tparam R result type of the callback
      */
     template<
             typename F,
-            typename G = typename std::decay<F>::type,
-            typename R = typename std::result_of<G(T &&)>::type>
+            typename R = typename std::result_of<
+                    typename std::decay<F>::type(T &&)>::type>
     Future<R> map(F &&) &&;
 
     /**
