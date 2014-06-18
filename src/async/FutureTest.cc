@@ -259,7 +259,26 @@ TEST_CASE("Future, map, failure in callback") {
     CHECK(d == 2.0);
 }
 
-TEST_CASE("Future, recover, success, movable function") {
+TEST_CASE("Future, recover, to promise, success") {
+    const auto delay = std::make_shared<Delay<int>>();
+    Future<int> f1(delay);
+    std::pair<Promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
+
+    const auto f = [](std::exception_ptr) -> int {
+        FAIL("unexpected exception");
+        return 2;
+    };
+    std::move(f1).recover(f, std::move(pf2.first));
+
+    int i = 0;
+    std::move(pf2.second).setCallback([&i](Try<int> &&r) { i = *r; });
+
+    CHECK(i == 0);
+    delay->setResult(1);
+    CHECK(i == 1);
+}
+
+TEST_CASE("Future, recover, returning future, success, movable function") {
     class MovableFunction {
     public:
         MovableFunction() = default;
@@ -282,7 +301,9 @@ TEST_CASE("Future, recover, success, movable function") {
     CHECK(i == 1);
 }
 
-TEST_CASE("Future, recover, success, copyable constant function") {
+TEST_CASE(
+        "Future, recover, returning future, success, "
+        "copyable constant function") {
     const auto delay = std::make_shared<Delay<int>>();
     Future<int> f1(delay);
     const auto f = [](std::exception_ptr) -> int {

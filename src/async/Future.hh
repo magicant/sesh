@@ -134,6 +134,30 @@ public:
      * Sets a callback function that recovers this future from an exception.
      *
      * If this future receives a result of type T, then the argument callback
+     * will not be called and the result is simply set to the argument promise.
+     *
+     * If this future returned an exception, the callback is called with a
+     * pointer to the exception. The result of the callback will be set to the
+     * promise.
+     *
+     * If the callback function or the move-constructor of the result throws an
+     * exception, that will be propagated to the promise.
+     *
+     * @tparam F Parameter type of the callback function. It must be callable
+     * with an exception pointer parameter and return a result of type T.
+     */
+    template<
+            typename F,
+            typename = typename std::enable_if<std::is_same<
+                    T,
+                    typename std::result_of<F(std::exception_ptr)>::type
+            >::value>::type>
+    void recover(F &&, Promise<T> &&) &&;
+
+    /**
+     * Sets a callback function that recovers this future from an exception.
+     *
+     * If this future receives a result of type T, then the argument callback
      * will not be called and the future returned from this method will receive
      * the same result.
      *

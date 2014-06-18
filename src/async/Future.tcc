@@ -151,12 +151,17 @@ public:
 
 template<typename T>
 template<typename F, typename>
+void FutureBase<T>::recover(F &&function, Promise<T> &&p) && {
+    using R = Recoverer<T, typename std::decay<F>::type>;
+    std::move(*this).setCallback(common::SharedFunction<R>::create(
+            std::forward<F>(function), std::move(p)));
+}
+
+template<typename T>
+template<typename F, typename>
 Future<T> FutureBase<T>::recover(F &&function) && {
-    using Function = typename std::decay<F>::type;
-    using C = Recoverer<T, Function>;
     std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
-    std::move(*this).setCallback(common::SharedFunction<C>::create(
-            std::forward<F>(function), std::move(pf.first)));
+    std::move(*this).recover(std::forward<F>(function), std::move(pf.first));
     return std::move(pf.second);
 }
 
