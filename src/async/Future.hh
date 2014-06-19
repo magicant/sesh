@@ -185,6 +185,26 @@ public:
      */
     void forward(Promise<T> &&) &&;
 
+    /**
+     * Sets a callback function to this future so that its result is wrapped in
+     * another future that is set to the argument promise.
+     *
+     * If this future receives an exception, it is directly propagated to the
+     * argument promise, not to the inner future. If the move-constructor of
+     * the result throws an exception, it is set to the inner future.
+     */
+    void wrap(Promise<Future<T>> &&) &&;
+
+    /**
+     * Sets a callback function to this future so that its result is wrapped in
+     * another future that is set to the returned future.
+     *
+     * If this future receives an exception, it is directly propagated to the
+     * returned future, not to the inner future. If the move-constructor of
+     * the result throws an exception, it is set to the inner future.
+     */
+    Future<Future<T>> wrap() &&;
+
 }; // template<typename T> class FutureBase
 
 /**

@@ -221,6 +221,19 @@ Future<T> createFailedFutureOf(E &&e) {
 }
 
 template<typename T>
+void FutureBase<T>::wrap(Promise<Future<T>> &&p) && {
+    std::move(*this).map(createFutureOf<T>, std::move(p));
+}
+
+template<typename T>
+Future<Future<T>> FutureBase<T>::wrap() && {
+    std::pair<Promise<Future<T>>, Future<Future<T>>> pf =
+            createPromiseFuturePair<Future<T>>();
+    std::move(*this).wrap(std::move(pf.first));
+    return std::move(pf.second);
+}
+
+template<typename T>
 class Unwrapper {
 
 private:

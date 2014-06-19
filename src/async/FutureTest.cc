@@ -449,6 +449,42 @@ TEST_CASE("Future, forward, failure") {
     CHECK(d == 1.0);
 }
 
+TEST_CASE("Future, wrap, to promise, success") {
+    std::pair<Promise<Future<int>>, Future<Future<int>>> pf =
+            createPromiseFuturePair<Future<int>>();
+    createFutureOf(123).wrap(std::move(pf.first));
+    int i = 0;
+    std::move(pf.second).setCallback([&i](Try<Future<int>> &&r) {
+        std::move(*r).setCallback([&i](Try<int> &&r) {
+            i = *r;
+        });
+    });
+    CHECK(i == 123);
+}
+
+TEST_CASE("Future, wrap, returning value, success") {
+    int i = 0;
+    createFutureOf(123).wrap().setCallback([&i](Try<Future<int>> &&r) {
+        std::move(*r).setCallback([&i](Try<int> &&r) {
+            i = *r;
+        });
+    });
+    CHECK(i == 123);
+}
+
+TEST_CASE("Future, wrap, returning value, failure in original future") {
+    Future<Future<int>> f = createFailedFutureOf<int>(1.0).wrap();
+    double d = 0.0;
+    std::move(f).setCallback([&d](Try<Future<int>> &&r) {
+        try {
+            *r;
+        } catch (double v) {
+            d = v;
+        }
+    });
+    CHECK(d == 1.0);
+}
+
 TEST_CASE("Future, unwrap, to promise, success") {
     std::pair<Promise<int>, Future<int>> pf = createPromiseFuturePair<int>();
     createFutureOf(createFutureOf(123)).unwrap(std::move(pf.first));
