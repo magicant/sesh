@@ -63,20 +63,50 @@ public:
      * Sets a callback function that converts the result to another result.
      *
      * The argument callback will be called when this future receives a result,
+     * either successful or unsuccessful. The result of the callback will be
+     * set to the argument promise. If the callback throws an exception, that
+     * will be propagated to the promise.
+     *
+     * @tparam F type of the callback function
+     * @tparam R result type of the callback
+     */
+    template<typename F, typename R>
+    void then(F &&, Promise<R> &&) &&;
+
+    /**
+     * Sets a callback function that converts the result to another result.
+     *
+     * The argument callback will be called when this future receives a result,
      * either successful or unsuccessful. The result of the callback will
      * become the result of the future returned from this method. If the
      * callback throws an exception, that will be propagated to the returned
      * future.
      *
-     * @tparam F parameter type of the callback function
-     * @tparam G object type of the callback
+     * @tparam F type of the callback function
      * @tparam R result type of the callback
      */
     template<
             typename F,
-            typename G = typename std::decay<F>::type,
-            typename R = typename std::result_of<G(common::Try<T> &&)>::type>
+            typename R = typename std::result_of<
+                    typename std::decay<F>::type(common::Try<T> &&)>::type>
     Future<R> then(F &&) &&;
+
+    /**
+     * Sets a callback function that converts the result to another result.
+     *
+     * The argument callback will be called when this future receives a result.
+     * The result of the callback will be set to the argument promise.
+     *
+     * If this future receives an exception, the callback will not be called
+     * and the exception will be propagated to the promise.
+     *
+     * If the callback throws an exception, that will be propagated alike.
+     *
+     * @tparam F type of the callback function
+     * @tparam R result type of the callback
+     */
+    template<typename F, typename R>
+    void map(F &&, Promise<R> &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.
@@ -91,15 +121,38 @@ public:
      *
      * If the callback throws an exception, that will be propagated alike.
      *
-     * @tparam F parameter type of the callback function
-     * @tparam G object type of the callback
+     * @tparam F type of the callback function
      * @tparam R result type of the callback
      */
     template<
             typename F,
-            typename G = typename std::decay<F>::type,
-            typename R = typename std::result_of<G(T &&)>::type>
+            typename R = typename std::result_of<
+                    typename std::decay<F>::type(T &&)>::type>
     Future<R> map(F &&) &&;
+
+    /**
+     * Sets a callback function that recovers this future from an exception.
+     *
+     * If this future receives a result of type T, then the argument callback
+     * will not be called and the result is simply set to the argument promise.
+     *
+     * If this future returned an exception, the callback is called with a
+     * pointer to the exception. The result of the callback will be set to the
+     * promise.
+     *
+     * If the callback function or the move-constructor of the result throws an
+     * exception, that will be propagated to the promise.
+     *
+     * @tparam F Parameter type of the callback function. It must be callable
+     * with an exception pointer parameter and return a result of type T.
+     */
+    template<
+            typename F,
+            typename = typename std::enable_if<std::is_same<
+                    T,
+                    typename std::result_of<F(std::exception_ptr)>::type
+            >::value>::type>
+    void recover(F &&, Promise<T> &&) &&;
 
     /**
      * Sets a callback function that recovers this future from an exception.
@@ -116,7 +169,7 @@ public:
      * exception, that will be propagated to the returned future.
      *
      * @tparam F Parameter type of the callback function. It must be callable
-     * with an exception pointer parameter and return a return of type T.
+     * with an exception pointer parameter and return a result of type T.
      */
     template<
             typename F,
@@ -131,6 +184,26 @@ public:
      * argument promise.
      */
     void forward(Promise<T> &&) &&;
+
+    /**
+     * Sets a callback function to this future so that its result is wrapped in
+     * another future that is set to the argument promise.
+     *
+     * If this future receives an exception, it is directly propagated to the
+     * argument promise, not to the inner future. If the move-constructor of
+     * the result throws an exception, it is set to the inner future.
+     */
+    void wrap(Promise<Future<T>> &&) &&;
+
+    /**
+     * Sets a callback function to this future so that its result is wrapped in
+     * another future that is set to the returned future.
+     *
+     * If this future receives an exception, it is directly propagated to the
+     * returned future, not to the inner future. If the move-constructor of
+     * the result throws an exception, it is set to the inner future.
+     */
+    Future<Future<T>> wrap() &&;
 
 }; // template<typename T> class FutureBase
 
@@ -166,6 +239,12 @@ class Future<Future<T>> : public FutureBase<Future<T>> {
 public:
 
     using FutureBase<Future<T>>::FutureBase;
+
+    /**
+     * Unwraps this nested future. The argument promise will receive the same
+     * result as the inner future.
+     */
+    void unwrap(Promise<T> &&) &&;
 
     /**
      * Unwraps this nested future. The returned future will receive the same
