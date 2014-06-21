@@ -455,14 +455,10 @@ void AwaiterImpl::awaitEvents() {
     while (!mPendingEvents.empty()) {
         TimePoint now = mApi.steadyClockNow();
         fireTimeouts(now);
-        if (removeFiredEvents())
-            continue;
 
         PselectArgument argument = computeArgumentFiringErroredEvents(now);
-        removeFiredEvents();
-
-        if (mPendingEvents.empty())
-            break;
+        if (removeFiredEvents())
+            continue;
 
         std::error_code e = argument.call(
                 mApi, mHandlerConfiguration->maskForPselect());
