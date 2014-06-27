@@ -146,13 +146,11 @@ public:
      * @tparam F Parameter type of the callback function. It must be callable
      * with an exception pointer parameter and return a result of type T.
      */
-    template<
-            typename F,
-            typename = typename std::enable_if<std::is_same<
-                    T,
-                    typename std::result_of<F(std::exception_ptr)>::type
-            >::value>::type>
-    void recover(F &&, Promise<T> &&) &&;
+    template<typename F>
+    typename std::enable_if<std::is_same<
+            T, typename std::result_of<F(std::exception_ptr)>::type
+    >::value>::type
+    recover(F &&, Promise<T> &&) &&;
 
     /**
      * Sets a callback function that recovers this future from an exception.
@@ -171,13 +169,11 @@ public:
      * @tparam F Parameter type of the callback function. It must be callable
      * with an exception pointer parameter and return a result of type T.
      */
-    template<
-            typename F,
-            typename = typename std::enable_if<std::is_same<
-                    T,
-                    typename std::result_of<F(std::exception_ptr)>::type
-            >::value>::type>
-    Future<T> recover(F &&) &&;
+    template<typename F>
+    typename std::enable_if<std::is_same<
+            T, typename std::result_of<F(std::exception_ptr)>::type
+    >::value, Future<T>>::type
+    recover(F &&) &&;
 
     /**
      * Adds a callback to this future so that its result will be set to the

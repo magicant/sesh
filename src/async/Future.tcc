@@ -145,15 +145,21 @@ public:
 };
 
 template<typename T>
-template<typename F, typename>
-void FutureBase<T>::recover(F &&function, Promise<T> &&p) && {
+template<typename F>
+typename std::enable_if<std::is_same<
+        T, typename std::result_of<F(std::exception_ptr)>::type
+>::value>::type
+FutureBase<T>::recover(F &&function, Promise<T> &&p) && {
     using R = Recoverer<typename std::decay<F>::type>;
     std::move(*this).then(R(std::forward<F>(function)), std::move(p));
 }
 
 template<typename T>
-template<typename F, typename>
-Future<T> FutureBase<T>::recover(F &&function) && {
+template<typename F>
+typename std::enable_if<std::is_same<
+        T, typename std::result_of<F(std::exception_ptr)>::type
+>::value, Future<T>>::type
+FutureBase<T>::recover(F &&function) && {
     std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
     std::move(*this).recover(std::forward<F>(function), std::move(pf.first));
     return std::move(pf.second);
