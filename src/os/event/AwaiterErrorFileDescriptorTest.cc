@@ -48,18 +48,13 @@ using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::ErrorFileDescriptor;
 using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Trigger;
+using sesh::os::event::triggers;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
 using sesh::os::test_helper::PselectApiStub;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
-
-std::vector<Trigger> fdTriggers(std::vector<ErrorFileDescriptor> &&fds) {
-    return std::vector<Trigger>(
-            std::make_move_iterator(fds.begin()),
-            std::make_move_iterator(fds.end()));
-}
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<PselectAndNowApiStub>,
@@ -103,8 +98,8 @@ TEST_CASE_METHOD(
         "pselect returning single FD") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(fdTriggers(
-            {ErrorFileDescriptor(2), ErrorFileDescriptor(0)}));
+    Future<Trigger> f = a.expect(triggers(
+            ErrorFileDescriptor(2), ErrorFileDescriptor(0)));
     std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ErrorFileDescriptor>());
@@ -142,8 +137,8 @@ TEST_CASE_METHOD(
         "pselect returning all FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(fdTriggers(
-            {ErrorFileDescriptor(2), ErrorFileDescriptor(0)}));
+    Future<Trigger> f = a.expect(triggers(
+            ErrorFileDescriptor(2), ErrorFileDescriptor(0)));
     std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ErrorFileDescriptor>());

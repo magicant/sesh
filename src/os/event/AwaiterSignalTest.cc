@@ -45,6 +45,7 @@ using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Signal;
 using sesh::os::event::Trigger;
+using sesh::os::event::triggers;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumber;
@@ -59,12 +60,6 @@ class SignalAwaiterTestApiFake :
         public virtual SigactionApiFake,
         public virtual SignalMaskApiFake {
 };
-
-std::vector<Trigger> signalTriggers(std::vector<Signal> &&signals) {
-    return std::vector<Trigger>(
-            std::make_move_iterator(signals.begin()),
-            std::make_move_iterator(signals.end()));
-}
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<SignalAwaiterTestApiFake>,
@@ -142,7 +137,7 @@ TEST_CASE_METHOD(
         "Awaiter: two signals in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(100));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(signalTriggers({Signal(2), Signal(6)}));
+    Future<Trigger> f = a.expect(triggers(Signal(2), Signal(6)));
     std::move(f).setCallback([this](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == Trigger::index<Signal>());
