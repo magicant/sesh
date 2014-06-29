@@ -21,6 +21,8 @@
 #include "buildconfig.h"
 
 #include <memory>
+#include <utility>
+#include <vector>
 #include "os/event/Awaiter.hh"
 #include "os/signaling/HandlerConfiguration.hh"
 #include "os/test_helper/NowApiStub.hh"
@@ -47,6 +49,22 @@ protected:
 class PselectAndNowApiStub :
         public test_helper::PselectApiStub, public test_helper::NowApiStub {
 };
+
+void addTriggers(std::vector<Trigger> &) {
+}
+
+template<typename Head, typename... Tail>
+void addTriggers(std::vector<Trigger> &ts, Head &&head, Tail &&... tail) {
+    ts.push_back(std::forward<Head>(head));
+    addTriggers(ts, std::forward<Tail>(tail)...);
+}
+
+template<typename... Arg>
+std::vector<Trigger> triggers(Arg &&... arg) {
+    std::vector<Trigger> ts;
+    addTriggers(ts, std::forward<Arg>(arg)...);
+    return ts;
+}
 
 } // namespace event
 } // namespace os

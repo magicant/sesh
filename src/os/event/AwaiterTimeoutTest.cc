@@ -66,6 +66,7 @@ using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
+using sesh::os::event::triggers;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
@@ -83,7 +84,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         AwaiterTestFixture<UnimplementedApi>,
         "Awaiter: does nothing for empty trigger set") {
-    Future<Trigger> f = a.expect(std::vector<Trigger>{});
+    Future<Trigger> f = a.expect(triggers());
     std::move(f).setCallback([](Try<Trigger> &&) { FAIL("callback called"); });
     a.awaitEvents();
 }
@@ -227,14 +228,12 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         AwaiterTestFixture<PselectAndNowApiStub>,
         "Awaiter: duplicate timeouts in one trigger set") {
-    std::vector<Trigger> triggers;
-    triggers.push_back(Timeout(std::chrono::seconds(10)));
-    triggers.push_back(Timeout(std::chrono::seconds(5)));
-    triggers.push_back(Timeout(std::chrono::seconds(20)));
-
     auto startTime = TimePoint(std::chrono::seconds(-100));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(std::move(triggers));
+    Future<Trigger> f = a.expect(triggers(
+            Timeout(std::chrono::seconds(10)),
+            Timeout(std::chrono::seconds(5)),
+            Timeout(std::chrono::seconds(20))));
     bool callbackCalled = false;
     std::move(f).setCallback(
             [this, startTime, &callbackCalled](Try<Trigger> &&t) {

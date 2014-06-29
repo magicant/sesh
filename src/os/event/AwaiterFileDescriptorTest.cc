@@ -51,6 +51,7 @@ using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
 using sesh::os::event::UserProvidedTrigger;
 using sesh::os::event::WritableFileDescriptor;
+using sesh::os::event::triggers;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
@@ -59,19 +60,13 @@ using TimePoint = sesh::os::Api::SteadyClockTime;
 using TriggerFileDescriptor = Variant<
         ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
 
-std::vector<Trigger> fdTriggers(std::vector<TriggerFileDescriptor> &&fds) {
-    return std::vector<Trigger>(
-            std::make_move_iterator(fds.begin()),
-            std::make_move_iterator(fds.end()));
-}
-
 TEST_CASE_METHOD(
         AwaiterTestFixture<PselectAndNowApiStub>,
         "Awaiter: one trigger set containing readable and writable FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(fdTriggers(
-            {ReadableFileDescriptor(3), WritableFileDescriptor(3)}));
+    Future<Trigger> f = a.expect(triggers(
+            ReadableFileDescriptor(3), WritableFileDescriptor(3)));
     std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         switch (t->index()) {
@@ -119,8 +114,8 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing readable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(fdTriggers(
-            {ReadableFileDescriptor(3), ErrorFileDescriptor(3)}));
+    Future<Trigger> f = a.expect(triggers(
+            ReadableFileDescriptor(3), ErrorFileDescriptor(3)));
     std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         switch (t->index()) {
@@ -168,8 +163,8 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing writable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(fdTriggers(
-            {WritableFileDescriptor(3), ErrorFileDescriptor(3)}));
+    Future<Trigger> f = a.expect(triggers(
+            WritableFileDescriptor(3), ErrorFileDescriptor(3)));
     std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         switch (t->index()) {

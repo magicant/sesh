@@ -140,9 +140,8 @@ public:
     /**
      * Updates this p-select argument according to the given event. This
      * function may fire the event directly if applicable.
-     * @return true iff the event was fired.
      */
-    bool addOrFire(PendingEvent &, const Api &);
+    void addOrFire(PendingEvent &, const Api &);
 
     /** Calls the p-select API function with this argument. */
     std::error_code call(const Api &api, const SignalNumberSet *);
@@ -154,9 +153,8 @@ public:
      * Applies this p-select call result to the argument event. If the result
      * matches the event, the event is fired. If the event has already been
      * fired, this function has no side effect.
-     * @return true iff the event was fired.
      */
-    bool applyResult(PendingEvent &) const;
+    void applyResult(PendingEvent &) const;
 
 }; // class PselectArgument
 
@@ -174,14 +172,16 @@ private:
 
     Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
 
-    bool fireTimeouts(TimePoint now);
+    bool removeFiredEvents();
+
+    void fireTimeouts(TimePoint now);
 
     /** @return min for infinity */
     TimePoint::duration durationToNextTimeout(TimePoint now) const;
 
-    PselectArgument computeArgumentRemovingDoneEvents(TimePoint now);
+    PselectArgument computeArgumentFiringErroredEvents(TimePoint now);
 
-    void applyResultRemovingDoneEvents(const PselectArgument &);
+    void applyResult(const PselectArgument &);
 
 public:
 
@@ -261,17 +261,15 @@ void PselectArgument::add(const FileDescriptorTrigger &t, const Api &api) {
     UNREACHABLE();
 }
 
-bool PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
+void PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
     if (e.hasFired())
-        return true;
+        return;
 
     try {
         for (const FileDescriptorTrigger &t : e.triggers())
             add(t, api);
-        return false;
     } catch (...) {
         e.failWithCurrentException();
-        return true;
     }
 }
 
@@ -304,17 +302,15 @@ bool PselectArgument::matches(const FileDescriptorTrigger &t) const {
     UNREACHABLE();
 }
 
-bool PselectArgument::applyResult(PendingEvent &e) const {
+void PselectArgument::applyResult(PendingEvent &e) const {
     if (e.hasFired())
-        return true;
+        return;
 
     using namespace std::placeholders;
     auto i = find_if(
             e.triggers(), std::bind(&PselectArgument::matches, this, _1));
-    if (i == e.triggers().end())
-        return false;
-    e.fire(std::move(*i));
-    return true;
+    if (i != e.triggers().end())
+        e.fire(std::move(*i));
 }
 
 AwaiterImpl::AwaiterImpl(
@@ -408,23 +404,26 @@ Future<Trigger> AwaiterImpl::expectImpl(
     return std::move(promiseAndFuture.second);
 }
 
-bool fireIfTimedOut(PendingEvent &e, TimePoint timeLimit, TimePoint now) {
-    if (timeLimit > now)
-        return false;
-    e.fire(e.timeout());
-    return true;
-}
-
-bool AwaiterImpl::fireTimeouts(TimePoint now) {
-    bool fired = false;
+bool AwaiterImpl::removeFiredEvents() {
+    bool removedAny = false;
     for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
-        if (fireIfTimedOut(*i->second, i->first, now)) {
+        PendingEvent &e = *i->second;
+        if (e.hasFired()) {
             i = mPendingEvents.erase(i);
-            fired = true;
+            removedAny = true;
         } else
             ++i;
     }
-    return fired;
+    return removedAny;
+}
+
+void AwaiterImpl::fireTimeouts(TimePoint now) {
+    for (auto &p : mPendingEvents) {
+        const TimeLimit &timeLimit = p.first;
+        std::shared_ptr<PendingEvent> &e = p.second;
+        if (timeLimit <= now)
+            e->fire(e->timeout());
+    }
 }
 
 TimePoint::duration AwaiterImpl::durationToNextTimeout(TimePoint now) const {
@@ -439,38 +438,27 @@ TimePoint::duration AwaiterImpl::durationToNextTimeout(TimePoint now) const {
     return nextTimeLimit - now;
 }
 
-PselectArgument AwaiterImpl::computeArgumentRemovingDoneEvents(
+PselectArgument AwaiterImpl::computeArgumentFiringErroredEvents(
         TimePoint now) {
     PselectArgument argument(durationToNextTimeout(now));
-    for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
-        if (argument.addOrFire(*i->second, mApi))
-            i = mPendingEvents.erase(i);
-        else
-            ++i;
-    }
+    for (auto &p : mPendingEvents)
+        argument.addOrFire(*p.second, mApi);
     return argument;
 }
 
-void AwaiterImpl::applyResultRemovingDoneEvents(const PselectArgument &a) {
-    for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
-        PendingEvent &e = *i->second;
-        if (a.applyResult(e))
-            i = mPendingEvents.erase(i);
-        else
-            ++i;
-    }
+void AwaiterImpl::applyResult(const PselectArgument &a) {
+    for (auto &p : mPendingEvents)
+        a.applyResult(*p.second);
 }
 
 void AwaiterImpl::awaitEvents() {
     while (!mPendingEvents.empty()) {
         TimePoint now = mApi.steadyClockNow();
-        if (fireTimeouts(now))
+        fireTimeouts(now);
+
+        PselectArgument argument = computeArgumentFiringErroredEvents(now);
+        if (removeFiredEvents())
             continue;
-
-        PselectArgument argument = computeArgumentRemovingDoneEvents(now);
-
-        if (mPendingEvents.empty())
-            break;
 
         std::error_code e = argument.call(
                 mApi, mHandlerConfiguration->maskForPselect());
@@ -478,7 +466,8 @@ void AwaiterImpl::awaitEvents() {
 
         mHandlerConfiguration->callHandlers();
 
-        applyResultRemovingDoneEvents(argument);
+        applyResult(argument);
+        removeFiredEvents();
     }
 }
 
