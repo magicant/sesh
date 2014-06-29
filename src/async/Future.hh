@@ -73,8 +73,9 @@ public:
      * set to the argument promise. If the callback throws an exception, that
      * will be propagated to the promise.
      *
-     * @tparam F type of the callback function
-     * @tparam R result type of the callback
+     * @tparam F Type of the callback function. It must be callable with an
+     * argument of type {@code common::Try<T> &&}.
+     * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
     void then(F &&, Promise<R> &&) &&;
@@ -88,7 +89,8 @@ public:
      * callback throws an exception, that will be propagated to the returned
      * future.
      *
-     * @tparam F type of the callback function
+     * @tparam F Type of the callback function. It must be callable with an
+     * argument of type {@code common::Try<T> &&}.
      * @tparam R Result type of the callback. Must not be void.
      */
     template<
@@ -109,8 +111,9 @@ public:
      *
      * If the callback throws an exception, that will be propagated alike.
      *
-     * @tparam F type of the callback function
-     * @tparam R result type of the callback
+     * @tparam F Type of the callback function. It must be callable with an
+     * argument of type {@code T &&}.
+     * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
     void map(F &&, Promise<R> &&) &&;
@@ -128,8 +131,9 @@ public:
      *
      * If the callback throws an exception, that will be propagated alike.
      *
-     * @tparam F type of the callback function
-     * @tparam R result type of the callback
+     * @tparam F Type of the callback function. It must be callable with an
+     * argument of type {@code T &&}.
+     * @tparam R Result type of the callback.
      */
     template<
             typename F,
@@ -150,8 +154,8 @@ public:
      * If the callback function or the move-constructor of the result throws an
      * exception, that will be propagated to the promise.
      *
-     * @tparam F Parameter type of the callback function. It must be callable
-     * with an exception pointer parameter and return a result of type T.
+     * @tparam F Type of the callback function. It must be callable with an
+     * exception pointer parameter and return a result of type T.
      */
     template<typename F>
     typename std::enable_if<std::is_same<
@@ -173,8 +177,8 @@ public:
      * If the callback function or the move-constructor of the result throws an
      * exception, that will be propagated to the returned future.
      *
-     * @tparam F Parameter type of the callback function. It must be callable
-     * with an exception pointer parameter and return a result of type T.
+     * @tparam F Type of the callback function. It must be callable with an
+     * exception pointer parameter and return a result of type T.
      */
     template<typename F>
     typename std::enable_if<std::is_same<
