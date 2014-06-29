@@ -45,8 +45,6 @@ class FutureBase : public DelayHolder<T> {
 
 public:
 
-    using Callback = typename Delay<T>::Callback;
-
     using DelayHolder<T>::DelayHolder;
 
     /**
