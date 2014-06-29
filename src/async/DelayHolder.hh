@@ -26,9 +26,7 @@
 namespace sesh {
 namespace async {
 
-/**
- * A non-copyable base class that has a shared pointer to a delay object.
- */
+/** A non-copyable base class that has a shared pointer to a delay object. */
 template<typename T>
 class DelayHolder {
 
@@ -38,7 +36,10 @@ private:
 
 public:
 
-    /** The default constructor creates a delay without an associated delay. */
+    /**
+     * The default constructor creates a delay holder without an associated
+     * delay.
+     */
     DelayHolder() = default;
 
     /** Creates a delay holder that holds the argument delay. */
