@@ -83,13 +83,14 @@ public:
      * future.
      *
      * @tparam F type of the callback function
-     * @tparam R result type of the callback
+     * @tparam R Result type of the callback. Must not be void.
      */
     template<
             typename F,
             typename R = typename std::result_of<
                     typename std::decay<F>::type(common::Try<T> &&)>::type>
-    Future<R> then(F &&) &&;
+    typename std::enable_if<!std::is_void<R>::value, Future<R>>::type
+    then(F &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.

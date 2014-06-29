@@ -82,7 +82,8 @@ void FutureBase<From>::then(Function &&f, Promise<To> &&p) && {
 
 template<typename From>
 template<typename Function, typename To>
-Future<To> FutureBase<From>::then(Function &&f) && {
+typename std::enable_if<!std::is_void<To>::value, Future<To>>::type
+FutureBase<From>::then(Function &&f) && {
     std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
     std::move(*this).then(std::forward<Function>(f), std::move(pf.first));
     return std::move(pf.second);
