@@ -56,8 +56,16 @@ public:
      *
      * The behavior is undefined if this future instance has no associated
      * promise.
+     *
+     * @tparam F Type of the callback function. It must return void when called
+     * with an argument of type {@code common::Try<T> &&}.
      */
-    void setCallback(Callback &&) &&;
+    template<typename F>
+    typename std::enable_if<std::is_void<
+            typename std::result_of<
+                    typename std::decay<F>::type(common::Try<T> &&)>::type
+    >::value>::type
+    then(F &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.

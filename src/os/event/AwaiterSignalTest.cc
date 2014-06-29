@@ -67,7 +67,7 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Signal(3));
-    std::move(f).setCallback([this](Try<Trigger> &&t) {
+    std::move(f).then([this](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == Trigger::index<Signal>());
         CHECK(t->value<Signal>().number() == 3);
@@ -138,7 +138,7 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(100));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(Signal(2), Signal(6)));
-    std::move(f).setCallback([this](Try<Trigger> &&t) {
+    std::move(f).then([this](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == Trigger::index<Signal>());
         CHECK(t->value<Signal>().number() == 6);
@@ -184,7 +184,7 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     for (unsigned i = 0; i < 2; ++i) {
-        a.expect(Signal(1)).setCallback([this](Try<Trigger> &&t) {
+        a.expect(Signal(1)).then([this](Try<Trigger> &&t) {
             REQUIRE(t.hasValue());
             REQUIRE(t->index() == Trigger::index<Signal>());
             CHECK(t->value<Signal>().number() == 1);
@@ -226,7 +226,7 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     for (SignalNumber sn : {1, 2}) {
-        a.expect(Signal(sn)).setCallback([this, sn](Try<Trigger> &&t) {
+        a.expect(Signal(sn)).then([this, sn](Try<Trigger> &&t) {
             REQUIRE(t.hasValue());
             REQUIRE(t->index() == Trigger::index<Signal>());
             CHECK(t->value<Signal>().number() == sn);
@@ -271,7 +271,7 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     for (SignalNumber sn : {1, 2}) {
-        a.expect(Signal(sn)).setCallback([this, sn](Try<Trigger> &&t) {
+        a.expect(Signal(sn)).then([this, sn](Try<Trigger> &&t) {
             REQUIRE(t.hasValue());
             REQUIRE(t->index() == Trigger::index<Signal>());
             CHECK(t->value<Signal>().number() == sn);

@@ -87,7 +87,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(
             Timeout(std::chrono::seconds(5)), ReadableFileDescriptor(3)));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == t->index<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(5));
@@ -124,7 +124,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(
             Timeout(std::chrono::seconds(10)), ReadableFileDescriptor(3)));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == t->index<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 3);
@@ -186,7 +186,7 @@ TEST_CASE_METHOD(
     bool called = false;
     a.expect(fd).wrap().recover([this](std::exception_ptr) {
         return a.expect(Timeout(std::chrono::seconds(0)));
-    }).unwrap().setCallback([&](Try<Trigger> &&) {
+    }).unwrap().then([&](Try<Trigger> &&) {
         called = true;
     });
     a.awaitEvents();

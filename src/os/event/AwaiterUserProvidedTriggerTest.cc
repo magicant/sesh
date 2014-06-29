@@ -53,7 +53,7 @@ TEST_CASE_METHOD(
 
     std::shared_ptr<void> result = std::make_shared<int>(1);
     Future<Trigger> f = a.expect(UserProvidedTrigger(createFutureOf(result)));
-    std::move(f).setCallback([this, &result](Try<Trigger> &&t) {
+    std::move(f).then([this, &result](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == Trigger::index<UserProvidedTrigger>());
         CHECK(t->value<UserProvidedTrigger>().result() == result);
@@ -73,7 +73,7 @@ TEST_CASE_METHOD(
 
     Future<Trigger> f = a.expect(UserProvidedTrigger(
                 createFailedFutureOf<std::shared_ptr<void>>(7)));
-    std::move(f).setCallback([this](Try<Trigger> &&t) {
+    std::move(f).then([this](Try<Trigger> &&t) {
         try {
             *t;
         } catch (int i) {
@@ -98,7 +98,7 @@ TEST_CASE_METHOD(
     Future<Trigger> f = a.expect(triggers(
             UPT(createPromiseFuturePair<UPT::Result>().second),
             UPT(createFutureOf(result))));
-    std::move(f).setCallback([this, &result](Try<Trigger> &&t) {
+    std::move(f).then([this, &result](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == Trigger::index<UserProvidedTrigger>());
         CHECK(t->value<UserProvidedTrigger>().result() == result);
@@ -121,7 +121,7 @@ TEST_CASE_METHOD(
     });
     auto f3 = a.expect(UserProvidedTrigger(std::move(f2)));
     std::shared_ptr<void> actual;
-    std::move(f3).setCallback([&actual](Try<Trigger> &&t) {
+    std::move(f3).then([&actual](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == Trigger::index<UserProvidedTrigger>());
         actual = t->value<UserProvidedTrigger>().result();

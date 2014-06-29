@@ -35,8 +35,13 @@ namespace async {
 namespace future_impl {
 
 template<typename T>
-void FutureBase<T>::setCallback(Callback &&f) && {
-    this->delay().setCallback(std::move(f));
+template<typename Function>
+typename std::enable_if<std::is_void<
+        typename std::result_of<
+                typename std::decay<Function>::type(common::Try<T> &&)>::type
+>::value>::type
+FutureBase<T>::then(Function &&f) && {
+    this->delay().setCallback(std::forward<Function>(f));
     this->invalidate();
 }
 
@@ -76,7 +81,7 @@ template<typename From>
 template<typename Function, typename To>
 void FutureBase<From>::then(Function &&f, Promise<To> &&p) && {
     using C = Composer<To, typename std::decay<Function>::type>;
-    std::move(*this).setCallback(common::SharedFunction<C>::create(
+    std::move(*this).then(common::SharedFunction<C>::create(
             std::forward<Function>(f), std::move(p)));
 }
 
@@ -267,7 +272,7 @@ public:
 
 template<typename T>
 void Future<Future<T>>::unwrap(Promise<T> &&p) && {
-    std::move(*this).setCallback(
+    std::move(*this).then(
             common::SharedFunction<Unwrapper<T>>::create(std::move(p)));
 }
 

@@ -67,7 +67,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(
             ReadableFileDescriptor(3), WritableFileDescriptor(3)));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         switch (t->index()) {
         case Trigger::index<ReadableFileDescriptor>():
@@ -116,7 +116,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(
             ReadableFileDescriptor(3), ErrorFileDescriptor(3)));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         switch (t->index()) {
         case Trigger::index<ReadableFileDescriptor>():
@@ -165,7 +165,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(
             WritableFileDescriptor(3), ErrorFileDescriptor(3)));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         switch (t->index()) {
         case Trigger::index<WritableFileDescriptor>():
@@ -214,7 +214,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
 
     bool callback1Called = false, callback2Called = false;
-    a.expect(ReadableFileDescriptor(2)).setCallback(
+    a.expect(ReadableFileDescriptor(2)).then(
             [this, startTime, &callback1Called](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ReadableFileDescriptor>());
@@ -222,7 +222,7 @@ TEST_CASE_METHOD(
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(10));
         callback1Called = true;
     });
-    a.expect(WritableFileDescriptor(3)).setCallback(
+    a.expect(WritableFileDescriptor(3)).then(
             [this, startTime, &callback2Called](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<WritableFileDescriptor>());
@@ -254,7 +254,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
 
     bool callback1Called = false, callback2Called = false;
-    a.expect(WritableFileDescriptor(3)).setCallback(
+    a.expect(WritableFileDescriptor(3)).then(
             [this, startTime, &callback1Called](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<WritableFileDescriptor>());
@@ -262,7 +262,7 @@ TEST_CASE_METHOD(
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(10));
         callback1Called = true;
     });
-    a.expect(ErrorFileDescriptor(2)).setCallback(
+    a.expect(ErrorFileDescriptor(2)).then(
             [this, startTime, &callback2Called](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ErrorFileDescriptor>());
@@ -294,7 +294,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
 
     bool callback1Called = false, callback2Called = false;
-    a.expect(ReadableFileDescriptor(2)).setCallback(
+    a.expect(ReadableFileDescriptor(2)).then(
             [this, startTime, &callback1Called](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ReadableFileDescriptor>());
@@ -302,7 +302,7 @@ TEST_CASE_METHOD(
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(10));
         callback1Called = true;
     });
-    a.expect(ErrorFileDescriptor(3)).setCallback(
+    a.expect(ErrorFileDescriptor(3)).then(
             [this, startTime, &callback2Called](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ErrorFileDescriptor>());
@@ -332,7 +332,7 @@ TEST_CASE_METHOD(
         "Awaiter: awaiting max readable FD") {
     auto max = FileDescriptorSetImpl::MAX_VALUE;
     bool callbackCalled = false;
-    a.expect(ReadableFileDescriptor(max)).setCallback(
+    a.expect(ReadableFileDescriptor(max)).then(
             [this, max, &callbackCalled](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ReadableFileDescriptor>());
@@ -359,7 +359,7 @@ TEST_CASE_METHOD(
         "Awaiter: domain error from FD set") {
     auto max = FileDescriptorSetImpl::MAX_VALUE;
     bool callbackCalled = false;
-    a.expect(ReadableFileDescriptor(max + 1)).setCallback(
+    a.expect(ReadableFileDescriptor(max + 1)).then(
             [this, &callbackCalled](Try<Trigger> &&t) {
         try {
             *t;

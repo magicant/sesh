@@ -62,7 +62,7 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(WritableFileDescriptor(4));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<WritableFileDescriptor>());
         CHECK(t->value<WritableFileDescriptor>().value() == 4);
@@ -100,7 +100,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(
             WritableFileDescriptor(2), WritableFileDescriptor(0)));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<WritableFileDescriptor>());
         CHECK(t->value<WritableFileDescriptor>().value() == 0);
@@ -139,7 +139,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(
             WritableFileDescriptor(2), WritableFileDescriptor(0)));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<WritableFileDescriptor>());
         auto fd = t->value<WritableFileDescriptor>().value();
@@ -177,7 +177,7 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutableSteadyClockNow() = startTime;
 
-    a.expect(WritableFileDescriptor(1)).setCallback(
+    a.expect(WritableFileDescriptor(1)).then(
             [this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<WritableFileDescriptor>());
@@ -185,7 +185,7 @@ TEST_CASE_METHOD(
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(9));
         mutableSteadyClockNow() += std::chrono::seconds(1);
     });
-    a.expect(WritableFileDescriptor(3)).setCallback(
+    a.expect(WritableFileDescriptor(3)).then(
             [this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<WritableFileDescriptor>());
@@ -245,8 +245,8 @@ TEST_CASE_METHOD(
         CHECK(t->value<WritableFileDescriptor>().value() == 7);
         mutableSteadyClockNow() += std::chrono::seconds(1);
     };
-    a.expect(WritableFileDescriptor(7)).setCallback(callback);
-    a.expect(WritableFileDescriptor(7)).setCallback(callback);
+    a.expect(WritableFileDescriptor(7)).then(callback);
+    a.expect(WritableFileDescriptor(7)).then(callback);
 
     unsigned count = 0;
     implementation() = [this, &count](

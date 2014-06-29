@@ -62,7 +62,7 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(ErrorFileDescriptor(4));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ErrorFileDescriptor>());
         CHECK(t->value<ErrorFileDescriptor>().value() == 4);
@@ -100,7 +100,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(
             ErrorFileDescriptor(2), ErrorFileDescriptor(0)));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ErrorFileDescriptor>());
         CHECK(t->value<ErrorFileDescriptor>().value() == 0);
@@ -139,7 +139,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(triggers(
             ErrorFileDescriptor(2), ErrorFileDescriptor(0)));
-    std::move(f).setCallback([this, startTime](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ErrorFileDescriptor>());
         auto fd = t->value<ErrorFileDescriptor>().value();
@@ -177,16 +177,14 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutableSteadyClockNow() = startTime;
 
-    a.expect(ErrorFileDescriptor(1)).setCallback(
-            [this, startTime](Try<Trigger> &&t) {
+    a.expect(ErrorFileDescriptor(1)).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ErrorFileDescriptor>());
         CHECK(t->value<ErrorFileDescriptor>().value() == 1);
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(9));
         mutableSteadyClockNow() += std::chrono::seconds(1);
     });
-    a.expect(ErrorFileDescriptor(3)).setCallback(
-            [this, startTime](Try<Trigger> &&t) {
+    a.expect(ErrorFileDescriptor(3)).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<ErrorFileDescriptor>());
         CHECK(t->value<ErrorFileDescriptor>().value() == 3);
@@ -245,8 +243,8 @@ TEST_CASE_METHOD(
         CHECK(t->value<ErrorFileDescriptor>().value() == 7);
         mutableSteadyClockNow() += std::chrono::seconds(1);
     };
-    a.expect(ErrorFileDescriptor(7)).setCallback(callback);
-    a.expect(ErrorFileDescriptor(7)).setCallback(callback);
+    a.expect(ErrorFileDescriptor(7)).then(callback);
+    a.expect(ErrorFileDescriptor(7)).then(callback);
 
     unsigned count = 0;
     implementation() = [this, &count](
