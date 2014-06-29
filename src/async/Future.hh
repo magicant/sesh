@@ -238,13 +238,15 @@ public:
 
     /**
      * Unwraps this nested future. The argument promise will receive the same
-     * result as the inner future.
+     * result as the inner future. If either future is invalid, the behavior is
+     * undefined.
      */
     void unwrap(Promise<T> &&) &&;
 
     /**
      * Unwraps this nested future. The returned future will receive the same
-     * result as the inner future.
+     * result as the inner future. If either future is invalid, the behavior is
+     * undefined.
      */
     Future<T> unwrap() &&;
 
