@@ -45,8 +45,6 @@ class FutureBase : public DelayHolder<T> {
 
 public:
 
-    using Callback = typename Delay<T>::Callback;
-
     using DelayHolder<T>::DelayHolder;
 
     /**
@@ -56,8 +54,16 @@ public:
      *
      * The behavior is undefined if this future instance has no associated
      * promise.
+     *
+     * @tparam F Type of the callback function. It must return void when called
+     * with an argument of type {@code common::Try<T> &&}.
      */
-    void setCallback(Callback &&) &&;
+    template<typename F>
+    typename std::enable_if<std::is_void<
+            typename std::result_of<
+                    typename std::decay<F>::type(common::Try<T> &&)>::type
+    >::value>::type
+    then(F &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.
@@ -67,8 +73,9 @@ public:
      * set to the argument promise. If the callback throws an exception, that
      * will be propagated to the promise.
      *
-     * @tparam F type of the callback function
-     * @tparam R result type of the callback
+     * @tparam F Type of the callback function. It must be callable with an
+     * argument of type {@code common::Try<T> &&}.
+     * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
     void then(F &&, Promise<R> &&) &&;
@@ -82,14 +89,16 @@ public:
      * callback throws an exception, that will be propagated to the returned
      * future.
      *
-     * @tparam F type of the callback function
-     * @tparam R result type of the callback
+     * @tparam F Type of the callback function. It must be callable with an
+     * argument of type {@code common::Try<T> &&}.
+     * @tparam R Result type of the callback. Must not be void.
      */
     template<
             typename F,
             typename R = typename std::result_of<
                     typename std::decay<F>::type(common::Try<T> &&)>::type>
-    Future<R> then(F &&) &&;
+    typename std::enable_if<!std::is_void<R>::value, Future<R>>::type
+    then(F &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.
@@ -102,8 +111,9 @@ public:
      *
      * If the callback throws an exception, that will be propagated alike.
      *
-     * @tparam F type of the callback function
-     * @tparam R result type of the callback
+     * @tparam F Type of the callback function. It must be callable with an
+     * argument of type {@code T &&}.
+     * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
     void map(F &&, Promise<R> &&) &&;
@@ -121,8 +131,9 @@ public:
      *
      * If the callback throws an exception, that will be propagated alike.
      *
-     * @tparam F type of the callback function
-     * @tparam R result type of the callback
+     * @tparam F Type of the callback function. It must be callable with an
+     * argument of type {@code T &&}.
+     * @tparam R Result type of the callback.
      */
     template<
             typename F,
@@ -143,16 +154,14 @@ public:
      * If the callback function or the move-constructor of the result throws an
      * exception, that will be propagated to the promise.
      *
-     * @tparam F Parameter type of the callback function. It must be callable
-     * with an exception pointer parameter and return a result of type T.
+     * @tparam F Type of the callback function. It must be callable with an
+     * exception pointer parameter and return a result of type T.
      */
-    template<
-            typename F,
-            typename = typename std::enable_if<std::is_same<
-                    T,
-                    typename std::result_of<F(std::exception_ptr)>::type
-            >::value>::type>
-    void recover(F &&, Promise<T> &&) &&;
+    template<typename F>
+    typename std::enable_if<std::is_same<
+            T, typename std::result_of<F(std::exception_ptr)>::type
+    >::value>::type
+    recover(F &&, Promise<T> &&) &&;
 
     /**
      * Sets a callback function that recovers this future from an exception.
@@ -168,16 +177,14 @@ public:
      * If the callback function or the move-constructor of the result throws an
      * exception, that will be propagated to the returned future.
      *
-     * @tparam F Parameter type of the callback function. It must be callable
-     * with an exception pointer parameter and return a result of type T.
+     * @tparam F Type of the callback function. It must be callable with an
+     * exception pointer parameter and return a result of type T.
      */
-    template<
-            typename F,
-            typename = typename std::enable_if<std::is_same<
-                    T,
-                    typename std::result_of<F(std::exception_ptr)>::type
-            >::value>::type>
-    Future<T> recover(F &&) &&;
+    template<typename F>
+    typename std::enable_if<std::is_same<
+            T, typename std::result_of<F(std::exception_ptr)>::type
+    >::value, Future<T>>::type
+    recover(F &&) &&;
 
     /**
      * Adds a callback to this future so that its result will be set to the
@@ -242,13 +249,15 @@ public:
 
     /**
      * Unwraps this nested future. The argument promise will receive the same
-     * result as the inner future.
+     * result as the inner future. If either future is invalid, the behavior is
+     * undefined.
      */
     void unwrap(Promise<T> &&) &&;
 
     /**
      * Unwraps this nested future. The returned future will receive the same
-     * result as the inner future.
+     * result as the inner future. If either future is invalid, the behavior is
+     * undefined.
      */
     Future<T> unwrap() &&;
 

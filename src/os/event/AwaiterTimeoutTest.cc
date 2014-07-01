@@ -85,7 +85,7 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<UnimplementedApi>,
         "Awaiter: does nothing for empty trigger set") {
     Future<Trigger> f = a.expect(triggers());
-    std::move(f).setCallback([](Try<Trigger> &&) { FAIL("callback called"); });
+    std::move(f).then([](Try<Trigger> &&) { FAIL("callback called"); });
     a.awaitEvents();
 }
 
@@ -110,8 +110,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(0)));
     bool callbackCalled = false;
-    std::move(f).setCallback(
-            [this, startTime, &callbackCalled](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(0));
@@ -149,8 +148,7 @@ TimeoutTest<durationInSecondsInt>::TimeoutTest() {
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Timeout(duration()));
     bool callbackCalled = false;
-    std::move(f).setCallback(
-            [this, startTime, &callbackCalled](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<Timeout>());
         CHECK(t->value<Timeout>().interval() == duration());
@@ -193,8 +191,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(-10)));
     bool callbackCalled = false;
-    std::move(f).setCallback(
-            [this, startTime, &callbackCalled](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(-10));
@@ -235,8 +232,7 @@ TEST_CASE_METHOD(
             Timeout(std::chrono::seconds(5)),
             Timeout(std::chrono::seconds(20))));
     bool callbackCalled = false;
-    std::move(f).setCallback(
-            [this, startTime, &callbackCalled](Try<Trigger> &&t) {
+    std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(5));
@@ -274,8 +270,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f1 = a.expect(Timeout(std::chrono::seconds(10)));
     bool callback1Called = false;
-    std::move(f1).setCallback(
-            [this, startTime, &callback1Called](Try<Trigger> &&t) {
+    std::move(f1).then([this, startTime, &callback1Called](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(10));
@@ -287,8 +282,7 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime + std::chrono::seconds(1);
     Future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(29)));
     bool callback2Called = false;
-    std::move(f2).setCallback(
-            [this, startTime, &callback2Called](Try<Trigger> &&t) {
+    std::move(f2).then([this, startTime, &callback2Called](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         CHECK(t->index() == Trigger::index<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(29));
@@ -352,8 +346,7 @@ TEST_CASE_METHOD(
         Future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(8)));
         mutableSteadyClockNow() += std::chrono::seconds(1);
         return f2;
-    }).unwrap().setCallback(
-            [this, startTime, &callbackCalled](Try<Trigger> &&t) {
+    }).unwrap().then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
         CHECK(t->index() == Trigger::index<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(8));
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(113));

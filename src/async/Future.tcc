@@ -35,8 +35,13 @@ namespace async {
 namespace future_impl {
 
 template<typename T>
-void FutureBase<T>::setCallback(Callback &&f) && {
-    this->delay().setCallback(std::move(f));
+template<typename Function>
+typename std::enable_if<std::is_void<
+        typename std::result_of<
+                typename std::decay<Function>::type(common::Try<T> &&)>::type
+>::value>::type
+FutureBase<T>::then(Function &&f) && {
+    this->delay().setCallback(std::forward<Function>(f));
     this->invalidate();
 }
 
@@ -49,7 +54,7 @@ std::pair<Promise<T>, Future<T>> createPromiseFuturePair() {
             std::forward_as_tuple(delay));
 }
 
-template<typename From, typename To, typename Function>
+template<typename To, typename Function>
 class Composer {
 
 private:
@@ -64,9 +69,10 @@ public:
             mFunction(std::forward<F>(function)),
             mReceiver(std::move(receiver)) { }
 
-    void operator()(common::Try<From> &&r) {
+    template<typename From>
+    void operator()(From &&r) {
         std::move(mReceiver).setResultFrom(
-                [this, &r] { return mFunction(std::move(r)); });
+                [this, &r] { return mFunction(std::forward<From>(r)); });
     }
 
 };
@@ -74,20 +80,21 @@ public:
 template<typename From>
 template<typename Function, typename To>
 void FutureBase<From>::then(Function &&f, Promise<To> &&p) && {
-    using C = Composer<From, To, typename std::decay<Function>::type>;
-    std::move(*this).setCallback(common::SharedFunction<C>::create(
+    using C = Composer<To, typename std::decay<Function>::type>;
+    std::move(*this).then(common::SharedFunction<C>::create(
             std::forward<Function>(f), std::move(p)));
 }
 
 template<typename From>
 template<typename Function, typename To>
-Future<To> FutureBase<From>::then(Function &&f) && {
+typename std::enable_if<!std::is_void<To>::value, Future<To>>::type
+FutureBase<From>::then(Function &&f) && {
     std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
     std::move(*this).then(std::forward<Function>(f), std::move(pf.first));
     return std::move(pf.second);
 }
 
-template<typename From, typename To, typename Function>
+template<typename Function>
 class Mapper {
 
 private:
@@ -99,7 +106,9 @@ public:
     template<typename F>
     Mapper(F &&function) : mFunction(std::forward<F>(function)) { }
 
-    To operator()(common::Try<From> &&r) {
+    template<typename From>
+    auto operator()(common::Try<From> &&r)
+            -> decltype(mFunction(std::move(*r))) {
         return mFunction(std::move(*r));
     }
 
@@ -108,7 +117,7 @@ public:
 template<typename From>
 template<typename Function, typename To>
 void FutureBase<From>::map(Function &&f, Promise<To> &&p) && {
-    using M = Mapper<From, To, typename std::decay<Function>::type>;
+    using M = Mapper<typename std::decay<Function>::type>;
     std::move(*this).then(M(std::forward<Function>(f)), std::move(p));
 }
 
@@ -120,7 +129,7 @@ Future<To> FutureBase<From>::map(Function &&f) && {
     return std::move(pf.second);
 }
 
-template<typename T, typename Function>
+template<typename Function>
 class Recoverer {
 
 private:
@@ -132,6 +141,7 @@ public:
     template<typename F>
     Recoverer(F &&function) : mFunction(std::forward<F>(function)) { }
 
+    template<typename T>
     T operator()(common::Try<T> &&r) {
         if (r.hasValue())
             return std::move(*r);
@@ -141,15 +151,21 @@ public:
 };
 
 template<typename T>
-template<typename F, typename>
-void FutureBase<T>::recover(F &&function, Promise<T> &&p) && {
-    using R = Recoverer<T, typename std::decay<F>::type>;
+template<typename F>
+typename std::enable_if<std::is_same<
+        T, typename std::result_of<F(std::exception_ptr)>::type
+>::value>::type
+FutureBase<T>::recover(F &&function, Promise<T> &&p) && {
+    using R = Recoverer<typename std::decay<F>::type>;
     std::move(*this).then(R(std::forward<F>(function)), std::move(p));
 }
 
 template<typename T>
-template<typename F, typename>
-Future<T> FutureBase<T>::recover(F &&function) && {
+template<typename F>
+typename std::enable_if<std::is_same<
+        T, typename std::result_of<F(std::exception_ptr)>::type
+>::value, Future<T>>::type
+FutureBase<T>::recover(F &&function) && {
     std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
     std::move(*this).recover(std::forward<F>(function), std::move(pf.first));
     return std::move(pf.second);
@@ -256,7 +272,7 @@ public:
 
 template<typename T>
 void Future<Future<T>>::unwrap(Promise<T> &&p) && {
-    std::move(*this).setCallback(
+    std::move(*this).then(
             common::SharedFunction<Unwrapper<T>>::create(std::move(p)));
 }
 
