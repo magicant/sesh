@@ -107,6 +107,11 @@ public:
     Mapper(F &&function) : mFunction(std::forward<F>(function)) { }
 
     template<typename From>
+    auto operator()(const common::Try<From> &r) -> decltype(mFunction(*r)) {
+        return mFunction(*r);
+    }
+
+    template<typename From>
     auto operator()(common::Try<From> &&r)
             -> decltype(mFunction(std::move(*r))) {
         return mFunction(std::move(*r));
@@ -140,6 +145,13 @@ public:
 
     template<typename F>
     Recoverer(F &&function) : mFunction(std::forward<F>(function)) { }
+
+    template<typename T>
+    T operator()(const common::Try<T> &r) {
+        if (r.hasValue())
+            return *r;
+        return mFunction(r.template value<std::exception_ptr>());
+    }
 
     template<typename T>
     T operator()(common::Try<T> &&r) {

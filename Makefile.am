@@ -25,6 +25,7 @@ TESTPROGRAMS = \
 	src/async/DelayTest \
 	src/async/FutureTest \
 	src/async/PromiseTest \
+	src/async/SharedFutureTest \
 	src/common/ContainerHelperTest \
 	src/common/EnumSetTest \
 	src/common/MaybeTest \
@@ -104,6 +105,8 @@ src_sesh_SOURCES = \
 	src/async/Future.hh \
 	src/async/Future.tcc \
 	src/async/Promise.hh \
+	src/async/SharedFuture.hh \
+	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
 	src/common/Char.hh \
 	src/common/ContainerHelper.hh \
@@ -290,6 +293,8 @@ src_async_FutureTest_SOURCES = \
 	src/async/FutureTest.cc
 src_async_PromiseTest_SOURCES = \
 	src/async/PromiseTest.cc
+src_async_SharedFutureTest_SOURCES = \
+	src/async/SharedFutureTest.cc
 src_common_ContainerHelperTest_SOURCES = \
 	src/common/ContainerHelperTest.cc
 src_common_EnumSetTest_SOURCES = \
