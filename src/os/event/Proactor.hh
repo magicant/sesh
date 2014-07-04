@@ -58,6 +58,9 @@ public:
      * user-provided trigger fires the event, the future that was returned from
      * this function provides a user-provided trigger object that was
      * constructed by the constructor that takes a shared pointer argument.
+     *
+     * If a file descriptor trigger contains an out-of-range file descriptor,
+     * the returned future fails with std::domain_error.
      */
     async::Future<Trigger> expect(std::vector<Trigger> &&triggers) {
         return expectImpl(std::move(triggers));
