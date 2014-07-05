@@ -25,7 +25,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "common/Nop.hh"
 
 namespace sesh {
 namespace common {
@@ -125,7 +124,16 @@ template<typename T, typename... Arg>
 std::vector<T> createVectorOf(Arg &&... arg) {
     std::vector<T> v;
     v.reserve(sizeof...(arg));
-    Nop{(v.push_back(std::forward<Arg>(arg)), nullptr)...};
+
+    /*
+     * List-initialization guarantees sequential evaluation of the parameter
+     * pack expansion. XXX To work around the GCC 4.8 bug, we use a dummy array
+     * here.
+     */
+    // Nop{(v.push_back(std::forward<Arg>(arg)), 0)...};
+    int dummy[] {(v.push_back(std::forward<Arg>(arg)), 0)..., 0};
+    (void) dummy;
+
     return v;
 }
 
