@@ -24,6 +24,8 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <vector>
+#include "common/Nop.hh"
 
 namespace sesh {
 namespace common {
@@ -113,6 +115,18 @@ bool contains(InputIterator begin, InputIterator end, const Element &e) {
 template<typename Container, typename Element>
 bool contains(const Container &c, const Element &e) {
     return find(c, e) != c.end();
+}
+
+/**
+ * Creates a new vector that contains the arguments. The vector elements are
+ * move- or copy-constructed from the arguments.
+ */
+template<typename T, typename... Arg>
+std::vector<T> createVectorOf(Arg &&... arg) {
+    std::vector<T> v;
+    v.reserve(sizeof...(arg));
+    Nop{(v.push_back(std::forward<Arg>(arg)), nullptr)...};
+    return v;
 }
 
 } // namespace common

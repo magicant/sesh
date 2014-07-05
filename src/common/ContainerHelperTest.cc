@@ -21,6 +21,7 @@
 #include "catch.hpp"
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include "common/ContainerHelper.hh"
@@ -29,6 +30,7 @@
 namespace {
 
 using sesh::common::contains;
+using sesh::common::createVectorOf;
 using sesh::common::find;
 
 TEST_CASE("Container helper: find first 2 in vector {1, 2, 5, 2}") {
@@ -87,6 +89,43 @@ TEST_CASE("String \"hello\" contains 'l'") {
 TEST_CASE("String \"hello\" doesn't 'x'") {
     std::string s = "hello";
     CHECK_FALSE(contains(s, 'x'));
+}
+
+TEST_CASE("Container helper: create vector of {}") {
+    std::vector<int> v = createVectorOf<int>();
+    CHECK(v.empty());
+}
+
+TEST_CASE("Container helper: create vector of {1}") {
+    std::vector<int> v = createVectorOf<int>(1);
+    CHECK(v.size() == 1);
+    CHECK(v.at(0) == 1);
+}
+
+TEST_CASE("Container helper: create vector of {2, 1}") {
+    std::vector<int> v = createVectorOf<int>(2, 1);
+    CHECK(v.size() == 2);
+    CHECK(v.at(0) == 2);
+    CHECK(v.at(1) == 1);
+}
+
+TEST_CASE("Container helper: create vector of {4, 2, 1, 3}") {
+    std::vector<int> v = createVectorOf<int>(4, 2, 1, 3);
+    CHECK(v.size() == 4);
+    CHECK(v.at(0) == 4);
+    CHECK(v.at(1) == 2);
+    CHECK(v.at(2) == 1);
+    CHECK(v.at(3) == 3);
+}
+
+TEST_CASE("Container helper: create vector of unique pointer") {
+    std::vector<std::unique_ptr<int>> v =
+            createVectorOf<std::unique_ptr<int>>(
+                    std::unique_ptr<int>(new int(100)),
+                    std::unique_ptr<int>(new int(200)));
+    CHECK(v.size() == 2);
+    CHECK(*v.at(0) == 100);
+    CHECK(*v.at(1) == 200);
 }
 
 } // namespace
