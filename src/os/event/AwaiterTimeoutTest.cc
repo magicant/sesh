@@ -35,7 +35,6 @@
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/SignalNumberSet.hh"
 #include "os/test_helper/PselectApiStub.hh"
-#include "os/test_helper/UnimplementedApi.hh"
 
 /*
 namespace std {
@@ -70,23 +69,8 @@ using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
 using sesh::os::test_helper::PselectApiStub;
-using sesh::os::test_helper::UnimplementedApi;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
-
-TEST_CASE_METHOD(
-        AwaiterTestFixture<UnimplementedApi>,
-        "Awaiter: doesn't wait if no events are pending") {
-    a.awaitEvents();
-}
-
-TEST_CASE_METHOD(
-        AwaiterTestFixture<UnimplementedApi>,
-        "Awaiter: does nothing for empty trigger set") {
-    Future<Trigger> f = a.expect();
-    std::move(f).then([](Try<Trigger> &&) { FAIL("callback called"); });
-    a.awaitEvents();
-}
 
 template<int durationInSecondsInt>
 class TimeoutTest : protected AwaiterTestFixture<PselectAndNowApiStub> {

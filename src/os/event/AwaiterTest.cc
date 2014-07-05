@@ -34,6 +34,7 @@
 #include "os/signaling/SignalNumberSet.hh"
 #include "os/test_helper/SigactionApiFake.hh"
 #include "os/test_helper/SignalMaskApiFake.hh"
+#include "os/test_helper/UnimplementedApi.hh"
 
 /*
 namespace std {
@@ -70,6 +71,7 @@ using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
 using sesh::os::test_helper::SigactionApiFake;
 using sesh::os::test_helper::SignalMaskApiFake;
+using sesh::os::test_helper::UnimplementedApi;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
 
@@ -78,6 +80,20 @@ class SignalAwaiterTestApiFake :
         public virtual SigactionApiFake,
         public virtual SignalMaskApiFake {
 };
+
+TEST_CASE_METHOD(
+        AwaiterTestFixture<UnimplementedApi>,
+        "Awaiter: doesn't wait if no events are pending") {
+    a.awaitEvents();
+}
+
+TEST_CASE_METHOD(
+        AwaiterTestFixture<UnimplementedApi>,
+        "Awaiter: does nothing for empty trigger set") {
+    Future<Trigger> f = a.expect();
+    std::move(f).then([](Try<Trigger> &&) { FAIL("callback called"); });
+    a.awaitEvents();
+}
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<PselectAndNowApiStub>,
