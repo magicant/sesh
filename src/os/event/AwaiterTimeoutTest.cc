@@ -66,7 +66,6 @@ using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
-using sesh::os::event::triggers;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
@@ -84,7 +83,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         AwaiterTestFixture<UnimplementedApi>,
         "Awaiter: does nothing for empty trigger set") {
-    Future<Trigger> f = a.expect(triggers());
+    Future<Trigger> f = a.expect();
     std::move(f).then([](Try<Trigger> &&) { FAIL("callback called"); });
     a.awaitEvents();
 }
@@ -227,10 +226,10 @@ TEST_CASE_METHOD(
         "Awaiter: duplicate timeouts in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(-100));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(triggers(
+    Future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(10)),
             Timeout(std::chrono::seconds(5)),
-            Timeout(std::chrono::seconds(20))));
+            Timeout(std::chrono::seconds(20)));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());

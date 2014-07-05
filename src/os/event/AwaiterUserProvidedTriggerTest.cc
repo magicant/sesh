@@ -41,7 +41,6 @@ using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Trigger;
 using sesh::os::event::UserProvidedTrigger;
-using sesh::os::event::triggers;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
 
@@ -95,9 +94,9 @@ TEST_CASE_METHOD(
 
     using UPT = UserProvidedTrigger;
     std::shared_ptr<void> result = std::make_shared<int>(2);
-    Future<Trigger> f = a.expect(triggers(
+    Future<Trigger> f = a.expect(
             UPT(createPromiseFuturePair<UPT::Result>().second),
-            UPT(createFutureOf(result))));
+            UPT(createFutureOf(result)));
     std::move(f).then([this, &result](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == Trigger::index<UserProvidedTrigger>());

@@ -23,6 +23,7 @@
 #include <utility>
 #include <vector>
 #include "async/Future.hh"
+#include "common/ContainerHelper.hh"
 #include "os/event/Trigger.hh"
 
 namespace sesh {
@@ -66,11 +67,18 @@ public:
         return expectImpl(std::move(triggers));
     }
 
+    void expect(std::vector<Trigger> &) = delete;
+    void expect(const std::vector<Trigger> &) = delete;
+
     /**
-     * A convenient version of {@link #expect(std::vector<Trigger> &&)} with a
-     * single trigger.
+     * A convenient version of {@link #expect(std::vector<Trigger> &&)} to
+     * which you can directly pass triggers as arguments.
      */
-    async::Future<Trigger> expect(Trigger &&);
+    template<typename... TriggerArg>
+    async::Future<Trigger> expect(TriggerArg &&... t) {
+        return expectImpl(common::createVectorOf<Trigger>(
+                std::forward<TriggerArg>(t)...));
+    }
 
 }; // class Proactor
 

@@ -45,7 +45,6 @@ using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Signal;
 using sesh::os::event::Trigger;
-using sesh::os::event::triggers;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumber;
@@ -137,7 +136,7 @@ TEST_CASE_METHOD(
         "Awaiter: two signals in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(100));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(triggers(Signal(2), Signal(6)));
+    Future<Trigger> f = a.expect(Signal(2), Signal(6));
     std::move(f).then([this](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == Trigger::index<Signal>());
