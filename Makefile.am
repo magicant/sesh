@@ -266,7 +266,6 @@ src_sesh_SOURCES = \
 	src/os/event/Awaiter.hh \
 	src/os/event/ErrorFileDescriptor.hh \
 	src/os/event/FileDescriptorCondition.hh \
-	src/os/event/Proactor.cc \
 	src/os/event/Proactor.hh \
 	src/os/event/ReadableFileDescriptor.hh \
 	src/os/event/Signal.hh \
@@ -790,56 +789,48 @@ src_os_event_AwaiterErrorFileDescriptorTest_SOURCES = \
 	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterErrorFileDescriptorTest.cc \
-	src/os/event/Proactor.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterFileDescriptorTest_SOURCES = \
 	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterFileDescriptorTest.cc \
-	src/os/event/Proactor.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterReadableFileDescriptorTest_SOURCES = \
 	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterReadableFileDescriptorTest.cc \
-	src/os/event/Proactor.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterSignalTest_SOURCES = \
 	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterSignalTest.cc \
-	src/os/event/Proactor.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterTest_SOURCES = \
 	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterTest.cc \
-	src/os/event/Proactor.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterTimeoutTest_SOURCES = \
 	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterTimeoutTest.cc \
-	src/os/event/Proactor.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterUserProvidedTriggerTest_SOURCES = \
 	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterUserProvidedTriggerTest.cc \
-	src/os/event/Proactor.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterWritableFileDescriptorTest_SOURCES = \
 	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterWritableFileDescriptorTest.cc \
-	src/os/event/Proactor.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_io_FileDescriptorTest_SOURCES = \

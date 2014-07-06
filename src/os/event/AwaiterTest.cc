@@ -34,6 +34,7 @@
 #include "os/signaling/SignalNumberSet.hh"
 #include "os/test_helper/SigactionApiFake.hh"
 #include "os/test_helper/SignalMaskApiFake.hh"
+#include "os/test_helper/UnimplementedApi.hh"
 
 /*
 namespace std {
@@ -65,12 +66,12 @@ using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Signal;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
-using sesh::os::event::triggers;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
 using sesh::os::test_helper::SigactionApiFake;
 using sesh::os::test_helper::SignalMaskApiFake;
+using sesh::os::test_helper::UnimplementedApi;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
 
@@ -81,12 +82,26 @@ class SignalAwaiterTestApiFake :
 };
 
 TEST_CASE_METHOD(
+        AwaiterTestFixture<UnimplementedApi>,
+        "Awaiter: doesn't wait if no events are pending") {
+    a.awaitEvents();
+}
+
+TEST_CASE_METHOD(
+        AwaiterTestFixture<UnimplementedApi>,
+        "Awaiter: does nothing for empty trigger set") {
+    Future<Trigger> f = a.expect();
+    std::move(f).then([](Try<Trigger> &&) { FAIL("callback called"); });
+    a.awaitEvents();
+}
+
+TEST_CASE_METHOD(
         AwaiterTestFixture<PselectAndNowApiStub>,
         "Awaiter: timeout with FD trigger in same set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(triggers(
-            Timeout(std::chrono::seconds(5)), ReadableFileDescriptor(3)));
+    Future<Trigger> f = a.expect(
+            Timeout(std::chrono::seconds(5)), ReadableFileDescriptor(3));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == t->index<Timeout>());
@@ -122,8 +137,8 @@ TEST_CASE_METHOD(
         "Awaiter: FD trigger with timeout in same set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(triggers(
-            Timeout(std::chrono::seconds(10)), ReadableFileDescriptor(3)));
+    Future<Trigger> f = a.expect(
+            Timeout(std::chrono::seconds(10)), ReadableFileDescriptor(3));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         REQUIRE(t->index() == t->index<ReadableFileDescriptor>());
@@ -156,7 +171,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         AwaiterTestFixture<SignalAwaiterTestApiFake>,
         "Awaiter: signal handler is reset after event fired (with timeout)") {
-    a.expect(triggers(Timeout(std::chrono::seconds(1)), Signal(1)));
+    a.expect(Timeout(std::chrono::seconds(1)), Signal(1));
 
     implementation() = [this](
             const PselectApiStub &,

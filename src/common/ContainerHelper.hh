@@ -24,6 +24,7 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace sesh {
 namespace common {
@@ -113,6 +114,27 @@ bool contains(InputIterator begin, InputIterator end, const Element &e) {
 template<typename Container, typename Element>
 bool contains(const Container &c, const Element &e) {
     return find(c, e) != c.end();
+}
+
+/**
+ * Creates a new vector that contains the arguments. The vector elements are
+ * move- or copy-constructed from the arguments.
+ */
+template<typename T, typename... Arg>
+std::vector<T> createVectorOf(Arg &&... arg) {
+    std::vector<T> v;
+    v.reserve(sizeof...(arg));
+
+    /*
+     * List-initialization guarantees sequential evaluation of the parameter
+     * pack expansion. XXX To work around the GCC 4.8 bug, we use a dummy array
+     * here.
+     */
+    // Nop{(v.push_back(std::forward<Arg>(arg)), 0)...};
+    int dummy[] {(v.push_back(std::forward<Arg>(arg)), 0)..., 0};
+    (void) dummy;
+
+    return v;
 }
 
 } // namespace common

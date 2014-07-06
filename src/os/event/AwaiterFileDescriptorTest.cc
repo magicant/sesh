@@ -51,7 +51,6 @@ using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
 using sesh::os::event::UserProvidedTrigger;
 using sesh::os::event::WritableFileDescriptor;
-using sesh::os::event::triggers;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
@@ -65,8 +64,8 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing readable and writable FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(triggers(
-            ReadableFileDescriptor(3), WritableFileDescriptor(3)));
+    Future<Trigger> f = a.expect(
+            ReadableFileDescriptor(3), WritableFileDescriptor(3));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         switch (t->index()) {
@@ -114,8 +113,8 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing readable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(triggers(
-            ReadableFileDescriptor(3), ErrorFileDescriptor(3)));
+    Future<Trigger> f = a.expect(
+            ReadableFileDescriptor(3), ErrorFileDescriptor(3));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         switch (t->index()) {
@@ -163,8 +162,8 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing writable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(triggers(
-            WritableFileDescriptor(3), ErrorFileDescriptor(3)));
+    Future<Trigger> f = a.expect(
+            WritableFileDescriptor(3), ErrorFileDescriptor(3));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
         switch (t->index()) {

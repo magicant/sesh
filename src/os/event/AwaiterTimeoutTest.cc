@@ -35,7 +35,6 @@
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/SignalNumberSet.hh"
 #include "os/test_helper/PselectApiStub.hh"
-#include "os/test_helper/UnimplementedApi.hh"
 
 /*
 namespace std {
@@ -66,28 +65,12 @@ using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
-using sesh::os::event::triggers;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumberSet;
 using sesh::os::test_helper::PselectApiStub;
-using sesh::os::test_helper::UnimplementedApi;
 
 using TimePoint = sesh::os::Api::SteadyClockTime;
-
-TEST_CASE_METHOD(
-        AwaiterTestFixture<UnimplementedApi>,
-        "Awaiter: doesn't wait if no events are pending") {
-    a.awaitEvents();
-}
-
-TEST_CASE_METHOD(
-        AwaiterTestFixture<UnimplementedApi>,
-        "Awaiter: does nothing for empty trigger set") {
-    Future<Trigger> f = a.expect(triggers());
-    std::move(f).then([](Try<Trigger> &&) { FAIL("callback called"); });
-    a.awaitEvents();
-}
 
 template<int durationInSecondsInt>
 class TimeoutTest : protected AwaiterTestFixture<PselectAndNowApiStub> {
@@ -227,10 +210,10 @@ TEST_CASE_METHOD(
         "Awaiter: duplicate timeouts in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(-100));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(triggers(
+    Future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(10)),
             Timeout(std::chrono::seconds(5)),
-            Timeout(std::chrono::seconds(20))));
+            Timeout(std::chrono::seconds(20)));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
