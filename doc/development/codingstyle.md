@@ -154,6 +154,8 @@ If at least one of the following special member functions is explicitly declared
 - Move assignment operator
 - Destructor
 
+Exceptionally, an empty interface-like class that has no base classes or data members may have a virtual destructor declared without declaring other special member functions.
+
 Prefer defaulted definition of special member functions over manual definition where possible.
 
 ### Function parameters
