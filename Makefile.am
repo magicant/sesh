@@ -256,7 +256,6 @@ src_sesh_SOURCES = \
 	src/language/syntax/Word.hh \
 	src/language/syntax/WordComponent.hh \
 	src/main.cc \
-	src/os/Api.cc \
 	src/os/Api.hh \
 	src/os/ApiImpl.cc \
 	src/os/capi.c \
@@ -277,6 +276,8 @@ src_sesh_SOURCES = \
 	src/os/io/FileDescriptorSet.hh \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfiguration.hh \
+	src/os/signaling/HandlerConfigurationApi.cc \
+	src/os/signaling/HandlerConfigurationApi.hh \
 	src/os/signaling/SignalErrorCategory.cc \
 	src/os/signaling/SignalErrorCategory.hh \
 	src/os/signaling/SignalErrorCode.hh \
@@ -786,58 +787,58 @@ src_language_syntax_WordTest_SOURCES = \
 	src/language/syntax/Word.cc \
 	src/language/syntax/WordTest.cc
 src_os_event_AwaiterErrorFileDescriptorTest_SOURCES = \
-	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterErrorFileDescriptorTest.cc \
 	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterFileDescriptorTest_SOURCES = \
-	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterFileDescriptorTest.cc \
 	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterReadableFileDescriptorTest_SOURCES = \
-	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterReadableFileDescriptorTest.cc \
 	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterSignalTest_SOURCES = \
-	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterSignalTest.cc \
 	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterTest_SOURCES = \
-	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterTest.cc \
 	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterTimeoutTest_SOURCES = \
-	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterTimeoutTest.cc \
 	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterUserProvidedTriggerTest_SOURCES = \
-	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterUserProvidedTriggerTest.cc \
 	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_AwaiterWritableFileDescriptorTest_SOURCES = \
-	src/os/Api.cc \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterWritableFileDescriptorTest.cc \
 	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_io_FileDescriptorTest_SOURCES = \
 	src/os/io/FileDescriptorTest.cc
 src_os_signaling_HandlerConfigurationTest_SOURCES = \
-	src/os/Api.cc \
 	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/HandlerConfigurationTest.cc \
 	src/os/signaling/SignalErrorCategory.cc
 

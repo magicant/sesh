@@ -16,29 +16,30 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Api.hh"
+#include "HandlerConfigurationApi.hh"
 
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::os::signaling::SignalNumber;
-using sesh::os::signaling::SignalNumberSet;
-
 namespace sesh {
 namespace os {
+namespace signaling {
 
-std::error_code Api::sigprocmaskBlock(SignalNumber n) const {
+std::error_code HandlerConfigurationApi::sigprocmaskBlock(SignalNumber n) const
+{
     std::unique_ptr<SignalNumberSet> set = createSignalNumberSet();
     set->set(n);
     return sigprocmask(MaskChangeHow::BLOCK, set.get(), nullptr);
 }
 
-std::error_code Api::sigprocmaskUnblock(SignalNumber n) const {
+std::error_code HandlerConfigurationApi::sigprocmaskUnblock(SignalNumber n)
+        const {
     std::unique_ptr<SignalNumberSet> set = createSignalNumberSet();
     set->set(n);
     return sigprocmask(MaskChangeHow::UNBLOCK, set.get(), nullptr);
 }
 
+} // namespace signaling
 } // namespace os
 } // namespace sesh
 
