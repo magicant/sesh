@@ -258,6 +258,7 @@ src_sesh_SOURCES = \
 	src/main.cc \
 	src/os/Api.hh \
 	src/os/ApiImpl.cc \
+	src/os/TimeApi.hh \
 	src/os/capi.c \
 	src/os/capi.h \
 	src/os/capitypes.h \

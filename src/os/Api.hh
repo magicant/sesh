@@ -23,6 +23,7 @@
 #include <chrono>
 #include <memory>
 #include <system_error>
+#include "os/TimeApi.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfigurationApi.hh"
@@ -32,20 +33,9 @@ namespace sesh {
 namespace os {
 
 /** Abstraction of POSIX API. */
-class Api : public signaling::HandlerConfigurationApi {
+class Api : public TimeApi, public signaling::HandlerConfigurationApi {
 
 public:
-
-    using SystemClockTime = std::chrono::time_point<
-            std::chrono::system_clock, std::chrono::nanoseconds>;
-    using SteadyClockTime = std::chrono::time_point<
-            std::chrono::steady_clock, std::chrono::nanoseconds>;
-
-    /** Returns the current time. */
-    virtual SystemClockTime systemClockNow() const noexcept = 0;
-
-    /** Returns the current time. */
-    virtual SteadyClockTime steadyClockNow() const noexcept = 0;
 
     /**
      * Closes the given file descriptor. This function may block on some
