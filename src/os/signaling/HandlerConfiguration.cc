@@ -26,7 +26,7 @@
 #include "common/Maybe.hh"
 #include "common/SharedFunction.hh"
 #include "helpermacros.h"
-#include "os/Api.hh"
+#include "os/signaling/HandlerConfigurationApi.hh"
 #include "os/signaling/SignalErrorCode.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
@@ -44,8 +44,8 @@ namespace {
 using AddHandlerResult = HandlerConfiguration::AddHandlerResult;
 using Canceler = HandlerConfiguration::Canceler;
 using Handler = HandlerConfiguration::Handler;
-using MaskChangeHow = Api::MaskChangeHow;
-using SignalAction = Api::SignalAction;
+using MaskChangeHow = HandlerConfigurationApi::MaskChangeHow;
+using SignalAction = HandlerConfigurationApi::SignalAction;
 using TrapDefault = HandlerConfiguration::Default;
 
 enum class ActionType {
@@ -132,9 +132,9 @@ extern "C" void nativeCatchSignal(int);
 SignalAction actionForType(ActionType type) {
     switch (type) {
     case ActionType::DEFAULT:
-        return Api::Default();
+        return HandlerConfigurationApi::Default();
     case ActionType::IGNORE:
-        return Api::Ignore();
+        return HandlerConfigurationApi::Ignore();
     case ActionType::HANDLER:
         return nativeCatchSignal;
     }
@@ -162,15 +162,18 @@ public:
      * call.
      */
     std::error_code sigaction(
-            const Api &api, SignalNumber n, const SignalAction *newAction) {
-        SignalAction oldAction = Api::Default();
+            const HandlerConfigurationApi &api,
+            SignalNumber n,
+            const SignalAction *newAction) {
+        SignalAction oldAction = HandlerConfigurationApi::Default();
         std::error_code e = api.sigaction(n, newAction, &oldAction);
         if (!mInitialAction.hasValue())
             mInitialAction.emplace(std::move(oldAction));
         return e;
     }
 
-    std::error_code getInitialActionIfUnknown(const Api &api, SignalNumber n) {
+    std::error_code getInitialActionIfUnknown(
+            const HandlerConfigurationApi &api, SignalNumber n) {
         if (mInitialAction.hasValue())
             return std::error_code();
         return sigaction(api, n, nullptr);
@@ -189,7 +192,7 @@ class HandlerConfigurationImpl :
 
 private:
 
-    const Api &mApi;
+    const HandlerConfigurationApi &mApi;
 
     std::map<SignalNumber, SignalData> mData;
 
@@ -289,7 +292,9 @@ private:
 
 public:
 
-    explicit HandlerConfigurationImpl(const Api &api) noexcept : mApi(api) { }
+    explicit HandlerConfigurationImpl(const HandlerConfigurationApi &api)
+            noexcept :
+            mApi(api) { }
 
     AddHandlerResult addHandler(SignalNumber n, Handler &&h) final override {
         SignalData &data = mData[n];
@@ -313,7 +318,7 @@ public:
             if (std::error_code e = data.getInitialActionIfUnknown(mApi, n))
                 return e;
             if (data.initialAction()->index() ==
-                    SignalAction::index<Api::Ignore>())
+                    SignalAction::index<HandlerConfigurationApi::Ignore>())
                 return SignalErrorCode::INITIALLY_IGNORED;
             // Fall through
         case SettingPolicy::FORCE:
@@ -355,7 +360,7 @@ void nativeCatchSignal(int signalNumber) {
 
 } // namespace
 
-auto HandlerConfiguration::create(const Api &api)
+auto HandlerConfiguration::create(const HandlerConfigurationApi &api)
         -> std::shared_ptr<HandlerConfiguration> {
     auto sharedInstance = std::make_shared<HandlerConfigurationImpl>(api);
     instance = sharedInstance;
