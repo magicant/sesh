@@ -23,22 +23,20 @@
 #include <system_error>
 #include "common/Nop.hh"
 #include "os/signaling/HandlerConfiguration.hh"
+#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalErrorCode.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
-#include "os/test_helper/SigactionApiFake.hh"
-#include "os/test_helper/SignalMaskApiFake.hh"
 #include "os/test_helper/UnimplementedApi.hh"
 
 namespace {
 
 using sesh::common::Nop;
 using sesh::os::signaling::HandlerConfiguration;
+using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalErrorCode;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
-using sesh::os::test_helper::SigactionApiFake;
-using sesh::os::test_helper::SignalMaskApiFake;
 using sesh::os::test_helper::UnimplementedApi;
 
 using Canceler = HandlerConfiguration::Canceler;
@@ -54,9 +52,6 @@ protected:
             HandlerConfiguration::create(*this);
 
 }; // template<typename Api> class Fixture
-
-class SignalApiFake : public SigactionApiFake, public SignalMaskApiFake {
-};
 
 TEST_CASE_METHOD(
         Fixture<UnimplementedApi>, "Handler configuration: construction") {
@@ -77,7 +72,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: simple handler and action") {
     SignalNumber v = 0;
     auto result = c->addHandler(5, [&v](SignalNumber n) { v += n; });
@@ -106,7 +101,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: many handlers and actions") {
     unsigned v1 = 0, v2 = 0, v3 = 0;
 
@@ -139,7 +134,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: handlers and actions for many signals") {
     SignalNumber s1 = 0, s2 = 0, s3 = 0;
     auto result1 = c->addHandler(1, [&s1](SignalNumber n) { s1 = n; });
@@ -156,7 +151,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: signal is blocked when handler is set") {
     auto result = c->addHandler(1, Nop());
     CHECK(signalMask().test(1));
@@ -166,7 +161,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: mask is restored when handler is unset") {
     signalMask().set(1);
 
@@ -178,7 +173,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: handler for invalid signal") {
     auto result =
             c->addHandler(INVALID_SIGNAL_NUMBER, [](SignalNumber) { FAIL(); });
@@ -187,7 +182,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: trap to default w/o handler") {
     std::error_code e = c->setTrap(
             5,
@@ -198,7 +193,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: trap to default and add handler") {
     c->setTrap(
             5,
@@ -216,7 +211,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: add handler and trap to default") {
     SignalNumber v = 0;
     auto handlerResult = c->addHandler(5, [&v](SignalNumber n) { v += n; });
@@ -236,7 +231,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: successful ignore w/o handler") {
     std::error_code e = c->setTrap(
             5,
@@ -247,7 +242,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: failed ignore w/o handler") {
     actions().emplace(5, Ignore());
 
@@ -259,7 +254,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: failed ignore w/ handler") {
     actions().emplace(5, Ignore());
     c->addHandler(5, Nop());
@@ -272,7 +267,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: forced ignore w/o handler") {
     actions().emplace(5, Ignore());
 
@@ -285,7 +280,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: ignore and add handler") {
     c->setTrap(
             5,
@@ -306,7 +301,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: add handler and ignore") {
     c->addHandler(5, Nop());
     c->setTrap(
@@ -318,7 +313,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: trap w/o handler") {
     SignalNumber v = 0;
     HandlerConfiguration::Handler h = [&v](SignalNumber n) { v = n; };
@@ -342,7 +337,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: trap and add another handler") {
     SignalNumber v1 = 0, v2 = 0;
     HandlerConfiguration::Handler h = [&v1](SignalNumber n) { v1 = n; };
@@ -359,7 +354,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: add handler and trap") {
     SignalNumber v1 = 0, v2 = 0;
     HandlerConfiguration::Handler h = [&v1](SignalNumber n) { v1 = n; };
@@ -376,7 +371,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: signal is blocked when trap is set") {
     c->setTrap(
             5,
@@ -392,7 +387,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: signal is restored when trap is unset") {
     signalMask().set(5);
 
@@ -410,7 +405,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: trapping invalid signal") {
     std::error_code e = c->setTrap(
             INVALID_SIGNAL_NUMBER,
@@ -420,7 +415,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: mask for pselect with handlers") {
     signalMask().set(1);
     signalMask().set(2);
@@ -444,7 +439,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        Fixture<SignalApiFake>,
+        Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: mask for pselect with ignore") {
     signalMask().set(1);
     signalMask().set(2);
