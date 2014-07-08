@@ -20,20 +20,17 @@
 
 #include "buildconfig.h"
 
-#include <chrono>
-#include <memory>
 #include <system_error>
-#include "os/TimeApi.hh"
+#include "os/event/PselectApi.hh"
 #include "os/io/FileDescriptor.hh"
-#include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfigurationApi.hh"
-#include "os/signaling/SignalNumberSet.hh"
 
 namespace sesh {
 namespace os {
 
 /** Abstraction of POSIX API. */
-class Api : public TimeApi, public signaling::HandlerConfigurationApi {
+class Api :
+        public event::PselectApi, public signaling::HandlerConfigurationApi {
 
 public:
 
@@ -47,28 +44,6 @@ public:
      * On failure, the file descriptor may be left still valid.
      */
     virtual std::error_code close(io::FileDescriptor &) const = 0;
-
-    /** Returns a unique pointer to a new empty file descriptor set. */
-    virtual std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet()
-            const = 0;
-
-    /**
-     * Wait for a file descriptor or signal event.
-     *
-     * The pointer arguments to file descriptor sets and a signal number set
-     * may be null. Non-null pointers passed to this function must be obtained
-     * from the {@link #createFileDescriptorSet} and {@link
-     * #createSignalNumberSet} functions called for the same {@code *this}.
-     *
-     * @param timeout A negative value means no timeout.
-     */
-    virtual std::error_code pselect(
-            io::FileDescriptor::Value fdBound,
-            io::FileDescriptorSet *readFds,
-            io::FileDescriptorSet *writeFds,
-            io::FileDescriptorSet *errorFds,
-            std::chrono::nanoseconds timeout,
-            const signaling::SignalNumberSet *signalMask) const = 0;
 
     /** Reference to the only instance of real API implementation. */
     static const Api &INSTANCE;

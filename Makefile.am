@@ -267,6 +267,7 @@ src_sesh_SOURCES = \
 	src/os/event/ErrorFileDescriptor.hh \
 	src/os/event/FileDescriptorCondition.hh \
 	src/os/event/Proactor.hh \
+	src/os/event/PselectApi.hh \
 	src/os/event/ReadableFileDescriptor.hh \
 	src/os/event/Signal.hh \
 	src/os/event/Timeout.hh \
