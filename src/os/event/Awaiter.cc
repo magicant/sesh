@@ -34,7 +34,8 @@
 #include "common/Try.hh"
 #include "common/Variant.hh"
 #include "helpermacros.h"
-#include "os/Api.hh"
+#include "os/TimeApi.hh"
+#include "os/event/PselectApi.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
@@ -55,7 +56,7 @@ using sesh::os::signaling::HandlerConfiguration;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::Api::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
 using Clock = TimePoint::clock;
 
 namespace sesh {
@@ -125,7 +126,7 @@ private:
     void addFd(
             std::unique_ptr<FileDescriptorSet> &fds,
             FileDescriptor::Value fd,
-            const Api &api);
+            const PselectApi &api);
 
 public:
 
@@ -135,16 +136,16 @@ public:
      * Updates this p-select argument according to the given trigger. May throw
      * some exception.
      */
-    void add(const FileDescriptorTrigger &, const Api &);
+    void add(const FileDescriptorTrigger &, const PselectApi &);
 
     /**
      * Updates this p-select argument according to the given event. This
      * function may fire the event directly if applicable.
      */
-    void addOrFire(PendingEvent &, const Api &);
+    void addOrFire(PendingEvent &, const PselectApi &);
 
     /** Calls the p-select API function with this argument. */
-    std::error_code call(const Api &api, const SignalNumberSet *);
+    std::error_code call(const PselectApi &api, const SignalNumberSet *);
 
     /** Tests if this p-select call result matches the given trigger. */
     bool matches(const FileDescriptorTrigger &) const;
@@ -166,7 +167,7 @@ public:
 
 private:
 
-    const Api &mApi;
+    const PselectApi &mApi;
     std::shared_ptr<HandlerConfiguration> mHandlerConfiguration;
     std::multimap<TimeLimit, std::shared_ptr<PendingEvent>> mPendingEvents;
 
@@ -185,7 +186,8 @@ private:
 
 public:
 
-    AwaiterImpl(const Api &, std::shared_ptr<HandlerConfiguration> &&hc);
+    AwaiterImpl(
+            const PselectApi &, std::shared_ptr<HandlerConfiguration> &&hc);
 
     void awaitEvents() final override;
 
@@ -238,7 +240,7 @@ PselectArgument::PselectArgument(TimePoint::duration timeout) noexcept :
 void PselectArgument::addFd(
         std::unique_ptr<FileDescriptorSet> &fds,
         FileDescriptor::Value fd,
-        const Api &api) {
+        const PselectApi &api) {
     if (fds == nullptr)
         fds = api.createFileDescriptorSet();
     fds->set(fd);
@@ -246,7 +248,8 @@ void PselectArgument::addFd(
     mFdBound = std::max(mFdBound, fd + 1);
 }
 
-void PselectArgument::add(const FileDescriptorTrigger &t, const Api &api) {
+void PselectArgument::add(
+        const FileDescriptorTrigger &t, const PselectApi &api) {
     switch (t.index()) {
     case FileDescriptorTrigger::index<ReadableFileDescriptor>():
         addFd(mReadFds, t.value<ReadableFileDescriptor>().value(), api);
@@ -261,7 +264,7 @@ void PselectArgument::add(const FileDescriptorTrigger &t, const Api &api) {
     UNREACHABLE();
 }
 
-void PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
+void PselectArgument::addOrFire(PendingEvent &e, const PselectApi &api) {
     if (e.hasFired())
         return;
 
@@ -274,7 +277,7 @@ void PselectArgument::addOrFire(PendingEvent &e, const Api &api) {
 }
 
 std::error_code PselectArgument::call(
-        const Api &api, const SignalNumberSet *signalMask) {
+        const PselectApi &api, const SignalNumberSet *signalMask) {
     return api.pselect(
             mFdBound,
             mReadFds.get(),
@@ -314,7 +317,7 @@ void PselectArgument::applyResult(PendingEvent &e) const {
 }
 
 AwaiterImpl::AwaiterImpl(
-        const Api &api, std::shared_ptr<HandlerConfiguration> &&hc) :
+        const PselectApi &api, std::shared_ptr<HandlerConfiguration> &&hc) :
         mApi(api), mHandlerConfiguration(std::move(hc)), mPendingEvents() {
     assert(mHandlerConfiguration != nullptr);
 }
@@ -374,7 +377,7 @@ void registerTrigger(
     }
 }
 
-TimePoint computeTimeLimit(Timeout timeout, const Api &api) {
+TimePoint computeTimeLimit(Timeout timeout, const TimeApi &api) {
     if (timeout.interval() < Timeout::Interval::zero())
         timeout = Timeout(Timeout::Interval::zero());
 
@@ -474,7 +477,7 @@ void AwaiterImpl::awaitEvents() {
 } // namespace
 
 std::unique_ptr<Awaiter> createAwaiter(
-        const Api &api,
+        const PselectApi &api,
         std::shared_ptr<HandlerConfiguration> &&hc) {
     return std::unique_ptr<Awaiter>(new AwaiterImpl(api, std::move(hc)));
 }
