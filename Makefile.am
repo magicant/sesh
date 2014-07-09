@@ -860,13 +860,7 @@ TESTHEADERS = \
 	src/os/event/PselectApiTestHelper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/signaling/HandlerConfigurationApiTestHelper.hh \
-	src/os/signaling/SignalNumberSetTestHelper.hh \
-	src/os/test_helper/FileDescriptorSetApi.hh \
-	src/os/test_helper/NowApiStub.hh \
-	src/os/test_helper/PselectApiStub.hh \
-	src/os/test_helper/SigactionApiFake.hh \
-	src/os/test_helper/SignalMaskApiFake.hh \
-	src/os/test_helper/UnimplementedApi.hh
+	src/os/signaling/SignalNumberSetTestHelper.hh
 
 ### Documentation
 
