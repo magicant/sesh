@@ -24,16 +24,15 @@
 #include <utility>
 #include <vector>
 #include "os/event/Awaiter.hh"
+#include "os/event/PselectApiTestHelper.hh"
 #include "os/signaling/HandlerConfiguration.hh"
-#include "os/test_helper/NowApiStub.hh"
-#include "os/test_helper/PselectApiStub.hh"
 
 namespace sesh {
 namespace os {
 namespace event {
 
-template<typename Api>
-class AwaiterTestFixture : protected Api {
+template<typename Base>
+class AwaiterTestFixture : protected PselectApiStub, protected Base {
 
 private:
 
@@ -44,11 +43,7 @@ protected:
 
     Awaiter &a = *mAwaiter;
 
-}; // template<typename Api> class AwaiterTestFixture
-
-class PselectAndNowApiStub :
-        public test_helper::PselectApiStub, public test_helper::NowApiStub {
-};
+}; // template<typename Base> class AwaiterTestFixture
 
 } // namespace event
 } // namespace os

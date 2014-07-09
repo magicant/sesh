@@ -25,16 +25,15 @@
 #include "async/Future.hh"
 #include "common/Try.hh"
 #include "os/event/AwaiterTestHelper.hh"
+#include "os/event/PselectApi.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Signal.hh"
 #include "os/event/Timeout.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalNumberSet.hh"
-#include "os/test_helper/SigactionApiFake.hh"
-#include "os/test_helper/SignalMaskApiFake.hh"
-#include "os/test_helper/UnimplementedApi.hh"
 
 /*
 namespace std {
@@ -61,34 +60,26 @@ namespace {
 using sesh::common::Try;
 using sesh::async::Future;
 using sesh::os::event::AwaiterTestFixture;
-using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Signal;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
+using sesh::os::signaling::HandlerConfigurationApiDummy;
+using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalNumberSet;
-using sesh::os::test_helper::SigactionApiFake;
-using sesh::os::test_helper::SignalMaskApiFake;
-using sesh::os::test_helper::UnimplementedApi;
 
-using TimePoint = sesh::os::Api::SteadyClockTime;
-
-class SignalAwaiterTestApiFake :
-        public PselectAndNowApiStub,
-        public virtual SigactionApiFake,
-        public virtual SignalMaskApiFake {
-};
+using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<UnimplementedApi>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: doesn't wait if no events are pending") {
     a.awaitEvents();
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<UnimplementedApi>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: does nothing for empty trigger set") {
     Future<Trigger> f = a.expect();
     std::move(f).then([](Try<Trigger> &&) { FAIL("callback called"); });
@@ -96,7 +87,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: timeout with FD trigger in same set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -133,7 +124,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: FD trigger with timeout in same set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -169,7 +160,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<SignalAwaiterTestApiFake>,
+        AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: signal handler is reset after event fired (with timeout)") {
     a.expect(Timeout(std::chrono::seconds(1)), Signal(1));
 
@@ -195,7 +186,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: setting timeout from domain error") {
     auto fd = ReadableFileDescriptor(FileDescriptorSetImpl::MAX_VALUE + 1);
     bool called = false;
