@@ -857,6 +857,7 @@ TESTHEADERS = \
 	src/language/syntax/PrinterTestHelper.hh \
 	src/os/TimeApiTestHelper.hh \
 	src/os/event/AwaiterTestHelper.hh \
+	src/os/event/PselectApiTestHelper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/signaling/HandlerConfigurationApiTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh \
