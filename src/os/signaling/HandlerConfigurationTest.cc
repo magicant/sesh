@@ -27,17 +27,16 @@
 #include "os/signaling/SignalErrorCode.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
-#include "os/test_helper/UnimplementedApi.hh"
 
 namespace {
 
 using sesh::common::Nop;
 using sesh::os::signaling::HandlerConfiguration;
+using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalErrorCode;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
-using sesh::os::test_helper::UnimplementedApi;
 
 using Canceler = HandlerConfiguration::Canceler;
 using TrapAction = HandlerConfiguration::TrapAction;
@@ -54,19 +53,20 @@ protected:
 }; // template<typename Api> class Fixture
 
 TEST_CASE_METHOD(
-        Fixture<UnimplementedApi>, "Handler configuration: construction") {
+        Fixture<HandlerConfigurationApiDummy>,
+        "Handler configuration: construction") {
     CHECK(c != nullptr);
     CHECK(c.use_count() == 1);
 }
 
 TEST_CASE_METHOD(
-        Fixture<UnimplementedApi>,
+        Fixture<HandlerConfigurationApiDummy>,
         "Handler configuration: empty configuration calls no handlers") {
     CHECK_NOTHROW(c->callHandlers());
 }
 
 TEST_CASE_METHOD(
-        Fixture<UnimplementedApi>,
+        Fixture<HandlerConfigurationApiDummy>,
         "Handler configuration: empty configuration calls null mask") {
     CHECK(c->maskForPselect() == nullptr);
 }

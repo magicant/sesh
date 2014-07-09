@@ -32,6 +32,28 @@ namespace sesh {
 namespace os {
 namespace signaling {
 
+class HandlerConfigurationApiDummy : public HandlerConfigurationApi {
+
+    std::unique_ptr<SignalNumberSet> createSignalNumberSet() const override {
+        throw "unexpected createSignalNumberSet";
+    }
+
+    std::error_code sigprocmask(
+            MaskChangeHow,
+            const SignalNumberSet *,
+            SignalNumberSet *) const override {
+        throw "unexpected sigprocmask";
+    }
+
+    std::error_code sigaction(
+            SignalNumber,
+            const SignalAction *,
+            SignalAction *) const override {
+        throw "unexpected sigaction";
+    }
+
+}; // class HandlerConfigurationApiDummy
+
 class HandlerConfigurationApiFake : public HandlerConfigurationApi {
 
 public:
