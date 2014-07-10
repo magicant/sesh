@@ -24,9 +24,9 @@
 #include "async/Future.hh"
 #include "common/Try.hh"
 #include "common/Variant.hh"
-#include "os/Api.hh"
 #include "os/event/AwaiterTestHelper.hh"
 #include "os/event/ErrorFileDescriptor.hh"
+#include "os/event/PselectApi.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Signal.hh"
 #include "os/event/Timeout.hh"
@@ -35,6 +35,7 @@
 #include "os/event/WritableFileDescriptor.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 namespace {
@@ -44,7 +45,6 @@ using sesh::common::Try;
 using sesh::common::Variant;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::ErrorFileDescriptor;
-using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Signal;
 using sesh::os::event::Timeout;
@@ -53,14 +53,15 @@ using sesh::os::event::UserProvidedTrigger;
 using sesh::os::event::WritableFileDescriptor;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
+using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::Api::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
 using TriggerFileDescriptor = Variant<
         ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing readable and writable FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -109,7 +110,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing readable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -158,7 +159,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing writable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -207,7 +208,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing readable and writable FDs") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutableSteadyClockNow() = startTime;
@@ -247,7 +248,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing writable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutableSteadyClockNow() = startTime;
@@ -287,7 +288,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing readable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutableSteadyClockNow() = startTime;
@@ -327,7 +328,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: awaiting max readable FD") {
     auto max = FileDescriptorSetImpl::MAX_VALUE;
     bool callbackCalled = false;
@@ -354,7 +355,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: domain error from FD set") {
     auto max = FileDescriptorSetImpl::MAX_VALUE;
     bool callbackCalled = false;

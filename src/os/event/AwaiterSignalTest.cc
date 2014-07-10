@@ -25,43 +25,34 @@
 #include <vector>
 #include "async/Future.hh"
 #include "common/Try.hh"
-#include "os/Api.hh"
 #include "os/event/Awaiter.hh"
 #include "os/event/AwaiterTestHelper.hh"
+#include "os/event/PselectApi.hh"
 #include "os/event/Signal.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
-#include "os/test_helper/SigactionApiFake.hh"
-#include "os/test_helper/SignalMaskApiFake.hh"
 
 namespace {
 
 using sesh::async::Future;
 using sesh::common::Try;
 using sesh::os::event::AwaiterTestFixture;
-using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Signal;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
+using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
-using sesh::os::test_helper::SigactionApiFake;
-using sesh::os::test_helper::SignalMaskApiFake;
 
-using TimePoint = sesh::os::Api::SteadyClockTime;
-
-class SignalAwaiterTestApiFake :
-        public PselectAndNowApiStub,
-        public virtual SigactionApiFake,
-        public virtual SignalMaskApiFake {
-};
+using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<SignalAwaiterTestApiFake>,
+        AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: one signal in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -102,7 +93,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<SignalAwaiterTestApiFake>,
+        AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: irrelevant signals are masked") {
     a.expect(Signal(3));
 
@@ -132,7 +123,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<SignalAwaiterTestApiFake>,
+        AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: two signals in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(100));
     mutableSteadyClockNow() = startTime;
@@ -178,7 +169,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<SignalAwaiterTestApiFake>,
+        AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: same signal in two trigger sets") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -220,7 +211,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<SignalAwaiterTestApiFake>,
+        AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: different signals in two trigger sets: fired at a time") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -264,7 +255,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<SignalAwaiterTestApiFake>,
+        AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: different signals in two trigger sets: "
         "fired intermittently") {
     auto startTime = TimePoint(std::chrono::seconds(0));
@@ -323,7 +314,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<SignalAwaiterTestApiFake>,
+        AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: signal handler is reset after event fired") {
     a.expect(Signal(1));
 

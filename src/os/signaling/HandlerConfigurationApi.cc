@@ -15,40 +15,32 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_AwaiterTestHelper_hh
-#define INCLUDED_os_event_AwaiterTestHelper_hh
-
 #include "buildconfig.h"
+#include "HandlerConfigurationApi.hh"
 
-#include <memory>
-#include <utility>
-#include <vector>
-#include "os/event/Awaiter.hh"
-#include "os/event/PselectApiTestHelper.hh"
-#include "os/signaling/HandlerConfiguration.hh"
+#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/SignalNumberSet.hh"
 
 namespace sesh {
 namespace os {
-namespace event {
+namespace signaling {
 
-template<typename Base>
-class AwaiterTestFixture : protected PselectApiStub, protected Base {
+std::error_code HandlerConfigurationApi::sigprocmaskBlock(SignalNumber n) const
+{
+    std::unique_ptr<SignalNumberSet> set = createSignalNumberSet();
+    set->set(n);
+    return sigprocmask(MaskChangeHow::BLOCK, set.get(), nullptr);
+}
 
-private:
+std::error_code HandlerConfigurationApi::sigprocmaskUnblock(SignalNumber n)
+        const {
+    std::unique_ptr<SignalNumberSet> set = createSignalNumberSet();
+    set->set(n);
+    return sigprocmask(MaskChangeHow::UNBLOCK, set.get(), nullptr);
+}
 
-    std::unique_ptr<Awaiter> mAwaiter = createAwaiter(
-            *this, signaling::HandlerConfiguration::create(*this));
-
-protected:
-
-    Awaiter &a = *mAwaiter;
-
-}; // template<typename Base> class AwaiterTestFixture
-
-} // namespace event
+} // namespace signaling
 } // namespace os
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_os_event_AwaiterTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

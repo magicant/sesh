@@ -15,48 +15,37 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_test_helper_NowApiStub_hh
-#define INCLUDED_os_test_helper_NowApiStub_hh
+#ifndef INCLUDED_os_TimeApi_hh
+#define INCLUDED_os_TimeApi_hh
 
 #include "buildconfig.h"
 
-#include "os/test_helper/UnimplementedApi.hh"
+#include <chrono>
 
 namespace sesh {
 namespace os {
-namespace test_helper {
 
-class NowApiStub : public virtual UnimplementedApi {
-
-private:
-
-    SystemClockTime mSystemClockNow;
-    SteadyClockTime mSteadyClockNow;
+/** Abstraction of POSIX API that provides current time. */
+class TimeApi {
 
 public:
 
-    SystemClockTime &mutableSystemClockNow() noexcept {
-        return mSystemClockNow;
-    }
+    using SystemClockTime = std::chrono::time_point<
+            std::chrono::system_clock, std::chrono::nanoseconds>;
+    using SteadyClockTime = std::chrono::time_point<
+            std::chrono::steady_clock, std::chrono::nanoseconds>;
 
-    SteadyClockTime &mutableSteadyClockNow() noexcept {
-        return mSteadyClockNow;
-    }
+    /** Returns the current time. */
+    virtual SystemClockTime systemClockNow() const noexcept = 0;
 
-    SystemClockTime systemClockNow() const noexcept override {
-        return mSystemClockNow;
-    }
+    /** Returns the current time. */
+    virtual SteadyClockTime steadyClockNow() const noexcept = 0;
 
-    SteadyClockTime steadyClockNow() const noexcept override {
-        return mSteadyClockNow;
-    }
+}; // class TimeApi
 
-}; // class NowApiStub
-
-} // namespace test_helper
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_test_helper_NowApiStub_hh
+#endif // #ifndef INCLUDED_os_TimeApi_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

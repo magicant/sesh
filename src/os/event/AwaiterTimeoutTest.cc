@@ -26,15 +26,15 @@
 #include <utility>
 #include "async/Future.hh"
 #include "common/Try.hh"
-#include "os/Api.hh"
 #include "os/event/Awaiter.hh"
 #include "os/event/AwaiterTestHelper.hh"
+#include "os/event/PselectApi.hh"
 #include "os/event/Timeout.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalNumberSet.hh"
-#include "os/test_helper/PselectApiStub.hh"
 
 /*
 namespace std {
@@ -62,18 +62,18 @@ using sesh::async::Future;
 using sesh::common::Try;
 using sesh::os::event::Awaiter;
 using sesh::os::event::AwaiterTestFixture;
-using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
+using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
-using sesh::os::test_helper::PselectApiStub;
 
-using TimePoint = sesh::os::Api::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
 
 template<int durationInSecondsInt>
-class TimeoutTest : protected AwaiterTestFixture<PselectAndNowApiStub> {
+class TimeoutTest :
+        protected AwaiterTestFixture<HandlerConfigurationApiDummy> {
 
 protected:
 
@@ -88,7 +88,8 @@ public:
 }; // class TimeoutTest
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>, "Awaiter: timeout 0") {
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        "Awaiter: timeout 0") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(0)));
@@ -168,7 +169,7 @@ TEST_CASE_METHOD(TimeoutTest<1>, "Awaiter: timeout 1") { }
 TEST_CASE_METHOD(TimeoutTest<2>, "Awaiter: timeout 2") { }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: negative timeout") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -206,7 +207,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: duplicate timeouts in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(-100));
     mutableSteadyClockNow() = startTime;
@@ -247,7 +248,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two simultaneous timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(1000));
     mutableSteadyClockNow() = startTime;
@@ -315,7 +316,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two successive timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;

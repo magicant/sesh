@@ -24,7 +24,7 @@
 #include <memory>
 #include <system_error>
 #include "common/Variant.hh"
-#include "os/Api.hh"
+#include "os/signaling/HandlerConfigurationApi.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
@@ -146,7 +146,8 @@ public:
      * instances of this class. The native signal catching function will not
      * work with multiple coexisting instances.
      */
-    static std::shared_ptr<HandlerConfiguration> create(const Api &);
+    static std::shared_ptr<HandlerConfiguration> create(
+            const HandlerConfigurationApi &);
 
 }; // class HandlerConfiguration
 

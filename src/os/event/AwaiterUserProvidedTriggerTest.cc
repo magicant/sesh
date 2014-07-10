@@ -25,10 +25,11 @@
 #include <utility>
 #include "async/Future.hh"
 #include "common/Try.hh"
-#include "os/Api.hh"
 #include "os/event/AwaiterTestHelper.hh"
+#include "os/event/PselectApi.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/UserProvidedTrigger.hh"
+#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 
 namespace {
 
@@ -38,14 +39,14 @@ using sesh::async::createFutureOf;
 using sesh::async::createPromiseFuturePair;
 using sesh::common::Try;
 using sesh::os::event::AwaiterTestFixture;
-using sesh::os::event::PselectAndNowApiStub;
 using sesh::os::event::Trigger;
 using sesh::os::event::UserProvidedTrigger;
+using sesh::os::signaling::HandlerConfigurationApiDummy;
 
-using TimePoint = sesh::os::Api::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: one user-provided trigger (successful future)") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -65,7 +66,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: one user-provided trigger (failed future)") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -87,7 +88,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two user-provided triggers in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
@@ -110,7 +111,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<PselectAndNowApiStub>,
+        AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two user-provided triggers in two trigger sets") {
     std::shared_ptr<void> expected = std::make_shared<int>(0);
     auto f1 = a.expect(UserProvidedTrigger(createFutureOf(expected)));

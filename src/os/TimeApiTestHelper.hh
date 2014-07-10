@@ -15,40 +15,46 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_AwaiterTestHelper_hh
-#define INCLUDED_os_event_AwaiterTestHelper_hh
+#ifndef INCLUDED_os_TimeApiTestHelper_hh
+#define INCLUDED_os_TimeApiTestHelper_hh
 
 #include "buildconfig.h"
 
-#include <memory>
-#include <utility>
-#include <vector>
-#include "os/event/Awaiter.hh"
-#include "os/event/PselectApiTestHelper.hh"
-#include "os/signaling/HandlerConfiguration.hh"
+#include "os/TimeApi.hh"
 
 namespace sesh {
 namespace os {
-namespace event {
 
-template<typename Base>
-class AwaiterTestFixture : protected PselectApiStub, protected Base {
+class TimeApiFake : public virtual TimeApi {
 
 private:
 
-    std::unique_ptr<Awaiter> mAwaiter = createAwaiter(
-            *this, signaling::HandlerConfiguration::create(*this));
+    SystemClockTime mSystemClockNow;
+    SteadyClockTime mSteadyClockNow;
 
-protected:
+public:
 
-    Awaiter &a = *mAwaiter;
+    SystemClockTime &mutableSystemClockNow() noexcept {
+        return mSystemClockNow;
+    }
 
-}; // template<typename Base> class AwaiterTestFixture
+    SteadyClockTime &mutableSteadyClockNow() noexcept {
+        return mSteadyClockNow;
+    }
 
-} // namespace event
+    SystemClockTime systemClockNow() const noexcept override {
+        return mSystemClockNow;
+    }
+
+    SteadyClockTime steadyClockNow() const noexcept override {
+        return mSteadyClockNow;
+    }
+
+}; // class TimeApiFake
+
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_AwaiterTestHelper_hh
+#endif // #ifndef INCLUDED_os_TimeApiTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
