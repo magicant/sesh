@@ -465,10 +465,11 @@ void AwaiterImpl::awaitEvents() {
 
         std::error_code e = argument.call(
                 mApi, mHandlerConfiguration->maskForPselect());
-        (void) e; // TODO
 
         mHandlerConfiguration->callHandlers();
 
+        if (e)
+            continue;
         applyResult(argument);
         removeFiredEvents();
     }
