@@ -19,10 +19,7 @@
 #include "OperatorParser.hh"
 
 #include <memory>
-#include "common/Nop.hh"
 #include "language/parser/Operator.hh"
-
-using sesh::common::Nop;
 
 namespace sesh {
 namespace language {
@@ -30,10 +27,8 @@ namespace parser {
 
 OperatorParser createOperatorParser(
         Environment &e, LineContinuationTreatment lct) {
-    return OperatorParser(
-            e,
-            std::shared_ptr<OperatorParser::Trie>(&Operator::TRIE, Nop()),
-            lct);
+    using P = std::shared_ptr<OperatorParser::Trie>;
+    return OperatorParser(e, P(P(), &Operator::TRIE), lct);
 }
 
 } // namespace parser
