@@ -22,6 +22,8 @@
 
 #include <chrono>
 #include <exception>
+#include <system_error>
+#include <utility>
 #include "async/Future.hh"
 #include "common/Try.hh"
 #include "os/event/AwaiterTestHelper.hh"
@@ -195,6 +197,55 @@ TEST_CASE_METHOD(
     }).unwrap().then([&](Try<Trigger> &&) {
         called = true;
     });
+    a.awaitEvents();
+    CHECK(called);
+}
+
+TEST_CASE_METHOD(
+        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        "Awaiter: ignores FD set if pselect failed") {
+    auto startTime = TimePoint(std::chrono::seconds(0));
+    mutableSteadyClockNow() = startTime;
+
+    bool called = false;
+    auto f = a.expect(
+            Timeout(std::chrono::seconds(1)), ReadableFileDescriptor(0));
+    std::move(f).then([&called](Try<Trigger> &&t) {
+        REQUIRE(t.hasValue());
+        CHECK(t->index() == t->index<Timeout>());
+        called = true;
+    });
+
+    a.expect(Signal(1));
+
+    implementation() = [this](
+            const PselectApiStub &,
+            FileDescriptor::Value,
+            FileDescriptorSet *,
+            FileDescriptorSet *,
+            FileDescriptorSet *,
+            std::chrono::nanoseconds,
+            const SignalNumberSet *) -> std::error_code {
+        Action &a = actions().at(1);
+        REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+        a.value<sesh_osapi_signal_handler *>()(1);
+
+        implementation() = [this](
+                const PselectApiStub &,
+                FileDescriptor::Value,
+                FileDescriptorSet *readFds,
+                FileDescriptorSet *,
+                FileDescriptorSet *,
+                std::chrono::nanoseconds,
+                const SignalNumberSet *) -> std::error_code {
+            if (readFds != nullptr)
+                readFds->reset();
+            mutableSteadyClockNow() += std::chrono::seconds(1);
+            return std::error_code();
+        };
+        return std::make_error_code(std::errc::interrupted);
+    };
+
     a.awaitEvents();
     CHECK(called);
 }

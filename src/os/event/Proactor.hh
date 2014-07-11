@@ -54,14 +54,20 @@ public:
      * This function returns a future that has not yet received a result unless
      * the argument includes an already-filled user-provided trigger.
      *
+     * All the file descriptors contained in the trigger set must be kept valid
+     * (open) until the future returned from this function receives a result.
+     * Otherwise, the behavior is undefined. That means you must ensure
+     * validity of the file descriptors before calling this function.
+     *
      * Any {@link UserProvidedTrigger} contained in the trigger set must have
      * been constructed by the constructor that takes a future argument. If a
      * user-provided trigger fires the event, the future that was returned from
      * this function provides a user-provided trigger object that was
      * constructed by the constructor that takes a shared pointer argument.
      *
-     * If a file descriptor trigger contains an out-of-range file descriptor,
-     * the returned future fails with std::domain_error.
+     * If a file descriptor trigger specifies a too large file descriptor that
+     * is not supported by the underlying OS API, the returned future fails
+     * with std::domain_error.
      */
     async::Future<Trigger> expect(std::vector<Trigger> &&triggers) {
         return expectImpl(std::move(triggers));

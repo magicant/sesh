@@ -21,6 +21,7 @@
 #include "catch.hpp"
 
 #include <chrono>
+#include <system_error>
 #include <utility>
 #include <vector>
 #include "async/Future.hh"
@@ -85,7 +86,7 @@ TEST_CASE_METHOD(
 
         mutableSteadyClockNow() += std::chrono::seconds(3);
         implementation() = nullptr;
-        return std::error_code();
+        return std::make_error_code(std::errc::interrupted);
     };
     mutableSteadyClockNow() += std::chrono::seconds(7);
     a.awaitEvents();
@@ -117,7 +118,7 @@ TEST_CASE_METHOD(
         a.value<sesh_osapi_signal_handler *>()(3);
 
         implementation() = nullptr;
-        return std::error_code();
+        return std::make_error_code(std::errc::interrupted);
     };
     a.awaitEvents();
 }
@@ -161,7 +162,7 @@ TEST_CASE_METHOD(
 
         mutableSteadyClockNow() += std::chrono::seconds(3);
         implementation() = nullptr;
-        return std::error_code();
+        return std::make_error_code(std::errc::interrupted);
     };
     mutableSteadyClockNow() += std::chrono::seconds(7);
     a.awaitEvents();
@@ -203,7 +204,7 @@ TEST_CASE_METHOD(
 
         mutableSteadyClockNow() += std::chrono::seconds(3);
         implementation() = nullptr;
-        return std::error_code();
+        return std::make_error_code(std::errc::interrupted);
     };
     mutableSteadyClockNow() += std::chrono::seconds(7);
     a.awaitEvents();
@@ -247,7 +248,7 @@ TEST_CASE_METHOD(
 
         mutableSteadyClockNow() += std::chrono::seconds(3);
         implementation() = nullptr;
-        return std::error_code();
+        return std::make_error_code(std::errc::interrupted);
     };
     mutableSteadyClockNow() += std::chrono::seconds(7);
     a.awaitEvents();
@@ -304,9 +305,9 @@ TEST_CASE_METHOD(
 
             mutableSteadyClockNow() += std::chrono::seconds(3);
             implementation() = nullptr;
-            return std::error_code();
+            return std::make_error_code(std::errc::interrupted);
         };
-        return std::error_code();
+        return std::make_error_code(std::errc::interrupted);
     };
     mutableSteadyClockNow() += std::chrono::seconds(7);
     a.awaitEvents();
@@ -331,7 +332,7 @@ TEST_CASE_METHOD(
         a.value<sesh_osapi_signal_handler *>()(1);
 
         implementation() = nullptr;
-        return std::error_code();
+        return std::make_error_code(std::errc::interrupted);
     };
     a.awaitEvents();
 
