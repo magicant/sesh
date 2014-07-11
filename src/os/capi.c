@@ -112,6 +112,17 @@ int sesh_osapi_pselect(
         timeout_spec_p = NULL;
     } else {
         lldiv_t v = lldiv(timeout, nanoseconds_per_second);
+
+        // POSIX requires that a timeout of at least 31 days be supported.
+        // Which means time_t is large enough to hold a value of at least 31
+        // days. Any larger value may not be safely cast to time_t, so we clamp
+        // it before casting. Particularly, we need to avoid arithmetic
+        // overflow yielding a negative timeout value.
+        const long long seconds_per_day = 24 * 60 * 60;
+        const long long max_timeout_seconds = 31 * seconds_per_day;
+        if (v.quot > max_timeout_seconds)
+            v.quot = max_timeout_seconds;
+
         timeout_spec.tv_sec = (time_t) v.quot;
         timeout_spec.tv_nsec = (long) v.rem;
         timeout_spec_p = &timeout_spec;
