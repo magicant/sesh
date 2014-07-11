@@ -465,6 +465,7 @@ void AwaiterImpl::awaitEvents() {
 
         std::error_code e = argument.call(
                 mApi, mHandlerConfiguration->maskForPselect());
+        assert(e != std::errc::bad_file_descriptor);
 
         mHandlerConfiguration->callHandlers();
 
