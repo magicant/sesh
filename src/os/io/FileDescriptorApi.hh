@@ -15,34 +15,39 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_io_FileDescriptorApi_hh
+#define INCLUDED_os_io_FileDescriptorApi_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include <system_error>
+#include "os/io/FileDescriptor.hh"
 
 namespace sesh {
 namespace os {
+namespace io {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptorApi,
-        public signaling::HandlerConfigurationApi {
+class FileDescriptorApi {
 
 public:
 
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
+    /**
+     * Closes the given file descriptor. This function may block on some
+     * conditions; refer to the POSIX standard for details.
+     *
+     * On success, the argument file descriptor is invalidated and a
+     * default-constructed error condition is returned.
+     *
+     * On failure, the file descriptor may be left still valid.
+     */
+    virtual std::error_code close(FileDescriptor &) const = 0;
 
-}; // class Api
+}; // class FileDescriptorApi
 
+} // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_io_FileDescriptorApi_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
