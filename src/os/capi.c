@@ -18,10 +18,66 @@
 #include "buildconfig.h"
 #include "capi.h"
 
+#include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/select.h>
 #include <unistd.h>
+
+enum sesh_osapi_fcntl_file_access_mode
+sesh_osapi_fcntl_file_access_mode_from_raw(int flags) {
+    switch (flags & O_ACCMODE) {
+    case O_RDONLY:
+        return SESH_OSAPI_O_RDONLY;
+    case O_RDWR:
+        return SESH_OSAPI_O_RDWR;
+    case O_WRONLY:
+        return SESH_OSAPI_O_WRONLY;
+#ifdef O_EXEC
+    case O_EXEC:
+        return SESH_OSAPI_O_EXEC;
+#endif
+#if defined(O_SEARCH) && (!defined(O_EXEC) || O_EXEC != O_SEARCH)
+    case O_SEARCH:
+#endif
+    default: // The default case is not expected to happen, but just in case.
+        return SESH_OSAPI_O_SEARCH;
+    }
+}
+
+int sesh_osapi_fcntl_file_attribute_to_raw(
+        enum sesh_osapi_fcntl_file_attribute a) {
+    switch (a) {
+    case SESH_OSAPI_O_ACCMODE:
+        return O_ACCMODE;
+    case SESH_OSAPI_O_APPEND:
+        return O_APPEND;
+    case SESH_OSAPI_O_DSYNC:
+#ifdef O_DSYNC
+        return O_DSYNC;
+#else
+        return 0;
+#endif
+    case SESH_OSAPI_O_NONBLOCK:
+        return O_NONBLOCK;
+    case SESH_OSAPI_O_RSYNC:
+#ifdef O_RSYNC
+        return O_RSYNC;
+#else
+        return 0;
+#endif
+    case SESH_OSAPI_O_SYNC:
+        return O_SYNC;
+    }
+}
+
+int sesh_osapi_fcntl_getfl(int fd) {
+    return fcntl(fd, F_GETFL);
+}
+
+int sesh_osapi_fcntl_setfl(int fd, int flags) {
+    return fcntl(fd, F_SETFL, flags);
+}
 
 int sesh_osapi_close(int fd) {
     return close(fd);

@@ -24,13 +24,22 @@
 #include <stdexcept>
 #include <system_error>
 #include "common/ErrnoHelper.hh"
+#include "common/Variant.hh"
+#include "helpermacros.h"
 #include "os/capi.h"
+#include "os/io/FileDescriptionAccessMode.hh"
+#include "os/io/FileDescriptionAttribute.hh"
+#include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
+using sesh::common::Variant;
 using sesh::common::errnoCode;
+using sesh::os::io::FileDescriptionAccessMode;
+using sesh::os::io::FileDescriptionAttribute;
+using sesh::os::io::FileDescriptionStatus;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::SignalNumber;
@@ -42,6 +51,44 @@ namespace sesh {
 namespace os {
 
 namespace {
+
+FileDescriptionAccessMode convert(enum sesh_osapi_fcntl_file_access_mode mode)
+        noexcept {
+    switch (mode) {
+    case SESH_OSAPI_O_EXEC:
+        return FileDescriptionAccessMode::EXEC;
+    case SESH_OSAPI_O_RDONLY:
+        return FileDescriptionAccessMode::READ_ONLY;
+    case SESH_OSAPI_O_RDWR:
+        return FileDescriptionAccessMode::READ_WRITE;
+    case SESH_OSAPI_O_SEARCH:
+        return FileDescriptionAccessMode::SEARCH;
+    case SESH_OSAPI_O_WRONLY:
+        return FileDescriptionAccessMode::WRITE_ONLY;
+    }
+    UNREACHABLE();
+}
+
+enum sesh_osapi_fcntl_file_attribute convert(FileDescriptionAttribute a)
+        noexcept {
+    switch (a) {
+    case FileDescriptionAttribute::APPEND:
+        return SESH_OSAPI_O_APPEND;
+    case FileDescriptionAttribute::DATA_SYNC:
+        return SESH_OSAPI_O_DSYNC;
+    case FileDescriptionAttribute::NON_BLOCKING:
+        return SESH_OSAPI_O_NONBLOCK;
+    case FileDescriptionAttribute::READ_SYNC:
+        return SESH_OSAPI_O_RSYNC;
+    case FileDescriptionAttribute::SYNC:
+        return SESH_OSAPI_O_SYNC;
+    }
+    UNREACHABLE();
+}
+
+int toRawFlag(FileDescriptionAttribute a) {
+    return sesh_osapi_fcntl_file_attribute_to_raw(convert(a));
+}
 
 void convert(const SignalAction &from, struct sesh_osapi_signal_action &to) {
     switch (from.index()) {
@@ -73,6 +120,49 @@ void convert(const struct sesh_osapi_signal_action &from, SignalAction &to) {
         break;
     }
 }
+
+class FileDescriptionStatusImpl : public FileDescriptionStatus {
+
+private:
+
+    int mRawFlags;
+
+public:
+
+    explicit FileDescriptionStatusImpl(int rawFlags) noexcept :
+            mRawFlags(rawFlags) { }
+
+    int rawFlags() const noexcept { return mRawFlags; }
+
+    FileDescriptionAccessMode accessMode() const noexcept final override {
+        return convert(sesh_osapi_fcntl_file_access_mode_from_raw(mRawFlags));
+    }
+
+    bool test(FileDescriptionAttribute a) const noexcept final override {
+        return mRawFlags & toRawFlag(a);
+    }
+
+    FileDescriptionStatus &set(FileDescriptionAttribute a, bool value)
+            noexcept final override {
+        int flag = toRawFlag(a);
+        if (value)
+            mRawFlags |= flag;
+        else
+            mRawFlags &= ~flag;
+        return *this;
+    }
+
+    FileDescriptionStatus &resetAttributes() noexcept final override {
+        mRawFlags &=
+                sesh_osapi_fcntl_file_attribute_to_raw(SESH_OSAPI_O_ACCMODE);
+        return *this;
+    }
+
+    std::unique_ptr<FileDescriptionStatus> clone() const final override {
+        return std::unique_ptr<FileDescriptionStatus>(new auto(*this));
+    }
+
+}; // class FileDescriptionStatusImpl
 
 class FileDescriptorSetImpl : public FileDescriptorSet {
 
@@ -209,6 +299,25 @@ class ApiImpl : public Api {
     SteadyClockTime steadyClockNow() const noexcept final override {
         return std::chrono::time_point_cast<SteadyClockTime::duration>(
                 SteadyClockTime::clock::now());
+    }
+
+    auto getFileDescriptionStatus(const FileDescriptor &fd) const
+            -> Variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+            final override {
+        int flags = sesh_osapi_fcntl_getfl(fd.value());
+        if (flags == -1)
+            return errnoCode();
+        return std::unique_ptr<FileDescriptionStatus>(
+                new FileDescriptionStatusImpl(flags));
+    }
+
+    std::error_code setFileDescriptionStatus(
+            const FileDescriptor &fd, const FileDescriptionStatus &s) const
+            final override {
+        const auto &i = static_cast<const FileDescriptionStatusImpl &>(s);
+        if (sesh_osapi_fcntl_setfl(fd.value(), i.rawFlags()) == -1)
+            return errnoCode();
+        return std::error_code();
     }
 
     std::error_code close(FileDescriptor &fd) const final override {

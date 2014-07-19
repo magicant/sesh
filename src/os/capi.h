@@ -26,6 +26,40 @@
 extern "C" {
 #endif
 
+enum sesh_osapi_fcntl_file_access_mode {
+    SESH_OSAPI_O_EXEC,
+    SESH_OSAPI_O_RDONLY,
+    SESH_OSAPI_O_RDWR,
+    SESH_OSAPI_O_SEARCH,
+    SESH_OSAPI_O_WRONLY,
+};
+
+enum sesh_osapi_fcntl_file_attribute {
+    SESH_OSAPI_O_ACCMODE,
+    SESH_OSAPI_O_APPEND,
+    SESH_OSAPI_O_DSYNC,
+    SESH_OSAPI_O_NONBLOCK,
+    SESH_OSAPI_O_RSYNC,
+    SESH_OSAPI_O_SYNC,
+};
+
+/** Returns the file access mode for the specified raw flag. */
+enum sesh_osapi_fcntl_file_access_mode
+sesh_osapi_fcntl_file_access_mode_from_raw(int flags);
+
+/**
+ * Returns the raw flag for the specified attribute (or zero if the attribute
+ * is not supported).
+ */
+int sesh_osapi_fcntl_file_attribute_to_raw(
+        enum sesh_osapi_fcntl_file_attribute);
+
+/** A direct wrapper for the POSIX fcntl F_GETFL function. */
+int sesh_osapi_fcntl_getfl(int fd);
+
+/** A direct wrapper for the POSIX fcntl F_SETFL function. */
+int sesh_osapi_fcntl_setfl(int fd, int flags);
+
 /** A direct wrapper for the POSIX close function. */
 int sesh_osapi_close(int fd);
 

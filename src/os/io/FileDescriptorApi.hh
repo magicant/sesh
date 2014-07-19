@@ -20,7 +20,10 @@
 
 #include "buildconfig.h"
 
+#include <memory>
 #include <system_error>
+#include "common/Variant.hh"
+#include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
 
 namespace sesh {
@@ -30,6 +33,31 @@ namespace io {
 class FileDescriptorApi {
 
 public:
+
+    /**
+     * Returns the current status of the open file description associated with
+     * the specified file descriptor.
+     *
+     * @return either a non-null pointer to a new file description status
+     * instance or a non-zero system error code.
+     */
+    virtual
+    common::Variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    getFileDescriptionStatus(const FileDescriptor &) const = 0;
+
+    /**
+     * Modifies the status of the open file description associated with the
+     * specified file descriptor.
+     *
+     * An attribute in the specified status will be ignored if it is not
+     * supported by the OS API. The access mode cannot be modified by this
+     * function.
+     *
+     * The argument status instance must be obtained from the {@link
+     * #getFileDescriptionStatus} function called for the same {@code *this}.
+     */
+    virtual std::error_code setFileDescriptionStatus(
+            const FileDescriptor &, const FileDescriptionStatus &) const = 0;
 
     /**
      * Closes the given file descriptor. This function may block on some
