@@ -126,6 +126,7 @@ src_sesh_SOURCES = \
 	src/common/OutputStream.hh \
 	src/common/Reference.hh \
 	src/common/SharedFunction.hh \
+	src/common/StaticCast.hh \
 	src/common/String.hh \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
