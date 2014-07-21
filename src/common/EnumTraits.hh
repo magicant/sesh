@@ -25,7 +25,7 @@ namespace common {
 
 /**
  * The enum traits template is a placeholder where characteristics of an
- * enumeration.
+ * enumeration are defined.
  *
  * A specialization of this template must have the following public members:
 @code
