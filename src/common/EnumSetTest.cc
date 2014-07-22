@@ -242,6 +242,28 @@ TEST_CASE("Enum set, enum set of") {
             EnumSet<E>().set(E::A).set(E::B).set(E::C));
 }
 
+TEST_CASE("Enum set, to unsigned long") {
+    CHECK(EnumSet<E>().to_ulong() == 0UL);
+    CHECK(enumSetOf(E::A).to_ulong() == 1UL << 0);
+    CHECK(enumSetOf(E::B).to_ulong() == 1UL << 1);
+    CHECK(enumSetOf(E::C).to_ulong() == 1UL << 2);
+    CHECK(enumSetOf(E::A, E::B).to_ulong() == 3UL);
+    CHECK(enumSetOf(E::A, E::C).to_ulong() == 5UL);
+    CHECK(enumSetOf(E::B, E::C).to_ulong() == 6UL);
+    CHECK(enumSetOf(E::A, E::B, E::C).to_ulong() == 7UL);
+}
+
+TEST_CASE("Enum set, to unsigned long long") {
+    CHECK(EnumSet<E>().to_ullong() == 0ULL);
+    CHECK(enumSetOf(E::A).to_ullong() == 1ULL << 0);
+    CHECK(enumSetOf(E::B).to_ullong() == 1ULL << 1);
+    CHECK(enumSetOf(E::C).to_ullong() == 1ULL << 2);
+    CHECK(enumSetOf(E::A, E::B).to_ullong() == 3ULL);
+    CHECK(enumSetOf(E::A, E::C).to_ullong() == 5ULL);
+    CHECK(enumSetOf(E::B, E::C).to_ullong() == 6ULL);
+    CHECK(enumSetOf(E::A, E::B, E::C).to_ullong() == 7ULL);
+}
+
 TEST_CASE("Enum set, hash") {
     const EnumSet<E> s1 = EnumSet<E>().set(E::A).set(E::B);
     const EnumSet<E> s2 = EnumSet<E>().set().reset(E::C);
