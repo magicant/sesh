@@ -22,9 +22,14 @@
 
 #include <memory>
 #include <system_error>
+#include "common/EnumSet.hh"
 #include "common/Variant.hh"
+#include "os/io/FileDescriptionAccessMode.hh"
+#include "os/io/FileDescriptionAttribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
+#include "os/io/FileDescriptorOpenMode.hh"
+#include "os/io/FileMode.hh"
 
 namespace sesh {
 namespace os {
@@ -58,6 +63,20 @@ public:
      */
     virtual std::error_code setFileDescriptionStatus(
             const FileDescriptor &, const FileDescriptionStatus &) const = 0;
+
+    /**
+     * Opens a file. A new open file description and file descriptor are
+     * created if successful. A non-zero error code is returned on failure.
+     *
+     * The file mode set argument is ignored unless the CREATE flag is included
+     * in the file descriptor open mode set argument.
+     */
+    virtual common::Variant<FileDescriptor, std::error_code> open(
+            const char *path,
+            FileDescriptionAccessMode,
+            common::EnumSet<FileDescriptionAttribute>,
+            common::EnumSet<FileDescriptorOpenMode>,
+            common::EnumSet<FileMode>) const = 0;
 
     /**
      * Closes the given file descriptor. This function may block on some

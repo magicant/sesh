@@ -282,7 +282,9 @@ src_sesh_SOURCES = \
 	src/os/io/FileDescriptionStatus.hh \
 	src/os/io/FileDescriptor.hh \
 	src/os/io/FileDescriptorApi.hh \
+	src/os/io/FileDescriptorOpenMode.hh \
 	src/os/io/FileDescriptorSet.hh \
+	src/os/io/FileMode.hh \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfiguration.hh \
 	src/os/signaling/HandlerConfigurationApi.cc \

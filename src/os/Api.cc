@@ -23,6 +23,8 @@
 #include <new>
 #include <stdexcept>
 #include <system_error>
+#include "common/EnumIterator.hh"
+#include "common/EnumSet.hh"
 #include "common/ErrnoHelper.hh"
 #include "common/Variant.hh"
 #include "helpermacros.h"
@@ -31,17 +33,23 @@
 #include "os/io/FileDescriptionAttribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
+#include "os/io/FileDescriptorOpenMode.hh"
 #include "os/io/FileDescriptorSet.hh"
+#include "os/io/FileMode.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
+using sesh::common::EnumSet;
 using sesh::common::Variant;
+using sesh::common::enumerators;
 using sesh::common::errnoCode;
 using sesh::os::io::FileDescriptionAccessMode;
 using sesh::os::io::FileDescriptionAttribute;
 using sesh::os::io::FileDescriptionStatus;
 using sesh::os::io::FileDescriptor;
+using sesh::os::io::FileDescriptorOpenMode;
 using sesh::os::io::FileDescriptorSet;
+using sesh::os::io::FileMode;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
@@ -51,6 +59,28 @@ namespace sesh {
 namespace os {
 
 namespace {
+
+enum sesh_osapi_fcntl_file_access_mode convert(FileDescriptionAccessMode mode)
+        noexcept {
+    switch (mode) {
+    case FileDescriptionAccessMode::EXEC:
+        return SESH_OSAPI_O_EXEC;
+    case FileDescriptionAccessMode::READ_ONLY:
+        return SESH_OSAPI_O_RDONLY;
+    case FileDescriptionAccessMode::READ_WRITE:
+        return SESH_OSAPI_O_RDWR;
+    case FileDescriptionAccessMode::SEARCH:
+        return SESH_OSAPI_O_SEARCH;
+    case FileDescriptionAccessMode::WRITE_ONLY:
+        return SESH_OSAPI_O_WRONLY;
+    }
+    UNREACHABLE();
+}
+
+/** @return -1 if not supported. */
+int toRawFlag(FileDescriptionAccessMode mode) {
+    return sesh_osapi_fcntl_file_access_mode_to_raw(convert(mode));
+}
 
 FileDescriptionAccessMode convert(enum sesh_osapi_fcntl_file_access_mode mode)
         noexcept {
@@ -86,8 +116,58 @@ enum sesh_osapi_fcntl_file_attribute convert(FileDescriptionAttribute a)
     UNREACHABLE();
 }
 
+enum sesh_osapi_open_mode convert(FileDescriptorOpenMode mode) noexcept {
+    switch (mode) {
+    case FileDescriptorOpenMode::CLOSE_ON_EXEC:
+        return SESH_OSAPI_O_CLOEXEC;
+    case FileDescriptorOpenMode::CREATE:
+        return SESH_OSAPI_O_CREAT;
+    case FileDescriptorOpenMode::DIRECTORY:
+        return SESH_OSAPI_O_DIRECTORY;
+    case FileDescriptorOpenMode::EXCLUSIVE:
+        return SESH_OSAPI_O_EXCL;
+    case FileDescriptorOpenMode::NO_CONTROLLING_TERMINAL:
+        return SESH_OSAPI_O_NOCTTY;
+    case FileDescriptorOpenMode::NO_FOLLOW:
+        return SESH_OSAPI_O_NOFOLLOW;
+    case FileDescriptorOpenMode::TRUNCATE:
+        return SESH_OSAPI_O_TRUNC;
+    case FileDescriptorOpenMode::TTY_INITIALIZE:
+        return SESH_OSAPI_O_TTY_INIT;
+    }
+    UNREACHABLE();
+}
+
 int toRawFlag(FileDescriptionAttribute a) {
     return sesh_osapi_fcntl_file_attribute_to_raw(convert(a));
+}
+
+int toRawFlag(FileDescriptorOpenMode mode) {
+    return sesh_osapi_open_mode_to_raw(convert(mode));
+}
+
+/** @return -1 if the access mode is not supported. */
+int toRawFlags(
+        FileDescriptionAccessMode accessMode,
+        EnumSet<FileDescriptionAttribute> attributes,
+        EnumSet<FileDescriptorOpenMode> openModes) {
+    int rawFlags = toRawFlag(accessMode);
+    if (rawFlags == -1)
+        return -1;
+
+    for (auto a : enumerators<FileDescriptionAttribute>())
+        if (attributes[a])
+            rawFlags |= toRawFlag(a);
+
+    for (auto m : enumerators<FileDescriptorOpenMode>())
+        if (openModes[m])
+            rawFlags |= toRawFlag(m);
+
+    return rawFlags;
+}
+
+int toRawModes(EnumSet<FileMode> modes) {
+    return sesh_osapi_mode_to_raw(static_cast<int>(modes.to_ulong()));
 }
 
 void convert(const SignalAction &from, struct sesh_osapi_signal_action &to) {
@@ -318,6 +398,23 @@ class ApiImpl : public Api {
         if (sesh_osapi_fcntl_setfl(fd.value(), i.rawFlags()) == -1)
             return errnoCode();
         return std::error_code();
+    }
+
+    Variant<FileDescriptor, std::error_code> open(
+            const char *path,
+            FileDescriptionAccessMode accessMode,
+            EnumSet<FileDescriptionAttribute> attributes,
+            EnumSet<FileDescriptorOpenMode> openModes,
+            EnumSet<FileMode> fileModes) const final override {
+        int flags = toRawFlags(accessMode, attributes, openModes);
+        if (flags == -1)
+            return std::make_error_code(std::errc::invalid_argument);
+
+        int modes = toRawModes(fileModes);
+        int fd = sesh_osapi_open(path, flags, modes);
+        if (fd < 0)
+            return errnoCode();
+        return FileDescriptor(fd);
     }
 
     std::error_code close(FileDescriptor &fd) const final override {

@@ -22,7 +22,32 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/select.h>
+#include <sys/stat.h>
 #include <unistd.h>
+
+int sesh_osapi_fcntl_file_access_mode_to_raw(
+        enum sesh_osapi_fcntl_file_access_mode mode) {
+    switch (mode) {
+    case SESH_OSAPI_O_RDONLY:
+        return O_RDONLY;
+    case SESH_OSAPI_O_RDWR:
+        return O_RDWR;
+    case SESH_OSAPI_O_WRONLY:
+        return O_WRONLY;
+    case SESH_OSAPI_O_EXEC:
+#ifdef O_EXEC
+        return O_EXEC;
+#else
+        return -1;
+#endif
+    case SESH_OSAPI_O_SEARCH:
+#ifdef O_EXEC
+        return O_SEARCH;
+#else
+        return -1;
+#endif
+    }
+}
 
 enum sesh_osapi_fcntl_file_access_mode
 sesh_osapi_fcntl_file_access_mode_from_raw(int flags) {
@@ -77,6 +102,84 @@ int sesh_osapi_fcntl_getfl(int fd) {
 
 int sesh_osapi_fcntl_setfl(int fd, int flags) {
     return fcntl(fd, F_SETFL, flags);
+}
+
+int sesh_osapi_open_mode_to_raw(enum sesh_osapi_open_mode mode) {
+    switch (mode) {
+    case SESH_OSAPI_O_CLOEXEC:
+#ifdef O_CLOEXEC
+        return O_CLOEXEC;
+#else
+        return 0;
+#endif
+    case SESH_OSAPI_O_CREAT:
+        return O_CREAT;
+    case SESH_OSAPI_O_DIRECTORY:
+#ifdef O_DIRECTORY
+        return O_DIRECTORY;
+#else
+        return 0;
+#endif
+    case SESH_OSAPI_O_EXCL:
+        return O_EXCL;
+    case SESH_OSAPI_O_NOCTTY:
+        return O_NOCTTY;
+    case SESH_OSAPI_O_NOFOLLOW:
+#ifdef O_NOFOLLOW
+        return O_NOFOLLOW;
+#else
+        return 0;
+#endif
+    case SESH_OSAPI_O_TRUNC:
+        return O_TRUNC;
+    case SESH_OSAPI_O_TTY_INIT:
+#ifdef O_TTY_INIT
+        return O_TTY_INIT;
+#else
+        return 0;
+#endif
+    }
+}
+
+int sesh_osapi_mode_to_raw(int modes) {
+    /*
+     * POSIX did not define the actual values for the mode bits until POSIX
+     * 2008. We explicitly map the values here just in case.
+     */
+    // return modes;
+
+    int rawModes = 0;
+    if (modes & (1 << 11))
+        rawModes |= S_ISUID;
+    if (modes & (1 << 10))
+        rawModes |= S_ISGID;
+#ifdef S_ISVTX
+    if (modes & (1 << 9))
+        rawModes |= S_ISVTX;
+#endif
+    if (modes & (1 << 8))
+        rawModes |= S_IRUSR;
+    if (modes & (1 << 7))
+        rawModes |= S_IWUSR;
+    if (modes & (1 << 6))
+        rawModes |= S_IXUSR;
+    if (modes & (1 << 5))
+        rawModes |= S_IRGRP;
+    if (modes & (1 << 4))
+        rawModes |= S_IWGRP;
+    if (modes & (1 << 3))
+        rawModes |= S_IXGRP;
+    if (modes & (1 << 2))
+        rawModes |= S_IROTH;
+    if (modes & (1 << 1))
+        rawModes |= S_IWOTH;
+    if (modes & (1 << 0))
+        rawModes |= S_IXOTH;
+    return rawModes;
+}
+
+int sesh_osapi_open(const char *path, int flags, int mode) {
+    return open(path, flags, mode);
 }
 
 int sesh_osapi_close(int fd) {
