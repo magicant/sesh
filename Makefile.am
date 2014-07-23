@@ -27,6 +27,7 @@ TESTPROGRAMS = \
 	src/async/PromiseTest \
 	src/async/SharedFutureTest \
 	src/common/ContainerHelperTest \
+	src/common/EnumIteratorTest \
 	src/common/EnumSetTest \
 	src/common/MaybeTest \
 	src/common/MessageTest \
@@ -112,6 +113,7 @@ src_sesh_SOURCES = \
 	src/common/ContainerHelper.hh \
 	src/common/DirectInitialize.hh \
 	src/common/Empty.hh \
+	src/common/EnumIterator.hh \
 	src/common/EnumSet.hh \
 	src/common/EnumTraits.hh \
 	src/common/ErrnoHelper.hh \
@@ -126,6 +128,7 @@ src_sesh_SOURCES = \
 	src/common/OutputStream.hh \
 	src/common/Reference.hh \
 	src/common/SharedFunction.hh \
+	src/common/StaticCast.hh \
 	src/common/String.hh \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
@@ -299,6 +302,8 @@ src_async_SharedFutureTest_SOURCES = \
 	src/async/SharedFutureTest.cc
 src_common_ContainerHelperTest_SOURCES = \
 	src/common/ContainerHelperTest.cc
+src_common_EnumIteratorTest_SOURCES = \
+	src/common/EnumIteratorTest.cc
 src_common_EnumSetTest_SOURCES = \
 	src/common/EnumSetTest.cc
 src_common_MaybeTest_SOURCES = \
