@@ -155,6 +155,13 @@ public:
         return *this;
     }
 
+    unsigned long to_ulong() const {
+        return mBitset.to_ulong();
+    }
+    unsigned long long to_ullong() const {
+        return mBitset.to_ullong();
+    }
+
     std::size_t hash() const noexcept {
         return std::hash<std::bitset<N>>()(mBitset);
     }

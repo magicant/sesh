@@ -26,6 +26,87 @@
 extern "C" {
 #endif
 
+enum sesh_osapi_fcntl_file_access_mode {
+    SESH_OSAPI_O_EXEC,
+    SESH_OSAPI_O_RDONLY,
+    SESH_OSAPI_O_RDWR,
+    SESH_OSAPI_O_SEARCH,
+    SESH_OSAPI_O_WRONLY,
+};
+
+enum sesh_osapi_fcntl_file_attribute {
+    SESH_OSAPI_O_ACCMODE,
+    SESH_OSAPI_O_APPEND,
+    SESH_OSAPI_O_DSYNC,
+    SESH_OSAPI_O_NONBLOCK,
+    SESH_OSAPI_O_RSYNC,
+    SESH_OSAPI_O_SYNC,
+};
+
+/**
+ * Returns the raw flag for the specified file access mode, or -1 if it is not
+ * supported.
+ */
+int sesh_osapi_fcntl_file_access_mode_to_raw(
+        enum sesh_osapi_fcntl_file_access_mode);
+
+/** Returns the file access mode for the specified raw flag. */
+enum sesh_osapi_fcntl_file_access_mode
+sesh_osapi_fcntl_file_access_mode_from_raw(int flags);
+
+/**
+ * Returns the raw flag for the specified attribute (or zero if the attribute
+ * is not supported).
+ */
+int sesh_osapi_fcntl_file_attribute_to_raw(
+        enum sesh_osapi_fcntl_file_attribute);
+
+/** A direct wrapper for the POSIX fcntl F_GETFL function. */
+int sesh_osapi_fcntl_getfl(int fd);
+
+/** A direct wrapper for the POSIX fcntl F_SETFL function. */
+int sesh_osapi_fcntl_setfl(int fd, int flags);
+
+enum sesh_osapi_open_mode {
+    SESH_OSAPI_O_CLOEXEC,
+    SESH_OSAPI_O_CREAT,
+    SESH_OSAPI_O_DIRECTORY,
+    SESH_OSAPI_O_EXCL,
+    SESH_OSAPI_O_NOCTTY,
+    SESH_OSAPI_O_NOFOLLOW,
+    SESH_OSAPI_O_TRUNC,
+    SESH_OSAPI_O_TTY_INIT,
+};
+
+/**
+ * Returns the raw flag for the specified open mode (or zero if the mode is not
+ * supported.
+ */
+int sesh_osapi_open_mode_to_raw(enum sesh_osapi_open_mode);
+
+/**
+ * Returns the raw file mode bits converted from the argument abstract bits.
+ * @param modes Logical "or" of any number of the following flags:
+ * <table>
+ * <tr><td>1 &lt;&lt; 11<td>Set user ID
+ * <tr><td>1 &lt;&lt; 10<td>Set group ID
+ * <tr><td>1 &lt;&lt; 9<td>Sticky
+ * <tr><td>1 &lt;&lt; 8<td>Owner read
+ * <tr><td>1 &lt;&lt; 7<td>Owner write
+ * <tr><td>1 &lt;&lt; 6<td>Owner execute
+ * <tr><td>1 &lt;&lt; 5<td>Group read
+ * <tr><td>1 &lt;&lt; 4<td>Group write
+ * <tr><td>1 &lt;&lt; 3<td>Group execute
+ * <tr><td>1 &lt;&lt; 2<td>Others read
+ * <tr><td>1 &lt;&lt; 1<td>Others write
+ * <tr><td>1 &lt;&lt; 0<td>Others execute
+ * </table>
+ */
+int sesh_osapi_mode_to_raw(int modes);
+
+/** A direct wrapper for the POSIX open function. */
+int sesh_osapi_open(const char *, int flags, int mode);
+
 /** A direct wrapper for the POSIX close function. */
 int sesh_osapi_close(int fd);
 

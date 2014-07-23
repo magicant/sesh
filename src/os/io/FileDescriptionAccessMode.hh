@@ -15,34 +15,30 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_io_FileDescriptionAccessMode_hh
+#define INCLUDED_os_io_FileDescriptionAccessMode_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include "common/EnumTraits.hh"
 
 namespace sesh {
 namespace os {
+namespace io {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptorApi,
-        public signaling::HandlerConfigurationApi {
+/** This enum class defines file access modes of open file descriptions. */
+enum class FileDescriptionAccessMode {
+    READ_ONLY,
+    WRITE_ONLY,
+    READ_WRITE,
+    EXEC,
+    SEARCH,
+};
 
-public:
-
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
-
-}; // class Api
-
+} // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_io_FileDescriptionAccessMode_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

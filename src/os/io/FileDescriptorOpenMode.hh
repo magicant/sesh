@@ -15,34 +15,46 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_io_FileDescriptorOpenMode_hh
+#define INCLUDED_os_io_FileDescriptorOpenMode_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include "common/EnumTraits.hh"
 
 namespace sesh {
+
 namespace os {
+namespace io {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptorApi,
-        public signaling::HandlerConfigurationApi {
+/** This enum class defines the behavior of the file open API. */
+enum class FileDescriptorOpenMode {
+    CLOSE_ON_EXEC,
+    CREATE,
+    DIRECTORY,
+    EXCLUSIVE,
+    NO_CONTROLLING_TERMINAL,
+    NO_FOLLOW,
+    TRUNCATE,
+    TTY_INITIALIZE,
+};
 
-public:
-
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
-
-}; // class Api
-
+} // namespace io
 } // namespace os
+
+namespace common {
+
+template<>
+class EnumTraits<os::io::FileDescriptorOpenMode> {
+public:
+    constexpr static os::io::FileDescriptorOpenMode max =
+            os::io::FileDescriptorOpenMode::TTY_INITIALIZE;
+};
+
+} // namespace common
+
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_io_FileDescriptorOpenMode_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

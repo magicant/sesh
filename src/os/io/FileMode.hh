@@ -15,34 +15,50 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_io_FileMode_hh
+#define INCLUDED_os_io_FileMode_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include "common/EnumTraits.hh"
 
 namespace sesh {
+
 namespace os {
+namespace io {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptorApi,
-        public signaling::HandlerConfigurationApi {
+/** Defines file permission bits. */
+enum class FileMode {
+    // ordered by the bit position, starting from the least significant bit.
+    OTHERS_EXECUTE,
+    OTHERS_WRITE,
+    OTHERS_READ,
+    GROUP_EXECUTE,
+    GROUP_WRITE,
+    GROUP_READ,
+    OWNER_EXECUTE,
+    OWNER_WRITE,
+    OWNER_READ,
+    STICKY,
+    SET_GROUP_ID,
+    SET_USER_ID,
+};
 
-public:
-
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
-
-}; // class Api
-
+} // namespace io
 } // namespace os
+
+namespace common {
+
+template<>
+class EnumTraits<os::io::FileMode> {
+public:
+    constexpr static os::io::FileMode max = os::io::FileMode::SET_USER_ID;
+};
+
+} // namespace common
+
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_io_FileMode_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

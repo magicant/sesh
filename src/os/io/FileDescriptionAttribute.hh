@@ -15,34 +15,43 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_io_FileDescriptionAttribute_hh
+#define INCLUDED_os_io_FileDescriptionAttribute_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include "common/EnumTraits.hh"
 
 namespace sesh {
+
 namespace os {
+namespace io {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptorApi,
-        public signaling::HandlerConfigurationApi {
+/** This enum class defines attributes an open file description can have. */
+enum class FileDescriptionAttribute {
+    APPEND,
+    DATA_SYNC,
+    NON_BLOCKING,
+    READ_SYNC,
+    SYNC,
+};
 
-public:
-
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
-
-}; // class Api
-
+} // namespace io
 } // namespace os
+
+namespace common {
+
+template<>
+class EnumTraits<os::io::FileDescriptionAttribute> {
+public:
+    constexpr static os::io::FileDescriptionAttribute max =
+            os::io::FileDescriptionAttribute::SYNC;
+};
+
+} // namespace common
+
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_io_FileDescriptionAttribute_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
