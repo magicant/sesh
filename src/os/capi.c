@@ -24,6 +24,7 @@
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "helpermacros.h"
 
 int sesh_osapi_fcntl_file_access_mode_to_raw(
         enum sesh_osapi_fcntl_file_access_mode mode) {
@@ -47,6 +48,7 @@ int sesh_osapi_fcntl_file_access_mode_to_raw(
         return -1;
 #endif
     }
+    UNREACHABLE();
 }
 
 enum sesh_osapi_fcntl_file_access_mode
@@ -94,6 +96,7 @@ int sesh_osapi_fcntl_file_attribute_to_raw(
     case SESH_OSAPI_O_SYNC:
         return O_SYNC;
     }
+    UNREACHABLE();
 }
 
 int sesh_osapi_fcntl_getfl(int fd) {
@@ -139,6 +142,7 @@ int sesh_osapi_open_mode_to_raw(enum sesh_osapi_open_mode mode) {
         return 0;
 #endif
     }
+    UNREACHABLE();
 }
 
 int sesh_osapi_mode_to_raw(int modes) {

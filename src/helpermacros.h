@@ -28,10 +28,17 @@
 #include "config.h"
 
 /**
+ * Defined to be the GCC version. It will be 0x40803 on GCC 4.8.3, for example.
+ * In non-GCC environments, it will be zero.
+ */
+#define GCC_VERSION \
+        (__GNUC__ << 16 | __GNUC_MINOR__ << 8 | __GNUC_PATCHLEVEL__)
+
+/**
  * Signifies unreachable code to help compiler optimization and dumb false
  * compiler warnings.
  */
-#if HAVE___BUILTIN_UNREACHABLE
+#if __cplusplus ? HAVE___BUILTIN_UNREACHABLE : GCC_VERSION >= 0x40500
 #define UNREACHABLE() (__builtin_unreachable())
 #else
 #define UNREACHABLE() ((void) 0)
