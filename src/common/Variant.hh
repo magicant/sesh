@@ -1160,7 +1160,7 @@ void swap(Variant<T...> &a, Variant<T...> &b)
 
 template<typename... T>
 void Variant<T...>::swap(Variant &other)
-        noexcept(Variant::IS_NOTHROW_SWAPPABLE) {
+        noexcept(noexcept(variant_impl::swap(*this, other))) {
     variant_impl::swap(*this, other);
 }
 
