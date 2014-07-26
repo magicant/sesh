@@ -528,7 +528,7 @@ public:
      * @param arg the arguments forwarded to the constructor.
      */
     template<typename U, typename... Arg>
-    VariantBase(TypeTag<U>, Arg &&... arg)
+    explicit VariantBase(TypeTag<U>, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
             mIndex(index<U>()) {
         value().template construct<U>(std::forward<Arg>(arg)...);
