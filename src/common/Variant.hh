@@ -491,7 +491,9 @@ public:
             IS_NOTHROW_MOVE_CONSTRUCTIBLE &&
             IS_NOTHROW_DESTRUCTIBLE;
     constexpr static bool IS_NOTHROW_SWAPPABLE =
-            ForAll<swap_impl::IsNothrowSwappable, T...>::value;
+            ForAll<swap_impl::IsNothrowSwappable, T...>::value &&
+            IS_NOTHROW_MOVE_CONSTRUCTIBLE &&
+            IS_NOTHROW_DESTRUCTIBLE;
 
     /** Returns the integral value that identifies the parameter type. */
     template<typename U>
