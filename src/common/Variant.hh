@@ -1077,7 +1077,16 @@ public:
      * Requirements: All the contained types must be swappable, no-throw
      * move-constructible, and no-throw destructible.
      */
-    void swap(Variant &other) noexcept(Variant::IS_NOTHROW_SWAPPABLE);
+    void swap(Variant &other) noexcept(Variant::IS_NOTHROW_SWAPPABLE) {
+        if (this->index() == other.index())
+            return this->apply(swap_impl::Swapper<Variant<T...>>(other));
+
+        assert(this != &other);
+
+        Variant<T...> temporary(std::move(*this));
+        std::move(other).apply(emplacer(*this));
+        std::move(temporary).apply(emplacer(other));
+    }
 
     /**
      * Creates a new variant by constructing its contained value by calling the
@@ -1156,23 +1165,8 @@ public:
  */
 template<typename... T>
 void swap(Variant<T...> &a, Variant<T...> &b)
-        noexcept(Variant<T...>::IS_NOTHROW_SWAPPABLE &&
-                Variant<T...>::IS_NOTHROW_COPY_CONSTRUCTIBLE &&
-                Variant<T...>::IS_NOTHROW_DESTRUCTIBLE) {
-    if (a.index() == b.index())
-        return a.apply(swap_impl::Swapper<Variant<T...>>(b));
-
-    assert(&a != &b);
-
-    Variant<T...> temporary(std::move(a));
-    std::move(b).apply(emplacer(a));
-    std::move(temporary).apply(emplacer(b));
-}
-
-template<typename... T>
-void Variant<T...>::swap(Variant &other)
-        noexcept(noexcept(variant_impl::swap(*this, other))) {
-    variant_impl::swap(*this, other);
+        noexcept(Variant<T...>::IS_NOTHROW_SWAPPABLE) {
+    a.swap(b);
 }
 
 /*
