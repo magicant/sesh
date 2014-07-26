@@ -70,7 +70,7 @@ public:
      * @param arg arguments to the contained object's constructor.
      */
     template<typename... Arg>
-    Maybe(TypeTag<T> tag, Arg &&... arg)
+    explicit Maybe(TypeTag<T> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<T, Arg...>::value) :
             mValue(tag, std::forward<Arg>(arg)...) { }
     // XXX support initializer_list?
