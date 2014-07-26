@@ -79,13 +79,13 @@ public:
     }
 
     /** Constructs an invalid file descriptor. */
-    FileDescriptor() noexcept : mValue(INVALID_VALUE) { }
+    constexpr FileDescriptor() noexcept : mValue(INVALID_VALUE) { }
 
     /**
      * Constructs a file descriptor of the given internal representation. A
      * negative internal representation value will be considered invalid.
      */
-    explicit FileDescriptor(Value value) noexcept : mValue(value) { }
+    constexpr explicit FileDescriptor(Value value) noexcept : mValue(value) { }
 
     /** Move constructor, which invalidates the other file descriptor. */
     FileDescriptor(FileDescriptor &&fd) noexcept : mValue(fd.value()) {
