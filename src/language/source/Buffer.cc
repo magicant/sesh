@@ -79,16 +79,4 @@ Buffer::String toString(
 } // namespace language
 } // namespace sesh
 
-namespace std {
-
-using ConstIterator = sesh::language::source::Buffer::ConstIterator;
-
-template<>
-void swap<ConstIterator>(ConstIterator &i1, ConstIterator &i2) noexcept {
-    swap(i1.bufferPointer(), i2.bufferPointer());
-    swap(i1.position(), i2.position());
-}
-
-} // namespace std
-
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

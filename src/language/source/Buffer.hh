@@ -290,15 +290,6 @@ std::basic_ostream<Char, Traits> &operator<<(
 } // namespace language
 } // namespace sesh
 
-namespace std {
-
-template<>
-void swap<sesh::language::source::Buffer::ConstIterator>(
-        sesh::language::source::Buffer::ConstIterator &i1,
-        sesh::language::source::Buffer::ConstIterator &i2) noexcept;
-
-} // namespace std
-
 #endif // #ifndef INCLUDED_language_source_Buffer_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
