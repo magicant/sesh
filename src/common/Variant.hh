@@ -283,7 +283,7 @@ private:
 
 public:
 
-    Constructor(Union &target) noexcept : mTarget(target) { }
+    explicit Constructor(Union &target) noexcept : mTarget(target) { }
 
     using Result = void;
 
@@ -308,7 +308,7 @@ private:
 
 public:
 
-    Assigner(Union &target) noexcept : mTarget(target) { }
+    explicit Assigner(Union &target) noexcept : mTarget(target) { }
 
     using Result = void;
 
@@ -347,7 +347,7 @@ private:
 
 public:
 
-    Emplacer(Variant &target) noexcept : mTarget(target) { }
+    explicit Emplacer(Variant &target) noexcept : mTarget(target) { }
 
     using Result = void;
 
@@ -440,7 +440,7 @@ private:
 
 public:
 
-    Swapper(Variant &other) noexcept : mOther(other) { }
+    explicit Swapper(Variant &other) noexcept : mOther(other) { }
 
     using Result = void;
 
