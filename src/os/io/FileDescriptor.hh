@@ -111,20 +111,14 @@ public:
 
 }; // class FileDescriptor
 
-} // namespace io
-} // namespace os
-} // namespace sesh
-
-namespace std {
-
 /** Swaps two file descriptors. */
-inline void swap(
-        sesh::os::io::FileDescriptor &l, sesh::os::io::FileDescriptor &r)
-        noexcept {
+inline void swap(FileDescriptor &l, FileDescriptor &r) noexcept {
     l.swap(r);
 }
 
-} // namespace std
+} // namespace io
+} // namespace os
+} // namespace sesh
 
 #endif // #ifndef INCLUDED_os_io_FileDescriptor_hh
 
