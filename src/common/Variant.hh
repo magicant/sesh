@@ -1067,7 +1067,16 @@ public:
         return *this;
     }
 
-    /** Swap the values of this and the argument variant. */
+    /**
+     * Swap the values of this and the argument variants.
+     *
+     * If the two variants have values of the same type, they are swapped by
+     * the swap function. Otherwise, the variants are swapped by emplacement
+     * using the move constructor.
+     *
+     * Requirements: All the contained types must be swappable, no-throw
+     * move-constructible, and no-throw destructible.
+     */
     void swap(Variant &other) noexcept(Variant::IS_NOTHROW_SWAPPABLE);
 
     /**
@@ -1142,8 +1151,8 @@ public:
  * swap function. Otherwise, the variants are swapped by emplacement using the
  * move constructor.
  *
- * Requirements: All the contained types must be swappable, copy-constructible,
- * and no-throw move-constructible.
+ * Requirements: All the contained types must be swappable, no-throw
+ * move-constructible, and no-throw destructible.
  */
 template<typename... T>
 void swap(Variant<T...> &a, Variant<T...> &b)
