@@ -283,7 +283,7 @@ private:
 
 public:
 
-    Constructor(Union &target) noexcept : mTarget(target) { }
+    explicit Constructor(Union &target) noexcept : mTarget(target) { }
 
     using Result = void;
 
@@ -308,7 +308,7 @@ private:
 
 public:
 
-    Assigner(Union &target) noexcept : mTarget(target) { }
+    explicit Assigner(Union &target) noexcept : mTarget(target) { }
 
     using Result = void;
 
@@ -347,7 +347,7 @@ private:
 
 public:
 
-    Emplacer(Variant &target) noexcept : mTarget(target) { }
+    explicit Emplacer(Variant &target) noexcept : mTarget(target) { }
 
     using Result = void;
 
@@ -440,7 +440,7 @@ private:
 
 public:
 
-    Swapper(Variant &other) noexcept : mOther(other) { }
+    explicit Swapper(Variant &other) noexcept : mOther(other) { }
 
     using Result = void;
 
@@ -491,7 +491,9 @@ public:
             IS_NOTHROW_MOVE_CONSTRUCTIBLE &&
             IS_NOTHROW_DESTRUCTIBLE;
     constexpr static bool IS_NOTHROW_SWAPPABLE =
-            ForAll<swap_impl::IsNothrowSwappable, T...>::value;
+            ForAll<swap_impl::IsNothrowSwappable, T...>::value &&
+            IS_NOTHROW_MOVE_CONSTRUCTIBLE &&
+            IS_NOTHROW_DESTRUCTIBLE;
 
     /** Returns the integral value that identifies the parameter type. */
     template<typename U>
@@ -528,7 +530,7 @@ public:
      * @param arg the arguments forwarded to the constructor.
      */
     template<typename U, typename... Arg>
-    VariantBase(TypeTag<U>, Arg &&... arg)
+    explicit VariantBase(TypeTag<U>, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
             mIndex(index<U>()) {
         value().template construct<U>(std::forward<Arg>(arg)...);
@@ -1065,8 +1067,26 @@ public:
         return *this;
     }
 
-    /** Swap the values of this and the argument variant. */
-    void swap(Variant &other) noexcept(Variant::IS_NOTHROW_SWAPPABLE);
+    /**
+     * Swap the values of this and the argument variants.
+     *
+     * If the two variants have values of the same type, they are swapped by
+     * the swap function. Otherwise, the variants are swapped by emplacement
+     * using the move constructor.
+     *
+     * Requirements: All the contained types must be swappable, no-throw
+     * move-constructible, and no-throw destructible.
+     */
+    void swap(Variant &other) noexcept(Variant::IS_NOTHROW_SWAPPABLE) {
+        if (this->index() == other.index())
+            return this->apply(swap_impl::Swapper<Variant<T...>>(other));
+
+        assert(this != &other);
+
+        Variant<T...> temporary(std::move(*this));
+        std::move(other).apply(emplacer(*this));
+        std::move(temporary).apply(emplacer(other));
+    }
 
     /**
      * Creates a new variant by constructing its contained value by calling the
@@ -1140,28 +1160,13 @@ public:
  * swap function. Otherwise, the variants are swapped by emplacement using the
  * move constructor.
  *
- * Requirements: All the contained types must be swappable, copy-constructible,
- * and no-throw move-constructible.
+ * Requirements: All the contained types must be swappable, no-throw
+ * move-constructible, and no-throw destructible.
  */
 template<typename... T>
 void swap(Variant<T...> &a, Variant<T...> &b)
-        noexcept(Variant<T...>::IS_NOTHROW_SWAPPABLE &&
-                Variant<T...>::IS_NOTHROW_COPY_CONSTRUCTIBLE &&
-                Variant<T...>::IS_NOTHROW_DESTRUCTIBLE) {
-    if (a.index() == b.index())
-        return a.apply(swap_impl::Swapper<Variant<T...>>(b));
-
-    assert(&a != &b);
-
-    Variant<T...> temporary(std::move(a));
-    std::move(b).apply(emplacer(a));
-    std::move(temporary).apply(emplacer(b));
-}
-
-template<typename... T>
-void Variant<T...>::swap(Variant &other)
-        noexcept(Variant::IS_NOTHROW_SWAPPABLE) {
-    variant_impl::swap(*this, other);
+        noexcept(Variant<T...>::IS_NOTHROW_SWAPPABLE) {
+    a.swap(b);
 }
 
 /*

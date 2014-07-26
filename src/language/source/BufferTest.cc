@@ -395,21 +395,6 @@ TEST_CASE("Buffer iterator, index") {
     CHECK(i[1] == L('t'));
 }
 
-TEST_CASE("Buffer iterator, swapping") {
-    BufferPointer b1 = createBuffer(L("Test 1"));
-    BufferPointer b2 = createBuffer(L("Test 2"));
-
-    SBCI i1 = b1->cbegin() + 1;
-    SBCI i2 = b2->cbegin() + 3;
-    SBCI oldI1 = i1;
-    SBCI oldI2 = i2;
-
-    using namespace std;
-    swap(i1, i2);
-    CHECK(i1 == oldI2);
-    CHECK(i2 == oldI1);
-}
-
 TEST_CASE("Buffer iterator, range to string") {
     BufferPointer b = createBuffer(L("string"));
 

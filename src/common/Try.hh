@@ -50,7 +50,7 @@ public:
         UNREACHABLE();
     }
 
-    operator bool() const noexcept {
+    explicit operator bool() const noexcept {
         return hasValue();
     }
 

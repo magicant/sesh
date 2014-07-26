@@ -75,7 +75,7 @@ public:
     bool isValid() const noexcept;
 
     /** True if this future is valid. */
-    operator bool() const noexcept;
+    explicit operator bool() const noexcept;
 
     /**
      * Adds a callback function to receive the result from the associated

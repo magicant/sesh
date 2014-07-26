@@ -67,7 +67,6 @@ TEST_CASE("File descriptor, move assignment") {
 }
 
 TEST_CASE("File descriptor, swap, non-member") {
-    using namespace std;
     FileDescriptor fd1(3), fd2(9);
     swap(fd1, fd2);
     CHECK(fd1.value() == 9);
