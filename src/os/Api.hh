@@ -21,6 +21,7 @@
 #include "buildconfig.h"
 
 #include "os/event/PselectApi.hh"
+#include "os/io/FileDescriptionApi.hh"
 #include "os/io/FileDescriptorApi.hh"
 #include "os/signaling/HandlerConfigurationApi.hh"
 
@@ -30,6 +31,7 @@ namespace os {
 /** Abstraction of POSIX API. */
 class Api :
         public event::PselectApi,
+        public io::FileDescriptionApi,
         public io::FileDescriptorApi,
         public signaling::HandlerConfigurationApi {
 

@@ -84,6 +84,7 @@ TESTPROGRAMS = \
 	src/os/event/AwaiterUserProvidedTriggerTest \
 	src/os/event/AwaiterWritableFileDescriptorTest \
 	src/os/io/FileDescriptorTest \
+	src/os/io/NonBlockingFileDescriptorTest \
 	src/os/signaling/HandlerConfigurationTest
 
 TESTSCRIPTS = \
@@ -278,6 +279,7 @@ src_sesh_SOURCES = \
 	src/os/event/UserProvidedTrigger.hh \
 	src/os/event/WritableFileDescriptor.hh \
 	src/os/io/FileDescriptionAccessMode.hh \
+	src/os/io/FileDescriptionApi.hh \
 	src/os/io/FileDescriptionAttribute.hh \
 	src/os/io/FileDescriptionStatus.hh \
 	src/os/io/FileDescriptor.hh \
@@ -285,6 +287,8 @@ src_sesh_SOURCES = \
 	src/os/io/FileDescriptorOpenMode.hh \
 	src/os/io/FileDescriptorSet.hh \
 	src/os/io/FileMode.hh \
+	src/os/io/NonBlockingFileDescriptor.cc \
+	src/os/io/NonBlockingFileDescriptor.hh \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfiguration.hh \
 	src/os/signaling/HandlerConfigurationApi.cc \
@@ -849,6 +853,9 @@ src_os_event_AwaiterWritableFileDescriptorTest_SOURCES = \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_io_FileDescriptorTest_SOURCES = \
 	src/os/io/FileDescriptorTest.cc
+src_os_io_NonBlockingFileDescriptorTest_SOURCES = \
+	src/os/io/NonBlockingFileDescriptor.cc \
+	src/os/io/NonBlockingFileDescriptorTest.cc
 src_os_signaling_HandlerConfigurationTest_SOURCES = \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
