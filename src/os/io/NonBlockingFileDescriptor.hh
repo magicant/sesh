@@ -61,6 +61,10 @@ public:
         return mFileDescriptor.isValid();
     }
 
+    operator const FileDescriptor &() const noexcept {
+        return mFileDescriptor;
+    }
+
     /**
      * Constructs a new non-blocking file descriptor.
      *
