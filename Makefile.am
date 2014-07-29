@@ -289,6 +289,7 @@ src_sesh_SOURCES = \
 	src/os/io/FileMode.hh \
 	src/os/io/NonBlockingFileDescriptor.cc \
 	src/os/io/NonBlockingFileDescriptor.hh \
+	src/os/io/WriterApi.hh \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfiguration.hh \
 	src/os/signaling/HandlerConfigurationApi.cc \

@@ -19,6 +19,7 @@
 #include "Api.hh"
 
 #include <chrono>
+#include <cstddef>
 #include <memory>
 #include <new>
 #include <stdexcept>
@@ -427,6 +428,18 @@ class ApiImpl : public Api {
         if (ec == std::errc::bad_file_descriptor)
             fd.clear();
         return ec;
+    }
+
+    WriteResult write(
+            const FileDescriptor &fd,
+            const void *bytes,
+            std::size_t bytesToWrite)
+            const final override {
+        std::size_t bytesWritten =
+                sesh_osapi_write(fd.value(), bytes, bytesToWrite);
+        if (std::error_code ec = errnoCode())
+            return ec;
+        return bytesWritten;
     }
 
     std::unique_ptr<FileDescriptorSet> createFileDescriptorSet() const
