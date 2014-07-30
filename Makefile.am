@@ -112,6 +112,7 @@ src_sesh_SOURCES = \
 	src/buildconfig.h \
 	src/common/Char.hh \
 	src/common/ContainerHelper.hh \
+	src/common/Copy.hh \
 	src/common/DirectInitialize.hh \
 	src/common/Empty.hh \
 	src/common/EnumIterator.hh \
