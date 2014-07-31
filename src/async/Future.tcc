@@ -197,38 +197,10 @@ auto createFutureFrom(F &&f) -> Future<typename std::result_of<F()>::type> {
 }
 
 template<typename T, typename... Arg>
-class Constructor {
-
-private:
-
-    std::tuple<Arg &&...> mArguments;
-
-    template<std::size_t... i>
-    T construct(const common::IndexSequence<i...> &) {
-        T t(std::forward<Arg>(std::get<i>(mArguments))...);
-        return t;
-    }
-
-public:
-
-    explicit Constructor(Arg &&... arg) :
-            mArguments(std::forward<Arg>(arg)...) { }
-
-    T operator()() {
-        return construct(common::IndexSequenceFor<Arg...>());
-    }
-
-};
-
-template<typename T, typename... Arg>
-Future<T> createFuture(Arg &&... arg){
-    /* XXX GCC 4.8.2 doesn't support capturing a parameter pack
-    return createFutureFrom([&arg...]() -> T {
-        T t(std::forward<Arg>(arg)...);
-        return t;
-    });
-    */
-    return createFutureFrom(Constructor<T, Arg...>(std::forward<Arg>(arg)...));
+Future<T> createFuture(Arg &&... arg) {
+    std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
+    std::move(pf.first).setResult(std::forward<Arg>(arg)...);
+    return std::move(pf.second);
 }
 
 template<typename T>
