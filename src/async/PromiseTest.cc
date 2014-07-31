@@ -50,7 +50,7 @@ TEST_CASE("Promise, invalidness after setting result") {
     CHECK_FALSE(p.isValid());
 }
 
-TEST_CASE("Promise, setting result by construction") {
+TEST_CASE("Promise, setting result by construction, value") {
     using P = std::pair<int, double>;
     const std::shared_ptr<Delay<P>> delay = std::make_shared<Delay<P>>();
     Promise<P> p(delay);
@@ -63,7 +63,14 @@ TEST_CASE("Promise, setting result by construction") {
     CHECK(d == 2.0);
 }
 
-TEST_CASE("Promise, setting result by function") {
+TEST_CASE("Promise, setting result by construction, invalidness") {
+    auto delay = std::make_shared<Delay<int>>();
+    Promise<int> p(delay);
+    delay->setCallback([&p](Try<int> &&) { CHECK_FALSE(p.isValid()); });
+    std::move(p).setResult(0);
+}
+
+TEST_CASE("Promise, setting result by function, value") {
     const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
     Promise<int> p(delay);
     std::move(p).setResultFrom([] { return 1; });
@@ -73,7 +80,14 @@ TEST_CASE("Promise, setting result by function") {
     CHECK(i == 1);
 }
 
-TEST_CASE("Promise, setting result to exception") {
+TEST_CASE("Promise, setting result by function, invalidness") {
+    auto delay = std::make_shared<Delay<int>>();
+    Promise<int> p(delay);
+    delay->setCallback([&p](Try<int> &&) { CHECK_FALSE(p.isValid()); });
+    std::move(p).setResultFrom([] { return 0; });
+}
+
+TEST_CASE("Promise, setting result to exception, value") {
     const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
     Promise<int> p(delay);
     std::move(p).fail(std::make_exception_ptr('\1'));
@@ -89,7 +103,14 @@ TEST_CASE("Promise, setting result to exception") {
     CHECK(c == '\1');
 }
 
-TEST_CASE("Promise, setting result to current exception") {
+TEST_CASE("Promise, setting result to exception, invalidness") {
+    auto delay = std::make_shared<Delay<int>>();
+    Promise<int> p(delay);
+    delay->setCallback([&p](Try<int> &&) { CHECK_FALSE(p.isValid()); });
+    std::move(p).fail(std::make_exception_ptr(0));
+}
+
+TEST_CASE("Promise, setting result to current exception, value") {
     const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
     Promise<int> p(delay);
     try {
@@ -107,6 +128,17 @@ TEST_CASE("Promise, setting result to current exception") {
         }
     });
     CHECK(c == '\1');
+}
+
+TEST_CASE("Promise, setting result to current exception, invalidness") {
+    auto delay = std::make_shared<Delay<int>>();
+    Promise<int> p(delay);
+    delay->setCallback([&p](Try<int> &&) { CHECK_FALSE(p.isValid()); });
+    try {
+        throw 0;
+    } catch (...) {
+        std::move(p).failWithCurrentException();
+    }
 }
 
 } // namespace

@@ -78,6 +78,13 @@ TEST_CASE("Future, setting callback") {
     CHECK(i == 1);
 }
 
+TEST_CASE("Future, invalidness in callback") {
+    auto delay = std::make_shared<Delay<int>>();
+    delay->setResult(0);
+    Future<int> f(delay);
+    std::move(f).then([&f](Try<int> &&) { CHECK_FALSE(f.isValid()); });
+}
+
 TEST_CASE("Create promise/future pair") {
     std::pair<Promise<int>, Future<int>> &&pf = createPromiseFuturePair<int>();
     std::move(pf.first).setResult(123);
