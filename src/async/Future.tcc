@@ -41,8 +41,8 @@ typename std::enable_if<std::is_void<
                 typename std::decay<Function>::type(common::Try<T> &&)>::type
 >::value>::type
 FutureBase<T>::then(Function &&f) && {
-    this->delay().setCallback(std::forward<Function>(f));
-    this->invalidate();
+    FutureBase copy = std::move(*this);
+    copy.delay().setCallback(std::forward<Function>(f));
 }
 
 template<typename T>

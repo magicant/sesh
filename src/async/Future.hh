@@ -50,7 +50,8 @@ public:
     /**
      * Sets a callback function to receive the result from the associated
      * promise. After the callback is set, this future instance will have no
-     * associated promise.
+     * associated promise. Then, if the result has already been set, the
+     * callback is called immediately.
      *
      * The behavior is undefined if this future instance has no associated
      * promise.
