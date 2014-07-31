@@ -59,7 +59,7 @@ public:
      * The behavior is undefined if this promise has no associated future.
      */
     template<typename... Arg>
-    void setResult(Arg &&... arg) {
+    void setResult(Arg &&... arg) && {
         this->delay().setResult(std::forward<Arg>(arg)...);
         this->invalidate();
     }
