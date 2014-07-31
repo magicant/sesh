@@ -54,14 +54,15 @@ public:
      * Sets the result of the associated future by constructing T with the
      * arguments. If the constructor throws, the result is set to the exception
      * thrown. After the result is set, this promise will have no associated
-     * future.
+     * future. Then, if the future has already a callback set, it is called
+     * with the result.
      *
      * The behavior is undefined if this promise has no associated future.
      */
     template<typename... Arg>
     void setResult(Arg &&... arg) && {
-        this->delay().setResult(std::forward<Arg>(arg)...);
-        this->invalidate();
+        Promise copy = std::move(*this);
+        copy.delay().setResult(std::forward<Arg>(arg)...);
     }
 
     /**
@@ -69,27 +70,37 @@ public:
      * function, which must be callable with no arguments and return a value of
      * T. If the function throws, the result is set to the exception thrown.
      * After the result is set, this promise will have no associated future.
+     * Then, if the future has already a callback set, it is called with the
+     * result.
      *
      * The behavior is undefined if this promise has no associated future.
      */
     template<typename F>
     void setResultFrom(F &&f) && {
-        this->delay().setResultFrom(std::forward<F>(f));
-        this->invalidate();
+        Promise copy = std::move(*this);
+        copy.delay().setResultFrom(std::forward<F>(f));
     }
 
     /**
-     * Sets the result of the associated future to the given exception. The
-     * behavior is undefined if the exception pointer is null.
+     * Sets the result of the associated future to the given exception. After
+     * the result is set, this promise will have no associated future. Then, if
+     * the future has already a callback set, it is called with the result.
+     *
+     * The behavior is undefined if this promise has no associated future or if
+     * the exception pointer is null.
      */
     void fail(const std::exception_ptr &e) && {
-        this->delay().setResultException(e);
-        this->invalidate();
+        Promise copy = std::move(*this);
+        copy.delay().setResultException(e);
     }
 
     /**
-     * Sets the result of the associated future to the current exception. This
-     * function can be used in a catch clause only.
+     * Sets the result of the associated future to the current exception. After
+     * the result is set, this promise will have no associated future. Then, if
+     * the future has already a callback set, it is called with the result.
+     *
+     * This function can be used in a catch clause only. The behavior is
+     * undefined if this promise has no associated future.
      */
     void failWithCurrentException() && {
         std::move(*this).fail(std::current_exception());
