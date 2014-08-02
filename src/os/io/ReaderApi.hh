@@ -15,40 +15,43 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_io_ReaderApi_hh
+#define INCLUDED_os_io_ReaderApi_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
-#include "os/io/FileDescriptionApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/io/ReaderApi.hh"
-#include "os/io/WriterApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include <cstddef>
+#include <system_error>
+#include "common/Variant.hh"
+#include "os/io/FileDescriptor.hh"
 
 namespace sesh {
 namespace os {
+namespace io {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptionApi,
-        public io::FileDescriptorApi,
-        public io::ReaderApi,
-        public io::WriterApi,
-        public signaling::HandlerConfigurationApi {
+/** Abstraction of POSIX API for reading. */
+class ReaderApi {
 
 public:
 
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
+    using ReadResult = common::Variant<std::size_t, std::error_code>;
 
-}; // class Api
+    /**
+     * Reads bytes from the given file descriptor. This function may block on
+     * some conditions; refer to the POSIX standard for details.
+     *
+     * On success, the number of actually read bytes is returned. On failure, a
+     * non-zero error code is returned.
+     */
+    virtual ReadResult read(const FileDescriptor &, void *, std::size_t) const
+            = 0;
 
+}; // class ReaderApi
+
+} // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_io_ReaderApi_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -20,6 +20,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/select.h>
@@ -189,6 +190,17 @@ int sesh_osapi_open(const char *path, int flags, int mode) {
 
 int sesh_osapi_close(int fd) {
     return close(fd);
+}
+
+size_t sesh_osapi_read(int fd, void *buffer, size_t maxBytesToRead) {
+    if (maxBytesToRead > SSIZE_MAX)
+        maxBytesToRead = SSIZE_MAX;
+
+    ssize_t bytesRead = read(fd, buffer, maxBytesToRead);
+    if (bytesRead < 0)
+        return 0;
+    errno = 0;
+    return (size_t) bytesRead;
 }
 
 size_t sesh_osapi_write(int fd, const void *bytes, size_t bytesToWrite){
