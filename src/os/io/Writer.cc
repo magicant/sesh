@@ -19,14 +19,18 @@
 #include "Writer.hh"
 
 #include <cassert>
+#include <stdexcept>
+#include <system_error>
 #include <utility>
 #include "async/Future.hh"
+#include "common/Try.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
 
 using sesh::async::Future;
 using sesh::async::createFuture;
+using sesh::common::Try;
 using sesh::os::event::Proactor;
 using sesh::os::event::Trigger;
 using sesh::os::event::WritableFileDescriptor;
@@ -58,8 +62,15 @@ struct Writer {
         return createFuture<ResultPair>(std::move(fd), e);
     }
 
-    Result operator()(Trigger &&t) {
-        assert(t.value<WritableFileDescriptor>().value() == fd.value());
+    Result operator()(Try<Trigger> &&t) {
+        try {
+            *t;
+        } catch (std::domain_error &e) {
+            return operator()(
+                    std::make_error_code(std::errc::too_many_files_open));
+        }
+
+        assert(t->value<WritableFileDescriptor>().value() == fd.value());
 
         auto r = api.write(
                 fd,
@@ -82,7 +93,7 @@ Future<ResultPair> write(
 
     auto trigger = WritableFileDescriptor(fd.value());
     auto writer = Writer{api, p, std::move(fd), std::move(bytes)};
-    return p.expect(trigger).map(std::move(writer)).unwrap();
+    return p.expect(trigger).then(std::move(writer)).unwrap();
 }
 
 } // namespace io

@@ -21,7 +21,9 @@
 #include "catch.hpp"
 
 #include <algorithm>
+#include <stdexcept>
 #include <string>
+#include <system_error>
 #include <vector>
 #include <utility>
 #include "async/Future.hh"
@@ -41,6 +43,7 @@ namespace {
 
 using sesh::async::Future;
 using sesh::async::Promise;
+using sesh::async::createFailedFutureOf;
 using sesh::async::createPromiseFuturePair;
 using sesh::common::Try;
 using sesh::common::copy;
@@ -54,8 +57,6 @@ using sesh::os::io::dummyNonBlockingFileDescriptor;
 using sesh::os::io::write;
 
 using ResultPair = std::pair<NonBlockingFileDescriptor, std::error_code>;
-
-namespace empty_write {
 
 class UncallableWriterApi : public WriterApi {
 
@@ -73,6 +74,8 @@ class UncallableProactor : public Proactor {
     }
 
 }; // class UncallableProactor
+
+namespace empty_write {
 
 TEST_CASE("Write: empty") {
     const FileDescriptor::Value FD = 2;
@@ -214,6 +217,39 @@ TEST_CASE_METHOD(WriteTestFixture, "Write: 25 bytes in three writes") {
 }
 
 } // namespace non_empty_write
+
+namespace domain_error {
+
+class DomainErrorProactor : public Proactor {
+
+    Future<Trigger> expectImpl(std::vector<Trigger> &&) override {
+        return createFailedFutureOf<Trigger>(
+                std::domain_error("expected error"));
+    }
+
+}; // class DomainErrorProactor
+
+TEST_CASE("Write: domain error in proactor") {
+    const FileDescriptor::Value FD = 2;
+    UncallableWriterApi api;
+    DomainErrorProactor p;
+    Future<ResultPair> f = write(
+            api, p, dummyNonBlockingFileDescriptor(FD), {'C'});
+
+    bool called = false;
+    std::move(f).then([FD, &called](Try<ResultPair> &&r) {
+        REQUIRE(r.hasValue());
+        CHECK(r->first.isValid());
+        CHECK(r->first.value() == FD);
+        CHECK(r->second ==
+                std::make_error_code(std::errc::too_many_files_open));
+        r->first.release().clear();
+        called = true;
+    });
+    CHECK(called);
+}
+
+} // namespace domain_error
 
 namespace error {
 
