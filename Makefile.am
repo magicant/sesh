@@ -85,6 +85,7 @@ TESTPROGRAMS = \
 	src/os/event/AwaiterWritableFileDescriptorTest \
 	src/os/io/FileDescriptorTest \
 	src/os/io/NonBlockingFileDescriptorTest \
+	src/os/io/WriterTest \
 	src/os/signaling/HandlerConfigurationTest
 
 TESTSCRIPTS = \
@@ -112,6 +113,7 @@ src_sesh_SOURCES = \
 	src/buildconfig.h \
 	src/common/Char.hh \
 	src/common/ContainerHelper.hh \
+	src/common/Copy.hh \
 	src/common/DirectInitialize.hh \
 	src/common/Empty.hh \
 	src/common/EnumIterator.hh \
@@ -289,6 +291,9 @@ src_sesh_SOURCES = \
 	src/os/io/FileMode.hh \
 	src/os/io/NonBlockingFileDescriptor.cc \
 	src/os/io/NonBlockingFileDescriptor.hh \
+	src/os/io/Writer.cc \
+	src/os/io/Writer.hh \
+	src/os/io/WriterApi.hh \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfiguration.hh \
 	src/os/signaling/HandlerConfigurationApi.cc \
@@ -856,6 +861,10 @@ src_os_io_FileDescriptorTest_SOURCES = \
 src_os_io_NonBlockingFileDescriptorTest_SOURCES = \
 	src/os/io/NonBlockingFileDescriptor.cc \
 	src/os/io/NonBlockingFileDescriptorTest.cc
+src_os_io_WriterTest_SOURCES = \
+	src/os/io/NonBlockingFileDescriptor.cc \
+	src/os/io/Writer.cc \
+	src/os/io/WriterTest.cc
 src_os_signaling_HandlerConfigurationTest_SOURCES = \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
@@ -876,7 +885,9 @@ TESTHEADERS = \
 	src/os/TimeApiTestHelper.hh \
 	src/os/event/AwaiterTestHelper.hh \
 	src/os/event/PselectApiTestHelper.hh \
+	src/os/io/FileDescriptionApiTestHelper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
+	src/os/io/NonBlockingFileDescriptorTestHelper.hh \
 	src/os/signaling/HandlerConfigurationApiTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh
 

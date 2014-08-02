@@ -190,6 +190,13 @@ int sesh_osapi_close(int fd) {
     return close(fd);
 }
 
+size_t sesh_osapi_write(int fd, const void *bytes, size_t bytesToWrite){
+    ssize_t bytesWritten = write(fd, bytes, bytesToWrite);
+    if (bytesWritten < 0)
+        return 0;
+    return (size_t) bytesWritten;
+}
+
 int sesh_osapi_fd_setsize(void) {
     return FD_SETSIZE;
 }

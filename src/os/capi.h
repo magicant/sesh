@@ -20,6 +20,7 @@
 
 #include "buildconfig.h"
 
+#include <stddef.h>
 #include "os/capitypes.h"
 
 #if __cplusplus
@@ -109,6 +110,12 @@ int sesh_osapi_open(const char *, int flags, int mode);
 
 /** A direct wrapper for the POSIX close function. */
 int sesh_osapi_close(int fd);
+
+/**
+ * A direct wrapper for the POSIX write function. On success, errno is set to
+ * zero. On failure, the return value is 0 and errno indicates the error.
+ */
+size_t sesh_osapi_write(int fd, const void *bytes, size_t bytesToWrite);
 
 /** Returns {@code FD_SETSIZE}. */
 int sesh_osapi_fd_setsize(void);

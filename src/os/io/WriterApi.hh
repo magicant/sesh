@@ -15,38 +15,43 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_io_WriterApi_hh
+#define INCLUDED_os_io_WriterApi_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
-#include "os/io/FileDescriptionApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/io/WriterApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include <cstddef>
+#include "common/Variant.hh"
+#include "os/event/Proactor.hh"
+#include "os/io/FileDescriptor.hh"
 
 namespace sesh {
 namespace os {
+namespace io {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptionApi,
-        public io::FileDescriptorApi,
-        public io::WriterApi,
-        public signaling::HandlerConfigurationApi {
+/** Abstraction of POSIX API for writing. */
+class WriterApi {
 
 public:
 
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
+    using WriteResult = common::Variant<std::size_t, std::error_code>;
 
-}; // class Api
+    /**
+     * Writes bytes to the given file descriptor. This function may block on
+     * some conditions; refer to the POSIX standard for details.
+     *
+     * On success, the number of actually written bytes is returned. On
+     * failure, a non-zero error code is returned.
+     */
+    virtual WriteResult write(
+            const FileDescriptor &, const void *, std::size_t) const = 0;
 
+}; // class WriterApi
+
+} // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_io_WriterApi_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

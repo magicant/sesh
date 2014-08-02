@@ -15,38 +15,36 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_io_NonBlockingFileDescriptorTestHelper_hh
+#define INCLUDED_os_io_NonBlockingFileDescriptorTestHelper_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
-#include "os/io/FileDescriptionApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/io/WriterApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include <system_error>
+#include <utility>
+#include "os/io/FileDescriptionApiTestHelper.hh"
+#include "os/io/FileDescriptor.hh"
+#include "os/io/NonBlockingFileDescriptor.hh"
 
 namespace sesh {
 namespace os {
+namespace io {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptionApi,
-        public io::FileDescriptorApi,
-        public io::WriterApi,
-        public signaling::HandlerConfigurationApi {
+inline auto dummyNonBlockingFileDescriptor(FileDescriptor &&fd)
+        -> NonBlockingFileDescriptor {
+    static FileDescriptionApiDummy api;
+    return NonBlockingFileDescriptor(api, std::move(fd));
+}
 
-public:
+inline auto dummyNonBlockingFileDescriptor(FileDescriptor::Value fd)
+        -> NonBlockingFileDescriptor {
+    return dummyNonBlockingFileDescriptor(FileDescriptor(fd));
+}
 
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
-
-}; // class Api
-
+} // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_io_NonBlockingFileDescriptorTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

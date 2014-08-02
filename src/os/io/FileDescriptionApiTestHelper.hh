@@ -15,38 +15,37 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_io_FileDescriptionApiTestHelper_hh
+#define INCLUDED_os_io_FileDescriptionApiTestHelper_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
+#include <system_error>
 #include "os/io/FileDescriptionApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/io/WriterApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
 
 namespace sesh {
 namespace os {
+namespace io {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptionApi,
-        public io::FileDescriptorApi,
-        public io::WriterApi,
-        public signaling::HandlerConfigurationApi {
+class FileDescriptionApiDummy : public FileDescriptionApi {
 
-public:
+    common::Variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    getFileDescriptionStatus(const FileDescriptor &) const override {
+        return std::error_code();
+    }
 
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
+    std::error_code setFileDescriptionStatus(
+            const FileDescriptor &, const FileDescriptionStatus &) const
+            override {
+        return std::error_code();
+    }
 
-}; // class Api
+};
 
+} // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_io_FileDescriptionApiTestHelper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
