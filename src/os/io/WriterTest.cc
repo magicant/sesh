@@ -44,6 +44,7 @@ namespace {
 using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::createFailedFutureOf;
+using sesh::async::createFuture;
 using sesh::async::createPromiseFuturePair;
 using sesh::common::Try;
 using sesh::common::copy;
@@ -74,6 +75,15 @@ class UncallableProactor : public Proactor {
     }
 
 }; // class UncallableProactor
+
+class EchoingProactor : public Proactor {
+
+    Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+        REQUIRE(triggers.size() == 1);
+        return createFuture<Trigger>(std::move(triggers.front()));
+    }
+
+}; // class EchoingProactor
 
 namespace empty_write {
 
@@ -251,11 +261,37 @@ TEST_CASE("Write: domain error in proactor") {
 
 } // namespace domain_error
 
-namespace error {
+namespace write_error {
 
-// FIXME more tests
+class WriteErrorApi : public WriterApi {
 
-} // namespace error
+    WriteResult write(const FileDescriptor &, const void *, std::size_t) const
+            override {
+        return std::make_error_code(std::errc::io_error);
+    }
+
+}; // class WriteErrorApi
+
+TEST_CASE("Write: write error") {
+    const FileDescriptor::Value FD = 4;
+    WriteErrorApi api;
+    EchoingProactor proactor;
+    Future<ResultPair> f = sesh::os::io::write(
+            api, proactor, dummyNonBlockingFileDescriptor(FD), {'A'});
+
+    bool called = false;
+    std::move(f).then([FD, &called](Try<ResultPair> &&r) {
+        REQUIRE(r.hasValue());
+        CHECK(r->first.isValid());
+        CHECK(r->first.value() == FD);
+        CHECK(r->second == std::make_error_code(std::errc::io_error));
+        r->first.release().clear();
+        called = true;
+    });
+    CHECK(called);
+}
+
+} // namespace write_error
 
 } // namespace
 
