@@ -21,8 +21,8 @@
 #include "buildconfig.h"
 
 #include <cstddef>
+#include <system_error>
 #include "common/Variant.hh"
-#include "os/event/Proactor.hh"
 #include "os/io/FileDescriptor.hh"
 
 namespace sesh {
