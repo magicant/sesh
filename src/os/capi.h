@@ -112,6 +112,12 @@ int sesh_osapi_open(const char *, int flags, int mode);
 int sesh_osapi_close(int fd);
 
 /**
+ * A direct wrapper for the POSIX read function. On success, errno is set to
+ * zero. On failure, the return value is 0 and errno indicates the error.
+ */
+size_t sesh_osapi_read(int fd, void *buffer, size_t maxBytesToRead);
+
+/**
  * A direct wrapper for the POSIX write function. On success, errno is set to
  * zero. On failure, the return value is 0 and errno indicates the error.
  */

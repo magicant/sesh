@@ -430,6 +430,16 @@ class ApiImpl : public Api {
         return ec;
     }
 
+    ReadResult read(
+            const FileDescriptor &fd, void *buffer, std::size_t maxBytesToRead)
+            const final override {
+        std::size_t bytesRead =
+                sesh_osapi_read(fd.value(), buffer, maxBytesToRead);
+        if (std::error_code ec = errnoCode())
+            return ec;
+        return bytesRead;
+    }
+
     WriteResult write(
             const FileDescriptor &fd,
             const void *bytes,

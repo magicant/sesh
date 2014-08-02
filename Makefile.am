@@ -291,6 +291,7 @@ src_sesh_SOURCES = \
 	src/os/io/FileMode.hh \
 	src/os/io/NonBlockingFileDescriptor.cc \
 	src/os/io/NonBlockingFileDescriptor.hh \
+	src/os/io/ReaderApi.hh \
 	src/os/io/Writer.cc \
 	src/os/io/Writer.hh \
 	src/os/io/WriterApi.hh \
