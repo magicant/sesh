@@ -238,7 +238,7 @@ TEST_CASE("Future, map, returning future, failure propagation") {
     });
 
     CHECK(d == 0.0);
-    delay->setResultFrom([]() -> int { throw 2.0; });
+    delay->setResult(std::make_exception_ptr(2.0));
     CHECK(d == 2.0);
 }
 
@@ -344,7 +344,7 @@ TEST_CASE("Future, recover from exception") {
     std::move(f2).then([&i](Try<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResultFrom([]() -> int { throw 1.0; });
+    delay->setResult(std::make_exception_ptr(1.0));
     CHECK(i == 1);
 }
 
@@ -365,7 +365,7 @@ TEST_CASE("Future, recovery failure") {
     });
 
     CHECK(i == 0);
-    delay->setResultFrom([]() -> int { throw 1.0; });
+    delay->setResult(std::make_exception_ptr(1.0));
     CHECK(i == 1);
 }
 

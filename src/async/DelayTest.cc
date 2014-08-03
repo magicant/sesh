@@ -24,17 +24,19 @@
 #include <tuple>
 #include "async/Delay.hh"
 #include "common/Try.hh"
+#include "common/TypeTag.hh"
 
 namespace {
 
 using sesh::async::Delay;
 using sesh::common::Try;
+using sesh::common::TypeTag;
 
-TEST_CASE("Delay, set successful result and callback, by value") {
+TEST_CASE("Delay: set result and callback") {
     using T = std::tuple<int, float, char>;
     Delay<T> s;
 
-    s.setResult(42, 3.0f, 'a');
+    s.setResult(TypeTag<T>(), 42, 3.0f, 'a');
 
     unsigned callCount = 0;
     s.setCallback([&callCount](Try<T> &&r) {
@@ -44,20 +46,7 @@ TEST_CASE("Delay, set successful result and callback, by value") {
     CHECK(callCount == 1);
 }
 
-TEST_CASE("Delay, set successful result and callback, by function") {
-    Delay<int> s;
-
-    s.setResultFrom([] { return 42; });
-
-    unsigned callCount = 0;
-    s.setCallback([&callCount](Try<int> &&r) {
-        ++callCount;
-        CHECK(*r == 42);
-    });
-    CHECK(callCount == 1);
-}
-
-TEST_CASE("Delay, set callback and successful result") {
+TEST_CASE("Delay: set callback and result") {
     Delay<int> s;
 
     unsigned callCount = 0;
@@ -71,7 +60,7 @@ TEST_CASE("Delay, set callback and successful result") {
     CHECK(callCount == 1);
 }
 
-TEST_CASE("Delay, set exception and callback, by copy") {
+TEST_CASE("Delay: set result with throwing constructor and then callback") {
     class Thrower {
     public:
         Thrower() noexcept = default;
@@ -91,58 +80,6 @@ TEST_CASE("Delay, set exception and callback, by copy") {
             CHECK(i == 42);
         }
     });
-    CHECK(callCount == 1);
-}
-
-TEST_CASE("Delay, set exception and callback, by function") {
-    Delay<int> s;
-
-    s.setResultFrom([]() -> int { throw 42; });
-
-    unsigned callCount = 0;
-    s.setCallback([&callCount](Try<int> &&r) {
-        ++callCount;
-        try {
-            *r;
-        } catch (int i) {
-            CHECK(i == 42);
-        }
-    });
-    CHECK(callCount == 1);
-}
-
-TEST_CASE("Delay, set exception and callback, by exception") {
-    Delay<int> s;
-
-    s.setResultException(std::make_exception_ptr(0.0));
-
-    unsigned callCount = 0;
-    s.setCallback([&callCount](Try<int> &&r) {
-        try {
-            *r;
-        } catch (double d) {
-            CHECK(d == 0.0);
-            ++callCount;
-        }
-    });
-    CHECK(callCount == 1);
-}
-
-TEST_CASE("Delay, set callback and exception") {
-    Delay<int> s;
-
-    unsigned callCount = 0;
-    s.setCallback([&callCount](Try<int> &&r) {
-        try {
-            *r;
-        } catch (int i) {
-            CHECK(i == 42);
-            ++callCount;
-        }
-    });
-    CHECK(callCount == 0);
-
-    s.setResultFrom([]() -> int { throw 42; });
     CHECK(callCount == 1);
 }
 

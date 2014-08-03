@@ -24,11 +24,8 @@
 #include <exception>
 #include <functional>
 #include <utility>
-#include "common/FunctionalInitialize.hh"
 #include "common/Maybe.hh"
 #include "common/Try.hh"
-#include "common/TypeTag.hh"
-#include "common/Variant.hh"
 
 namespace sesh {
 namespace async {
@@ -66,7 +63,7 @@ private:
 public:
 
     /**
-     * Sets the result of this delay object by constructing T with the
+     * Sets the result of this delay object by constructing Try&lt;T> with the
      * arguments. If the constructor throws, the result is set to the exception
      * thrown.
      *
@@ -80,50 +77,11 @@ public:
         assert(!mResult.hasValue());
 
         try {
-            mResult.emplace(common::TypeTag<T>(), std::forward<Arg>(arg)...);
+            mResult.emplace(std::forward<Arg>(arg)...);
         } catch (...) {
             mResult.emplace(std::current_exception());
         }
 
-        fireIfReady();
-    }
-
-    /**
-     * Sets the result of this delay object to the result of a call to the
-     * argument function, which must be callable with no arguments and return a
-     * value of T. If the function throws, the result is set to the exception
-     * thrown.
-     *
-     * The behavior is undefined if the result has already been set.
-     *
-     * If a callback function has already been set, it is called immediately
-     * with the result set.
-     */
-    template<typename F>
-    void setResultFrom(F &&f) {
-        assert(!mResult.hasValue());
-
-        try {
-            mResult.emplace(common::FUNCTIONAL_INITIALIZE, std::forward<F>(f));
-        } catch (...) {
-            mResult.emplace(std::current_exception());
-        }
-
-        fireIfReady();
-    }
-
-    /**
-     * Sets the result of this delay object to the given exception.
-     *
-     * The behavior is undefined if the exception pointer is null.
-     *
-     * If a callback function has already been set, it is called immediately
-     * with the result set.
-     */
-    void setResultException(const std::exception_ptr &e) {
-        assert(!mResult.hasValue());
-        assert(e);
-        mResult.emplace(e);
         fireIfReady();
     }
 
