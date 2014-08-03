@@ -34,11 +34,14 @@ namespace async {
  * Communicator between a future and promise.
  *
  * It may contain a result and a callback function, both of which are initially
- * empty. When the both is first set non-empty, the callback function is
- * called. Either the result and callback must not be set twice.
+ * empty. They can independently set non-empty afterward. When both are set,
+ * the callback function is called with the result passed as an argument.
+ * Neither the result nor callback can be set twice.
  *
  * The result and callback set are not destroyed until this delay object is
- * destroyed.
+ * destroyed. This is because the delay object would normally be destroyed by
+ * the client just after the result is passed to the callback, so the result
+ * and callback are soon destroyed anyway.
  *
  * @tparam T The result type. It must be a decayed move-constructible type
  * other than std::exception_ptr.
@@ -88,7 +91,8 @@ public:
     /**
      * Sets a callback function to this delay object.
      *
-     * The behavior is undefined if a callback has already been set.
+     * The behavior is undefined if a callback has already been set or the
+     * argument callback is empty.
      *
      * If a result has already been set, the callback function is called
      * immediately with the result.
