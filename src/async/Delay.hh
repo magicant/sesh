@@ -24,8 +24,10 @@
 #include <exception>
 #include <functional>
 #include <utility>
+#include "common/Empty.hh"
 #include "common/Maybe.hh"
 #include "common/Try.hh"
+#include "common/TypeTag.hh"
 
 namespace sesh {
 namespace async {
@@ -55,12 +57,23 @@ public:
 
 private:
 
-    common::Maybe<common::Try<T>> mResult;
-    Callback mCallback;
+    using Empty = common::Empty;
+    using Try = common::Try<T>;
+
+    using Input = common::Variant<Empty, Try>;
+    using Output = common::Variant<Empty, Callback>;
+
+    Input mInput = Input(common::TypeTag<Empty>());
+    Output mOutput = Output(common::TypeTag<Empty>());
 
     void fireIfReady() {
-        if (mResult.hasValue() && mCallback != nullptr)
-            mCallback(std::move(mResult.value()));
+        if (mInput.index() != mInput.template index<Try>())
+            return;
+        if (mOutput.index() != mOutput.template index<Callback>())
+            return;
+
+        auto &f = mOutput.template value<Callback>();
+        f(std::move(mInput.template value<Try>()));
     }
 
 public:
@@ -77,12 +90,13 @@ public:
      */
     template<typename... Arg>
     void setResult(Arg &&... arg) {
-        assert(!mResult.hasValue());
+        assert(mInput.index() == mInput.template index<Empty>());
 
         try {
-            mResult.emplace(std::forward<Arg>(arg)...);
+            mInput.template emplaceWithFallback<Try, Empty>(
+                    std::forward<Arg>(arg)...);
         } catch (...) {
-            mResult.emplace(std::current_exception());
+            mInput.template emplace<Try>(std::current_exception());
         }
 
         fireIfReady();
@@ -98,10 +112,11 @@ public:
      * immediately with the result.
      */
     void setCallback(Callback &&f) {
-        assert(mCallback == nullptr);
+        assert(mOutput.index() == mOutput.template index<Empty>());
         assert(f != nullptr);
 
-        mCallback = std::move(f);
+        mOutput.template emplaceWithFallback<Callback, Empty>(std::move(f));
+
         fireIfReady();
     }
 
