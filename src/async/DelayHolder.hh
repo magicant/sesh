@@ -21,6 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
+#include <utility>
 #include "async/Delay.hh"
 
 namespace sesh {
@@ -69,6 +70,14 @@ protected:
      * only when this object has an associated delay.
      */
     Delay<T> &delay() { return *mDelay; }
+
+    /**
+     * Calls the forward function for the delay object contained in the
+     * arguments.
+     */
+    static void forward(DelayHolder &&from, DelayHolder &&to) {
+        Delay<T>::forward(std::move(from.mDelay), std::move(to.mDelay));
+    }
 
 }; // template<typename T> class DelayHolder
 
