@@ -23,6 +23,7 @@
 #include <cassert>
 #include <exception>
 #include <functional>
+#include <memory>
 #include <utility>
 #include "common/Empty.hh"
 #include "common/Maybe.hh"
@@ -59,9 +60,11 @@ private:
 
     using Empty = common::Empty;
     using Try = common::Try<T>;
+    using ForwardSource = std::weak_ptr<Delay>;
+    using ForwardTarget = std::shared_ptr<Delay>;
 
-    using Input = common::Variant<Empty, Try>;
-    using Output = common::Variant<Empty, Callback>;
+    using Input = common::Variant<Empty, Try, ForwardSource>;
+    using Output = common::Variant<Empty, Callback, ForwardTarget>;
 
     Input mInput = Input(common::TypeTag<Empty>());
     Output mOutput = Output(common::TypeTag<Empty>());
@@ -90,7 +93,11 @@ public:
      */
     template<typename... Arg>
     void setResult(Arg &&... arg) {
-        assert(mInput.index() == mInput.template index<Empty>());
+        assert(mInput.index() != mInput.template index<Try>());
+
+        if (mOutput.index() == mOutput.template index<ForwardTarget>())
+            return mOutput.template value<ForwardTarget>()->setResult(
+                    std::forward<Arg>(arg)...);
 
         try {
             mInput.template emplaceWithFallback<Try, Empty>(
@@ -112,12 +119,73 @@ public:
      * immediately with the result.
      */
     void setCallback(Callback &&f) {
-        assert(mOutput.index() == mOutput.template index<Empty>());
+        assert(mOutput.index() != mOutput.template index<Callback>());
         assert(f != nullptr);
+
+        if (mInput.index() == mInput.template index<ForwardSource>()) {
+            if (auto fs = mInput.template value<ForwardSource>().lock())
+                fs->setCallback(std::move(f));
+            return;
+        }
 
         mOutput.template emplaceWithFallback<Callback, Empty>(std::move(f));
 
         fireIfReady();
+    }
+
+    /**
+     * Connects two Delay objects as if a callback is set to the "from" object
+     * so that the result set to the "from" object is simply transferred to the
+     * "to" object. If a result and callback both have already been set, the
+     * result is immediately passed to the callback.
+     *
+     * Using this function is more efficient than setting a callback normally.
+     * Especially, when more than two delay objects are connected in a row with
+     * this function, the two endpoints are directly connected so that the
+     * intermediate delay objects are dropped and deallocated.
+     *
+     * For maximum efficiency, the argument shared pointers should be destroyed
+     * (or reset) as soon as possible after this function returned.
+     *
+     * The argument pointers must be non-null. The "from" and "to" objects must
+     * not have a callback and result set, respectively. After calling this
+     * function, {@link #setCallback} and {@link #setResult} must not be called
+     * for the "from" and "to" objects, respectively.
+     */
+    static void forward(
+            std::shared_ptr<Delay> &&from, std::shared_ptr<Delay> &&to) {
+        assert(from != nullptr);
+        assert(from->mOutput.index() !=
+                from->mOutput.template index<Callback>());
+
+        assert(to != nullptr);
+        assert(to->mInput.index() != to->mInput.template index<Try>());
+
+        // Normalize "from"
+        if (from->mInput.index() ==
+                from->mInput.template index<ForwardSource>()) {
+            from = from->mInput.template value<ForwardSource>().lock();
+            if (from == nullptr)
+                return;
+        }
+
+        // Normalize "to"
+        if (to->mOutput.index() == to->mOutput.template index<ForwardTarget>())
+            to = std::move(to->mOutput.template value<ForwardTarget>());
+
+        // Transfer result
+        if (from->mInput.index() == from->mInput.template index<Try>())
+            return to->setResult(
+                    std::move(from->mInput.template value<Try>()));
+
+        // Transfer callback
+        if (to->mOutput.index() == to->mOutput.template index<Callback>())
+            return from->setCallback(
+                    std::move(to->mOutput.template value<Callback>()));
+
+        // Connect
+        to->mInput.template emplace<ForwardSource>(from);
+        from->mOutput.template emplace<ForwardTarget>(std::move(to));
     }
 
 }; // template<typename T> class Delay
