@@ -24,6 +24,7 @@
 #include <exception>
 #include <utility>
 #include "async/Future.tcc"
+#include "common/Identity.hh"
 #include "common/Maybe.hh"
 #include "common/Try.hh"
 

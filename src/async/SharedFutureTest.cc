@@ -251,7 +251,7 @@ TEST_CASE("Shared future: recover, failure") {
     });
 
     CHECK(i == 0);
-    delay->setResultFrom([]() -> int { throw 1.0; });
+    delay->setResult(std::make_exception_ptr(1.0));
     CHECK(i == 2);
 
     double d = 0.0;

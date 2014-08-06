@@ -21,20 +21,25 @@
 #include "catch.hpp"
 
 #include <exception>
+#include <memory>
 #include <tuple>
 #include "async/Delay.hh"
+#include "common/Copy.hh"
 #include "common/Try.hh"
+#include "common/TypeTag.hh"
 
 namespace {
 
 using sesh::async::Delay;
 using sesh::common::Try;
+using sesh::common::TypeTag;
+using sesh::common::copy;
 
-TEST_CASE("Delay, set successful result and callback, by value") {
+TEST_CASE("Delay: set result and callback") {
     using T = std::tuple<int, float, char>;
     Delay<T> s;
 
-    s.setResult(42, 3.0f, 'a');
+    s.setResult(TypeTag<T>(), 42, 3.0f, 'a');
 
     unsigned callCount = 0;
     s.setCallback([&callCount](Try<T> &&r) {
@@ -44,20 +49,7 @@ TEST_CASE("Delay, set successful result and callback, by value") {
     CHECK(callCount == 1);
 }
 
-TEST_CASE("Delay, set successful result and callback, by function") {
-    Delay<int> s;
-
-    s.setResultFrom([] { return 42; });
-
-    unsigned callCount = 0;
-    s.setCallback([&callCount](Try<int> &&r) {
-        ++callCount;
-        CHECK(*r == 42);
-    });
-    CHECK(callCount == 1);
-}
-
-TEST_CASE("Delay, set callback and successful result") {
+TEST_CASE("Delay: set callback and result") {
     Delay<int> s;
 
     unsigned callCount = 0;
@@ -71,7 +63,7 @@ TEST_CASE("Delay, set callback and successful result") {
     CHECK(callCount == 1);
 }
 
-TEST_CASE("Delay, set exception and callback, by copy") {
+TEST_CASE("Delay: set result with throwing constructor and then callback") {
     class Thrower {
     public:
         Thrower() noexcept = default;
@@ -94,57 +86,158 @@ TEST_CASE("Delay, set exception and callback, by copy") {
     CHECK(callCount == 1);
 }
 
-TEST_CASE("Delay, set exception and callback, by function") {
-    Delay<int> s;
+namespace forwarding {
 
-    s.setResultFrom([]() -> int { throw 42; });
+TEST_CASE("Delay: simplest forward") {
+    auto source = std::make_shared<Delay<int>>();
+    auto target = std::make_shared<Delay<int>>();
+    Delay<int>::forward(copy(source), copy(target));
 
-    unsigned callCount = 0;
-    s.setCallback([&callCount](Try<int> &&r) {
-        ++callCount;
-        try {
-            *r;
-        } catch (int i) {
-            CHECK(i == 42);
-        }
-    });
-    CHECK(callCount == 1);
+    CHECK(source.unique());
+    source->setResult(42);
+    source.reset();
+
+    CHECK(target.unique());
+    int result = 0;
+    target->setCallback([&result](Try<int> &&r) { result = *r; });
+    CHECK(result == 42);
 }
 
-TEST_CASE("Delay, set exception and callback, by exception") {
-    Delay<int> s;
+TEST_CASE("Delay: forward with connected source") {
+    auto source1 = std::make_shared<Delay<int>>();
+    auto source2 = std::make_shared<Delay<int>>();
+    auto target = std::make_shared<Delay<int>>();
+    Delay<int>::forward(copy(source1), copy(source2));
+    Delay<int>::forward(copy(source2), copy(target));
 
-    s.setResultException(std::make_exception_ptr(0.0));
+    CHECK(source2.unique());
+    source2.reset();
 
-    unsigned callCount = 0;
-    s.setCallback([&callCount](Try<int> &&r) {
-        try {
-            *r;
-        } catch (double d) {
-            CHECK(d == 0.0);
-            ++callCount;
-        }
-    });
-    CHECK(callCount == 1);
+    CHECK(source1.unique());
+    source1->setResult(42);
+    source1.reset();
+
+    CHECK(target.unique());
+    int result = 0;
+    target->setCallback([&result](Try<int> &&r) { result = *r; });
+    CHECK(result == 42);
 }
 
-TEST_CASE("Delay, set callback and exception") {
-    Delay<int> s;
+TEST_CASE("Delay: forward with abandoned source") {
+    auto source1 = std::make_shared<Delay<int>>();
+    auto source2 = std::make_shared<Delay<int>>();
+    auto target = std::make_shared<Delay<int>>();
+    Delay<int>::forward(copy(source1), copy(source2));
+    source1.reset();
+    Delay<int>::forward(copy(source2), copy(target));
 
-    unsigned callCount = 0;
-    s.setCallback([&callCount](Try<int> &&r) {
-        try {
-            *r;
-        } catch (int i) {
-            CHECK(i == 42);
-            ++callCount;
-        }
-    });
-    CHECK(callCount == 0);
+    CHECK(source2.unique());
+    source2.reset();
 
-    s.setResultFrom([]() -> int { throw 42; });
-    CHECK(callCount == 1);
+    CHECK(target.unique());
+    target->setCallback([](Try<int> &&) { FAIL("unexpected"); });
 }
+
+TEST_CASE("Delay: forward with connected target") {
+    auto source = std::make_shared<Delay<int>>();
+    auto target1 = std::make_shared<Delay<int>>();
+    auto target2 = std::make_shared<Delay<int>>();
+    Delay<int>::forward(copy(target1), copy(target2));
+    Delay<int>::forward(copy(source), copy(target1));
+
+    CHECK(target1.unique());
+    target1.reset();
+
+    CHECK(source.unique());
+    source->setResult(42);
+    source.reset();
+
+    CHECK(target2.unique());
+    int result = 0;
+    target2->setCallback([&result](Try<int> &&r) { result = *r; });
+    CHECK(result == 42);
+}
+
+TEST_CASE("Delay: forward with connected source and target") {
+    auto source1 = std::make_shared<Delay<int>>();
+    auto source2 = std::make_shared<Delay<int>>();
+    auto target1 = std::make_shared<Delay<int>>();
+    auto target2 = std::make_shared<Delay<int>>();
+    Delay<int>::forward(copy(source1), copy(source2));
+    Delay<int>::forward(copy(target1), copy(target2));
+    Delay<int>::forward(copy(source2), copy(target1));
+
+    CHECK(source2.unique());
+    CHECK(target1.unique());
+    source2.reset();
+    target1.reset();
+
+    CHECK(source1.unique());
+    source1->setResult(42);
+    source1.reset();
+
+    CHECK(target2.unique());
+    int result = 0;
+    target2->setCallback([&result](Try<int> &&r) { result = *r; });
+    CHECK(result == 42);
+}
+
+TEST_CASE("Delay: forward from source with preset result") {
+    auto source = std::make_shared<Delay<int>>();
+    auto target = std::make_shared<Delay<int>>();
+    source->setResult(42);
+    Delay<int>::forward(copy(source), copy(target));
+
+    CHECK(source.unique());
+    source.reset();
+
+    CHECK(target.unique());
+    int result = 0;
+    target->setCallback([&result](Try<int> &&r) { result = *r; });
+    CHECK(result == 42);
+}
+
+TEST_CASE("Delay: forward to target with preset callback") {
+    auto source = std::make_shared<Delay<int>>();
+    auto target = std::make_shared<Delay<int>>();
+    int result = 0;
+    target->setCallback([&result](Try<int> &&r) { result = *r; });
+    Delay<int>::forward(copy(source), copy(target));
+
+    CHECK(target.unique());
+    target.reset();
+
+    CHECK(source.unique());
+    CHECK(result == 0);
+    source->setResult(42);
+    CHECK(result == 42);
+}
+
+TEST_CASE("Delay: forward preset result to preset callback") {
+    auto source = std::make_shared<Delay<int>>();
+    auto target = std::make_shared<Delay<int>>();
+    source->setResult(42);
+    int result = 0;
+    target->setCallback([&result](Try<int> &&r) { result = *r; });
+    CHECK(result == 0);
+    Delay<int>::forward(copy(source), copy(target));
+    CHECK(result == 42);
+
+    CHECK(source.unique());
+    source.reset();
+
+    CHECK(target.unique());
+}
+
+TEST_CASE("Delay: uniqueness of target shared pointer after forward") {
+    auto source = std::make_shared<Delay<int>>();
+    auto target = std::make_shared<Delay<int>>();
+    Delay<int>::forward(copy(source), copy(target));
+    source.reset();
+    CHECK(target.unique());
+}
+
+} // namespace forwarding
 
 } // namespace
 

@@ -26,7 +26,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "common/Identity.hh"
 #include "common/IntegerSequence.hh"
 #include "common/SharedFunction.hh"
 
@@ -185,7 +184,14 @@ FutureBase<T>::recover(F &&function) && {
 
 template<typename T>
 void FutureBase<T>::forward(Promise<T> &&receiver) && {
-    std::move(*this).map(common::Identity(), std::move(receiver));
+    // std::move(*this).map(common::Identity(), std::move(receiver));
+    /*
+     * Mapping would leave intermediate delay objects that will not be
+     * deallocated until the final result is set. This would cause an
+     * infinitely recursive algorithm to grow the delay object chain until it
+     * eats up the heap.
+     */
+    DelayHolder<T>::forward(std::move(*this), std::move(receiver));
 }
 
 template<typename F>
