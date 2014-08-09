@@ -24,11 +24,21 @@ namespace sesh {
 namespace common {
 
 /**
- * A type tag is a dummy object that is passed to some templated constructors
- * to help template parameter type deduction.
+ * The type tag is an enumeration-like type to render distinct values which
+ * each corresponds to one of the template parameter types.
+ *
+ * Note that the specialization {@code TypeTag<>} cannot be instantiated since
+ * it cannot represent any type.
+ */
+template<typename...>
+class TypeTag;
+
+/**
+ * An object of this TypeTag class template specialization always represents
+ * the template parameter type T.
  */
 template<typename T>
-class TypeTag { };
+class TypeTag<T> { };
 
 } // namespace common
 } // namespace sesh
