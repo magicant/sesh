@@ -40,6 +40,18 @@ class TypeTag;
 template<typename T>
 class TypeTag<T> { };
 
+/** Single-typed type tag objects always compare equal. */
+template<typename T>
+constexpr bool operator==(TypeTag<T>, TypeTag<T>) noexcept {
+    return true;
+}
+
+/** Single-typed type tag objects always compare equal. */
+template<typename T>
+constexpr bool operator<(TypeTag<T>, TypeTag<T>) noexcept {
+    return false;
+}
+
 } // namespace common
 } // namespace sesh
 

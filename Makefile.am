@@ -35,6 +35,7 @@ TESTPROGRAMS = \
 	src/common/SharedFunctionTest \
 	src/common/TrieTest \
 	src/common/TryTest \
+	src/common/TypeTagTest \
 	src/common/VariantTest \
 	src/language/parser/AndOrListParserTest \
 	src/language/parser/AssignedWordParserTest \
@@ -338,6 +339,9 @@ src_common_TrieTest_SOURCES = \
 	src/common/TrieTest.cc
 src_common_TryTest_SOURCES = \
 	src/common/TryTest.cc
+src_common_TypeTagTest_SOURCES = \
+	src/common/TypeTag.hh \
+	src/common/TypeTagTest.cc
 src_common_VariantTest_SOURCES = \
 	src/common/VariantTest.cc
 src_language_parser_AndOrListParserTest_SOURCES = \
