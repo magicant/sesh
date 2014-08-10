@@ -33,6 +33,11 @@ template<std::size_t SIZE>
 struct TypeTagValue;
 
 template<>
+struct TypeTagValue<0> {
+    enum class type { };
+};
+
+template<>
 struct TypeTagValue<1> {
     enum class type { V0, };
 };
@@ -141,6 +146,31 @@ indexOf() noexcept {
  */
 template<typename...>
 class TypeTag;
+
+/** The empty type tag. This class cannot be instantiated. */
+template<>
+class TypeTag<> {
+
+public:
+
+    /**
+     * @return the number of types that may be represented by this type tag
+     * specialization, which is 0 for this template specialization.
+     */
+    constexpr static std::size_t variety() noexcept { return 0; }
+
+    /** The underlying enumeration type. */
+    using Value = typename type_tag_impl::TypeTagValue<0>::type;
+
+    constexpr TypeTag() noexcept = delete;
+    constexpr explicit TypeTag(Value) noexcept = delete;
+
+    constexpr /*explicit*/ operator Value() const noexcept = delete;
+
+    template<typename F>
+    [[noreturn]] constexpr void apply(F &&f) const = delete;
+
+}; // template<> class TypeTag<>
 
 /**
  * An object of this TypeTag class template specialization always represents

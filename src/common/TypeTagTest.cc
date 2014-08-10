@@ -32,6 +32,10 @@ constexpr TypeTag<char> CHAR{};
 constexpr TypeTag<float> FLOAT{};
 constexpr TypeTag<TypeTag<int>> INT_TAG{};
 
+static_assert(
+        sizeof(TypeTag<>) > 0,
+        "empty type tag is a valid type, if not constructible");
+
 TEST_CASE("Type tag: comparison of single-type tags") {
     CHECK(INT == INT);
     CHECK_FALSE(INT < INT);
