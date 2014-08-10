@@ -169,29 +169,43 @@ public:
     /** Returns a reference to the value of type <code>U</code>. */
     template<typename U>
     typename std::enable_if<std::is_same<U, Head>::value, U &>::type
-    value() noexcept {
+    value() & noexcept {
         return mHead;
     }
 
     /** Returns a reference to the value of type <code>U</code>. */
     template<typename U>
     typename std::enable_if<std::is_same<U, Head>::value, const U &>::type
-    value() const noexcept {
+    value() const & noexcept {
         return mHead;
     }
 
     /** Returns a reference to the value of type <code>U</code>. */
     template<typename U>
+    typename std::enable_if<std::is_same<U, Head>::value, U &&>::type
+    value() && noexcept {
+        return std::move(mHead);
+    }
+
+    /** Returns a reference to the value of type <code>U</code>. */
+    template<typename U>
     typename std::enable_if<!std::is_same<U, Head>::value, U &>::type
-    value() noexcept {
+    value() & noexcept {
         return mTail.template value<U>();
     }
 
     /** Returns a reference to the value of type <code>U</code>. */
     template<typename U>
     typename std::enable_if<!std::is_same<U, Head>::value, const U &>::type
-    value() const noexcept {
+    value() const & noexcept {
         return mTail.template value<U>();
+    }
+
+    /** Returns a reference to the value of type <code>U</code>. */
+    template<typename U>
+    typename std::enable_if<!std::is_same<U, Head>::value, U &&>::type
+    value() && noexcept {
+        return std::move(mTail).template value<U>();
     }
 
     /**
