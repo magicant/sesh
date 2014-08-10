@@ -195,26 +195,46 @@ public:
     }
 
     /**
+     * Constructs the value of type <code>Head</code> using the given arguments.
+     */
+    template<typename... Arg>
+    // constexpr XXX C++11 7.1.5.4
+    explicit Union(TypeTag<Head>, Arg &&... arg)
+            noexcept(std::is_nothrow_constructible<Head, Arg...>::value) :
+            mHead(std::forward<Arg>(arg)...) { }
+
+    /**
      * Constructs the value of type <code>U</code> using the given arguments.
-     * This function must not be called when a value of this union has already
-     * been constructed for some type.
      */
     template<typename U, typename... Arg>
-    void construct(Arg &&... arg)
-            noexcept(std::is_nothrow_constructible<U, Arg...>::value) {
-        new (std::addressof(value<U>())) U(std::forward<Arg>(arg)...);
-    }
+    // constexpr XXX C++11 7.1.5.4
+    explicit Union(TypeTag<U> tag, Arg &&... arg)
+            noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
+            mTail(tag, std::forward<Arg>(arg)...) { }
+
+    /**
+     * Constructs the value by move-constructing the result of the argument
+     * function, which must return (a reference to) an object of type Head.
+     */
+    template<typename F>
+    // constexpr XXX C++11 7.1.5.4
+    explicit Union(FunctionalInitialize, TypeTag<Head>, F &&f)
+            /*noexcept(noexcept(std::declval<F>()()) &&
+                    std::is_nothrow_constructible<
+                        Head, typename std::result_of<F()>::type>::value)*/ :
+            mHead(std::forward<F>(f)()) { }
 
     /**
      * Constructs the value by move-constructing the result of the argument
      * function, which must return (a reference to) a value of one of the types
-     * that may be contained in this union. This function must not be called
-     * when a value of this union has already been constructed for some type.
+     * that may be contained in this union.
      */
-    template<typename F, typename U>
-    void constructFrom(F &&f) {
-        new (std::addressof(value<U>())) U(std::forward<F>(f)());
-    }
+    template<typename U, typename F>
+    // constexpr XXX C++11 7.1.5.4
+    explicit Union(FunctionalInitialize fi, TypeTag<U> tag, F &&f)
+            noexcept(std::is_nothrow_constructible<
+                TailUnion, FunctionalInitialize, TypeTag<U>, F &&>::value) :
+            mTail(fi, tag, std::forward<F>(f)) { }
 
     /**
      * Calls the argument visitor's () operator with the value of the argument
@@ -293,7 +313,7 @@ public:
                     typename std::remove_reference<T>::type>::type>
     void operator()(T &&v)
             noexcept(std::is_nothrow_constructible<V, T &&>::value) {
-        mTarget.template construct<V>(std::forward<T>(v));
+        new (std::addressof(mTarget)) Union(TypeTag<V>(), std::forward<T>(v));
     }
 
 };
@@ -517,14 +537,13 @@ public:
      * @tparam U the type of the new contained value to be constructed.
      *     (inferred from the type of type tag argument.)
      * @tparam Arg the type of the constructor's arguments.
+     * @param tag a dummy object to select the type of the contained value.
      * @param arg the arguments forwarded to the constructor.
      */
     template<typename U, typename... Arg>
-    explicit VariantBase(TypeTag<U>, Arg &&... arg)
+    explicit VariantBase(TypeTag<U> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
-            mIndex(index<U>()) {
-        value().template construct<U>(std::forward<Arg>(arg)...);
-    }
+            mIndex(index<U>()), mValue(tag, std::forward<Arg>(arg)...) { }
 
     /**
      * Creates a new variant by copy- or move-constructing its contained value
@@ -551,18 +570,34 @@ public:
      *
      * Throws any exception thrown by the argument function or constructor.
      *
+     * @tparam U the type of the new contained value to be constructed.
+     * @tparam F the type of the function argument.
+     * @param fi a dummy argument to disambiguate overload resolution.
+     * @param tag a dummy object to select the type of the contained value.
+     * @param f the function that constructs the new contained value.
+     */
+    template<typename U, typename F>
+    VariantBase(FunctionalInitialize fi, TypeTag<U> tag, F &&f) :
+            mIndex(index<U>()), mValue(fi, tag, std::forward<F>(f)) { }
+
+    /**
+     * Creates a new variant by move-constructing its contained value from the
+     * result of calling the argument function.
+     *
+     * Throws any exception thrown by the argument function or constructor.
+     *
      * @tparam F the type of the function argument.
      * @tparam U the type of the new contained value to be constructed.
      *     (inferred from the return type of the argument function.)
+     * @param fi a dummy argument for overload resolution disambiguation.
      * @param f the function that constructs the new contained value.
      */
     template<
             typename F,
             typename U = typename std::decay<
                     typename std::result_of<F()>::type>::type>
-    VariantBase(FunctionalInitialize, F &&f) : mIndex(index<U>()) {
-        value().template constructFrom<F, U>(std::forward<F>(f));
-    }
+    VariantBase(FunctionalInitialize fi, F &&f) :
+            VariantBase(fi, TypeTag<U>(), std::forward<F>(f)) { }
 
     /**
      * Returns a reference to the value of the template parameter type.
