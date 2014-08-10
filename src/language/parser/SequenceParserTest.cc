@@ -24,6 +24,7 @@
 #include <utility>
 #include "common/Char.hh"
 #include "common/EnumSet.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "language/parser/CharParser.hh"
 #include "language/parser/Converter.hh"
 #include "language/parser/Environment.hh"

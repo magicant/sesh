@@ -71,36 +71,15 @@ class IsAnyOf<T, Head, Tail...> :
                 std::true_type,
                 IsAnyOf<T, Tail...>>::type { };
 
-/** Integral type that identifies the type of the active value of a variant. */
-using Index = unsigned;
-
 /** Contains the value of a variant. */
-template<Index, typename...>
+template<typename...>
 union Union;
 
-template<Index headIndex>
-union Union<headIndex> {
+template<>
+union Union<> { };
 
-public:
-
-    /** Must never be called. */
-    template<Index, typename...>
-    constexpr static Index convertIndex(Index i) noexcept {
-        // assert(false); not allowed in constexpr function
-        return i;
-    }
-
-    /** Must never be called. */
-    template<typename Visitor, typename Result>
-    Result apply(Index, Visitor &&) const noexcept {
-        assert(false);
-        throw nullptr;
-    }
-
-};
-
-template<Index headIndex, typename Head, typename... Tail>
-union Union<headIndex, Head, Tail...> {
+template<typename Head, typename... Tail>
+union Union<Head, Tail...> {
 
     static_assert(
             std::is_same<Head, typename std::decay<Head>::type>::value,
@@ -108,41 +87,12 @@ union Union<headIndex, Head, Tail...> {
 
 private:
 
-    using TailUnion = Union<headIndex + 1u, Tail...>;
+    using TailUnion = Union<Tail...>;
 
     Head mHead;
     TailUnion mTail;
 
 public:
-
-    /** Returns the index of type <code>U</code>. */
-    template<typename U>
-    constexpr static
-    typename std::enable_if<std::is_same<U, Head>::value, Index>::type
-    index() noexcept {
-        return headIndex;
-    }
-
-    /** Returns the index for the template parameter type. */
-    template<typename U>
-    constexpr static
-    typename std::enable_if<!std::is_same<U, Head>::value, Index>::type
-    index() noexcept {
-        return TailUnion::template index<U>();
-    }
-
-    /**
-     * Converts the type index for this union into the index of the same type
-     * in <code>Variant&lt;U...></code>. All the types that may be contained in
-     * this union (<code>T...</code>) must be included in the template
-     * parameter types (<code>U...</code>).
-     */
-    template<Index i, typename... U>
-    constexpr static Index convertIndex(Index index) noexcept {
-        return (index == headIndex) ?
-                Union<i, U...>::template index<Head>() :
-                TailUnion::template convertIndex<i, U...>(index);
-    }
 
     /** The constructor does nothing. */
     Union() noexcept { }
@@ -250,62 +200,36 @@ public:
                 TailUnion, FunctionalInitialize, TypeTag<U>, F &&>::value) :
             mTail(fi, tag, std::forward<F>(f)) { }
 
-    /**
-     * Calls the argument visitor's () operator with the value of the argument
-     * index. The value is passed by l-value reference to the () operator.
-     */
-    template<typename Visitor, typename Result>
-    Result apply(Index index, Visitor &&visitor) &
-            noexcept(noexcept(
-                    index == headIndex ?
-                    std::forward<Visitor>(visitor)(mHead) :
-                    mTail.template apply<Visitor, Result>(
-                            index, std::forward<Visitor>(visitor)))) {
-        if (index == headIndex)
-            return std::forward<Visitor>(visitor)(mHead);
-        else
-            return mTail.template apply<Visitor, Result>(
-                    index, std::forward<Visitor>(visitor));
-    }
-
-    /**
-     * Calls the argument visitor's () operator with the value of the argument
-     * index. The value is passed by const l-value reference to the ()
-     * operator.
-     */
-    template<typename Visitor, typename Result>
-    Result apply(Index index, Visitor &&visitor) const &
-            noexcept(noexcept(
-                    index == headIndex ?
-                    std::forward<Visitor>(visitor)(mHead) :
-                    mTail.template apply<Visitor, Result>(
-                            index, std::forward<Visitor>(visitor)))) {
-        if (index == headIndex)
-            return std::forward<Visitor>(visitor)(mHead);
-        else
-            return mTail.template apply<Visitor, Result>(
-                    index, std::forward<Visitor>(visitor));
-    }
-
-    /**
-     * Calls the argument visitor's () operator with the value of the argument
-     * index. The value is passed by r-value reference to the () operator.
-     */
-    template<typename Visitor, typename Result>
-    Result apply(Index index, Visitor &&visitor) &&
-            noexcept(noexcept(
-                    index == headIndex ?
-                    std::forward<Visitor>(visitor)(std::move(mHead)) :
-                    std::move(mTail).template apply<Visitor, Result>(
-                            index, std::forward<Visitor>(visitor)))) {
-        if (index == headIndex)
-            return std::forward<Visitor>(visitor)(std::move(mHead));
-        else
-            return std::move(mTail).template apply<Visitor, Result>(
-                    index, std::forward<Visitor>(visitor));
-    }
-
 };
+
+template<typename T, typename U>
+using CopyReference = typename std::conditional<
+        std::is_lvalue_reference<T>::value, U &, U &&>::type;
+
+/** A visitor on the type tag which forwards to a visitor on the variant. */
+template<typename Union, typename Visitor>
+class Applier {
+
+private:
+
+    Union &&mTarget;
+    Visitor &&mVisitor;
+
+public:
+
+    constexpr explicit Applier(Union &&target, Visitor &&visitor) noexcept :
+            mTarget(std::forward<Union>(target)),
+            mVisitor(std::forward<Visitor>(visitor)) { }
+
+    template<typename T, typename R = CopyReference<Union, T>>
+    constexpr auto operator()(TypeTag<T>) const
+            noexcept(noexcept(std::declval<Visitor>()(std::declval<R>())))
+            -> typename std::result_of<Visitor(R)>::type {
+        return std::forward<Visitor>(mVisitor)(
+                std::forward<Union>(mTarget).template value<T>());
+    }
+
+}; // template<typename Union> class Applier
 
 /** A visitor that constructs a value of a target union. */
 template<typename Union>
@@ -399,6 +323,13 @@ public:
 
 namespace {
 
+/** A helper function that constructs an applier. */
+template<typename Union, typename Visitor>
+Applier<Union, Visitor> applier(Union &&u, Visitor &&v) noexcept {
+    return Applier<Union, Visitor>(
+            std::forward<Union>(u), std::forward<Visitor>(v));
+}
+
 /** A helper function that constructs a constructor. */
 template<typename Union>
 Constructor<Union> constructor(Union &target) noexcept {
@@ -479,14 +410,25 @@ public:
 
 /** Fundamental implementation of variant. */
 template<typename... T>
-class VariantBase {
+class VariantBase : private TypeTag<T...> {
+
+    /*
+     * The type tag sub-object is contained as a base class object rather than
+     * a non-static data member to allow empty base optimization.
+     */
+
+public:
+
+    /**
+     * The type of the type tag which specifies the type of the contained
+     * value.
+     */
+    using Tag = TypeTag<T...>;
 
 private:
 
-    constexpr static Index INDEX_BASE = 0u;
-    using Value = Union<INDEX_BASE, T...>;
+    using Value = Union<T...>;
 
-    Index mIndex;
     Value mValue;
 
 protected:
@@ -521,26 +463,15 @@ public:
 
     /** Returns the integral value that identifies the parameter type. */
     template<typename U>
-    constexpr static Index index() noexcept {
-        return Value::template index<U>();
+    constexpr static Tag index() noexcept {
+        return TypeTag<U>();
     }
 
     /**
      * Returns an integral value that identifies the type of the currently
      * contained value.
      */
-    Index index() const noexcept { return mIndex; }
-
-    /**
-     * Converts the index of the currently contained type in this variant into
-     * the index of the same type in <code>Variant&lt;U...></code>. All the
-     * types that may be contained in this variant (<code>T...</code>) must be
-     * included in the template parameter types (<code>U...</code>).
-     */
-    template<typename... U>
-    Index convertIndex() const noexcept {
-        return Value::template convertIndex<INDEX_BASE, U...>(index());
-    }
+    Tag index() const noexcept { return *this; }
 
     /**
      * Creates a new variant by constructing its contained value by calling the
@@ -557,7 +488,7 @@ public:
     template<typename U, typename... Arg>
     explicit VariantBase(TypeTag<U> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
-            mIndex(index<U>()), mValue(tag, std::forward<Arg>(arg)...) { }
+            Tag(index<U>()), mValue(tag, std::forward<Arg>(arg)...) { }
 
     /**
      * Creates a new variant by copy- or move-constructing its contained value
@@ -592,7 +523,7 @@ public:
      */
     template<typename U, typename F>
     VariantBase(FunctionalInitialize fi, TypeTag<U> tag, F &&f) :
-            mIndex(index<U>()), mValue(fi, tag, std::forward<F>(f)) { }
+            Tag(index<U>()), mValue(fi, tag, std::forward<F>(f)) { }
 
     /**
      * Creates a new variant by move-constructing its contained value from the
@@ -674,12 +605,9 @@ public:
             typename Result =
                     typename std::remove_reference<Visitor>::type::Result>
     Result apply(Visitor &&visitor) &
-            noexcept(noexcept(
-                std::declval<Value &>().template apply<Visitor, Result>(
-                    std::declval<Index>(),
-                    std::forward<Visitor>(visitor)))) {
-        return value().template apply<Visitor, Result>(
-                index(), std::forward<Visitor>(visitor));
+            noexcept(noexcept(std::declval<Tag>().apply(
+                    std::declval<Applier<Value &, Visitor>>()))) {
+        return Tag::apply(applier(value(), std::forward<Visitor>(visitor)));
     }
 
     /**
@@ -705,12 +633,9 @@ public:
             typename Result =
                     typename std::remove_reference<Visitor>::type::Result>
     Result apply(Visitor &&visitor) const &
-            noexcept(noexcept(
-                std::declval<const Value &>().template apply<Visitor, Result>(
-                    std::declval<Index>(),
-                    std::forward<Visitor>(visitor)))) {
-        return value().template apply<Visitor, Result>(
-                index(), std::forward<Visitor>(visitor));
+            noexcept(noexcept(std::declval<Tag>().apply(
+                    std::declval<Applier<const Value &, Visitor>>()))) {
+        return Tag::apply(applier(value(), std::forward<Visitor>(visitor)));
     }
 
     /**
@@ -735,12 +660,10 @@ public:
             typename Result =
                     typename std::remove_reference<Visitor>::type::Result>
     Result apply(Visitor &&visitor) &&
-            noexcept(noexcept(
-                std::declval<Value &&>().template apply<Visitor, Result>(
-                    std::declval<Index>(),
-                    std::forward<Visitor>(visitor)))) {
-        return std::move(value()).template apply<Visitor, Result>(
-                index(), std::forward<Visitor>(visitor));
+            noexcept(noexcept(std::declval<Tag>().apply(
+                    std::declval<Applier<Value, Visitor>>()))) {
+        return Tag::apply(applier(
+                    std::move(value()), std::forward<Visitor>(visitor)));
     }
 
     /**
@@ -765,7 +688,7 @@ public:
      * Requirements: All the contained types must be copy-constructible.
      */
     VariantBase(const VariantBase &v) noexcept(IS_NOTHROW_COPY_CONSTRUCTIBLE) :
-            mIndex(v.index()) {
+            Tag(v.index()) {
         v.apply(constructor(value()));
     }
 
@@ -784,7 +707,7 @@ public:
     template<typename... U>
     VariantBase(const VariantBase<U...> &v)
             noexcept(VariantBase<U...>::IS_NOTHROW_COPY_CONSTRUCTIBLE) :
-            mIndex(v.template convertIndex<T...>()) {
+            Tag(v.index()) {
         v.apply(constructor(value()));
     }
 
@@ -799,7 +722,7 @@ public:
      * Requirements: All the contained types must be move-constructible.
      */
     VariantBase(VariantBase &&v) noexcept(IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
-            mIndex(v.index()) {
+            Tag(v.index()) {
         std::move(v).apply(constructor(value()));
     }
 
@@ -818,7 +741,7 @@ public:
     template<typename... U>
     VariantBase(VariantBase<U...> &&v)
             noexcept(VariantBase<U...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
-            mIndex(v.template convertIndex<T...>()) {
+            Tag(v.index()) {
         std::move(v).apply(constructor(this->value()));
     }
 
@@ -1077,7 +1000,7 @@ public:
     template<typename... U>
     Variant &operator=(const Variant<U...> &v)
             noexcept(Variant<U...>::IS_NOTHROW_COPY_ASSIGNABLE) {
-        if (this->index() == v.template convertIndex<T...>())
+        if (this->index() == typename Base::Tag(v.index()))
             v.apply(assigner(this->value()));
         else
             v.apply(emplacer(*this));
@@ -1099,7 +1022,7 @@ public:
     template<typename... U>
     Variant &operator=(Variant<U...> &&v)
             noexcept(Variant<U...>::IS_NOTHROW_MOVE_ASSIGNABLE) {
-        if (this->index() == v.template convertIndex<T...>())
+        if (this->index() == typename Base::Tag(v.index()))
             std::move(v).apply(assigner(this->value()));
         else
             std::move(v).apply(emplacer(*this));
@@ -1207,11 +1130,6 @@ void swap(Variant<T...> &a, Variant<T...> &b)
         noexcept(Variant<T...>::IS_NOTHROW_SWAPPABLE) {
     a.swap(b);
 }
-
-/*
- * XXX: A more efficient specialization for a single contained type variant may
- * be defined because its index is always zero.
- */
 
 } // namespace variant_impl
 

@@ -29,6 +29,7 @@
 #include "async/Future.hh"
 #include "async/Promise.hh"
 #include "common/Try.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "common/Variant.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/ReadableFileDescriptor.hh"

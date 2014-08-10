@@ -30,6 +30,7 @@
 #include "async/Promise.hh"
 #include "common/Copy.hh"
 #include "common/Try.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/WritableFileDescriptor.hh"

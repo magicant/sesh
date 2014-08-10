@@ -26,6 +26,7 @@
 #include "common/EnumSet.hh"
 #include "common/Maybe.hh"
 #include "common/String.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/EnvironmentTestHelper.hh"
 #include "language/parser/EofEnvironment.hh"
