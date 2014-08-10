@@ -409,27 +409,17 @@ public:
 }; // template<typename T> class IsSwappable
 
 template<typename T, bool = IsSwappable<T>::type::value>
-class IsNothrowSwappableImpl {
-
-public:
-
-    using type = std::false_type;
-
-}; // template<typename, bool> class IsNothrowSwappableImpl
+class IsNothrowSwappableImpl : public std::false_type { };
 
 template<typename T>
-class IsNothrowSwappableImpl<T, true> {
-
-public:
-
-    using type = std::integral_constant<
+class IsNothrowSwappableImpl<T, true> :
+    public std::integral_constant<
             bool,
-            noexcept(swap(std::declval<T &>(), std::declval<T &>()))>;
-
-}; // template<typename T> class IsNothrowSwappableImpl<T, true>
+            noexcept(swap(std::declval<T &>(), std::declval<T &>()))> {
+};
 
 template<typename T>
-using IsNothrowSwappable = typename IsNothrowSwappableImpl<T>::type;
+using IsNothrowSwappable = IsNothrowSwappableImpl<T>;
 
 template<typename Variant>
 class Swapper {
