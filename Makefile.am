@@ -884,6 +884,7 @@ src_os_signaling_HandlerConfigurationTest_SOURCES = \
 	src/os/signaling/SignalErrorCategory.cc
 
 TESTHEADERS = \
+	src/common/TypeTagTestHelper.hh \
 	src/language/parser/AssignmentParserTestHelper.hh \
 	src/language/parser/DiagnosticEnvironmentTestHelper.hh \
 	src/language/parser/EnvironmentTestHelper.hh \
