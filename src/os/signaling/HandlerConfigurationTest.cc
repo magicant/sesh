@@ -80,7 +80,7 @@ TEST_CASE_METHOD(
     CHECK(v == 0);
 
     Action &a = actions().at(5);
-    REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     CHECK(v == 0);
@@ -92,10 +92,10 @@ TEST_CASE_METHOD(
     c->callHandlers();
     CHECK(v == 15);
 
-    REQUIRE(result.index() == result.index<Canceler>());
+    REQUIRE(result.tag() == result.tag<Canceler>());
     CHECK(result.value<Canceler>()().value() == 0);
     CHECK(result.value<Canceler>()().value() == 0);
-    CHECK(a.index() == Action::index<Default>());
+    CHECK(a.tag() == Action::tag<Default>());
 
     c->callHandlers();
     CHECK(v == 15);
@@ -111,7 +111,7 @@ TEST_CASE_METHOD(
     auto result3 = c->addHandler(5, [&v3](SignalNumber) { ++v3; });
 
     Action &a = actions().at(5);
-    REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
     a.value<sesh_osapi_signal_handler *>()(5);
     c->callHandlers();
 
@@ -122,7 +122,7 @@ TEST_CASE_METHOD(
     result1.value<Canceler>()();
     result2.value<Canceler>()();
 
-    REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
     a.value<sesh_osapi_signal_handler *>()(5);
     c->callHandlers();
 
@@ -131,7 +131,7 @@ TEST_CASE_METHOD(
     CHECK(v3 == 2);
 
     result3.value<Canceler>()();
-    CHECK(a.index() == Action::index<Default>());
+    CHECK(a.tag() == Action::tag<Default>());
 }
 
 TEST_CASE_METHOD(
@@ -178,7 +178,7 @@ TEST_CASE_METHOD(
         "Handler configuration: handler for invalid signal") {
     auto result =
             c->addHandler(INVALID_SIGNAL_NUMBER, [](SignalNumber) { FAIL(); });
-    REQUIRE(result.index() == result.index<std::error_code>());
+    REQUIRE(result.tag() == result.tag<std::error_code>());
     CHECK(result.value<std::error_code>() == std::errc::invalid_argument);
 }
 
@@ -190,7 +190,7 @@ TEST_CASE_METHOD(
             HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(e.value() == 0);
-    CHECK(actions().at(5).index() == Action::index<Default>());
+    CHECK(actions().at(5).tag() == Action::tag<Default>());
 }
 
 TEST_CASE_METHOD(
@@ -208,7 +208,7 @@ TEST_CASE_METHOD(
     CHECK(v == 5);
 
     handlerResult.value<Canceler>()();
-    CHECK(actions().at(5).index() == Action::index<Default>());
+    CHECK(actions().at(5).tag() == Action::tag<Default>());
 }
 
 TEST_CASE_METHOD(
@@ -224,7 +224,7 @@ TEST_CASE_METHOD(
     CHECK(e.value() == 0);
 
     Action &a = actions().at(5);
-    REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->callHandlers();
@@ -239,7 +239,7 @@ TEST_CASE_METHOD(
             HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FAIL_IF_IGNORED);
     CHECK(e.value() == 0);
-    CHECK(actions().at(5).index() == Action::index<Ignore>());
+    CHECK(actions().at(5).tag() == Action::tag<Ignore>());
 }
 
 TEST_CASE_METHOD(
@@ -277,7 +277,7 @@ TEST_CASE_METHOD(
             HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(e.value() == 0);
-    CHECK(actions().at(5).index() == Action::index<Ignore>());
+    CHECK(actions().at(5).tag() == Action::tag<Ignore>());
 }
 
 TEST_CASE_METHOD(
@@ -291,14 +291,14 @@ TEST_CASE_METHOD(
     auto handlerResult = c->addHandler(5, [&v](SignalNumber n) { v = n; });
 
     Action &a = actions().at(5);
-    REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->callHandlers();
     CHECK(v == 5);
 
     handlerResult.value<Canceler>()();
-    CHECK(a.index() == Action::index<Ignore>());
+    CHECK(a.tag() == Action::tag<Ignore>());
 }
 
 TEST_CASE_METHOD(
@@ -310,7 +310,7 @@ TEST_CASE_METHOD(
             HandlerConfiguration::Handler(),
             HandlerConfiguration::SettingPolicy::FORCE);
     Action &a = actions().at(5);
-    REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
 }
 
 TEST_CASE_METHOD(
@@ -323,7 +323,7 @@ TEST_CASE_METHOD(
     CHECK(e.value() == 0);
 
     Action &a = actions().at(5);
-    REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->callHandlers();
@@ -334,7 +334,7 @@ TEST_CASE_METHOD(
             HandlerConfiguration::Default(),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(e.value() == 0);
-    CHECK(a.index() == Action::index<Default>());
+    CHECK(a.tag() == Action::tag<Default>());
 }
 
 TEST_CASE_METHOD(
@@ -346,7 +346,7 @@ TEST_CASE_METHOD(
     c->addHandler(5, [&v2](SignalNumber n) { v2 = n; });
 
     Action &a = actions().at(5);
-    REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->callHandlers();
@@ -363,7 +363,7 @@ TEST_CASE_METHOD(
     c->setTrap(5, std::move(h), HandlerConfiguration::SettingPolicy::FORCE);
 
     Action &a = actions().at(5);
-    REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->callHandlers();

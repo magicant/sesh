@@ -70,9 +70,9 @@ private:
     Output mOutput = Output(common::TypeTag<Empty>());
 
     void fireIfReady() {
-        if (mInput.index() != mInput.template index<Try>())
+        if (mInput.tag() != mInput.template tag<Try>())
             return;
-        if (mOutput.index() != mOutput.template index<Callback>())
+        if (mOutput.tag() != mOutput.template tag<Callback>())
             return;
 
         auto &f = mOutput.template value<Callback>();
@@ -93,9 +93,9 @@ public:
      */
     template<typename... Arg>
     void setResult(Arg &&... arg) {
-        assert(mInput.index() != mInput.template index<Try>());
+        assert(mInput.tag() != mInput.template tag<Try>());
 
-        if (mOutput.index() == mOutput.template index<ForwardTarget>())
+        if (mOutput.tag() == mOutput.template tag<ForwardTarget>())
             return mOutput.template value<ForwardTarget>()->setResult(
                     std::forward<Arg>(arg)...);
 
@@ -119,10 +119,10 @@ public:
      * immediately with the result.
      */
     void setCallback(Callback &&f) {
-        assert(mOutput.index() != mOutput.template index<Callback>());
+        assert(mOutput.tag() != mOutput.template tag<Callback>());
         assert(f != nullptr);
 
-        if (mInput.index() == mInput.template index<ForwardSource>()) {
+        if (mInput.tag() == mInput.template tag<ForwardSource>()) {
             if (auto fs = mInput.template value<ForwardSource>().lock())
                 fs->setCallback(std::move(f));
             return;
@@ -155,31 +155,29 @@ public:
     static void forward(
             std::shared_ptr<Delay> &&from, std::shared_ptr<Delay> &&to) {
         assert(from != nullptr);
-        assert(from->mOutput.index() !=
-                from->mOutput.template index<Callback>());
+        assert(from->mOutput.tag() != from->mOutput.template tag<Callback>());
 
         assert(to != nullptr);
-        assert(to->mInput.index() != to->mInput.template index<Try>());
+        assert(to->mInput.tag() != to->mInput.template tag<Try>());
 
         // Normalize "from"
-        if (from->mInput.index() ==
-                from->mInput.template index<ForwardSource>()) {
+        if (from->mInput.tag() == from->mInput.template tag<ForwardSource>()) {
             from = from->mInput.template value<ForwardSource>().lock();
             if (from == nullptr)
                 return;
         }
 
         // Normalize "to"
-        if (to->mOutput.index() == to->mOutput.template index<ForwardTarget>())
+        if (to->mOutput.tag() == to->mOutput.template tag<ForwardTarget>())
             to = std::move(to->mOutput.template value<ForwardTarget>());
 
         // Transfer result
-        if (from->mInput.index() == from->mInput.template index<Try>())
+        if (from->mInput.tag() == from->mInput.template tag<Try>())
             return to->setResult(
                     std::move(from->mInput.template value<Try>()));
 
         // Transfer callback
-        if (to->mOutput.index() == to->mOutput.template index<Callback>())
+        if (to->mOutput.tag() == to->mOutput.template tag<Callback>())
             return from->setCallback(
                     std::move(to->mOutput.template value<Callback>()));
 

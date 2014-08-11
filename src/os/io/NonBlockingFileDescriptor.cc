@@ -38,10 +38,10 @@ std::unique_ptr<FileDescriptionStatus> statusOrNull(
         const FileDescriptionApi &api, const FileDescriptor &fd) {
     using StatusPointer = std::unique_ptr<FileDescriptionStatus>;
     auto statusOrError = api.getFileDescriptionStatus(fd);
-    switch (statusOrError.index()) {
-    case statusOrError.index<StatusPointer>():
+    switch (statusOrError.tag()) {
+    case statusOrError.tag<StatusPointer>():
         return std::move(statusOrError.value<StatusPointer>());
-    case statusOrError.index<std::error_code>():
+    case statusOrError.tag<std::error_code>():
         return nullptr;
     }
     UNREACHABLE();

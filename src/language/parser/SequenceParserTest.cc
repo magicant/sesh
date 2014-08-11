@@ -123,7 +123,7 @@ private:
 void checkTokenParserLeftBrace(Parser<Token> &p) {
     CHECK(p.state() == ParserBase::State::FINISHED);
     REQUIRE(p.parse() != nullptr);
-    REQUIRE(p.parse()->index() == p.parse()->index<Keyword>());
+    REQUIRE(p.parse()->tag() == p.parse()->tag<Keyword>());
     CHECK(p.parse()->value<Keyword>() == Keyword::keywordLeftBrace());
 }
 

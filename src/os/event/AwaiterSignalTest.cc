@@ -61,7 +61,7 @@ TEST_CASE_METHOD(
     Future<Trigger> f = a.expect(Signal(3));
     std::move(f).then([this](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        REQUIRE(t->index() == Trigger::index<Signal>());
+        REQUIRE(t->tag() == Trigger::tag<Signal>());
         CHECK(t->value<Signal>().number() == 3);
         mutableSteadyClockNow() += std::chrono::seconds(2);
     });
@@ -82,7 +82,7 @@ TEST_CASE_METHOD(
             CHECK_FALSE(signalMask->test(3));
 
         Action &a = actions().at(3);
-        REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(3);
 
         mutableSteadyClockNow() += std::chrono::seconds(3);
@@ -115,7 +115,7 @@ TEST_CASE_METHOD(
         CHECK(signalMask().test(5));
 
         Action &a = actions().at(3);
-        REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(3);
 
         implementation() = nullptr;
@@ -132,7 +132,7 @@ TEST_CASE_METHOD(
     Future<Trigger> f = a.expect(Signal(2), Signal(6));
     std::move(f).then([this](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        REQUIRE(t->index() == Trigger::index<Signal>());
+        REQUIRE(t->tag() == Trigger::tag<Signal>());
         CHECK(t->value<Signal>().number() == 6);
         mutableSteadyClockNow() += std::chrono::seconds(2);
     });
@@ -155,10 +155,10 @@ TEST_CASE_METHOD(
         }
 
         Action &a2 = actions().at(2);
-        REQUIRE(a2.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a2.tag() == Action::tag<sesh_osapi_signal_handler *>());
 
         Action &a6 = actions().at(6);
-        REQUIRE(a6.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a6.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a6.value<sesh_osapi_signal_handler *>()(6);
 
         mutableSteadyClockNow() += std::chrono::seconds(3);
@@ -178,7 +178,7 @@ TEST_CASE_METHOD(
     for (unsigned i = 0; i < 2; ++i) {
         a.expect(Signal(1)).then([this](Try<Trigger> &&t) {
             REQUIRE(t.hasValue());
-            REQUIRE(t->index() == Trigger::index<Signal>());
+            REQUIRE(t->tag() == Trigger::tag<Signal>());
             CHECK(t->value<Signal>().number() == 1);
             mutableSteadyClockNow() += std::chrono::seconds(1);
         });
@@ -200,7 +200,7 @@ TEST_CASE_METHOD(
             CHECK_FALSE(signalMask->test(1));
 
         Action &a = actions().at(1);
-        REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
         mutableSteadyClockNow() += std::chrono::seconds(3);
@@ -220,7 +220,7 @@ TEST_CASE_METHOD(
     for (SignalNumber sn : {1, 2}) {
         a.expect(Signal(sn)).then([this, sn](Try<Trigger> &&t) {
             REQUIRE(t.hasValue());
-            REQUIRE(t->index() == Trigger::index<Signal>());
+            REQUIRE(t->tag() == Trigger::tag<Signal>());
             CHECK(t->value<Signal>().number() == sn);
             mutableSteadyClockNow() += std::chrono::seconds(1);
         });
@@ -240,11 +240,11 @@ TEST_CASE_METHOD(
         }
 
         Action &a1 = actions().at(1);
-        REQUIRE(a1.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a1.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a1.value<sesh_osapi_signal_handler *>()(1);
 
         Action &a2 = actions().at(2);
-        REQUIRE(a2.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a2.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a2.value<sesh_osapi_signal_handler *>()(2);
 
         mutableSteadyClockNow() += std::chrono::seconds(3);
@@ -265,7 +265,7 @@ TEST_CASE_METHOD(
     for (SignalNumber sn : {1, 2}) {
         a.expect(Signal(sn)).then([this, sn](Try<Trigger> &&t) {
             REQUIRE(t.hasValue());
-            REQUIRE(t->index() == Trigger::index<Signal>());
+            REQUIRE(t->tag() == Trigger::tag<Signal>());
             CHECK(t->value<Signal>().number() == sn);
             mutableSteadyClockNow() += std::chrono::seconds(1);
         });
@@ -285,7 +285,7 @@ TEST_CASE_METHOD(
         }
 
         Action &a = actions().at(1);
-        REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
         mutableSteadyClockNow() += std::chrono::seconds(3);
@@ -301,7 +301,7 @@ TEST_CASE_METHOD(
                 CHECK_FALSE(signalMask->test(2));
 
             Action &a = actions().at(2);
-            REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+            REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
             a.value<sesh_osapi_signal_handler *>()(2);
 
             mutableSteadyClockNow() += std::chrono::seconds(3);
@@ -329,7 +329,7 @@ TEST_CASE_METHOD(
             std::chrono::nanoseconds,
             const SignalNumberSet *) -> std::error_code {
         Action &a = actions().at(1);
-        REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
         implementation() = nullptr;
@@ -338,7 +338,7 @@ TEST_CASE_METHOD(
     a.awaitEvents();
 
     Action &a = actions().at(1);
-    CHECK(a.index() == Action::index<Default>());
+    CHECK(a.tag() == Action::tag<Default>());
 }
 
 } // namespace

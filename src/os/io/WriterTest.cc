@@ -156,7 +156,7 @@ private:
     Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
         Trigger &t = triggers.front();
-        CHECK(t.index() == t.index<WritableFileDescriptor>());
+        CHECK(t.tag() == t.tag<WritableFileDescriptor>());
         CHECK(t.value<WritableFileDescriptor>().value() == FD);
 
         auto pf = createPromiseFuturePair<Trigger>();

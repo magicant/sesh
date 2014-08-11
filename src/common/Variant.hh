@@ -454,7 +454,7 @@ public:
 
     /** Returns the integral value that identifies the parameter type. */
     template<typename U>
-    constexpr static Tag index() noexcept {
+    constexpr static Tag tag() noexcept {
         return TypeTag<U>();
     }
 
@@ -462,7 +462,7 @@ public:
      * Returns an integral value that identifies the type of the currently
      * contained value.
      */
-    Tag index() const noexcept { return *this; }
+    Tag tag() const noexcept { return *this; }
 
     /**
      * Creates a new variant by constructing its contained value by calling the
@@ -479,7 +479,7 @@ public:
     template<typename U, typename... Arg>
     explicit VariantBase(TypeTag<U> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
-            Tag(index<U>()), mValue(tag, std::forward<Arg>(arg)...) { }
+            Tag(tag), mValue(tag, std::forward<Arg>(arg)...) { }
 
     /**
      * Creates a new variant by copy- or move-constructing its contained value
@@ -514,7 +514,7 @@ public:
      */
     template<typename U, typename F>
     VariantBase(FunctionalInitialize fi, TypeTag<U> tag, F &&f) :
-            Tag(index<U>()), mValue(fi, tag, std::forward<F>(f)) { }
+            Tag(tag), mValue(fi, tag, std::forward<F>(f)) { }
 
     /**
      * Creates a new variant by move-constructing its contained value from the
@@ -544,7 +544,7 @@ public:
      */
     template<typename U>
     U &value() & noexcept {
-        assert(index() == index<U>());
+        assert(tag() == tag<U>());
         return mValue.template value<U>();
     }
 
@@ -557,7 +557,7 @@ public:
      */
     template<typename U>
     const U &value() const & noexcept {
-        assert(index() == index<U>());
+        assert(tag() == tag<U>());
         return mValue.template value<U>();
     }
 
@@ -570,7 +570,7 @@ public:
      */
     template<typename U>
     U &&value() && noexcept {
-        assert(index() == index<U>());
+        assert(tag() == tag<U>());
         return std::move(mValue.template value<U>());
     }
 
@@ -670,7 +670,7 @@ public:
      * Requirements: All the contained types must be copy-constructible.
      */
     VariantBase(const VariantBase &v) noexcept(IS_NOTHROW_COPY_CONSTRUCTIBLE) :
-            Tag(v.index()) {
+            Tag(v.tag()) {
         v.apply(constructor(value()));
     }
 
@@ -689,7 +689,7 @@ public:
     template<typename... U>
     VariantBase(const VariantBase<U...> &v)
             noexcept(VariantBase<U...>::IS_NOTHROW_COPY_CONSTRUCTIBLE) :
-            Tag(v.index()) {
+            Tag(v.tag()) {
         v.apply(constructor(value()));
     }
 
@@ -704,7 +704,7 @@ public:
      * Requirements: All the contained types must be move-constructible.
      */
     VariantBase(VariantBase &&v) noexcept(IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
-            Tag(v.index()) {
+            Tag(v.tag()) {
         std::move(v).apply(constructor(value()));
     }
 
@@ -723,7 +723,7 @@ public:
     template<typename... U>
     VariantBase(VariantBase<U...> &&v)
             noexcept(VariantBase<U...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
-            Tag(v.index()) {
+            Tag(v.tag()) {
         std::move(v).apply(constructor(this->value()));
     }
 
@@ -822,7 +822,7 @@ public:
      */
     template<typename U, typename V = typename std::decay<U>::type>
     void assign(U &&v) noexcept(std::is_nothrow_assignable<V, U &&>::value) {
-        if (index() == index<V>())
+        if (tag() == tag<V>())
             value<V>() = std::forward<U>(v);
         else
             emplace<V>(std::forward<U>(v));
@@ -886,7 +886,7 @@ public:
      */
     AssignableVariant &operator=(const AssignableVariant &v)
             noexcept(Base::IS_NOTHROW_COPY_ASSIGNABLE) {
-        if (this->index() == v.index())
+        if (this->tag() == v.tag())
             v.apply(assigner(this->value()));
         else
             v.apply(emplacer(*this));
@@ -908,7 +908,7 @@ public:
      */
     AssignableVariant &operator=(AssignableVariant &&v)
             noexcept(Base::IS_NOTHROW_MOVE_ASSIGNABLE) {
-        if (this->index() == v.index())
+        if (this->tag() == v.tag())
             std::move(v).apply(assigner(this->value()));
         else
             std::move(v).apply(emplacer(*this));
@@ -982,7 +982,7 @@ public:
     template<typename... U>
     Variant &operator=(const Variant<U...> &v)
             noexcept(Variant<U...>::IS_NOTHROW_COPY_ASSIGNABLE) {
-        if (this->index() == typename Base::Tag(v.index()))
+        if (this->tag() == typename Base::Tag(v.tag()))
             v.apply(assigner(this->value()));
         else
             v.apply(emplacer(*this));
@@ -1004,7 +1004,7 @@ public:
     template<typename... U>
     Variant &operator=(Variant<U...> &&v)
             noexcept(Variant<U...>::IS_NOTHROW_MOVE_ASSIGNABLE) {
-        if (this->index() == typename Base::Tag(v.index()))
+        if (this->tag() == typename Base::Tag(v.tag()))
             std::move(v).apply(assigner(this->value()));
         else
             std::move(v).apply(emplacer(*this));
@@ -1022,7 +1022,7 @@ public:
      * move-constructible, and no-throw destructible.
      */
     void swap(Variant &other) noexcept(Variant::IS_NOTHROW_SWAPPABLE) {
-        if (this->index() == other.index())
+        if (this->tag() == other.tag())
             return this->apply(swap_impl::Swapper<Variant<T...>>(other));
 
         assert(this != &other);

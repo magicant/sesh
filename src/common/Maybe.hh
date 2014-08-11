@@ -125,7 +125,7 @@ public:
 
     /** Returns true if and only if this maybe object is non-empty. */
     bool hasValue() const noexcept {
-        return mValue.index() != mValue.template index<Nil>();
+        return mValue.tag() != mValue.template tag<Nil>();
     }
 
     /** Same as {@link #hasValue()}. */

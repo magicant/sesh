@@ -41,10 +41,10 @@ public:
 
     /** Checks if this value has an actual result rather than an exception. */
     bool hasValue() const noexcept {
-        switch (this->index()) {
-        case Try::template index<T>():
+        switch (this->tag()) {
+        case Try::template tag<T>():
             return true;
-        case Try::template index<std::exception_ptr>():
+        case Try::template tag<std::exception_ptr>():
             return false;
         }
         UNREACHABLE();
@@ -56,10 +56,10 @@ public:
 
     /** Returns a reference to the result value or throws the exception. */
     T &operator*() {
-        switch (this->index()) {
-        case Try::template index<T>():
+        switch (this->tag()) {
+        case Try::template tag<T>():
             return this->template value<T>();
-        case Try::template index<std::exception_ptr>():
+        case Try::template tag<std::exception_ptr>():
             std::rethrow_exception(this->template value<std::exception_ptr>());
         }
         UNREACHABLE();
@@ -67,10 +67,10 @@ public:
 
     /** Returns a reference to the result value or throws the exception. */
     const T &operator*() const {
-        switch (this->index()) {
-        case Try::template index<T>():
+        switch (this->tag()) {
+        case Try::template tag<T>():
             return this->template value<T>();
-        case Try::template index<std::exception_ptr>():
+        case Try::template tag<std::exception_ptr>():
             std::rethrow_exception(this->template value<std::exception_ptr>());
         }
         UNREACHABLE();

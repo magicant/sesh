@@ -172,16 +172,16 @@ int toRawModes(EnumSet<FileMode> modes) {
 }
 
 void convert(const SignalAction &from, struct sesh_osapi_signal_action &to) {
-    switch (from.index()) {
-    case SignalAction::index<Api::Default>():
+    switch (from.tag()) {
+    case SignalAction::tag<Api::Default>():
         to.type = SESH_OSAPI_SIG_DFL;
         to.handler = nullptr;
         break;
-    case SignalAction::index<Api::Ignore>():
+    case SignalAction::tag<Api::Ignore>():
         to.type = SESH_OSAPI_SIG_IGN;
         to.handler = nullptr;
         break;
-    case SignalAction::index<sesh_osapi_signal_handler *>():
+    case SignalAction::tag<sesh_osapi_signal_handler *>():
         to.type = SESH_OSAPI_SIG_HANDLER;
         to.handler = from.value<sesh_osapi_signal_handler *>();
         break;

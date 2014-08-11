@@ -68,19 +68,19 @@ class TokenParserTestEnvironment :
 };
 
 void checkAssignment(const Token &r) {
-    REQUIRE(r.index() == r.index<AssignmentPointer>());
+    REQUIRE(r.tag() == r.tag<AssignmentPointer>());
     REQUIRE(r.value<AssignmentPointer>() != nullptr);
     CHECK(r.value<AssignmentPointer>()->variableName() == L("N"));
     CHECK(r.value<AssignmentPointer>()->value().components().empty());
 }
 
 void checkKeyword(const Token &r, const String &s) {
-    REQUIRE(r.index() == r.index<Keyword>());
+    REQUIRE(r.tag() == r.tag<Keyword>());
     CHECK(r.value<Keyword>().get() == s);
 }
 
 void checkWord(const Token &r, const String &s) {
-    REQUIRE(r.index() == r.index<WordPointer>());
+    REQUIRE(r.tag() == r.tag<WordPointer>());
     REQUIRE(r.value<WordPointer>() != nullptr);
     REQUIRE(r.value<WordPointer>()->components().size() == 1);
 

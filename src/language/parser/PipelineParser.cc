@@ -103,7 +103,7 @@ public:
             return false;
 
         Pipeline::ExitStatusType est;
-        if (t->index() == t->index<Keyword>() &&
+        if (t->tag() == t->tag<Keyword>() &&
                 t->value<Keyword>() == Keyword::keywordExclamation()) {
             est = Pipeline::ExitStatusType::NEGATED;
             state.tokenParser->reset();

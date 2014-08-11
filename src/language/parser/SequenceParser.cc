@@ -66,7 +66,7 @@ private:
             noexcept {
         if (t == nullptr)
             return false;
-        if (t->index() != t->index<Keyword>())
+        if (t->tag() != t->tag<Keyword>())
             return false;
         if (!isClosingKeyword(t->value<Keyword>()))
             return false;
