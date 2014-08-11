@@ -72,6 +72,12 @@ class IsAnyOf<T, Head, Tail...> :
                 std::true_type,
                 IsAnyOf<T, Tail...>>::type { };
 
+template<typename T>
+class IsTypeTag : public std::false_type { };
+
+template<typename T>
+class IsTypeTag<TypeTag<T>> : public std::true_type { };
+
 /** Contains the value of a variant. */
 template<typename...>
 union Union;
@@ -489,13 +495,15 @@ public:
      *
      * @tparam U the argument type.
      * @tparam V the type of the new contained value to be constructed.
-     *     (inferred from the argument type.)
+     *     Inferred from the argument type. If V is a specialization of
+     *     TypeTag, this constructor overload cannot be used.
      * @param v the argument forwarded to the constructor.
      */
     template<
             typename U,
             typename V = typename std::decay<U>::type,
-            typename = typename std::enable_if<IsAnyOf<V, T...>::value>::type>
+            typename = typename std::enable_if<IsAnyOf<V, T...>::value>::type,
+            typename = typename std::enable_if<!IsTypeTag<V>::value>::type>
     VariantBase(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
             VariantBase(TypeTag<V>(), std::forward<U>(v)) { }

@@ -261,6 +261,23 @@ TEST_CASE("Quad variant construction & destruction") {
     Variant<A, B, C, D>(FUNCTIONAL_INITIALIZE, [] { return D(); });
 }
 
+TEST_CASE("Double variant copy initialization") {
+    Variant<int, TypeTag<int>> vi = 0;
+    CHECK(vi.tag() == vi.tag<int>());
+
+    // Implicit conversion from TypeTag is disabled to disambiguate overloads.
+//    Variant<int, TypeTag<int>> vt = TypeTag<int>();
+//    CHECK(vt.tag() == vt.tag<TypeTag<int>>());
+}
+
+TEST_CASE("Double variant direct initialization") {
+    Variant<int, TypeTag<int>> vi((TypeTag<int>()));
+    CHECK(vi.tag() == vi.tag<int>());
+
+    Variant<int, TypeTag<int>> vt((TypeTag<TypeTag<int>>()));
+    CHECK(vt.tag() == vt.tag<TypeTag<int>>());
+}
+
 TEST_CASE("Double variant value") {
     const int I1 = 123, I2 = 234;
     const float F1 = 456.0f, F2 = 567.0f;
