@@ -65,8 +65,6 @@ private:
 
 public:
 
-    using Result = void;
-
     explicit TokenParserResultAcceptor(SimpleCommandParser &p) noexcept :
             mParser(p) { }
 

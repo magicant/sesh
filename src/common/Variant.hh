@@ -27,6 +27,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "common/CommonResult.hh"
 #include "common/FunctionalInitialize.hh"
 #include "common/TypeTag.hh"
 
@@ -243,8 +244,6 @@ public:
 
     explicit Constructor(Union &target) noexcept : mTarget(target) { }
 
-    using Result = void;
-
     template<
             typename T,
             typename V = typename std::remove_const<
@@ -268,8 +267,6 @@ public:
 
     explicit Assigner(Union &target) noexcept : mTarget(target) { }
 
-    using Result = void;
-
     template<
             typename T,
             typename V = typename std::remove_const<
@@ -285,8 +282,6 @@ public:
 class Destructor {
 
 public:
-
-    using Result = void;
 
     template<typename V>
     void operator()(V &v) noexcept(std::is_nothrow_destructible<V>::value) {
@@ -306,8 +301,6 @@ private:
 public:
 
     explicit Emplacer(Variant &target) noexcept : mTarget(target) { }
-
-    using Result = void;
 
     template<
             typename T,
@@ -396,8 +389,6 @@ private:
 public:
 
     explicit Swapper(Variant &other) noexcept : mOther(other) { }
-
-    using Result = void;
 
     template<typename T>
     void operator()(T &v) noexcept(IsNothrowSwappable<T>::value) {
@@ -596,17 +587,14 @@ public:
      * contained value is passed to the () operator in l-value context.
      *
      * @tparam Visitor the type of the argument.
-     * @tparam Result the return type of the () operators.
      * @param visitor an object that has () operators to be called.
      * @return the return value of the () operator.
      */
-    template<
-            typename Visitor,
-            typename Result =
-                    typename std::remove_reference<Visitor>::type::Result>
-    Result apply(Visitor &&visitor) &
-            noexcept(noexcept(std::declval<Tag>().apply(
-                    std::declval<Applier<Value &, Visitor>>()))) {
+    template<typename Visitor>
+    auto apply(Visitor &&visitor) &
+            noexcept(noexcept(std::declval<Tag &>().apply(
+                    std::declval<Applier<Value &, Visitor>>())))
+            -> typename CommonResult<Visitor, T &...>::type {
         return Tag::apply(applier(value(), std::forward<Visitor>(visitor)));
     }
 
@@ -624,17 +612,14 @@ public:
      * l-value context.
      *
      * @tparam Visitor the type of the argument.
-     * @tparam Result the return type of the () operators.
      * @param visitor an object that has () operators to be called.
      * @return the return value of the () operator.
      */
-    template<
-            typename Visitor,
-            typename Result =
-                    typename std::remove_reference<Visitor>::type::Result>
-    Result apply(Visitor &&visitor) const &
-            noexcept(noexcept(std::declval<Tag>().apply(
-                    std::declval<Applier<const Value &, Visitor>>()))) {
+    template<typename Visitor>
+    auto apply(Visitor &&visitor) const &
+            noexcept(noexcept(std::declval<const Tag &>().apply(
+                    std::declval<Applier<const Value &, Visitor>>())))
+            -> typename CommonResult<Visitor, const T &...>::type {
         return Tag::apply(applier(value(), std::forward<Visitor>(visitor)));
     }
 
@@ -651,17 +636,14 @@ public:
      * contained value is passed to the () operator in r-value context.
      *
      * @tparam Visitor the type of the argument.
-     * @tparam Result the return type of the () operators.
      * @param visitor an object that has () operators to be called.
      * @return the return value of the () operator.
      */
-    template<
-            typename Visitor,
-            typename Result =
-                    typename std::remove_reference<Visitor>::type::Result>
-    Result apply(Visitor &&visitor) &&
-            noexcept(noexcept(std::declval<Tag>().apply(
-                    std::declval<Applier<Value, Visitor>>()))) {
+    template<typename Visitor>
+    auto apply(Visitor &&visitor) &&
+            noexcept(noexcept(std::declval<Tag &>().apply(
+                    std::declval<Applier<Value, Visitor>>())))
+            -> typename CommonResult<Visitor, T &&...>::type {
         return Tag::apply(applier(
                     std::move(value()), std::forward<Visitor>(visitor)));
     }

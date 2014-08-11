@@ -52,18 +52,16 @@ struct Reader {
     NonBlockingFileDescriptor fd;
     std::vector<char> buffer;
 
-    using Result = ResultPair;
-
-    Result operator()(std::size_t bytesRead) {
+    ResultPair operator()(std::size_t bytesRead) {
         buffer.resize(static_cast<std::vector<char>::size_type>(bytesRead));
         return ResultPair(std::move(fd), std::move(buffer));
     }
 
-    Result operator()(std::error_code e) {
+    ResultPair operator()(std::error_code e) {
         return ResultPair(std::move(fd), std::move(e));
     }
 
-    Result operator()(Try<Trigger> &&t) {
+    ResultPair operator()(Try<Trigger> &&t) {
         try {
             *t;
         } catch (std::domain_error &) {

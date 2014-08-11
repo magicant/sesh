@@ -94,8 +94,6 @@ public:
 
     StateProcessor(PipelineParser &p) noexcept : mParser(p) { }
 
-    using Result = bool;
-
     bool operator()(ParsingFirstToken &state) {
         if (state.tokenParser == nullptr)
             state.tokenParser = mParser.createTokenParser();

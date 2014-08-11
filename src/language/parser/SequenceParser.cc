@@ -76,8 +76,6 @@ private:
 
 public:
 
-    using Result = bool;
-
     InnerParserProcessor(SequenceParser &p) noexcept : mParser(p) { }
 
     bool operator()(TokenParserPointer &p) {

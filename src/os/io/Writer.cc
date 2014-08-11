@@ -50,19 +50,17 @@ struct Writer {
     NonBlockingFileDescriptor fd;
     std::vector<char> bytes;
 
-    using Result = Future<ResultPair>;
-
-    Result operator()(std::size_t bytesWritten) {
+    Future<ResultPair> operator()(std::size_t bytesWritten) {
         auto i = bytes.begin();
         bytes.erase(i, i + bytesWritten);
         return write(api, proactor, std::move(fd), std::move(bytes));
     }
 
-    Result operator()(std::error_code e) {
+    Future<ResultPair> operator()(std::error_code e) {
         return createFuture<ResultPair>(std::move(fd), e);
     }
 
-    Result operator()(Try<Trigger> &&t) {
+    Future<ResultPair> operator()(Try<Trigger> &&t) {
         try {
             *t;
         } catch (std::domain_error &e) {

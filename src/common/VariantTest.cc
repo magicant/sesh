@@ -310,29 +310,13 @@ TEST_CASE("Double variant r-value") {
     CHECK(actions.at(5) == Action::DESTRUCTION);
 }
 
-TEST_CASE("Double variant apply with explicit result type") {
-    struct Visitor {
-        std::string operator()(int v) { return std::to_string(v); }
-        std::string operator()(const double &v) { return std::to_string(v); }
-    };
-
-    Variant<int, double> vi = 3;
-    std::string si = vi.apply<Visitor, std::string>(Visitor());
-    CHECK(si == "3");
-
-    Variant<int, double> vd = 1.5;
-    std::string sd = vd.apply<Visitor, std::string>(Visitor());
-    CHECK(sd == "1.500000");
-}
-
 struct TemplateVisitor {
-    using Result = std::string;
     template<typename T>
-    Result operator()(T v) { return std::to_string(v); }
+    std::string operator()(T v) { return std::to_string(v); }
     // A local class cannot have a template member.
 };
 
-TEST_CASE("Double variant apply with inferred result type") {
+TEST_CASE("Double variant apply with templated visitor") {
     Variant<int, double> vi = 3;
     std::string si = vi.apply(TemplateVisitor());
     CHECK(si == "3");
@@ -344,13 +328,12 @@ TEST_CASE("Double variant apply with inferred result type") {
 
 TEST_CASE("Double variant apply, contained value l/r-value") {
     struct Visitor {
-        using Result = std::string;
-        Result operator()(int &) { return "int &"; }
-        Result operator()(const int &) { return "const int &"; }
-        Result operator()(int &&) { return "int &&"; }
-        Result operator()(double &) { return "double &"; }
-        Result operator()(const double &) { return "const double &"; }
-        Result operator()(double &&) { return "double &&"; }
+        std::string operator()(int &) { return "int &"; }
+        std::string operator()(const int &) { return "const int &"; }
+        std::string operator()(int &&) { return "int &&"; }
+        std::string operator()(double &) { return "double &"; }
+        std::string operator()(const double &) { return "const double &"; }
+        std::string operator()(double &&) { return "double &&"; }
     };
 
     auto vi = Variant<int, double>::create<int>();
@@ -373,13 +356,12 @@ TEST_CASE("Double variant apply, contained value l/r-value") {
 TEST_CASE("Double variant apply, visitor l/r-value") {
     struct Visitor {
         Visitor() { }
-        using Result = std::string;
-        Result operator()(int) & { return "int, &"; }
-        Result operator()(int) const & { return "int, const &"; }
-        Result operator()(int) && { return "int, &&"; }
-        Result operator()(double) & { return "double, &"; }
-        Result operator()(double) const & { return "double, const &"; }
-        Result operator()(double) && { return "double, &&"; }
+        std::string operator()(int) & { return "int, &"; }
+        std::string operator()(int) const & { return "int, const &"; }
+        std::string operator()(int) && { return "int, &&"; }
+        std::string operator()(double) & { return "double, &"; }
+        std::string operator()(double) const & { return "double, const &"; }
+        std::string operator()(double) && { return "double, &&"; }
     };
 
     auto vi = Variant<int, double>::create<int>();
