@@ -114,6 +114,7 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
 	src/common/Char.hh \
+	src/common/CommonResult.hh \
 	src/common/ContainerHelper.hh \
 	src/common/Copy.hh \
 	src/common/DirectInitialize.hh \
