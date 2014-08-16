@@ -296,30 +296,6 @@ public:
 
 };
 
-/** A visitor that emplaces the target variant. */
-template<typename Variant>
-class Emplacer {
-
-private:
-
-    Variant &mTarget;
-
-public:
-
-    explicit Emplacer(Variant &target) noexcept : mTarget(target) { }
-
-    template<
-            typename T,
-            typename V = typename std::remove_const<
-                    typename std::remove_reference<T>::type>::type>
-    void operator()(T &&v)
-            noexcept(noexcept(std::declval<Variant>().template emplace<V>(
-                    std::forward<T>(v)))) {
-        mTarget.template emplace<V>(std::forward<T>(v));
-    }
-
-};
-
 namespace {
 
 /** A helper function that constructs an applier. */
@@ -339,12 +315,6 @@ Constructor<Union> constructor(Union &target) noexcept {
 template<typename Union>
 Assigner<Union> assigner(Union &target) noexcept {
     return Assigner<Union>(target);
-}
-
-/** A helper function that constructs an emplacer. */
-template<typename Variant>
-Emplacer<Variant> emplacer(Variant &variant) noexcept {
-    return Emplacer<Variant>(variant);
 }
 
 } // namespace
@@ -752,7 +722,7 @@ public:
 
     /**
      * Destructs the currently contained value and creates a new contained
-     * value by calling the constructor of type <code>U</code> with the given
+     * value by calling the constructor of this variant again with the given
      * arguments.
      *
      * To ensure that a valid object is contained after return from this
@@ -763,10 +733,10 @@ public:
      * @see #emplaceWithFallback
      * @see #reset
      */
-    template<typename U, typename... Arg>
+    template<typename... Arg>
     void emplace(Arg &&... arg) noexcept {
         this->~VariantBase();
-        new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
+        new (this) VariantBase(std::forward<Arg>(arg)...);
     }
 
     /**
@@ -808,7 +778,7 @@ public:
      */
     template<typename U, typename V = typename std::decay<U>::type>
     void reset(U &&v) noexcept {
-        emplace<V>(std::forward<U>(v));
+        emplace(TypeTag<V>(), std::forward<U>(v));
     }
 
     /**
@@ -833,7 +803,7 @@ public:
         if (tag() == tag<V>())
             value<V>() = std::forward<U>(v);
         else
-            emplace<V>(std::forward<U>(v));
+            reset(std::forward<U>(v));
     }
 
     /**
@@ -897,7 +867,7 @@ public:
         if (this->tag() == v.tag())
             v.apply(assigner(this->value()));
         else
-            v.apply(emplacer(*this));
+            this->emplace(v);
         return *this;
     }
 
@@ -919,7 +889,7 @@ public:
         if (this->tag() == v.tag())
             std::move(v).apply(assigner(this->value()));
         else
-            std::move(v).apply(emplacer(*this));
+            this->emplace(std::move(v));
         return *this;
     };
 
@@ -993,7 +963,7 @@ public:
         if (this->tag() == typename Base::Tag(v.tag()))
             v.apply(assigner(this->value()));
         else
-            v.apply(emplacer(*this));
+            this->emplace(static_cast<const VariantBase<U...> &>(v));
         return *this;
     }
 
@@ -1015,7 +985,7 @@ public:
         if (this->tag() == typename Base::Tag(v.tag()))
             std::move(v).apply(assigner(this->value()));
         else
-            std::move(v).apply(emplacer(*this));
+            this->emplace(static_cast<VariantBase<U...> &&>(v));
         return *this;
     }
 
@@ -1036,8 +1006,8 @@ public:
         assert(this != &other);
 
         Variant<T...> temporary(std::move(*this));
-        std::move(other).apply(emplacer(*this));
-        std::move(temporary).apply(emplacer(other));
+        this->emplace(std::move(other));
+        other.emplace(std::move(temporary));
     }
 
     /**

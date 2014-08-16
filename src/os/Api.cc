@@ -27,6 +27,7 @@
 #include "common/EnumIterator.hh"
 #include "common/EnumSet.hh"
 #include "common/ErrnoHelper.hh"
+#include "common/TypeTag.hh"
 #include "common/Variant.hh"
 #include "helpermacros.h"
 #include "os/capi.h"
@@ -41,6 +42,7 @@
 #include "os/signaling/SignalNumberSet.hh"
 
 using sesh::common::EnumSet;
+using sesh::common::TypeTag;
 using sesh::common::Variant;
 using sesh::common::enumerators;
 using sesh::common::errnoCode;
@@ -191,13 +193,13 @@ void convert(const SignalAction &from, struct sesh_osapi_signal_action &to) {
 void convert(const struct sesh_osapi_signal_action &from, SignalAction &to) {
     switch (from.type) {
     case SESH_OSAPI_SIG_DFL:
-        to.emplace<Api::Default>();
+        to.emplace(TypeTag<Api::Default>());
         break;
     case SESH_OSAPI_SIG_IGN:
-        to.emplace<Api::Ignore>();
+        to.emplace(TypeTag<Api::Ignore>());
         break;
     case SESH_OSAPI_SIG_HANDLER:
-        to.emplace<sesh_osapi_signal_handler *>(from.handler);
+        to.emplace(TypeTag<sesh_osapi_signal_handler *>(), from.handler);
         break;
     }
 }

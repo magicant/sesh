@@ -103,7 +103,7 @@ public:
             mInput.template emplaceWithFallback<Try, Empty>(
                     std::forward<Arg>(arg)...);
         } catch (...) {
-            mInput.template emplace<Try>(std::current_exception());
+            mInput.emplace(common::TypeTag<Try>(), std::current_exception());
         }
 
         fireIfReady();
@@ -182,8 +182,8 @@ public:
                     std::move(to->mOutput.template value<Callback>()));
 
         // Connect
-        to->mInput.template emplace<ForwardSource>(from);
-        from->mOutput.template emplace<ForwardTarget>(std::move(to));
+        to->mInput.emplace(common::TypeTag<ForwardSource>(), from);
+        from->mOutput.emplace(common::TypeTag<ForwardTarget>(), std::move(to));
     }
 
 }; // template<typename T> class Delay

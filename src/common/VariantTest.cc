@@ -542,11 +542,11 @@ TEST_CASE("Double variant emplacement") {
         Variant<int, Stub> v(TypeTag<int>(), 1);
         CHECK(v.value<int>() == 1);
 
-        CHECK_NOTHROW(v.emplace<Stub>(actions));
+        CHECK_NOTHROW(v.emplace(TypeTag<Stub>(), actions));
         CHECK(v.tag() == v.tag<Stub>());
         CHECK(actions.size() == 1);
 
-        CHECK_NOTHROW(v.emplace<int>(2));
+        CHECK_NOTHROW(v.emplace(2));
         REQUIRE(v.tag() == v.tag<int>());
         CHECK(v.value<int>() == 2);
         CHECK(actions.size() == 2);
