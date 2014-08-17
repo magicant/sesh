@@ -154,6 +154,15 @@ TEST_CASE("Single variant construction & destruction") {
             Variant<int>::IS_NOTHROW_DESTRUCTIBLE,
             "int is no-throw destructible");
 
+    auto throwing = []() noexcept(false) { return 0; };
+    auto nonthrowing = []() noexcept(true) { return 0; };
+    static_assert(
+            !noexcept(Variant<int>(FUNCTIONAL_INITIALIZE, throwing)),
+            "functional initialize propagates noexcept(false)");
+    static_assert(
+            noexcept(Variant<int>(FUNCTIONAL_INITIALIZE, nonthrowing)),
+            "functional initialize propagates noexcept(true)");
+
     std::vector<Action> actions;
     Variant<Stub>(TypeTag<Stub>(), actions);
     CHECK(actions.size() == 2);
@@ -208,6 +217,15 @@ TEST_CASE("Double variant construction & destruction") {
     static_assert(
             Variant<A, B>::IS_NOTHROW_DESTRUCTIBLE,
             "A and B are no-throw destructible");
+
+    auto throwing = []() noexcept(false) { return 0; };
+    auto nonthrowing = []() noexcept(true) { return 0.0; };
+    static_assert(
+            !noexcept(Variant<int, double>(FUNCTIONAL_INITIALIZE, throwing)),
+            "functional initialize propagates noexcept(false)");
+    static_assert(
+            noexcept(Variant<int, double>(FUNCTIONAL_INITIALIZE, nonthrowing)),
+            "functional initialize propagates noexcept(true)");
 }
 
 //TEST_CASE("Double variant throwing constructor") {

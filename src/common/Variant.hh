@@ -190,9 +190,9 @@ public:
     template<typename F>
     // constexpr XXX C++11 7.1.5.4
     explicit Union(FunctionalInitialize, TypeTag<Head>, F &&f)
-            /*noexcept(noexcept(std::declval<F>()()) &&
+            noexcept(noexcept(std::declval<F>()()) &&
                     std::is_nothrow_constructible<
-                        Head, typename std::result_of<F()>::type>::value)*/ :
+                        Head, typename std::result_of<F()>::type>::value) :
             mHead(std::forward<F>(f)()) { }
 
     /**
@@ -491,7 +491,9 @@ public:
      * @param f the function that constructs the new contained value.
      */
     template<typename U, typename F>
-    VariantBase(FunctionalInitialize fi, TypeTag<U> tag, F &&f) :
+    VariantBase(FunctionalInitialize fi, TypeTag<U> tag, F &&f)
+            noexcept(std::is_nothrow_constructible<
+                    Value, FunctionalInitialize, TypeTag<U>, F &&>::value) :
             Tag(tag), mValue(fi, tag, std::forward<F>(f)) { }
 
     /**
@@ -510,7 +512,9 @@ public:
             typename F,
             typename U = typename std::decay<
                     typename std::result_of<F()>::type>::type>
-    VariantBase(FunctionalInitialize fi, F &&f) :
+    VariantBase(FunctionalInitialize fi, F &&f)
+            noexcept(std::is_nothrow_constructible<
+                VariantBase, FunctionalInitialize, TypeTag<U>, F &&>::value) :
             VariantBase(fi, TypeTag<U>(), std::forward<F>(f)) { }
 
     /**
