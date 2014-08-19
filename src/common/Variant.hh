@@ -712,14 +712,13 @@ public:
 private:
 
     /**
-     * Re-constructs this variant by forwarding the argument to the applicable
-     * constructor of <code>U</code>. This function assumes the constructor
-     * never throws. If the constructor did throw something at runtime,
-     * std::terminate is called.
+     * Re-constructs this variant by forwarding the argument to the
+     * constructor. This function assumes the constructor never throws. If the
+     * constructor did throw something at runtime, std::terminate is called.
      */
-    template<typename U, typename... Arg>
+    template<typename... Arg>
     void reconstructOrTerminate(Arg &&... arg) noexcept {
-        new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
+        new (this) VariantBase(std::forward<Arg>(arg)...);
     }
 
 public:
@@ -761,7 +760,7 @@ public:
             this->~VariantBase();
             new (this) VariantBase(std::forward<Arg>(arg)...);
         } catch (...) {
-            reconstructOrTerminate<Fallback>();
+            reconstructOrTerminate(TypeTag<Fallback>());
             throw;
         }
     }
