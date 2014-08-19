@@ -100,8 +100,8 @@ public:
                     std::forward<Arg>(arg)...);
 
         try {
-            mInput.template emplaceWithFallback<Try, Empty>(
-                    std::forward<Arg>(arg)...);
+            mInput.template emplaceWithFallback<Empty>(
+                    common::TypeTag<Try>(), std::forward<Arg>(arg)...);
         } catch (...) {
             mInput.emplace(common::TypeTag<Try>(), std::current_exception());
         }
@@ -128,7 +128,7 @@ public:
             return;
         }
 
-        mOutput.template emplaceWithFallback<Callback, Empty>(std::move(f));
+        mOutput.template emplaceWithFallback<Empty>(std::move(f));
 
         fireIfReady();
     }

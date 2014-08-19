@@ -745,7 +745,7 @@ public:
 
     /**
      * Destructs the currently contained value and creates a new contained
-     * value by calling the constructor of type <code>U</code> with the given
+     * value by calling the constructor of this variant again with the given
      * arguments.
      *
      * If the destructor or constructor threw something, the default
@@ -753,13 +753,13 @@ public:
      * exception is re-thrown. If the <code>Fallback</code> default constructor
      * threw again, std::terminate is called.
      */
-    template<typename U, typename Fallback, typename... Arg>
+    template<typename Fallback, typename... Arg>
     void emplaceWithFallback(Arg &&... arg)
             noexcept(IS_NOTHROW_DESTRUCTIBLE &&
-                    std::is_nothrow_constructible<U, Arg &&...>::value) {
+                std::is_nothrow_constructible<VariantBase, Arg &&...>::value) {
         try {
             this->~VariantBase();
-            new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
+            new (this) VariantBase(std::forward<Arg>(arg)...);
         } catch (...) {
             reconstructOrTerminate<Fallback>();
             throw;

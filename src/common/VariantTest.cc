@@ -576,14 +576,12 @@ TEST_CASE("Double variant emplacement") {
 
 TEST_CASE("Double variant emplacement with fallback") {
     Variant<int, MoveThrows> v(TypeTag<int>(), 1);
-    CHECK_NOTHROW((v.emplaceWithFallback<MoveThrows, int>()));
+    CHECK_NOTHROW(v.emplaceWithFallback<int>(TypeTag<MoveThrows>()));
     CHECK(v.tag() == v.tag<MoveThrows>());
-    CHECK_NOTHROW((v.emplaceWithFallback<int, int>(2)));
+    CHECK_NOTHROW(v.emplaceWithFallback<int>(2));
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 2);
-    CHECK_THROWS_AS(
-            (v.emplaceWithFallback<MoveThrows, int>(MoveThrows())),
-            Exception);
+    CHECK_THROWS_AS(v.emplaceWithFallback<int>(MoveThrows()), Exception);
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 0);
 }
