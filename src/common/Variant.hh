@@ -936,11 +936,6 @@ private:
 
     using Base = VariantBase<T...>;
 
-    static_assert(Base::IS_NOTHROW_MOVE_CONSTRUCTIBLE,
-            "Variable assignment requires no-throw move");
-    static_assert(Base::IS_NOTHROW_DESTRUCTIBLE,
-            "Variable assignment requires no-throw destructor");
-
 public:
 
     using Base::Base;
@@ -956,22 +951,22 @@ public:
      * the old value is destructed and the new value is copy-constructed.
      *
      * If the copy constructor for the new value may throw, a temporary copy of
-     * the old value is move-constructed before the destruction so that, if the
-     * constructor for the new value throws, we can restore the variant to the
-     * original value. The move constructor may not throw in this case.
+     * the old value is move- or copy-constructed before the destruction so
+     * that, if the constructor for the new value throws, we can restore the
+     * variant to the original value.
      *
-     * Propagates any exception thrown by the assignment operator or the copy
+     * Propagates any exception thrown by the assignment operator or move/copy
      * constructor.
      *
-     * Requirements: All the contained types must be copy-constructible,
-     * no-throw move-constructible, copy-assignable, and no-throw destructible.
+     * Requirements: All the contained types must be copy-constructible and
+     * copy-assignable.
      */
     AssignableVariant &operator=(const AssignableVariant &v)
             noexcept(Base::IS_NOTHROW_COPY_ASSIGNABLE) {
         if (this->tag() == v.tag())
             v.apply(assigner(this->value()));
         else
-            this->emplace(v);
+            this->emplaceWithBackup(v);
         return *this;
     }
 
@@ -983,17 +978,23 @@ public:
      * Otherwise, the old value is destructed and the new value is
      * move- (or copy-) constructed.
      *
-     * Propagates any exception thrown by the assignment operator.
+     * If the move constructor for the new value may throw, a temporary copy of
+     * the old value is move- or copy-constructed before the destruction so
+     * that, if the constructor for the new value throws, we can restore the
+     * variant to the original value.
      *
-     * Requirements: All the contained types must be no-throw
-     * move-constructible, move-assignable, and no-throw destructible.
+     * Propagates any exception thrown by the assignment operator or move/copy
+     * constructor.
+     *
+     * Requirements: All the contained types must be move-constructible and
+     * move-assignable.
      */
     AssignableVariant &operator=(AssignableVariant &&v)
             noexcept(Base::IS_NOTHROW_MOVE_ASSIGNABLE) {
         if (this->tag() == v.tag())
             std::move(v).apply(assigner(this->value()));
         else
-            this->emplace(std::move(v));
+            this->emplaceWithBackup(std::move(v));
         return *this;
     };
 
@@ -1063,11 +1064,12 @@ public:
      */
     template<typename... U>
     Variant &operator=(const Variant<U...> &v)
-            noexcept(Variant<U...>::IS_NOTHROW_COPY_ASSIGNABLE) {
+            noexcept(Variant<U...>::IS_NOTHROW_COPY_ASSIGNABLE &&
+                    Variant::IS_NOTHROW_MOVE_CONSTRUCTIBLE) {
         if (this->tag() == typename Base::Tag(v.tag()))
             v.apply(assigner(this->value()));
         else
-            this->emplace(static_cast<const VariantBase<U...> &>(v));
+            this->emplaceWithBackup(static_cast<const VariantBase<U...> &>(v));
         return *this;
     }
 
@@ -1085,11 +1087,12 @@ public:
      */
     template<typename... U>
     Variant &operator=(Variant<U...> &&v)
-            noexcept(Variant<U...>::IS_NOTHROW_MOVE_ASSIGNABLE) {
+            noexcept(Variant<U...>::IS_NOTHROW_MOVE_ASSIGNABLE &&
+                    Variant::IS_NOTHROW_MOVE_CONSTRUCTIBLE) {
         if (this->tag() == typename Base::Tag(v.tag()))
             std::move(v).apply(assigner(this->value()));
         else
-            this->emplace(static_cast<VariantBase<U...> &&>(v));
+            this->emplaceWithBackup(static_cast<VariantBase<U...> &&>(v));
         return *this;
     }
 
