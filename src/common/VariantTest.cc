@@ -115,10 +115,9 @@ struct MoveMayThrow {
 };
 struct MoveThrows {
     MoveThrows() = default;
-    MoveThrows(const MoveThrows &) = default;
-    MoveThrows(MoveThrows &&) { throw Exception(); }
+    MoveThrows(const MoveThrows &) { throw Exception(); }
+    // Throwing copy implies throwing move.
     MoveThrows &operator=(const MoveThrows &) = default;
-    MoveThrows &operator=(MoveThrows &&) = default;
 };
 struct NonMovable {
     NonMovable() = default;
@@ -584,6 +583,37 @@ TEST_CASE("Double variant emplacement with fallback") {
     CHECK_THROWS_AS(v.emplaceWithFallback<int>(MoveThrows()), Exception);
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 0);
+}
+
+TEST_CASE("Double variant emplacement with backup, without actual backup") {
+    Variant<int, double> v = 1.0;
+    static_assert(noexcept(v.emplaceWithBackup(2)), "emplacement is noexcept");
+    v.emplaceWithBackup(2);
+    REQUIRE(v.tag() == v.tag<int>());
+    CHECK(v.value<int>() == 2);
+}
+
+TEST_CASE("Double variant emplacement with backup, with actual backup") {
+    Variant<int, DefaultMayThrow> v = 1;
+    CHECK_NOTHROW(v.emplaceWithBackup(TypeTag<DefaultMayThrow>()));
+    CHECK(v.tag() == v.tag<DefaultMayThrow>());
+}
+
+TEST_CASE("Double variant emplacement with backup; "
+        "exception in new value construction") {
+    Variant<int, DefaultThrows> v = 1;
+    CHECK_THROWS_AS(v.emplaceWithBackup(TypeTag<DefaultThrows>()), Exception);
+    REQUIRE(v.tag() == v.tag<int>());
+    CHECK(v.value<int>() == 1);
+}
+
+TEST_CASE("Double variant emplacement with backup; "
+        "exception in backup construction") {
+    using V = Variant<MoveThrows, DefaultMayThrow>;
+    V v((TypeTag<MoveThrows>()));
+    CHECK_THROWS_AS(
+            v.emplaceWithBackup(TypeTag<DefaultMayThrow>()), Exception);
+    CHECK(v.tag() == v.tag<MoveThrows>());
 }
 
 TEST_CASE("Double variant reset") {

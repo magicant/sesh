@@ -78,6 +78,8 @@ class IsTypeTag : public std::false_type { };
 template<typename T>
 class IsTypeTag<TypeTag<T>> : public std::true_type { };
 
+class MoveIfNoexcept { };
+
 /** Contains the value of a variant. */
 template<typename...>
 union Union;
@@ -261,6 +263,28 @@ public:
 
 };
 
+/** A visitor that constructs a value of a target union. */
+template<typename Union>
+class MoveIfNoexceptConstructor {
+
+private:
+
+    Union &mTarget;
+
+public:
+
+    constexpr explicit MoveIfNoexceptConstructor(Union &target) noexcept :
+            mTarget(target) { }
+
+    template<typename T>
+    void operator()(T &v)
+            noexcept(std::is_nothrow_move_constructible<T>::value) {
+        new (std::addressof(mTarget)) Union(
+                TypeTag<T>(), std::move_if_noexcept(v));
+    }
+
+};
+
 /** A visitor that assigns a value to a target union. */
 template<typename Union>
 class Assigner {
@@ -309,6 +333,12 @@ Applier<Union, Visitor> applier(Union &&u, Visitor &&v) noexcept {
 template<typename Union>
 Constructor<Union> constructor(Union &target) noexcept {
     return Constructor<Union>(target);
+}
+
+template<typename Union>
+MoveIfNoexceptConstructor<Union> moveIfNoexceptConstructor(Union &target)
+        noexcept {
+    return MoveIfNoexceptConstructor<Union>(target);
 }
 
 /** A helper function that constructs an assigner. */
@@ -709,6 +739,27 @@ public:
         std::move(v).apply(constructor(this->value()));
     }
 
+    /**
+     * Widening move-if-noexcept constructor.
+     *
+     * The move (or copy) constructor of the currently contained type in the
+     * argument is used to initialize the value of the new variant. If the
+     * value has a never-throwing move constructor or no copy constructor, the
+     * value is move-constructed. Otherwise, it is copy-constructed.
+     *
+     * Propagates any exception thrown by the constructor.
+     *
+     * @tparam U Types that may be contained in the argument variant. All
+     * <code>U</code>s must be contained in <code>T</code>s and
+     * move-constructible.
+     */
+    template<typename... U>
+    VariantBase(MoveIfNoexcept, VariantBase<U...> &v)
+            noexcept(VariantBase<U...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
+            Tag(v.tag()) {
+        v.apply(moveIfNoexceptConstructor(value()));
+    }
+
 private:
 
     /**
@@ -734,6 +785,7 @@ public:
      * something is thrown at runtime, std::terminate is called.
      *
      * @see #emplaceWithFallback
+     * @see #emplaceWithBackup
      * @see #reset
      */
     template<typename... Arg>
@@ -761,6 +813,55 @@ public:
             new (this) VariantBase(std::forward<Arg>(arg)...);
         } catch (...) {
             reconstructOrTerminate(TypeTag<Fallback>());
+            throw;
+        }
+    }
+
+    /**
+     * Destructs the currently contained value and creates a new contained
+     * value by calling the constructor of this variant again with the given
+     * arguments.
+     *
+     * This overload is selected if the destructor and constructor are
+     * guaranteed never to throw. This overload is equivalent to {@link
+     * #emplace}.
+     */
+    template<typename... Arg>
+    typename std::enable_if<
+            IS_NOTHROW_DESTRUCTIBLE &&
+            std::is_nothrow_constructible<VariantBase, Arg &&...>::value
+    >::type
+    emplaceWithBackup(Arg &&... arg) noexcept {
+        return emplace(std::forward<Arg>(arg)...);
+    }
+
+    /**
+     * Destructs the currently contained value and creates a new contained
+     * value by calling the constructor of this variant again with the given
+     * arguments.
+     *
+     * This overload is selected if the destructor or constructor may throw. In
+     * case they throw something, a temporary backup of the original value is
+     * created before the destruction and construction. If an exception is
+     * thrown from the destructor or constructor, the backup is used to restore
+     * the original value before propagating the exception. If the restoration
+     * again fails with an exception, std::terminate is called. The backup is
+     * created by std::move_if_noexcept.
+     *
+     * Requirements: All the contained types must be move-constructible.
+     */
+    template<typename... Arg>
+    typename std::enable_if<
+            !IS_NOTHROW_DESTRUCTIBLE ||
+            !std::is_nothrow_constructible<VariantBase, Arg &&...>::value
+    >::type
+    emplaceWithBackup(Arg &&... arg) {
+        VariantBase backup(MoveIfNoexcept(), *this);
+        try {
+            this->~VariantBase();
+            new (this) VariantBase(std::forward<Arg>(arg)...);
+        } catch (...) {
+            reconstructOrTerminate(std::move(backup));
             throw;
         }
     }
