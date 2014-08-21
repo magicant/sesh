@@ -250,13 +250,14 @@ private:
 
 public:
 
-    explicit Constructor(Union &target) noexcept : mTarget(target) { }
+    constexpr explicit Constructor(Union &target) noexcept :
+            mTarget(target) { }
 
     template<
             typename T,
             typename V = typename std::remove_const<
                     typename std::remove_reference<T>::type>::type>
-    void operator()(T &&v)
+    void operator()(T &&v) const
             noexcept(std::is_nothrow_constructible<V, T &&>::value) {
         new (std::addressof(mTarget)) Union(TypeTag<V>(), std::forward<T>(v));
     }
@@ -277,7 +278,7 @@ public:
             mTarget(target) { }
 
     template<typename T>
-    void operator()(T &v)
+    void operator()(T &v) const
             noexcept(std::is_nothrow_move_constructible<T>::value) {
         new (std::addressof(mTarget)) Union(
                 TypeTag<T>(), std::move_if_noexcept(v));
@@ -295,13 +296,13 @@ private:
 
 public:
 
-    explicit Assigner(Union &target) noexcept : mTarget(target) { }
+    constexpr explicit Assigner(Union &target) noexcept : mTarget(target) { }
 
     template<
             typename T,
             typename V = typename std::remove_const<
                     typename std::remove_reference<T>::type>::type>
-    void operator()(T &&v)
+    void operator()(T &&v) const
             noexcept(std::is_nothrow_assignable<V, T &&>::value) {
         mTarget.template value<V>() = std::forward<T>(v);
     }
@@ -314,7 +315,8 @@ class Destructor {
 public:
 
     template<typename V>
-    void operator()(V &v) noexcept(std::is_nothrow_destructible<V>::value) {
+    void operator()(V &v) const
+            noexcept(std::is_nothrow_destructible<V>::value) {
         v.~V();
     }
 
@@ -394,10 +396,10 @@ private:
 
 public:
 
-    explicit Swapper(Variant &other) noexcept : mOther(other) { }
+    constexpr explicit Swapper(Variant &other) noexcept : mOther(other) { }
 
     template<typename T>
-    void operator()(T &v) noexcept(IsNothrowSwappable<T>::value) {
+    void operator()(T &v) const noexcept(IsNothrowSwappable<T>::value) {
         swap(v, mOther.template value<T>());
     }
 
