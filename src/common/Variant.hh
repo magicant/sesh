@@ -926,17 +926,89 @@ public:
 
 };
 
+/** A subclass of variant base that defines no move or copy constructor. */
+template<typename... T>
+class UnmovableVariant : public VariantBase<T...> {
+
+public:
+
+    using VariantBase<T...>::VariantBase;
+
+    UnmovableVariant(const UnmovableVariant &) = delete;
+    UnmovableVariant(UnmovableVariant &&) = delete;
+    UnmovableVariant &operator=(const UnmovableVariant &) = delete;
+    UnmovableVariant &operator=(UnmovableVariant &&) = delete;
+
+}; // template<typename... T> class UnmovableVariant
+
+/** A subclass of variant base that defines the move constructor. */
+template<typename... T>
+class MoveConstructibleVariant : public VariantBase<T...> {
+
+public:
+
+    using VariantBase<T...>::VariantBase;
+
+    MoveConstructibleVariant(const MoveConstructibleVariant &) = delete;
+    MoveConstructibleVariant(MoveConstructibleVariant &&) = default;
+    MoveConstructibleVariant &operator=(const MoveConstructibleVariant &) =
+            delete;
+    MoveConstructibleVariant &operator=(MoveConstructibleVariant &&) = delete;
+
+}; // template<typename... T> class MoveConstructibleVariant
+
+/** A subclass of variant base that defines the move and copy constructor. */
+template<typename... T>
+class CopyConstructibleVariant : public VariantBase<T...> {
+
+public:
+
+    using VariantBase<T...>::VariantBase;
+
+    CopyConstructibleVariant(const CopyConstructibleVariant &) = default;
+    CopyConstructibleVariant(CopyConstructibleVariant &&) = default;
+    CopyConstructibleVariant &operator=(const CopyConstructibleVariant &) =
+            delete;
+    CopyConstructibleVariant &operator=(CopyConstructibleVariant &&) = delete;
+
+}; // template<typename... T> class CopyConstructibleVariant
+
 /**
- * A subclass of variant base that re-defines copy and move assignment
- * operators. Actual assignment operators may not be defined if contained types
- * do not have copy/move constructor/assignment operator.
+ * Either unmovable or move-constructible variant class, selected by
+ * move-constructibility of contained types.
  */
 template<typename... T>
-class AssignableVariant : public VariantBase<T...> {
+using ConditionallyMoveConstructibleVariant =
+        typename std::conditional<
+                ForAll<std::is_move_constructible, T...>::value,
+                MoveConstructibleVariant<T...>,
+                UnmovableVariant<T...>
+        >::type;
+
+/**
+ * Either unmovable, move-constructible, or copy-constructible variant class,
+ * selected by move- and copy-constructibility of contained types.
+ */
+template<typename... T>
+using ConditionallyCopyConstructibleVariant =
+        typename std::conditional<
+                ForAll<std::is_copy_constructible, T...>::value,
+                CopyConstructibleVariant<T...>,
+                ConditionallyMoveConstructibleVariant<T...>
+        >::type;
+
+/**
+ * A subclass of conditionally copy-constructible variant that re-defines copy
+ * and move assignment operators. Actual assignment operators may not be
+ * defined if contained types do not have copy/move constructor/assignment
+ * operator.
+ */
+template<typename... T>
+class AssignableVariant : public ConditionallyCopyConstructibleVariant<T...> {
 
 private:
 
-    using Base = VariantBase<T...>;
+    using Base = ConditionallyCopyConstructibleVariant<T...>;
 
 public:
 
@@ -1013,7 +1085,7 @@ using ConditionallyAssignableVariant =
                 VariantBase<T...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE &&
                         VariantBase<T...>::IS_NOTHROW_DESTRUCTIBLE,
                 AssignableVariant<T...>,
-                VariantBase<T...>
+                ConditionallyCopyConstructibleVariant<T...>
         >::type;
 
 /**

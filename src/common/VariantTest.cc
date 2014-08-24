@@ -454,11 +454,9 @@ TEST_CASE("Double variant deleted copy constructor") {
     Variant<int, NonCopyable> v1((TypeTag<NonCopyable>()));
     // Variant<int, NonCopyable> v2(v1);
 
-    // std::is_copy_constructible (wrongly) returns true due to lazy template
-    // specialization.
-//    static_assert(
-//            !std::is_copy_constructible<Variant<int, NonCopyable>>::value,
-//            "NonCopyable has no copy constructor");
+    static_assert(
+            !std::is_copy_constructible<Variant<int, NonCopyable>>::value,
+            "NonCopyable has no copy constructor");
 }
 
 TEST_CASE("Double/quad variant copy construction to supertype") {
@@ -517,11 +515,9 @@ TEST_CASE("Double variant deleted move constructor") {
     Variant<int, NonMovable> v1((TypeTag<NonMovable>()));
     // Variant<int, NonMovable> v2(std::move(v1));
 
-    // std::is_move_constructible (wrongly) returns true due to lazy template
-    // specialization.
-//    static_assert(
-//            !std::is_move_constructible<Variant<int, NonMovable>>::value,
-//            "NonMovable has no move constructor");
+    static_assert(
+            !std::is_move_constructible<Variant<int, NonMovable>>::value,
+            "NonMovable has no move constructor");
 }
 
 TEST_CASE("Double/quad variant move construction to supertype") {
