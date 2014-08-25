@@ -27,6 +27,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "common/CommonResult.hh"
 #include "common/FunctionalInitialize.hh"
 #include "common/TypeTag.hh"
 
@@ -71,36 +72,23 @@ class IsAnyOf<T, Head, Tail...> :
                 std::true_type,
                 IsAnyOf<T, Tail...>>::type { };
 
-/** Integral type that identifies the type of the active value of a variant. */
-using Index = unsigned;
+template<typename T>
+class IsTypeTag : public std::false_type { };
+
+template<typename T>
+class IsTypeTag<TypeTag<T>> : public std::true_type { };
+
+class MoveIfNoexcept { };
 
 /** Contains the value of a variant. */
-template<Index, typename...>
+template<typename...>
 union Union;
 
-template<Index headIndex>
-union Union<headIndex> {
+template<>
+union Union<> { };
 
-public:
-
-    /** Must never be called. */
-    template<Index, typename...>
-    constexpr static Index convertIndex(Index i) noexcept {
-        // assert(false); not allowed in constexpr function
-        return i;
-    }
-
-    /** Must never be called. */
-    template<typename Visitor, typename Result>
-    Result apply(Index, Visitor &&) const noexcept {
-        assert(false);
-        throw nullptr;
-    }
-
-};
-
-template<Index headIndex, typename Head, typename... Tail>
-union Union<headIndex, Head, Tail...> {
+template<typename Head, typename... Tail>
+union Union<Head, Tail...> {
 
     static_assert(
             std::is_same<Head, typename std::decay<Head>::type>::value,
@@ -108,41 +96,12 @@ union Union<headIndex, Head, Tail...> {
 
 private:
 
-    using TailUnion = Union<headIndex + 1u, Tail...>;
+    using TailUnion = Union<Tail...>;
 
     Head mHead;
     TailUnion mTail;
 
 public:
-
-    /** Returns the index of type <code>U</code>. */
-    template<typename U>
-    constexpr static
-    typename std::enable_if<std::is_same<U, Head>::value, Index>::type
-    index() noexcept {
-        return headIndex;
-    }
-
-    /** Returns the index for the template parameter type. */
-    template<typename U>
-    constexpr static
-    typename std::enable_if<!std::is_same<U, Head>::value, Index>::type
-    index() noexcept {
-        return TailUnion::template index<U>();
-    }
-
-    /**
-     * Converts the type index for this union into the index of the same type
-     * in <code>Variant&lt;U...></code>. All the types that may be contained in
-     * this union (<code>T...</code>) must be included in the template
-     * parameter types (<code>U...</code>).
-     */
-    template<Index i, typename... U>
-    constexpr static Index convertIndex(Index index) noexcept {
-        return (index == headIndex) ?
-                Union<i, U...>::template index<Head>() :
-                TailUnion::template convertIndex<i, U...>(index);
-    }
 
     /** The constructor does nothing. */
     Union() noexcept { }
@@ -169,109 +128,117 @@ public:
     /** Returns a reference to the value of type <code>U</code>. */
     template<typename U>
     typename std::enable_if<std::is_same<U, Head>::value, U &>::type
-    value() noexcept {
+    value() & noexcept {
         return mHead;
     }
 
     /** Returns a reference to the value of type <code>U</code>. */
     template<typename U>
     typename std::enable_if<std::is_same<U, Head>::value, const U &>::type
-    value() const noexcept {
+    value() const & noexcept {
         return mHead;
     }
 
     /** Returns a reference to the value of type <code>U</code>. */
     template<typename U>
+    typename std::enable_if<std::is_same<U, Head>::value, U &&>::type
+    value() && noexcept {
+        return std::move(mHead);
+    }
+
+    /** Returns a reference to the value of type <code>U</code>. */
+    template<typename U>
     typename std::enable_if<!std::is_same<U, Head>::value, U &>::type
-    value() noexcept {
+    value() & noexcept {
         return mTail.template value<U>();
     }
 
     /** Returns a reference to the value of type <code>U</code>. */
     template<typename U>
     typename std::enable_if<!std::is_same<U, Head>::value, const U &>::type
-    value() const noexcept {
+    value() const & noexcept {
         return mTail.template value<U>();
     }
 
+    /** Returns a reference to the value of type <code>U</code>. */
+    template<typename U>
+    typename std::enable_if<!std::is_same<U, Head>::value, U &&>::type
+    value() && noexcept {
+        return std::move(mTail).template value<U>();
+    }
+
+    /**
+     * Constructs the value of type <code>Head</code> using the given arguments.
+     */
+    template<typename... Arg>
+    // constexpr XXX C++11 7.1.5.4
+    explicit Union(TypeTag<Head>, Arg &&... arg)
+            noexcept(std::is_nothrow_constructible<Head, Arg...>::value) :
+            mHead(std::forward<Arg>(arg)...) { }
+
     /**
      * Constructs the value of type <code>U</code> using the given arguments.
-     * This function must not be called when a value of this union has already
-     * been constructed for some type.
      */
     template<typename U, typename... Arg>
-    void construct(Arg &&... arg)
-            noexcept(std::is_nothrow_constructible<U, Arg...>::value) {
-        new (std::addressof(value<U>())) U(std::forward<Arg>(arg)...);
-    }
+    // constexpr XXX C++11 7.1.5.4
+    explicit Union(TypeTag<U> tag, Arg &&... arg)
+            noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
+            mTail(tag, std::forward<Arg>(arg)...) { }
+
+    /**
+     * Constructs the value by move-constructing the result of the argument
+     * function, which must return (a reference to) an object of type Head.
+     */
+    template<typename F>
+    // constexpr XXX C++11 7.1.5.4
+    explicit Union(FunctionalInitialize, TypeTag<Head>, F &&f)
+            noexcept(noexcept(std::declval<F>()()) &&
+                    std::is_nothrow_constructible<
+                        Head, typename std::result_of<F()>::type>::value) :
+            mHead(std::forward<F>(f)()) { }
 
     /**
      * Constructs the value by move-constructing the result of the argument
      * function, which must return (a reference to) a value of one of the types
-     * that may be contained in this union. This function must not be called
-     * when a value of this union has already been constructed for some type.
+     * that may be contained in this union.
      */
-    template<typename F, typename U>
-    void constructFrom(F &&f) {
-        new (std::addressof(value<U>())) U(std::forward<F>(f)());
-    }
-
-    /**
-     * Calls the argument visitor's () operator with the value of the argument
-     * index. The value is passed by l-value reference to the () operator.
-     */
-    template<typename Visitor, typename Result>
-    Result apply(Index index, Visitor &&visitor) &
-            noexcept(noexcept(
-                    index == headIndex ?
-                    std::forward<Visitor>(visitor)(mHead) :
-                    mTail.template apply<Visitor, Result>(
-                            index, std::forward<Visitor>(visitor)))) {
-        if (index == headIndex)
-            return std::forward<Visitor>(visitor)(mHead);
-        else
-            return mTail.template apply<Visitor, Result>(
-                    index, std::forward<Visitor>(visitor));
-    }
-
-    /**
-     * Calls the argument visitor's () operator with the value of the argument
-     * index. The value is passed by const l-value reference to the ()
-     * operator.
-     */
-    template<typename Visitor, typename Result>
-    Result apply(Index index, Visitor &&visitor) const &
-            noexcept(noexcept(
-                    index == headIndex ?
-                    std::forward<Visitor>(visitor)(mHead) :
-                    mTail.template apply<Visitor, Result>(
-                            index, std::forward<Visitor>(visitor)))) {
-        if (index == headIndex)
-            return std::forward<Visitor>(visitor)(mHead);
-        else
-            return mTail.template apply<Visitor, Result>(
-                    index, std::forward<Visitor>(visitor));
-    }
-
-    /**
-     * Calls the argument visitor's () operator with the value of the argument
-     * index. The value is passed by r-value reference to the () operator.
-     */
-    template<typename Visitor, typename Result>
-    Result apply(Index index, Visitor &&visitor) &&
-            noexcept(noexcept(
-                    index == headIndex ?
-                    std::forward<Visitor>(visitor)(std::move(mHead)) :
-                    std::move(mTail).template apply<Visitor, Result>(
-                            index, std::forward<Visitor>(visitor)))) {
-        if (index == headIndex)
-            return std::forward<Visitor>(visitor)(std::move(mHead));
-        else
-            return std::move(mTail).template apply<Visitor, Result>(
-                    index, std::forward<Visitor>(visitor));
-    }
+    template<typename U, typename F>
+    // constexpr XXX C++11 7.1.5.4
+    explicit Union(FunctionalInitialize fi, TypeTag<U> tag, F &&f)
+            noexcept(std::is_nothrow_constructible<
+                TailUnion, FunctionalInitialize, TypeTag<U>, F &&>::value) :
+            mTail(fi, tag, std::forward<F>(f)) { }
 
 };
+
+template<typename T, typename U>
+using CopyReference = typename std::conditional<
+        std::is_lvalue_reference<T>::value, U &, U &&>::type;
+
+/** A visitor on the type tag which forwards to a visitor on the variant. */
+template<typename Union, typename Visitor>
+class Applier {
+
+private:
+
+    Union &&mTarget;
+    Visitor &&mVisitor;
+
+public:
+
+    constexpr explicit Applier(Union &&target, Visitor &&visitor) noexcept :
+            mTarget(std::forward<Union>(target)),
+            mVisitor(std::forward<Visitor>(visitor)) { }
+
+    template<typename T, typename R = CopyReference<Union, T>>
+    constexpr auto operator()(TypeTag<T>) const
+            noexcept(noexcept(std::declval<Visitor>()(std::declval<R>())))
+            -> typename std::result_of<Visitor(R)>::type {
+        return std::forward<Visitor>(mVisitor)(
+                std::forward<Union>(mTarget).template value<T>());
+    }
+
+}; // template<typename Union> class Applier
 
 /** A visitor that constructs a value of a target union. */
 template<typename Union>
@@ -283,17 +250,38 @@ private:
 
 public:
 
-    explicit Constructor(Union &target) noexcept : mTarget(target) { }
-
-    using Result = void;
+    constexpr explicit Constructor(Union &target) noexcept :
+            mTarget(target) { }
 
     template<
             typename T,
             typename V = typename std::remove_const<
                     typename std::remove_reference<T>::type>::type>
-    void operator()(T &&v)
+    void operator()(T &&v) const
             noexcept(std::is_nothrow_constructible<V, T &&>::value) {
-        mTarget.template construct<V>(std::forward<T>(v));
+        new (std::addressof(mTarget)) Union(TypeTag<V>(), std::forward<T>(v));
+    }
+
+};
+
+/** A visitor that constructs a value of a target union. */
+template<typename Union>
+class MoveIfNoexceptConstructor {
+
+private:
+
+    Union &mTarget;
+
+public:
+
+    constexpr explicit MoveIfNoexceptConstructor(Union &target) noexcept :
+            mTarget(target) { }
+
+    template<typename T>
+    void operator()(T &v) const
+            noexcept(std::is_nothrow_move_constructible<T>::value) {
+        new (std::addressof(mTarget)) Union(
+                TypeTag<T>(), std::move_if_noexcept(v));
     }
 
 };
@@ -308,15 +296,13 @@ private:
 
 public:
 
-    explicit Assigner(Union &target) noexcept : mTarget(target) { }
-
-    using Result = void;
+    constexpr explicit Assigner(Union &target) noexcept : mTarget(target) { }
 
     template<
             typename T,
             typename V = typename std::remove_const<
                     typename std::remove_reference<T>::type>::type>
-    void operator()(T &&v)
+    void operator()(T &&v) const
             noexcept(std::is_nothrow_assignable<V, T &&>::value) {
         mTarget.template value<V>() = std::forward<T>(v);
     }
@@ -328,42 +314,22 @@ class Destructor {
 
 public:
 
-    using Result = void;
-
     template<typename V>
-    void operator()(V &v) noexcept(std::is_nothrow_destructible<V>::value) {
+    void operator()(V &v) const
+            noexcept(std::is_nothrow_destructible<V>::value) {
         v.~V();
     }
 
 };
 
-/** A visitor that emplaces the target variant. */
-template<typename Variant>
-class Emplacer {
-
-private:
-
-    Variant &mTarget;
-
-public:
-
-    explicit Emplacer(Variant &target) noexcept : mTarget(target) { }
-
-    using Result = void;
-
-    template<
-            typename T,
-            typename V = typename std::remove_const<
-                    typename std::remove_reference<T>::type>::type>
-    void operator()(T &&v)
-            noexcept(noexcept(std::declval<Variant>().template emplace<V>(
-                    std::forward<T>(v)))) {
-        mTarget.template emplace<V>(std::forward<T>(v));
-    }
-
-};
-
 namespace {
+
+/** A helper function that constructs an applier. */
+template<typename Union, typename Visitor>
+Applier<Union, Visitor> applier(Union &&u, Visitor &&v) noexcept {
+    return Applier<Union, Visitor>(
+            std::forward<Union>(u), std::forward<Visitor>(v));
+}
 
 /** A helper function that constructs a constructor. */
 template<typename Union>
@@ -371,16 +337,16 @@ Constructor<Union> constructor(Union &target) noexcept {
     return Constructor<Union>(target);
 }
 
+template<typename Union>
+MoveIfNoexceptConstructor<Union> moveIfNoexceptConstructor(Union &target)
+        noexcept {
+    return MoveIfNoexceptConstructor<Union>(target);
+}
+
 /** A helper function that constructs an assigner. */
 template<typename Union>
 Assigner<Union> assigner(Union &target) noexcept {
     return Assigner<Union>(target);
-}
-
-/** A helper function that constructs an emplacer. */
-template<typename Variant>
-Emplacer<Variant> emplacer(Variant &variant) noexcept {
-    return Emplacer<Variant>(variant);
 }
 
 } // namespace
@@ -409,27 +375,17 @@ public:
 }; // template<typename T> class IsSwappable
 
 template<typename T, bool = IsSwappable<T>::type::value>
-class IsNothrowSwappableImpl {
-
-public:
-
-    using type = std::false_type;
-
-}; // template<typename, bool> class IsNothrowSwappableImpl
+class IsNothrowSwappableImpl : public std::false_type { };
 
 template<typename T>
-class IsNothrowSwappableImpl<T, true> {
-
-public:
-
-    using type = std::integral_constant<
+class IsNothrowSwappableImpl<T, true> :
+    public std::integral_constant<
             bool,
-            noexcept(swap(std::declval<T &>(), std::declval<T &>()))>;
-
-}; // template<typename T> class IsNothrowSwappableImpl<T, true>
+            noexcept(swap(std::declval<T &>(), std::declval<T &>()))> {
+};
 
 template<typename T>
-using IsNothrowSwappable = typename IsNothrowSwappableImpl<T>::type;
+using IsNothrowSwappable = IsNothrowSwappableImpl<T>;
 
 template<typename Variant>
 class Swapper {
@@ -440,12 +396,10 @@ private:
 
 public:
 
-    explicit Swapper(Variant &other) noexcept : mOther(other) { }
-
-    using Result = void;
+    constexpr explicit Swapper(Variant &other) noexcept : mOther(other) { }
 
     template<typename T>
-    void operator()(T &v) noexcept(IsNothrowSwappable<T>::value) {
+    void operator()(T &v) const noexcept(IsNothrowSwappable<T>::value) {
         swap(v, mOther.template value<T>());
     }
 
@@ -455,14 +409,25 @@ public:
 
 /** Fundamental implementation of variant. */
 template<typename... T>
-class VariantBase {
+class VariantBase : private TypeTag<T...> {
+
+    /*
+     * The type tag sub-object is contained as a base class object rather than
+     * a non-static data member to allow empty base optimization.
+     */
+
+public:
+
+    /**
+     * The type of the type tag which specifies the type of the contained
+     * value.
+     */
+    using Tag = TypeTag<T...>;
 
 private:
 
-    constexpr static Index INDEX_BASE = 0u;
-    using Value = Union<INDEX_BASE, T...>;
+    using Value = Union<T...>;
 
-    Index mIndex;
     Value mValue;
 
 protected:
@@ -497,26 +462,15 @@ public:
 
     /** Returns the integral value that identifies the parameter type. */
     template<typename U>
-    constexpr static Index index() noexcept {
-        return Value::template index<U>();
+    constexpr static Tag tag() noexcept {
+        return TypeTag<U>();
     }
 
     /**
      * Returns an integral value that identifies the type of the currently
      * contained value.
      */
-    Index index() const noexcept { return mIndex; }
-
-    /**
-     * Converts the index of the currently contained type in this variant into
-     * the index of the same type in <code>Variant&lt;U...></code>. All the
-     * types that may be contained in this variant (<code>T...</code>) must be
-     * included in the template parameter types (<code>U...</code>).
-     */
-    template<typename... U>
-    Index convertIndex() const noexcept {
-        return Value::template convertIndex<INDEX_BASE, U...>(index());
-    }
+    Tag tag() const noexcept { return *this; }
 
     /**
      * Creates a new variant by constructing its contained value by calling the
@@ -527,14 +481,13 @@ public:
      * @tparam U the type of the new contained value to be constructed.
      *     (inferred from the type of type tag argument.)
      * @tparam Arg the type of the constructor's arguments.
+     * @param tag a dummy object to select the type of the contained value.
      * @param arg the arguments forwarded to the constructor.
      */
     template<typename U, typename... Arg>
-    explicit VariantBase(TypeTag<U>, Arg &&... arg)
+    explicit VariantBase(TypeTag<U> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
-            mIndex(index<U>()) {
-        value().template construct<U>(std::forward<Arg>(arg)...);
-    }
+            Tag(tag), mValue(tag, std::forward<Arg>(arg)...) { }
 
     /**
      * Creates a new variant by copy- or move-constructing its contained value
@@ -544,13 +497,15 @@ public:
      *
      * @tparam U the argument type.
      * @tparam V the type of the new contained value to be constructed.
-     *     (inferred from the argument type.)
+     *     Inferred from the argument type. If V is a specialization of
+     *     TypeTag, this constructor overload cannot be used.
      * @param v the argument forwarded to the constructor.
      */
     template<
             typename U,
             typename V = typename std::decay<U>::type,
-            typename = typename std::enable_if<IsAnyOf<V, T...>::value>::type>
+            typename = typename std::enable_if<IsAnyOf<V, T...>::value>::type,
+            typename = typename std::enable_if<!IsTypeTag<V>::value>::type>
     VariantBase(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
             VariantBase(TypeTag<V>(), std::forward<U>(v)) { }
@@ -561,18 +516,38 @@ public:
      *
      * Throws any exception thrown by the argument function or constructor.
      *
+     * @tparam U the type of the new contained value to be constructed.
+     * @tparam F the type of the function argument.
+     * @param fi a dummy argument to disambiguate overload resolution.
+     * @param tag a dummy object to select the type of the contained value.
+     * @param f the function that constructs the new contained value.
+     */
+    template<typename U, typename F>
+    VariantBase(FunctionalInitialize fi, TypeTag<U> tag, F &&f)
+            noexcept(std::is_nothrow_constructible<
+                    Value, FunctionalInitialize, TypeTag<U>, F &&>::value) :
+            Tag(tag), mValue(fi, tag, std::forward<F>(f)) { }
+
+    /**
+     * Creates a new variant by move-constructing its contained value from the
+     * result of calling the argument function.
+     *
+     * Throws any exception thrown by the argument function or constructor.
+     *
      * @tparam F the type of the function argument.
      * @tparam U the type of the new contained value to be constructed.
      *     (inferred from the return type of the argument function.)
+     * @param fi a dummy argument for overload resolution disambiguation.
      * @param f the function that constructs the new contained value.
      */
     template<
             typename F,
             typename U = typename std::decay<
                     typename std::result_of<F()>::type>::type>
-    VariantBase(FunctionalInitialize, F &&f) : mIndex(index<U>()) {
-        value().template constructFrom<F, U>(std::forward<F>(f));
-    }
+    VariantBase(FunctionalInitialize fi, F &&f)
+            noexcept(std::is_nothrow_constructible<
+                VariantBase, FunctionalInitialize, TypeTag<U>, F &&>::value) :
+            VariantBase(fi, TypeTag<U>(), std::forward<F>(f)) { }
 
     /**
      * Returns a reference to the value of the template parameter type.
@@ -583,7 +558,7 @@ public:
      */
     template<typename U>
     U &value() & noexcept {
-        assert(index() == index<U>());
+        assert(tag() == tag<U>());
         return mValue.template value<U>();
     }
 
@@ -596,7 +571,7 @@ public:
      */
     template<typename U>
     const U &value() const & noexcept {
-        assert(index() == index<U>());
+        assert(tag() == tag<U>());
         return mValue.template value<U>();
     }
 
@@ -609,7 +584,7 @@ public:
      */
     template<typename U>
     U &&value() && noexcept {
-        assert(index() == index<U>());
+        assert(tag() == tag<U>());
         return std::move(mValue.template value<U>());
     }
 
@@ -626,21 +601,15 @@ public:
      * contained value is passed to the () operator in l-value context.
      *
      * @tparam Visitor the type of the argument.
-     * @tparam Result the return type of the () operators.
      * @param visitor an object that has () operators to be called.
      * @return the return value of the () operator.
      */
-    template<
-            typename Visitor,
-            typename Result =
-                    typename std::remove_reference<Visitor>::type::Result>
-    Result apply(Visitor &&visitor) &
-            noexcept(noexcept(
-                std::declval<Value &>().template apply<Visitor, Result>(
-                    std::declval<Index>(),
-                    std::forward<Visitor>(visitor)))) {
-        return value().template apply<Visitor, Result>(
-                index(), std::forward<Visitor>(visitor));
+    template<typename Visitor>
+    auto apply(Visitor &&visitor) &
+            noexcept(noexcept(std::declval<Tag &>().apply(
+                    std::declval<Applier<Value &, Visitor>>())))
+            -> typename CommonResult<Visitor, T &...>::type {
+        return Tag::apply(applier(value(), std::forward<Visitor>(visitor)));
     }
 
     /**
@@ -657,21 +626,15 @@ public:
      * l-value context.
      *
      * @tparam Visitor the type of the argument.
-     * @tparam Result the return type of the () operators.
      * @param visitor an object that has () operators to be called.
      * @return the return value of the () operator.
      */
-    template<
-            typename Visitor,
-            typename Result =
-                    typename std::remove_reference<Visitor>::type::Result>
-    Result apply(Visitor &&visitor) const &
-            noexcept(noexcept(
-                std::declval<const Value &>().template apply<Visitor, Result>(
-                    std::declval<Index>(),
-                    std::forward<Visitor>(visitor)))) {
-        return value().template apply<Visitor, Result>(
-                index(), std::forward<Visitor>(visitor));
+    template<typename Visitor>
+    auto apply(Visitor &&visitor) const &
+            noexcept(noexcept(std::declval<const Tag &>().apply(
+                    std::declval<Applier<const Value &, Visitor>>())))
+            -> typename CommonResult<Visitor, const T &...>::type {
+        return Tag::apply(applier(value(), std::forward<Visitor>(visitor)));
     }
 
     /**
@@ -687,21 +650,16 @@ public:
      * contained value is passed to the () operator in r-value context.
      *
      * @tparam Visitor the type of the argument.
-     * @tparam Result the return type of the () operators.
      * @param visitor an object that has () operators to be called.
      * @return the return value of the () operator.
      */
-    template<
-            typename Visitor,
-            typename Result =
-                    typename std::remove_reference<Visitor>::type::Result>
-    Result apply(Visitor &&visitor) &&
-            noexcept(noexcept(
-                std::declval<Value &&>().template apply<Visitor, Result>(
-                    std::declval<Index>(),
-                    std::forward<Visitor>(visitor)))) {
-        return std::move(value()).template apply<Visitor, Result>(
-                index(), std::forward<Visitor>(visitor));
+    template<typename Visitor>
+    auto apply(Visitor &&visitor) &&
+            noexcept(noexcept(std::declval<Tag &>().apply(
+                    std::declval<Applier<Value, Visitor>>())))
+            -> typename CommonResult<Visitor, T &&...>::type {
+        return Tag::apply(applier(
+                    std::move(value()), std::forward<Visitor>(visitor)));
     }
 
     /**
@@ -726,7 +684,7 @@ public:
      * Requirements: All the contained types must be copy-constructible.
      */
     VariantBase(const VariantBase &v) noexcept(IS_NOTHROW_COPY_CONSTRUCTIBLE) :
-            mIndex(v.index()) {
+            Tag(v.tag()) {
         v.apply(constructor(value()));
     }
 
@@ -745,7 +703,7 @@ public:
     template<typename... U>
     VariantBase(const VariantBase<U...> &v)
             noexcept(VariantBase<U...>::IS_NOTHROW_COPY_CONSTRUCTIBLE) :
-            mIndex(v.template convertIndex<T...>()) {
+            Tag(v.tag()) {
         v.apply(constructor(value()));
     }
 
@@ -760,7 +718,7 @@ public:
      * Requirements: All the contained types must be move-constructible.
      */
     VariantBase(VariantBase &&v) noexcept(IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
-            mIndex(v.index()) {
+            Tag(v.tag()) {
         std::move(v).apply(constructor(value()));
     }
 
@@ -779,28 +737,48 @@ public:
     template<typename... U>
     VariantBase(VariantBase<U...> &&v)
             noexcept(VariantBase<U...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
-            mIndex(v.template convertIndex<T...>()) {
+            Tag(v.tag()) {
         std::move(v).apply(constructor(this->value()));
+    }
+
+    /**
+     * Widening move-if-noexcept constructor.
+     *
+     * The move (or copy) constructor of the currently contained type in the
+     * argument is used to initialize the value of the new variant. If the
+     * value has a never-throwing move constructor or no copy constructor, the
+     * value is move-constructed. Otherwise, it is copy-constructed.
+     *
+     * Propagates any exception thrown by the constructor.
+     *
+     * @tparam U Types that may be contained in the argument variant. All
+     * <code>U</code>s must be contained in <code>T</code>s and
+     * move-constructible.
+     */
+    template<typename... U>
+    VariantBase(MoveIfNoexcept, VariantBase<U...> &v)
+            noexcept(VariantBase<U...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE) :
+            Tag(v.tag()) {
+        v.apply(moveIfNoexceptConstructor(value()));
     }
 
 private:
 
     /**
-     * Re-constructs this variant by forwarding the argument to the applicable
-     * constructor of <code>U</code>. This function assumes the constructor
-     * never throws. If the constructor did throw something at runtime,
-     * std::terminate is called.
+     * Re-constructs this variant by forwarding the argument to the
+     * constructor. This function assumes the constructor never throws. If the
+     * constructor did throw something at runtime, std::terminate is called.
      */
-    template<typename U, typename... Arg>
+    template<typename... Arg>
     void reconstructOrTerminate(Arg &&... arg) noexcept {
-        new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
+        new (this) VariantBase(std::forward<Arg>(arg)...);
     }
 
 public:
 
     /**
      * Destructs the currently contained value and creates a new contained
-     * value by calling the constructor of type <code>U</code> with the given
+     * value by calling the constructor of this variant again with the given
      * arguments.
      *
      * To ensure that a valid object is contained after return from this
@@ -809,17 +787,18 @@ public:
      * something is thrown at runtime, std::terminate is called.
      *
      * @see #emplaceWithFallback
+     * @see #emplaceWithBackup
      * @see #reset
      */
-    template<typename U, typename... Arg>
+    template<typename... Arg>
     void emplace(Arg &&... arg) noexcept {
         this->~VariantBase();
-        new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
+        new (this) VariantBase(std::forward<Arg>(arg)...);
     }
 
     /**
      * Destructs the currently contained value and creates a new contained
-     * value by calling the constructor of type <code>U</code> with the given
+     * value by calling the constructor of this variant again with the given
      * arguments.
      *
      * If the destructor or constructor threw something, the default
@@ -827,15 +806,64 @@ public:
      * exception is re-thrown. If the <code>Fallback</code> default constructor
      * threw again, std::terminate is called.
      */
-    template<typename U, typename Fallback, typename... Arg>
+    template<typename Fallback, typename... Arg>
     void emplaceWithFallback(Arg &&... arg)
             noexcept(IS_NOTHROW_DESTRUCTIBLE &&
-                    std::is_nothrow_constructible<U, Arg &&...>::value) {
+                std::is_nothrow_constructible<VariantBase, Arg &&...>::value) {
         try {
             this->~VariantBase();
-            new (this) VariantBase(TypeTag<U>(), std::forward<Arg>(arg)...);
+            new (this) VariantBase(std::forward<Arg>(arg)...);
         } catch (...) {
-            reconstructOrTerminate<Fallback>();
+            reconstructOrTerminate(TypeTag<Fallback>());
+            throw;
+        }
+    }
+
+    /**
+     * Destructs the currently contained value and creates a new contained
+     * value by calling the constructor of this variant again with the given
+     * arguments.
+     *
+     * This overload is selected if the destructor and constructor are
+     * guaranteed never to throw. This overload is equivalent to {@link
+     * #emplace}.
+     */
+    template<typename... Arg>
+    typename std::enable_if<
+            IS_NOTHROW_DESTRUCTIBLE &&
+            std::is_nothrow_constructible<VariantBase, Arg &&...>::value
+    >::type
+    emplaceWithBackup(Arg &&... arg) noexcept {
+        return emplace(std::forward<Arg>(arg)...);
+    }
+
+    /**
+     * Destructs the currently contained value and creates a new contained
+     * value by calling the constructor of this variant again with the given
+     * arguments.
+     *
+     * This overload is selected if the destructor or constructor may throw. In
+     * case they throw something, a temporary backup of the original value is
+     * created before the destruction and construction. If an exception is
+     * thrown from the destructor or constructor, the backup is used to restore
+     * the original value before propagating the exception. If the restoration
+     * again fails with an exception, std::terminate is called. The backup is
+     * created by std::move_if_noexcept.
+     *
+     * Requirements: All the contained types must be move-constructible.
+     */
+    template<typename... Arg>
+    typename std::enable_if<
+            !IS_NOTHROW_DESTRUCTIBLE ||
+            !std::is_nothrow_constructible<VariantBase, Arg &&...>::value
+    >::type
+    emplaceWithBackup(Arg &&... arg) {
+        VariantBase backup(MoveIfNoexcept(), *this);
+        try {
+            this->~VariantBase();
+            new (this) VariantBase(std::forward<Arg>(arg)...);
+        } catch (...) {
+            reconstructOrTerminate(std::move(backup));
             throw;
         }
     }
@@ -856,7 +884,7 @@ public:
      */
     template<typename U, typename V = typename std::decay<U>::type>
     void reset(U &&v) noexcept {
-        emplace<V>(std::forward<U>(v));
+        emplace(TypeTag<V>(), std::forward<U>(v));
     }
 
     /**
@@ -878,10 +906,10 @@ public:
      */
     template<typename U, typename V = typename std::decay<U>::type>
     void assign(U &&v) noexcept(std::is_nothrow_assignable<V, U &&>::value) {
-        if (index() == index<V>())
+        if (tag() == tag<V>())
             value<V>() = std::forward<U>(v);
         else
-            emplace<V>(std::forward<U>(v));
+            reset(std::forward<U>(v));
     }
 
     /**
@@ -898,56 +926,96 @@ public:
 
 };
 
+/** A subclass of variant base that defines no move or copy constructor. */
+template<typename... T>
+class UnmovableVariant : public VariantBase<T...> {
+
+public:
+
+    using VariantBase<T...>::VariantBase;
+
+    UnmovableVariant(const UnmovableVariant &) = delete;
+    UnmovableVariant(UnmovableVariant &&) = delete;
+    UnmovableVariant &operator=(const UnmovableVariant &) = delete;
+    UnmovableVariant &operator=(UnmovableVariant &&) = delete;
+
+}; // template<typename... T> class UnmovableVariant
+
+/** A subclass of variant base that defines the move constructor. */
+template<typename... T>
+class MoveConstructibleVariant : public VariantBase<T...> {
+
+public:
+
+    using VariantBase<T...>::VariantBase;
+
+    MoveConstructibleVariant(const MoveConstructibleVariant &) = delete;
+    MoveConstructibleVariant(MoveConstructibleVariant &&) = default;
+    MoveConstructibleVariant &operator=(const MoveConstructibleVariant &) =
+            delete;
+    MoveConstructibleVariant &operator=(MoveConstructibleVariant &&) = delete;
+
+}; // template<typename... T> class MoveConstructibleVariant
+
+/** A subclass of variant base that defines the move and copy constructor. */
+template<typename... T>
+class CopyConstructibleVariant : public VariantBase<T...> {
+
+public:
+
+    using VariantBase<T...>::VariantBase;
+
+    CopyConstructibleVariant(const CopyConstructibleVariant &) = default;
+    CopyConstructibleVariant(CopyConstructibleVariant &&) = default;
+    CopyConstructibleVariant &operator=(const CopyConstructibleVariant &) =
+            delete;
+    CopyConstructibleVariant &operator=(CopyConstructibleVariant &&) = delete;
+
+}; // template<typename... T> class CopyConstructibleVariant
+
 /**
- * A subclass of variant base that re-defines copy and move assignment
- * operators. Actual assignment operators may not be defined if contained types
- * do not have copy/move constructor/assignment operator.
+ * Either unmovable or move-constructible variant class, selected by
+ * move-constructibility of contained types.
  */
 template<typename... T>
-class AssignableVariant : public VariantBase<T...> {
+using ConditionallyMoveConstructibleVariant =
+        typename std::conditional<
+                ForAll<std::is_move_constructible, T...>::value,
+                MoveConstructibleVariant<T...>,
+                UnmovableVariant<T...>
+        >::type;
+
+/**
+ * Either unmovable, move-constructible, or copy-constructible variant class,
+ * selected by move- and copy-constructibility of contained types.
+ */
+template<typename... T>
+using ConditionallyCopyConstructibleVariant =
+        typename std::conditional<
+                ForAll<std::is_copy_constructible, T...>::value,
+                CopyConstructibleVariant<T...>,
+                ConditionallyMoveConstructibleVariant<T...>
+        >::type;
+
+/**
+ * A subclass of conditionally copy-constructible variant that re-defines the
+ * move assignment operator.
+ */
+template<typename... T>
+class MoveAssignableVariant :
+        public ConditionallyCopyConstructibleVariant<T...> {
 
 private:
 
-    using Base = VariantBase<T...>;
-
-    static_assert(Base::IS_NOTHROW_MOVE_CONSTRUCTIBLE,
-            "Variable assignment requires no-throw move");
-    static_assert(Base::IS_NOTHROW_DESTRUCTIBLE,
-            "Variable assignment requires no-throw destructor");
+    using Base = ConditionallyCopyConstructibleVariant<T...>;
 
 public:
 
     using Base::Base;
 
-    AssignableVariant(const AssignableVariant &) = default;
-    AssignableVariant(AssignableVariant &&) = default;
-
-    /**
-     * Copy assignment operator.
-     *
-     * If the left-hand-side and right-hand-side contain values of the same
-     * type, the value is assigned by its copy assignment operator. Otherwise,
-     * the old value is destructed and the new value is copy-constructed.
-     *
-     * If the copy constructor for the new value may throw, a temporary copy of
-     * the old value is move-constructed before the destruction so that, if the
-     * constructor for the new value throws, we can restore the variant to the
-     * original value. The move constructor may not throw in this case.
-     *
-     * Propagates any exception thrown by the assignment operator or the copy
-     * constructor.
-     *
-     * Requirements: All the contained types must be copy-constructible,
-     * no-throw move-constructible, copy-assignable, and no-throw destructible.
-     */
-    AssignableVariant &operator=(const AssignableVariant &v)
-            noexcept(Base::IS_NOTHROW_COPY_ASSIGNABLE) {
-        if (this->index() == v.index())
-            v.apply(assigner(this->value()));
-        else
-            v.apply(emplacer(*this));
-        return *this;
-    }
+    MoveAssignableVariant(const MoveAssignableVariant &) = default;
+    MoveAssignableVariant(MoveAssignableVariant &&) = default;
+    MoveAssignableVariant &operator=(const MoveAssignableVariant &) = delete;
 
     /**
      * Move assignment operator.
@@ -957,34 +1025,100 @@ public:
      * Otherwise, the old value is destructed and the new value is
      * move- (or copy-) constructed.
      *
-     * Propagates any exception thrown by the assignment operator.
+     * If the move constructor for the new value may throw, a temporary copy of
+     * the old value is move- or copy-constructed before the destruction so
+     * that, if the constructor for the new value throws, we can restore the
+     * variant to the original value.
      *
-     * Requirements: All the contained types must be no-throw
-     * move-constructible, move-assignable, and no-throw destructible.
+     * Propagates any exception thrown by the assignment operator or move/copy
+     * constructor.
+     *
+     * Requirements: All the contained types must be move-constructible and
+     * move-assignable.
      */
-    AssignableVariant &operator=(AssignableVariant &&v)
+    MoveAssignableVariant &operator=(MoveAssignableVariant &&v)
             noexcept(Base::IS_NOTHROW_MOVE_ASSIGNABLE) {
-        if (this->index() == v.index())
+        if (this->tag() == v.tag())
             std::move(v).apply(assigner(this->value()));
         else
-            std::move(v).apply(emplacer(*this));
+            this->emplaceWithBackup(std::move(v));
         return *this;
-    };
+    }
 
-};
+}; // template<typename... T> class MoveAssignableVariant
 
 /**
- * Either assignable variant or variant base class, selected by possibility of
- * exceptions in assignment. Note that not all assignable variants have
- * assignment operators.
+ * Either move-assignable or conditionally copy-constructible variant class,
+ * selected by move-constructibility and -assignability.
  */
 template<typename... T>
-using ConditionallyAssignableVariant =
+using ConditionallyMoveAssignableVariant =
         typename std::conditional<
-                VariantBase<T...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE &&
-                        VariantBase<T...>::IS_NOTHROW_DESTRUCTIBLE,
-                AssignableVariant<T...>,
-                VariantBase<T...>
+                ForAll<std::is_move_constructible, T...>::value &&
+                ForAll<std::is_move_assignable, T...>::value,
+                MoveAssignableVariant<T...>,
+                ConditionallyCopyConstructibleVariant<T...>
+        >::type;
+
+/**
+ * A subclass of move-assignable variant that re-defines the copy assignment
+ * operator.
+ */
+template<typename... T>
+class CopyAssignableVariant : public MoveAssignableVariant<T...> {
+
+private:
+
+    using Base = MoveAssignableVariant<T...>;
+
+public:
+
+    using Base::Base;
+
+    CopyAssignableVariant(const CopyAssignableVariant &) = default;
+    CopyAssignableVariant(CopyAssignableVariant &&) = default;
+    CopyAssignableVariant &operator=(CopyAssignableVariant &&) = default;
+
+    /**
+     * Copy assignment operator.
+     *
+     * If the left-hand-side and right-hand-side contain values of the same
+     * type, the value is assigned by its copy assignment operator. Otherwise,
+     * the old value is destructed and the new value is copy-constructed.
+     *
+     * If the copy constructor for the new value may throw, a temporary copy of
+     * the old value is move- or copy-constructed before the destruction so
+     * that, if the constructor for the new value throws, we can restore the
+     * variant to the original value.
+     *
+     * Propagates any exception thrown by the assignment operator or move/copy
+     * constructor.
+     *
+     * Requirements: All the contained types must be copy-constructible and
+     * copy-assignable.
+     */
+    CopyAssignableVariant &operator=(const CopyAssignableVariant &v)
+            noexcept(Base::IS_NOTHROW_COPY_ASSIGNABLE) {
+        if (this->tag() == v.tag())
+            v.apply(assigner(this->value()));
+        else
+            this->emplaceWithBackup(v);
+        return *this;
+    }
+
+}; // template<typename... T> class CopyAssignableVariant
+
+/**
+ * Either copy-assignable or conditionally move-assignable variant class,
+ * selected by copy-constructibility and -assignability.
+ */
+template<typename... T>
+using ConditionallyCopyAssignableVariant =
+        typename std::conditional<
+                ForAll<std::is_copy_constructible, T...>::value &&
+                ForAll<std::is_copy_assignable, T...>::value,
+                CopyAssignableVariant<T...>,
+                ConditionallyMoveAssignableVariant<T...>
         >::type;
 
 /**
@@ -1001,9 +1135,9 @@ using ConditionallyAssignableVariant =
  * decayed types (see std::decay).
  */
 template<typename... T>
-class Variant : public ConditionallyAssignableVariant<T...> {
+class Variant : public ConditionallyCopyAssignableVariant<T...> {
 
-    using Base = ConditionallyAssignableVariant<T...>;
+    using Base = ConditionallyCopyAssignableVariant<T...>;
 
     // constructor inheritance
     using Base::Base;
@@ -1036,12 +1170,18 @@ public:
      * <code>Variant&lt;U...></code> must be copy-assignable.
      */
     template<typename... U>
-    Variant &operator=(const Variant<U...> &v)
-            noexcept(Variant<U...>::IS_NOTHROW_COPY_ASSIGNABLE) {
-        if (this->index() == v.template convertIndex<T...>())
+    typename std::enable_if<
+            std::is_copy_assignable<
+                    ConditionallyCopyAssignableVariant<U...>>::value,
+            Variant &
+            >::type
+    operator=(const Variant<U...> &v)
+            noexcept(Variant<U...>::IS_NOTHROW_COPY_ASSIGNABLE &&
+                    Variant::IS_NOTHROW_MOVE_CONSTRUCTIBLE) {
+        if (this->tag() == typename Base::Tag(v.tag()))
             v.apply(assigner(this->value()));
         else
-            v.apply(emplacer(*this));
+            this->emplaceWithBackup(static_cast<const VariantBase<U...> &>(v));
         return *this;
     }
 
@@ -1058,12 +1198,18 @@ public:
      * <code>Variant&lt;U...></code> must be move-assignable.
      */
     template<typename... U>
-    Variant &operator=(Variant<U...> &&v)
-            noexcept(Variant<U...>::IS_NOTHROW_MOVE_ASSIGNABLE) {
-        if (this->index() == v.template convertIndex<T...>())
+    typename std::enable_if<
+            std::is_move_assignable<
+                    ConditionallyCopyAssignableVariant<U...>>::value,
+            Variant &
+            >::type
+    operator=(Variant<U...> &&v)
+            noexcept(Variant<U...>::IS_NOTHROW_MOVE_ASSIGNABLE &&
+                    Variant::IS_NOTHROW_MOVE_CONSTRUCTIBLE) {
+        if (this->tag() == typename Base::Tag(v.tag()))
             std::move(v).apply(assigner(this->value()));
         else
-            std::move(v).apply(emplacer(*this));
+            this->emplaceWithBackup(static_cast<VariantBase<U...> &&>(v));
         return *this;
     }
 
@@ -1078,14 +1224,14 @@ public:
      * move-constructible, and no-throw destructible.
      */
     void swap(Variant &other) noexcept(Variant::IS_NOTHROW_SWAPPABLE) {
-        if (this->index() == other.index())
+        if (this->tag() == other.tag())
             return this->apply(swap_impl::Swapper<Variant<T...>>(other));
 
         assert(this != &other);
 
         Variant<T...> temporary(std::move(*this));
-        std::move(other).apply(emplacer(*this));
-        std::move(temporary).apply(emplacer(other));
+        this->emplace(std::move(other));
+        other.emplace(std::move(temporary));
     }
 
     /**
@@ -1168,11 +1314,6 @@ void swap(Variant<T...> &a, Variant<T...> &b)
         noexcept(Variant<T...>::IS_NOTHROW_SWAPPABLE) {
     a.swap(b);
 }
-
-/*
- * XXX: A more efficient specialization for a single contained type variant may
- * be defined because its index is always zero.
- */
 
 } // namespace variant_impl
 

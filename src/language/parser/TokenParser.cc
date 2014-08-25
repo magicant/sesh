@@ -23,11 +23,13 @@
 #include "common/EnumSet.hh"
 #include "common/Maybe.hh"
 #include "common/String.hh"
+#include "common/TypeTag.hh"
 #include "language/parser/CharPredicates.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/Keyword.hh"
 #include "language/syntax/Word.hh"
 
+using sesh::common::TypeTag;
 using sesh::common::EnumSet;
 using sesh::common::Maybe;
 using sesh::common::String;
@@ -109,7 +111,7 @@ void TokenParser::resetImpl() noexcept {
         mAssignmentParser->reset();
     if (mWordParser != nullptr)
         mWordParser->reset();
-    mResultToken.emplace<WordPointer>();
+    mResultToken.emplace(TypeTag<WordPointer>());
     Parser::resetImpl();
 }
 

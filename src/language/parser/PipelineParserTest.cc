@@ -25,6 +25,7 @@
 #include "common/Char.hh"
 #include "common/EnumSet.hh"
 #include "common/String.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "language/parser/CharParser.hh"
 #include "language/parser/CharPredicates.hh"
 #include "language/parser/Converter.hh"
@@ -193,8 +194,8 @@ TEST_CASE("Pipeline parser, non-keyword token, single command") {
             REQUIRE(tp != nullptr);
             CHECK(tp->state() == State::FINISHED);
             REQUIRE(tp->parse() != nullptr);
-            REQUIRE(tp->parse()->index() ==
-                    tp->parse()->index<std::unique_ptr<Word>>());
+            REQUIRE(tp->parse()->tag() ==
+                    tp->parse()->tag<std::unique_ptr<Word>>());
             checkWord(
                     tp->parse()->value<std::unique_ptr<Word>>().get(), L("A"));
             CHECK(environment().position() == 1);
@@ -208,8 +209,7 @@ TEST_CASE("Pipeline parser, non-keyword token, single command") {
 
     auto tp = newTokenParser(e);
     REQUIRE(tp->parse() != nullptr);
-    REQUIRE(tp->parse()->index() ==
-            tp->parse()->index<std::unique_ptr<Word>>());
+    REQUIRE(tp->parse()->tag() == tp->parse()->tag<std::unique_ptr<Word>>());
     checkWord(tp->parse()->value<std::unique_ptr<Word>>().get(), L("A"));
     CHECK(e.position() == 1);
 
@@ -231,7 +231,7 @@ TEST_CASE("Pipeline parser, keyword token, single command") {
             REQUIRE(tp != nullptr);
             CHECK(tp->state() == State::FINISHED);
             REQUIRE(tp->parse() != nullptr);
-            REQUIRE(tp->parse()->index() == tp->parse()->index<Keyword>());
+            REQUIRE(tp->parse()->tag() == tp->parse()->tag<Keyword>());
             CHECK(tp->parse()->value<Keyword>() ==
                     Keyword::keywordLeftBrace());
             return CommandParserPointer(new CommandParserStub(environment()));

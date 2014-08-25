@@ -24,6 +24,7 @@
 #include <utility>
 #include "common/Char.hh"
 #include "common/EnumSet.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "language/parser/CharParser.hh"
 #include "language/parser/Converter.hh"
 #include "language/parser/Environment.hh"
@@ -122,7 +123,7 @@ private:
 void checkTokenParserLeftBrace(Parser<Token> &p) {
     CHECK(p.state() == ParserBase::State::FINISHED);
     REQUIRE(p.parse() != nullptr);
-    REQUIRE(p.parse()->index() == p.parse()->index<Keyword>());
+    REQUIRE(p.parse()->tag() == p.parse()->tag<Keyword>());
     CHECK(p.parse()->value<Keyword>() == Keyword::keywordLeftBrace());
 }
 

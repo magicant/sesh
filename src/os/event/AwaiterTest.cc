@@ -26,6 +26,7 @@
 #include <utility>
 #include "async/Future.hh"
 #include "common/Try.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "os/event/AwaiterTestHelper.hh"
 #include "os/event/PselectApi.hh"
 #include "os/event/ReadableFileDescriptor.hh"
@@ -97,7 +98,7 @@ TEST_CASE_METHOD(
             Timeout(std::chrono::seconds(5)), ReadableFileDescriptor(3));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        REQUIRE(t->index() == t->index<Timeout>());
+        REQUIRE(t->tag() == t->tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(5));
         mutableSteadyClockNow() += std::chrono::seconds(2);
     });
@@ -134,7 +135,7 @@ TEST_CASE_METHOD(
             Timeout(std::chrono::seconds(10)), ReadableFileDescriptor(3));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        REQUIRE(t->index() == t->index<ReadableFileDescriptor>());
+        REQUIRE(t->tag() == t->tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 3);
         mutableSteadyClockNow() += std::chrono::seconds(4);
     });
@@ -175,7 +176,7 @@ TEST_CASE_METHOD(
             std::chrono::nanoseconds,
             const SignalNumberSet *) -> std::error_code {
         Action &a = actions().at(1);
-        CHECK(a.index() == Action::index<sesh_osapi_signal_handler *>());
+        CHECK(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
 
         mutableSteadyClockNow() += std::chrono::seconds(1);
         implementation() = nullptr;
@@ -184,7 +185,7 @@ TEST_CASE_METHOD(
     a.awaitEvents();
 
     Action &a = actions().at(1);
-    CHECK(a.index() == Action::index<Default>());
+    CHECK(a.tag() == Action::tag<Default>());
 }
 
 TEST_CASE_METHOD(
@@ -212,7 +213,7 @@ TEST_CASE_METHOD(
             Timeout(std::chrono::seconds(1)), ReadableFileDescriptor(0));
     std::move(f).then([&called](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        CHECK(t->index() == t->index<Timeout>());
+        CHECK(t->tag() == t->tag<Timeout>());
         called = true;
     });
 
@@ -227,7 +228,7 @@ TEST_CASE_METHOD(
             std::chrono::nanoseconds,
             const SignalNumberSet *) -> std::error_code {
         Action &a = actions().at(1);
-        REQUIRE(a.index() == Action::index<sesh_osapi_signal_handler *>());
+        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
         implementation() = [this](

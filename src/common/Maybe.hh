@@ -111,7 +111,8 @@ public:
     void emplace(Arg &&... arg)
             noexcept(std::is_nothrow_destructible<T>::value &&
                     std::is_nothrow_constructible<T, Arg...>::value) {
-        mValue.template emplaceWithFallback<T, Nil>(std::forward<Arg>(arg)...);
+        mValue.template emplaceWithFallback<Nil>(
+                TypeTag<T>(), std::forward<Arg>(arg)...);
     }
     // XXX support initializer_list?
 
@@ -120,12 +121,12 @@ public:
      * object if any.
      */
     void clear() noexcept(std::is_nothrow_destructible<T>::value) {
-        mValue.template emplaceWithFallback<Nil, Nil>();
+        mValue.template emplaceWithFallback<Nil>(TypeTag<Nil>());
     }
 
     /** Returns true if and only if this maybe object is non-empty. */
     bool hasValue() const noexcept {
-        return mValue.index() != mValue.template index<Nil>();
+        return mValue.tag() != mValue.template tag<Nil>();
     }
 
     /** Same as {@link #hasValue()}. */

@@ -99,10 +99,10 @@ public:
         for (const Handler &h : mHandlers)
             h(n);
 
-        switch (mTrapAction.index()) {
-        case TrapAction::index<TrapDefault>():
+        switch (mTrapAction.tag()) {
+        case TrapAction::tag<TrapDefault>():
             break;
-        case TrapAction::index<Handler>():
+        case TrapAction::tag<Handler>():
             if (const auto &h = mTrapAction.value<Handler>())
                 h(n);
             break;
@@ -113,10 +113,10 @@ public:
         if (!mHandlers.empty())
             return ActionType::HANDLER;
 
-        switch (mTrapAction.index()) {
-        case TrapAction::index<TrapDefault>():
+        switch (mTrapAction.tag()) {
+        case TrapAction::tag<TrapDefault>():
             return ActionType::DEFAULT;
-        case TrapAction::index<Handler>():
+        case TrapAction::tag<Handler>():
             if (mTrapAction.value<Handler>() == nullptr)
                 return ActionType::IGNORE;
             else
@@ -317,8 +317,8 @@ public:
         case SettingPolicy::FAIL_IF_IGNORED:
             if (std::error_code e = data.getInitialActionIfUnknown(mApi, n))
                 return e;
-            if (data.initialAction()->index() ==
-                    SignalAction::index<HandlerConfigurationApi::Ignore>())
+            if (data.initialAction()->tag() ==
+                    SignalAction::tag<HandlerConfigurationApi::Ignore>())
                 return SignalErrorCode::INITIALLY_IGNORED;
             // Fall through
         case SettingPolicy::FORCE:

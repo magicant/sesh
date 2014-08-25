@@ -35,6 +35,7 @@ TESTPROGRAMS = \
 	src/common/SharedFunctionTest \
 	src/common/TrieTest \
 	src/common/TryTest \
+	src/common/TypeTagTest \
 	src/common/VariantTest \
 	src/language/parser/AndOrListParserTest \
 	src/language/parser/AssignedWordParserTest \
@@ -113,6 +114,7 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
 	src/common/Char.hh \
+	src/common/CommonResult.hh \
 	src/common/ContainerHelper.hh \
 	src/common/Copy.hh \
 	src/common/DirectInitialize.hh \
@@ -338,6 +340,9 @@ src_common_TrieTest_SOURCES = \
 	src/common/TrieTest.cc
 src_common_TryTest_SOURCES = \
 	src/common/TryTest.cc
+src_common_TypeTagTest_SOURCES = \
+	src/common/TypeTag.hh \
+	src/common/TypeTagTest.cc
 src_common_VariantTest_SOURCES = \
 	src/common/VariantTest.cc
 src_language_parser_AndOrListParserTest_SOURCES = \
@@ -880,6 +885,7 @@ src_os_signaling_HandlerConfigurationTest_SOURCES = \
 	src/os/signaling/SignalErrorCategory.cc
 
 TESTHEADERS = \
+	src/common/TypeTagTestHelper.hh \
 	src/language/parser/AssignmentParserTestHelper.hh \
 	src/language/parser/DiagnosticEnvironmentTestHelper.hh \
 	src/language/parser/EnvironmentTestHelper.hh \

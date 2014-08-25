@@ -27,6 +27,7 @@
 #include <utility>
 #include "async/Future.hh"
 #include "common/Try.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "common/Variant.hh"
 #include "os/event/Awaiter.hh"
 #include "os/event/AwaiterTestHelper.hh"
@@ -62,7 +63,7 @@ TEST_CASE_METHOD(
     Future<Trigger> f = a.expect(ReadableFileDescriptor(4));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        CHECK(t->index() == Trigger::index<ReadableFileDescriptor>());
+        CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 4);
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
         mutableSteadyClockNow() += std::chrono::seconds(1);
@@ -100,7 +101,7 @@ TEST_CASE_METHOD(
             ReadableFileDescriptor(2), ReadableFileDescriptor(0));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        CHECK(t->index() == Trigger::index<ReadableFileDescriptor>());
+        CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 0);
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
         mutableSteadyClockNow() += std::chrono::seconds(1);
@@ -139,7 +140,7 @@ TEST_CASE_METHOD(
             ReadableFileDescriptor(2), ReadableFileDescriptor(0));
     std::move(f).then([this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        CHECK(t->index() == Trigger::index<ReadableFileDescriptor>());
+        CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         auto fd = t->value<ReadableFileDescriptor>().value();
         if (fd != 0)
             CHECK(fd == 2);
@@ -178,7 +179,7 @@ TEST_CASE_METHOD(
     a.expect(ReadableFileDescriptor(1)).then(
             [this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        CHECK(t->index() == Trigger::index<ReadableFileDescriptor>());
+        CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 1);
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(9));
         mutableSteadyClockNow() += std::chrono::seconds(1);
@@ -186,7 +187,7 @@ TEST_CASE_METHOD(
     a.expect(ReadableFileDescriptor(3)).then(
             [this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        CHECK(t->index() == Trigger::index<ReadableFileDescriptor>());
+        CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 3);
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(28));
         mutableSteadyClockNow() += std::chrono::seconds(2);
@@ -239,7 +240,7 @@ TEST_CASE_METHOD(
 
     auto callback = [this, startTime](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        CHECK(t->index() == Trigger::index<ReadableFileDescriptor>());
+        CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 7);
         mutableSteadyClockNow() += std::chrono::seconds(1);
     };

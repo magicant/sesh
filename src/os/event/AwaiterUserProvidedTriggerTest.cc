@@ -25,6 +25,7 @@
 #include <utility>
 #include "async/Future.hh"
 #include "common/Try.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "os/event/AwaiterTestHelper.hh"
 #include "os/event/PselectApi.hh"
 #include "os/event/Trigger.hh"
@@ -55,7 +56,7 @@ TEST_CASE_METHOD(
     Future<Trigger> f = a.expect(UserProvidedTrigger(createFutureOf(result)));
     std::move(f).then([this, &result](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        REQUIRE(t->index() == Trigger::index<UserProvidedTrigger>());
+        REQUIRE(t->tag() == Trigger::tag<UserProvidedTrigger>());
         CHECK(t->value<UserProvidedTrigger>().result() == result);
         mutableSteadyClockNow() += std::chrono::seconds(2);
     });
@@ -100,7 +101,7 @@ TEST_CASE_METHOD(
             UPT(createFutureOf(result)));
     std::move(f).then([this, &result](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        REQUIRE(t->index() == Trigger::index<UserProvidedTrigger>());
+        REQUIRE(t->tag() == Trigger::tag<UserProvidedTrigger>());
         CHECK(t->value<UserProvidedTrigger>().result() == result);
         mutableSteadyClockNow() += std::chrono::seconds(2);
     });
@@ -116,14 +117,14 @@ TEST_CASE_METHOD(
     std::shared_ptr<void> expected = std::make_shared<int>(0);
     auto f1 = a.expect(UserProvidedTrigger(createFutureOf(expected)));
     auto f2 = std::move(f1).map([this](Trigger &&t) -> std::shared_ptr<void> {
-        REQUIRE(t.index() == Trigger::index<UserProvidedTrigger>());
+        REQUIRE(t.tag() == Trigger::tag<UserProvidedTrigger>());
         return std::move(t.value<UserProvidedTrigger>().result());
     });
     auto f3 = a.expect(UserProvidedTrigger(std::move(f2)));
     std::shared_ptr<void> actual;
     std::move(f3).then([&actual](Try<Trigger> &&t) {
         REQUIRE(t.hasValue());
-        REQUIRE(t->index() == Trigger::index<UserProvidedTrigger>());
+        REQUIRE(t->tag() == Trigger::tag<UserProvidedTrigger>());
         actual = t->value<UserProvidedTrigger>().result();
     });
 

@@ -250,14 +250,14 @@ void PselectArgument::addFd(
 
 void PselectArgument::add(
         const FileDescriptorTrigger &t, const PselectApi &api) {
-    switch (t.index()) {
-    case FileDescriptorTrigger::index<ReadableFileDescriptor>():
+    switch (t.tag()) {
+    case FileDescriptorTrigger::tag<ReadableFileDescriptor>():
         addFd(mReadFds, t.value<ReadableFileDescriptor>().value(), api);
         return;
-    case FileDescriptorTrigger::index<WritableFileDescriptor>():
+    case FileDescriptorTrigger::tag<WritableFileDescriptor>():
         addFd(mWriteFds, t.value<WritableFileDescriptor>().value(), api);
         return;
-    case FileDescriptorTrigger::index<ErrorFileDescriptor>():
+    case FileDescriptorTrigger::tag<ErrorFileDescriptor>():
         addFd(mErrorFds, t.value<ErrorFileDescriptor>().value(), api);
         return;
     }
@@ -294,12 +294,12 @@ bool contains(
 }
 
 bool PselectArgument::matches(const FileDescriptorTrigger &t) const {
-    switch (t.index()) {
-    case FileDescriptorTrigger::index<ReadableFileDescriptor>():
+    switch (t.tag()) {
+    case FileDescriptorTrigger::tag<ReadableFileDescriptor>():
         return contains(mReadFds, t.value<ReadableFileDescriptor>().value());
-    case FileDescriptorTrigger::index<WritableFileDescriptor>():
+    case FileDescriptorTrigger::tag<WritableFileDescriptor>():
         return contains(mWriteFds, t.value<WritableFileDescriptor>().value());
-    case FileDescriptorTrigger::index<ErrorFileDescriptor>():
+    case FileDescriptorTrigger::tag<ErrorFileDescriptor>():
         return contains(mErrorFds, t.value<ErrorFileDescriptor>().value());
     }
     UNREACHABLE();
@@ -326,11 +326,11 @@ void registerSignalTrigger(
         Signal s, std::shared_ptr<PendingEvent> &e, HandlerConfiguration &hc) {
     auto result = hc.addHandler(
             s.number(), SharedFunction<SignalHandler>::create(e));
-    switch (result.index()) {
-    case decltype(result)::index<HandlerConfiguration::Canceler>():
+    switch (result.tag()) {
+    case decltype(result)::tag<HandlerConfiguration::Canceler>():
         return e->addCanceler(
                 std::move(result.value<HandlerConfiguration::Canceler>()));
-    case decltype(result)::index<std::error_code>():
+    case decltype(result)::tag<std::error_code>():
         throw std::system_error(result.value<std::error_code>());
     }
 }
@@ -354,23 +354,23 @@ void registerTrigger(
         Trigger &&t,
         std::shared_ptr<PendingEvent> &e,
         HandlerConfiguration &hc) {
-    switch (t.index()) {
-    case Trigger::index<Timeout>():
+    switch (t.tag()) {
+    case Trigger::tag<Timeout>():
         e->timeout() = std::min(e->timeout(), t.value<Timeout>());
         return;
-    case Trigger::index<ReadableFileDescriptor>():
+    case Trigger::tag<ReadableFileDescriptor>():
         e->addTrigger(t.value<ReadableFileDescriptor>());
         return;
-    case Trigger::index<WritableFileDescriptor>():
+    case Trigger::tag<WritableFileDescriptor>():
         e->addTrigger(t.value<WritableFileDescriptor>());
         return;
-    case Trigger::index<ErrorFileDescriptor>():
+    case Trigger::tag<ErrorFileDescriptor>():
         e->addTrigger(t.value<ErrorFileDescriptor>());
         return;
-    case Trigger::index<Signal>():
+    case Trigger::tag<Signal>():
         registerSignalTrigger(t.value<Signal>(), e, hc);
         return;
-    case Trigger::index<UserProvidedTrigger>():
+    case Trigger::tag<UserProvidedTrigger>():
         registerUserProvidedTrigger(
                 std::move(t.value<UserProvidedTrigger>()), e);
         return;

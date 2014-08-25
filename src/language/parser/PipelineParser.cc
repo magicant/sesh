@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <utility>
+#include "common/TypeTag.hh"
 #include "language/parser/LinebreakParser.hh"
 #include "language/parser/Operator.hh"
 #include "language/parser/Parser.hh"
@@ -27,6 +28,7 @@
 #include "language/syntax/Command.hh"
 #include "language/syntax/Pipeline.hh"
 
+using sesh::common::TypeTag;
 using sesh::language::parser::LinebreakParser;
 using sesh::language::parser::SpecificOperatorParser;
 using sesh::language::syntax::Command;
@@ -94,8 +96,6 @@ public:
 
     StateProcessor(PipelineParser &p) noexcept : mParser(p) { }
 
-    using Result = bool;
-
     bool operator()(ParsingFirstToken &state) {
         if (state.tokenParser == nullptr)
             state.tokenParser = mParser.createTokenParser();
@@ -105,7 +105,7 @@ public:
             return false;
 
         Pipeline::ExitStatusType est;
-        if (t->index() == t->index<Keyword>() &&
+        if (t->tag() == t->tag<Keyword>() &&
                 t->value<Keyword>() == Keyword::keywordExclamation()) {
             est = Pipeline::ExitStatusType::NEGATED;
             state.tokenParser->reset();
@@ -153,7 +153,7 @@ void PipelineParser::parseImpl() {
 }
 
 void PipelineParser::resetImpl() noexcept {
-    mState.emplace<ParsingFirstToken>();
+    mState.emplace(TypeTag<ParsingFirstToken>());
     Parser<PipelinePointer>::resetImpl();
 }
 

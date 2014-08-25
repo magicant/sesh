@@ -20,6 +20,7 @@
 
 #include "common/EnumSet.hh"
 #include "common/Maybe.hh"
+#include "common/TypeTag.hh"
 #include "language/parser/Environment.hh"
 #include "language/parser/Keyword.hh"
 #include "language/parser/Token.hh"
@@ -27,6 +28,7 @@
 
 using sesh::common::EnumSet;
 using sesh::common::Maybe;
+using sesh::common::TypeTag;
 using sesh::language::parser::Keyword;
 using sesh::language::parser::Token;
 using sesh::language::parser::TokenType;
@@ -66,7 +68,7 @@ private:
             noexcept {
         if (t == nullptr)
             return false;
-        if (t->index() != t->index<Keyword>())
+        if (t->tag() != t->tag<Keyword>())
             return false;
         if (!isClosingKeyword(t->value<Keyword>()))
             return false;
@@ -75,8 +77,6 @@ private:
     }
 
 public:
-
-    using Result = bool;
 
     InnerParserProcessor(SequenceParser &p) noexcept : mParser(p) { }
 
@@ -98,7 +98,7 @@ public:
         mParser.mResult.first.andOrLists().push_back(std::move(r->first));
         if (!r->second)
             return false;
-        mParser.mInnerParser.emplace<TokenParserPointer>();
+        mParser.mInnerParser.emplace(TypeTag<TokenParserPointer>());
         return true;
     }
 
@@ -110,7 +110,7 @@ void SequenceParser::parseImpl() {
 }
 
 void SequenceParser::resetImpl() noexcept {
-    mInnerParser.emplace<TokenParserPointer>(nullptr);
+    mInnerParser.emplace(TypeTag<TokenParserPointer>(), nullptr);
     mResult.first = Sequence();
     mResult.second.clear();
     Parser<SequenceParserResult>::resetImpl();

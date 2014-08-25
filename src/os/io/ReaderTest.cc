@@ -29,6 +29,7 @@
 #include "async/Future.hh"
 #include "async/Promise.hh"
 #include "common/Try.hh"
+#include "common/TypeTagTestHelper.hh"
 #include "common/Variant.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/ReadableFileDescriptor.hh"
@@ -100,7 +101,7 @@ TEST_CASE("Read: empty") {
         REQUIRE(r.hasValue());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
-        REQUIRE(r->second.index() == r->second.index<std::vector<char>>());
+        REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
         CHECK(r->second.value<std::vector<char>>().empty());
         r->first.release().clear();
         called = true;
@@ -159,7 +160,7 @@ private:
     Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
         Trigger &t = triggers.front();
-        CHECK(t.index() == t.index<ReadableFileDescriptor>());
+        CHECK(t.tag() == t.tag<ReadableFileDescriptor>());
         CHECK(t.value<ReadableFileDescriptor>().value() == FD);
 
         auto pf = createPromiseFuturePair<Trigger>();
@@ -181,7 +182,7 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than available") {
         REQUIRE(r.hasValue());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
-        REQUIRE(r->second.index() == r->second.index<std::vector<char>>());
+        REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
         REQUIRE(r->second.value<std::vector<char>>().size() == 1);
         CHECK(r->second.value<std::vector<char>>().at(0) == C);
         r->first.release().clear();
@@ -210,7 +211,7 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than buffer size") {
         REQUIRE(r.hasValue());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
-        REQUIRE(r->second.index() == r->second.index<std::vector<char>>());
+        REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
         CHECK(r->second.value<std::vector<char>>() == bytes);
         r->first.release().clear();
         called = true;
@@ -249,7 +250,7 @@ TEST_CASE("Read: domain error in proactor") {
         REQUIRE(r.hasValue());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
-        REQUIRE(r->second.index() == r->second.index<std::error_code>());
+        REQUIRE(r->second.tag() == r->second.tag<std::error_code>());
         CHECK(r->second.value<std::error_code>() ==
                 std::make_error_code(std::errc::too_many_files_open));
         r->first.release().clear();
@@ -283,7 +284,7 @@ TEST_CASE("Read: read error") {
         REQUIRE(r.hasValue());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
-        REQUIRE(r->second.index() == r->second.index<std::error_code>());
+        REQUIRE(r->second.tag() == r->second.tag<std::error_code>());
         CHECK(r->second.value<std::error_code>() ==
                 std::make_error_code(std::errc::io_error));
         r->first.release().clear();
