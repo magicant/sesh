@@ -998,13 +998,12 @@ using ConditionallyCopyConstructibleVariant =
         >::type;
 
 /**
- * A subclass of conditionally copy-constructible variant that re-defines copy
- * and move assignment operators. Actual assignment operators may not be
- * defined if contained types do not have copy/move constructor/assignment
- * operator.
+ * A subclass of conditionally copy-constructible variant that re-defines the
+ * move assignment operator.
  */
 template<typename... T>
-class AssignableVariant : public ConditionallyCopyConstructibleVariant<T...> {
+class MoveAssignableVariant :
+        public ConditionallyCopyConstructibleVariant<T...> {
 
 private:
 
@@ -1014,35 +1013,9 @@ public:
 
     using Base::Base;
 
-    AssignableVariant(const AssignableVariant &) = default;
-    AssignableVariant(AssignableVariant &&) = default;
-
-    /**
-     * Copy assignment operator.
-     *
-     * If the left-hand-side and right-hand-side contain values of the same
-     * type, the value is assigned by its copy assignment operator. Otherwise,
-     * the old value is destructed and the new value is copy-constructed.
-     *
-     * If the copy constructor for the new value may throw, a temporary copy of
-     * the old value is move- or copy-constructed before the destruction so
-     * that, if the constructor for the new value throws, we can restore the
-     * variant to the original value.
-     *
-     * Propagates any exception thrown by the assignment operator or move/copy
-     * constructor.
-     *
-     * Requirements: All the contained types must be copy-constructible and
-     * copy-assignable.
-     */
-    AssignableVariant &operator=(const AssignableVariant &v)
-            noexcept(Base::IS_NOTHROW_COPY_ASSIGNABLE) {
-        if (this->tag() == v.tag())
-            v.apply(assigner(this->value()));
-        else
-            this->emplaceWithBackup(v);
-        return *this;
-    }
+    MoveAssignableVariant(const MoveAssignableVariant &) = default;
+    MoveAssignableVariant(MoveAssignableVariant &&) = default;
+    MoveAssignableVariant &operator=(const MoveAssignableVariant &) = delete;
 
     /**
      * Move assignment operator.
@@ -1063,29 +1036,89 @@ public:
      * Requirements: All the contained types must be move-constructible and
      * move-assignable.
      */
-    AssignableVariant &operator=(AssignableVariant &&v)
+    MoveAssignableVariant &operator=(MoveAssignableVariant &&v)
             noexcept(Base::IS_NOTHROW_MOVE_ASSIGNABLE) {
         if (this->tag() == v.tag())
             std::move(v).apply(assigner(this->value()));
         else
             this->emplaceWithBackup(std::move(v));
         return *this;
-    };
+    }
 
-};
+}; // template<typename... T> class MoveAssignableVariant
 
 /**
- * Either assignable variant or variant base class, selected by possibility of
- * exceptions in assignment. Note that not all assignable variants have
- * assignment operators.
+ * Either move-assignable or conditionally copy-constructible variant class,
+ * selected by move-constructibility and -assignability.
  */
 template<typename... T>
-using ConditionallyAssignableVariant =
+using ConditionallyMoveAssignableVariant =
         typename std::conditional<
-                VariantBase<T...>::IS_NOTHROW_MOVE_CONSTRUCTIBLE &&
-                        VariantBase<T...>::IS_NOTHROW_DESTRUCTIBLE,
-                AssignableVariant<T...>,
+                ForAll<std::is_move_constructible, T...>::value &&
+                ForAll<std::is_move_assignable, T...>::value,
+                MoveAssignableVariant<T...>,
                 ConditionallyCopyConstructibleVariant<T...>
+        >::type;
+
+/**
+ * A subclass of move-assignable variant that re-defines the copy assignment
+ * operator.
+ */
+template<typename... T>
+class CopyAssignableVariant : public MoveAssignableVariant<T...> {
+
+private:
+
+    using Base = MoveAssignableVariant<T...>;
+
+public:
+
+    using Base::Base;
+
+    CopyAssignableVariant(const CopyAssignableVariant &) = default;
+    CopyAssignableVariant(CopyAssignableVariant &&) = default;
+    CopyAssignableVariant &operator=(CopyAssignableVariant &&) = default;
+
+    /**
+     * Copy assignment operator.
+     *
+     * If the left-hand-side and right-hand-side contain values of the same
+     * type, the value is assigned by its copy assignment operator. Otherwise,
+     * the old value is destructed and the new value is copy-constructed.
+     *
+     * If the copy constructor for the new value may throw, a temporary copy of
+     * the old value is move- or copy-constructed before the destruction so
+     * that, if the constructor for the new value throws, we can restore the
+     * variant to the original value.
+     *
+     * Propagates any exception thrown by the assignment operator or move/copy
+     * constructor.
+     *
+     * Requirements: All the contained types must be copy-constructible and
+     * copy-assignable.
+     */
+    CopyAssignableVariant &operator=(const CopyAssignableVariant &v)
+            noexcept(Base::IS_NOTHROW_COPY_ASSIGNABLE) {
+        if (this->tag() == v.tag())
+            v.apply(assigner(this->value()));
+        else
+            this->emplaceWithBackup(v);
+        return *this;
+    }
+
+}; // template<typename... T> class CopyAssignableVariant
+
+/**
+ * Either copy-assignable or conditionally move-assignable variant class,
+ * selected by copy-constructibility and -assignability.
+ */
+template<typename... T>
+using ConditionallyCopyAssignableVariant =
+        typename std::conditional<
+                ForAll<std::is_copy_constructible, T...>::value &&
+                ForAll<std::is_copy_assignable, T...>::value,
+                CopyAssignableVariant<T...>,
+                ConditionallyMoveAssignableVariant<T...>
         >::type;
 
 /**
@@ -1102,9 +1135,9 @@ using ConditionallyAssignableVariant =
  * decayed types (see std::decay).
  */
 template<typename... T>
-class Variant : public ConditionallyAssignableVariant<T...> {
+class Variant : public ConditionallyCopyAssignableVariant<T...> {
 
-    using Base = ConditionallyAssignableVariant<T...>;
+    using Base = ConditionallyCopyAssignableVariant<T...>;
 
     // constructor inheritance
     using Base::Base;
@@ -1137,7 +1170,12 @@ public:
      * <code>Variant&lt;U...></code> must be copy-assignable.
      */
     template<typename... U>
-    Variant &operator=(const Variant<U...> &v)
+    typename std::enable_if<
+            std::is_copy_assignable<
+                    ConditionallyCopyAssignableVariant<U...>>::value,
+            Variant &
+            >::type
+    operator=(const Variant<U...> &v)
             noexcept(Variant<U...>::IS_NOTHROW_COPY_ASSIGNABLE &&
                     Variant::IS_NOTHROW_MOVE_CONSTRUCTIBLE) {
         if (this->tag() == typename Base::Tag(v.tag()))
@@ -1160,7 +1198,12 @@ public:
      * <code>Variant&lt;U...></code> must be move-assignable.
      */
     template<typename... U>
-    Variant &operator=(Variant<U...> &&v)
+    typename std::enable_if<
+            std::is_move_assignable<
+                    ConditionallyCopyAssignableVariant<U...>>::value,
+            Variant &
+            >::type
+    operator=(Variant<U...> &&v)
             noexcept(Variant<U...>::IS_NOTHROW_MOVE_ASSIGNABLE &&
                     Variant::IS_NOTHROW_MOVE_CONSTRUCTIBLE) {
         if (this->tag() == typename Base::Tag(v.tag()))

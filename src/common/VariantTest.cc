@@ -115,8 +115,7 @@ struct MoveMayThrow {
 };
 struct MoveThrows {
     MoveThrows() = default;
-    MoveThrows(const MoveThrows &) { throw Exception(); }
-    // Throwing copy implies throwing move.
+    MoveThrows(MoveThrows &&) { throw Exception(); }
     MoveThrows &operator=(const MoveThrows &) = default;
 };
 struct NonMovable {
@@ -776,15 +775,30 @@ TEST_CASE("Double variant copy assignment with same tag & exception") {
     CHECK(actions2.at(1) == Action::DESTRUCTION);
 }
 
-// TEST_CASE(
-//         "Double variant copy assignment with different tag & exception") {
+TEST_CASE("Double variant copy assignment with different tag & exception") {
     static_assert(
             std::is_copy_assignable<Variant<int, Stub>>::value,
             "int and Stub are copy-assignable");
     static_assert(
-            Variant<int, double>::IS_NOTHROW_COPY_ASSIGNABLE,
+            std::is_nothrow_copy_assignable<Variant<int, double>>::value,
             "int and double are no-throw copy-assignable");
-// }
+    static_assert(
+            !std::is_nothrow_copy_assignable<Variant<CopyThrows>>::value,
+            "MoveThrows is copy-assignable but throwing");
+
+    std::vector<Action> actions;
+    Variant<Stub, CopyThrows> v1(TypeTag<Stub>(), actions);
+    Variant<Stub, CopyThrows> v2((TypeTag<CopyThrows>()));
+    CHECK_THROWS_AS(v1 = v2, Exception);
+    CHECK(v1.tag() == v1.tag<Stub>());
+    CHECK(v2.tag() == v1.tag<CopyThrows>());
+    CHECK(actions.size() == 5);
+    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
+    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of backup
+    CHECK(actions.at(2) == Action::DESTRUCTION); // of v1
+    CHECK(actions.at(3) == Action::MOVE_CONSTRUCTION); // of v1
+    CHECK(actions.at(4) == Action::DESTRUCTION); // of backup
+}
 
 TEST_CASE("Double variant no copy assignment") {
     using V = Variant<Stub, NonCopyAssignable>;
@@ -792,11 +806,9 @@ TEST_CASE("Double variant no copy assignment") {
     V v((TypeTag<NonCopyAssignable>()));
     // v = v;
 
-    // std::is_copy_assignable (wrongly) returns true due to lazy template
-    // specialization.
-//    static_assert(
-//            !std::is_copy_assignable<V>::value,
-//            "NonCopyAssignable is not copy-assignable");
+    static_assert(
+            !std::is_copy_assignable<V>::value,
+            "NonCopyAssignable is not copy-assignable");
 }
 
 TEST_CASE("Double/quad variant copy assignment to supertype") {
@@ -900,15 +912,30 @@ TEST_CASE("Double variant move assignment with same tag & exception") {
     CHECK(actions2.at(1) == Action::DESTRUCTION);
 }
 
-//TEST_CASE(
-//      "Double variant move assignment with different tag & exception") {
+TEST_CASE("Double variant move assignment with different tag & exception") {
     static_assert(
             std::is_move_assignable<Variant<int, Stub>>::value,
             "int and Stub are move-assignable");
     static_assert(
-            Variant<int, double>::IS_NOTHROW_MOVE_ASSIGNABLE,
+            std::is_nothrow_move_assignable<Variant<int, double>>::value,
             "int and double are no-throw move-assignable");
-//}
+    static_assert(
+            !std::is_nothrow_move_assignable<Variant<MoveThrows>>::value,
+            "MoveThrows is move-assignable but throwing");
+
+    std::vector<Action> actions;
+    Variant<Stub, MoveThrows> v1(TypeTag<Stub>(), actions);
+    Variant<Stub, MoveThrows> v2((TypeTag<MoveThrows>()));
+    CHECK_THROWS_AS(v1 = std::move(v2), Exception);
+    CHECK(v1.tag() == v1.tag<Stub>());
+    CHECK(v2.tag() == v1.tag<MoveThrows>());
+    CHECK(actions.size() == 5);
+    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
+    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of backup
+    CHECK(actions.at(2) == Action::DESTRUCTION); // of v1
+    CHECK(actions.at(3) == Action::MOVE_CONSTRUCTION); // of v1
+    CHECK(actions.at(4) == Action::DESTRUCTION); // of backup
+}
 
 TEST_CASE("Double variant no move assignment") {
     using V = Variant<Stub, NonMoveAssignable>;
@@ -916,24 +943,9 @@ TEST_CASE("Double variant no move assignment") {
     V v((TypeTag<NonMoveAssignable>()));
 //    v = std::move(v);
 
-    // std::is_move_assignable (wrongly) returns true due to lazy template
-    // specialization.
-//    static_assert(
-//            !std::is_move_assignable<V>::value,
-//            "NonMoveAssignable is not move-assignable");
-
-//    struct ThrowingMoveOnly : NonCopyable, MoveThrows { };
-//    {
-//        Variant<Stub, ThrowingMoveOnly> v1(TypeTag<Stub>(), actions);
-//        Variant<Stub, ThrowingMoveOnly> v2((TypeTag<ThrowingMoveOnly>()));
-//        CHECK_THROWS_AS(v1 = std::move(v2), Exception);
-//    }
-
-    // std::is_move_assignable (wrongly) returns true due to lazy template
-    // specialization.
-//    static_assert(
-//            !std::is_move_assignable<Variant<Stub, ThrowingMoveOnly>>::value,
-//            "ThrowingMoveOnly is not move-assignable");
+    static_assert(
+            !std::is_move_assignable<V>::value,
+            "NonMoveAssignable is not move-assignable");
 }
 
 TEST_CASE("Double/quad variant move assignment to supertype") {
