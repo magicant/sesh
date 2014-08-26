@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 #include "async/Future.hh"
-#include "common/ContainerHelper.hh"
+#include "common/container_helper.hh"
 #include "os/event/Trigger.hh"
 
 namespace sesh {
@@ -82,7 +82,7 @@ public:
      */
     template<typename... TriggerArg>
     async::Future<Trigger> expect(TriggerArg &&... t) {
-        return expectImpl(common::createVectorOf<Trigger>(
+        return expectImpl(common::make_vector_of<Trigger>(
                 std::forward<TriggerArg>(t)...));
     }
 

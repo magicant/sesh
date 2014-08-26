@@ -24,14 +24,14 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "common/ContainerHelper.hh"
+#include "common/container_helper.hh"
 #include "common/xstring.hh" // for test of overloading
 
 namespace {
 
 using sesh::common::contains;
-using sesh::common::createVectorOf;
 using sesh::common::find;
+using sesh::common::make_vector_of;
 
 TEST_CASE("Container helper: find first 2 in vector {1, 2, 5, 2}") {
     std::vector<int> v{1, 2, 5, 2};
@@ -92,25 +92,25 @@ TEST_CASE("String \"hello\" doesn't 'x'") {
 }
 
 TEST_CASE("Container helper: create vector of {}") {
-    std::vector<int> v = createVectorOf<int>();
+    std::vector<int> v = make_vector_of<int>();
     CHECK(v.empty());
 }
 
 TEST_CASE("Container helper: create vector of {1}") {
-    std::vector<int> v = createVectorOf<int>(1);
+    std::vector<int> v = make_vector_of<int>(1);
     CHECK(v.size() == 1);
     CHECK(v.at(0) == 1);
 }
 
 TEST_CASE("Container helper: create vector of {2, 1}") {
-    std::vector<int> v = createVectorOf<int>(2, 1);
+    std::vector<int> v = make_vector_of<int>(2, 1);
     CHECK(v.size() == 2);
     CHECK(v.at(0) == 2);
     CHECK(v.at(1) == 1);
 }
 
 TEST_CASE("Container helper: create vector of {4, 2, 1, 3}") {
-    std::vector<int> v = createVectorOf<int>(4, 2, 1, 3);
+    std::vector<int> v = make_vector_of<int>(4, 2, 1, 3);
     CHECK(v.size() == 4);
     CHECK(v.at(0) == 4);
     CHECK(v.at(1) == 2);
@@ -120,7 +120,7 @@ TEST_CASE("Container helper: create vector of {4, 2, 1, 3}") {
 
 TEST_CASE("Container helper: create vector of unique pointer") {
     std::vector<std::unique_ptr<int>> v =
-            createVectorOf<std::unique_ptr<int>>(
+            make_vector_of<std::unique_ptr<int>>(
                     std::unique_ptr<int>(new int(100)),
                     std::unique_ptr<int>(new int(200)));
     CHECK(v.size() == 2);

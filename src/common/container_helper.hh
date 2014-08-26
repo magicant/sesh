@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_ContainerHelper_hh
-#define INCLUDED_common_ContainerHelper_hh
+#ifndef INCLUDED_common_container_helper_hh
+#define INCLUDED_common_container_helper_hh
 
 #include "buildconfig.h"
 
@@ -121,7 +121,7 @@ bool contains(const Container &c, const Element &e) {
  * move- or copy-constructed from the arguments.
  */
 template<typename T, typename... Arg>
-std::vector<T> createVectorOf(Arg &&... arg) {
+std::vector<T> make_vector_of(Arg &&... arg) {
     std::vector<T> v;
     v.reserve(sizeof...(arg));
 
@@ -140,6 +140,6 @@ std::vector<T> createVectorOf(Arg &&... arg) {
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_ContainerHelper_hh
+#endif // #ifndef INCLUDED_common_container_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

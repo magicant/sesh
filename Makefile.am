@@ -26,7 +26,6 @@ TESTPROGRAMS = \
 	src/async/FutureTest \
 	src/async/PromiseTest \
 	src/async/SharedFutureTest \
-	src/common/ContainerHelperTest \
 	src/common/EnumIteratorTest \
 	src/common/EnumSetTest \
 	src/common/MaybeTest \
@@ -37,6 +36,7 @@ TESTPROGRAMS = \
 	src/common/TryTest \
 	src/common/TypeTagTest \
 	src/common/VariantTest \
+	src/common/container_helper_test \
 	src/language/source/BufferTest \
 	src/language/source/LineAppendedSourceTest \
 	src/language/source/LineContinuedSourceTest \
@@ -89,7 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/ContainerHelper.hh \
 	src/common/Copy.hh \
 	src/common/DirectInitialize.hh \
 	src/common/Empty.hh \
@@ -115,6 +114,7 @@ src_sesh_SOURCES = \
 	src/common/TypeTag.hh \
 	src/common/Variant.hh \
 	src/common/common_result.hh \
+	src/common/container_helper.hh \
 	src/common/xchar.hh \
 	src/common/xstring.hh \
 	src/helpermacros.h \
@@ -210,8 +210,6 @@ src_async_PromiseTest_SOURCES = \
 	src/async/PromiseTest.cc
 src_async_SharedFutureTest_SOURCES = \
 	src/async/SharedFutureTest.cc
-src_common_ContainerHelperTest_SOURCES = \
-	src/common/ContainerHelperTest.cc
 src_common_EnumIteratorTest_SOURCES = \
 	src/common/EnumIteratorTest.cc
 src_common_EnumSetTest_SOURCES = \
@@ -234,6 +232,8 @@ src_common_TypeTagTest_SOURCES = \
 	src/common/TypeTagTest.cc
 src_common_VariantTest_SOURCES = \
 	src/common/VariantTest.cc
+src_common_container_helper_test_SOURCES = \
+	src/common/container_helper_test.cc
 src_language_source_BufferTest_SOURCES = \
 	src/common/Message.cc \
 	src/language/source/Buffer.cc \
