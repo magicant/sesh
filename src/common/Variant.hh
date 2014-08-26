@@ -303,7 +303,7 @@ public:
             typename V = typename std::remove_const<
                     typename std::remove_reference<T>::type>::type>
     void operator()(T &&v) const
-            noexcept(std::is_nothrow_assignable<V, T &&>::value) {
+            noexcept(std::is_nothrow_assignable<V &, T &&>::value) {
         mTarget.template value<V>() = std::forward<T>(v);
     }
 
@@ -905,7 +905,7 @@ public:
      * @see #reset
      */
     template<typename U, typename V = typename std::decay<U>::type>
-    void assign(U &&v) noexcept(std::is_nothrow_assignable<V, U &&>::value) {
+    void assign(U &&v) noexcept(std::is_nothrow_assignable<V &, U &&>::value) {
         if (tag() == tag<V>())
             value<V>() = std::forward<U>(v);
         else
