@@ -23,6 +23,7 @@ Makefile.in
 *.log
 *.trs
 *Test
+*_test
 
 TAGS
 tags
