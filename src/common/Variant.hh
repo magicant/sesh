@@ -28,9 +28,9 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "common/CommonResult.hh"
 #include "common/FunctionalInitialize.hh"
 #include "common/TypeTag.hh"
+#include "common/common_result.hh"
 
 namespace sesh {
 namespace common {
@@ -609,7 +609,7 @@ public:
     auto apply(Visitor &&visitor) &
             noexcept(noexcept(std::declval<Tag &>().apply(
                     std::declval<Applier<Value &, Visitor>>())))
-            -> typename CommonResult<Visitor, T &...>::type {
+            -> typename common_result<Visitor, T &...>::type {
         return Tag::apply(applier(value(), std::forward<Visitor>(visitor)));
     }
 
@@ -634,7 +634,7 @@ public:
     auto apply(Visitor &&visitor) const &
             noexcept(noexcept(std::declval<const Tag &>().apply(
                     std::declval<Applier<const Value &, Visitor>>())))
-            -> typename CommonResult<Visitor, const T &...>::type {
+            -> typename common_result<Visitor, const T &...>::type {
         return Tag::apply(applier(value(), std::forward<Visitor>(visitor)));
     }
 
@@ -658,7 +658,7 @@ public:
     auto apply(Visitor &&visitor) &&
             noexcept(noexcept(std::declval<Tag &>().apply(
                     std::declval<Applier<Value, Visitor>>())))
-            -> typename CommonResult<Visitor, T &&...>::type {
+            -> typename common_result<Visitor, T &&...>::type {
         return Tag::apply(applier(
                     std::move(value()), std::forward<Visitor>(visitor)));
     }

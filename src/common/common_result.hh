@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_CommonResult_hh
-#define INCLUDED_common_CommonResult_hh
+#ifndef INCLUDED_common_common_result_hh
+#define INCLUDED_common_common_result_hh
 
 #include "buildconfig.h"
 
@@ -31,42 +31,42 @@ namespace common_result_impl {
 inline void ignore(...);
 
 template<typename Function, typename... Argument>
-inline auto isCallable(Function &&f, Argument &&... a)
+inline auto is_callable(Function &&f, Argument &&... a)
     -> decltype(
         ignore((std::forward<Function>(f)(std::forward<Argument>(a)), 0)...),
         std::true_type());
 
-inline std::false_type isCallable(...);
+inline std::false_type is_callable(...);
 
 template<typename, typename>
-class SameType { };
+class same_type { };
 
 template<typename T>
-class SameType<T, T> {
+class same_type<T, T> {
 public:
     using type = T;
 };
 
-template<bool IS_CALLABLE, typename Function, typename... Argument>
-class CommonResultImpl;
+template<bool IsCallable, typename Function, typename... Argument>
+class common_result_impl;
 
 template<typename Function, typename... Argument>
-class CommonResultImpl<false, Function, Argument...> { };
+class common_result_impl<false, Function, Argument...> { };
 
 template<typename Function>
-class CommonResultImpl<true, Function> { };
+class common_result_impl<true, Function> { };
 
 template<typename Function, typename Argument>
-class CommonResultImpl<true, Function, Argument> {
+class common_result_impl<true, Function, Argument> {
 public:
     using type = decltype(std::declval<Function>()(std::declval<Argument>()));
 };
 
 template<typename Function, typename A1, typename A2, typename... AN>
-class CommonResultImpl<true, Function, A1, A2, AN...> :
-        public SameType<
-                typename CommonResultImpl<true, Function, A1>::type,
-                typename CommonResultImpl<true, Function, A2, AN...>::type> {
+class common_result_impl<true, Function, A1, A2, AN...> :
+        public same_type<
+                typename common_result_impl<true, Function, A1>::type,
+                typename common_result_impl<true, Function, A2, AN...>::type> {
 };
 
 } // namespace common_result_impl
@@ -86,9 +86,9 @@ class CommonResultImpl<true, Function, A1, A2, AN...> :
  * @tparam Argument Argument types that are passed to the function.
  */
 template<typename Function, typename... Argument>
-class CommonResult :
-        public common_result_impl::CommonResultImpl<
-                decltype(common_result_impl::isCallable(
+class common_result :
+        public common_result_impl::common_result_impl<
+                decltype(common_result_impl::is_callable(
                         std::declval<Function>(),
                         std::declval<Argument>()...))::value,
                 Function,
@@ -97,6 +97,6 @@ class CommonResult :
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_CommonResult_hh
+#endif // #ifndef INCLUDED_common_common_result_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
