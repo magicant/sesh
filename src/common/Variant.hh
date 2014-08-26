@@ -22,6 +22,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <functional>
 #include <initializer_list>
 #include <memory>
 #include <tuple>
@@ -1313,6 +1314,45 @@ template<typename... T>
 void swap(Variant<T...> &a, Variant<T...> &b)
         noexcept(Variant<T...>::IS_NOTHROW_SWAPPABLE) {
     a.swap(b);
+}
+
+template<template<typename> class C, typename... T>
+class Comparator {
+
+private:
+
+    const Variant<T...> &mVariant;
+
+public:
+
+    constexpr explicit Comparator(const Variant<T...> &v) noexcept :
+            mVariant(v) { }
+
+    template<typename U>
+    constexpr bool operator()(const U &u) const {
+        return C<U>()(u, mVariant.template value<U>());
+    }
+
+}; // template<template<typename> typename C, typename... T> class Comparator
+
+/** Checks if two variants have the same indexes and equal values. */
+template<typename... T>
+constexpr bool operator==(const Variant<T...> &l, const Variant<T...> &r) {
+    return l.tag() == r.tag() && l.apply(Comparator<std::equal_to, T...>(r));
+}
+
+/**
+ * Checks the order of two variants.
+ *
+ * Variants with different type indexes are ordered by indexes. Variants with
+ * the same indexes are compared by applying the {@code <} operator to the
+ * values.
+ */
+template<typename... T>
+constexpr bool operator<(const Variant<T...> &l, const Variant<T...> &r) {
+    return l.tag() == r.tag() ?
+            l.apply(Comparator<std::less, T...>(r)) :
+            l.tag() < r.tag();
 }
 
 } // namespace variant_impl
