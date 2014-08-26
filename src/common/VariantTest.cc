@@ -1092,6 +1092,62 @@ TEST_CASE("Double variant swapping with different type") {
             "CopyMayThrow swap may throw");
 //}
 
+TEST_CASE("Double variant operator==") {
+    Variant<int, double> i1 = 42;
+    Variant<int, double> i2 = 123;
+    Variant<int, double> d1 = 42.0;
+    Variant<int, double> d2 = 123.0;
+
+    CHECK(i1 == i1);
+    CHECK(i2 == i2);
+    CHECK(d1 == d1);
+    CHECK(d2 == d2);
+
+    CHECK_FALSE(i1 == i2);
+    CHECK_FALSE(i1 == d1);
+    CHECK_FALSE(i1 == d2);
+
+    CHECK_FALSE(i2 == i1);
+    CHECK_FALSE(i2 == d1);
+    CHECK_FALSE(i2 == d2);
+
+    CHECK_FALSE(d1 == i1);
+    CHECK_FALSE(d1 == i2);
+    CHECK_FALSE(d1 == d2);
+
+    CHECK_FALSE(d2 == i1);
+    CHECK_FALSE(d2 == i2);
+    CHECK_FALSE(d2 == d1);
+}
+
+TEST_CASE("Double variant operator<") {
+    Variant<int, double> i1 = 42;
+    Variant<int, double> i2 = 123;
+    Variant<int, double> d1 = 42.0;
+    Variant<int, double> d2 = 123.0;
+
+    CHECK_FALSE(i1 < i1);
+    CHECK_FALSE(i2 < i2);
+    CHECK_FALSE(d1 < d1);
+    CHECK_FALSE(d2 < d2);
+
+    CHECK(i1 < i2);
+    CHECK(i1 < d1);
+    CHECK(i1 < d2);
+
+    CHECK_FALSE(i2 < i1);
+    CHECK(i2 < d1);
+    CHECK(i2 < d2);
+
+    CHECK_FALSE(d1 < i1);
+    CHECK_FALSE(d1 < i2);
+    CHECK(d1 < d2);
+
+    CHECK_FALSE(d2 < i1);
+    CHECK_FALSE(d2 < i2);
+    CHECK_FALSE(d2 < d1);
+}
+
 } // namespace
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
