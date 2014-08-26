@@ -202,10 +202,10 @@ public:
             typename U,
             typename = typename std::enable_if<
                     std::is_constructible<T, U &&>::value &&
-                    std::is_assignable<T, U &&>::value>::type>
+                    std::is_assignable<T &, U &&>::value>::type>
     Maybe &operator=(U &&v)
             noexcept(std::is_nothrow_constructible<T, U &&>::value &&
-                    std::is_nothrow_assignable<T, U &&>::value) {
+                    std::is_nothrow_assignable<T &, U &&>::value) {
         if (hasValue())
             value() = std::forward<U>(v);
         else
