@@ -24,8 +24,8 @@
 #include <type_traits>
 #include <utility>
 #include "common/OutputStream.hh"
-#include "common/String.hh"
 #include "common/StringStream.hh"
+#include "common/xstring.hh"
 
 namespace sesh {
 namespace language {
@@ -89,7 +89,7 @@ public:
         return mLineMode;
     }
 
-    common::String toString() const;
+    common::xstring toString() const;
 
     common::OutputStream &delayedCharacters() noexcept {
         return mDelayedCharacters;

@@ -22,7 +22,7 @@
 
 #include <memory>
 #include "common/xchar.hh"
-#include "common/String.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
@@ -30,8 +30,8 @@
 
 namespace {
 
-using sesh::common::String;
 using sesh::common::xchar;
+using sesh::common::xstring;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
@@ -39,7 +39,7 @@ using sesh::language::syntax::forEachLineMode;
 
 class CommandStub : public Command {
 private:
-    String mString;
+    xstring mString;
 public:
     explicit CommandStub(const xchar *s) : Command(), mString(s) { }
     void print(Printer &p) const override {
@@ -52,7 +52,7 @@ void addCommand(Pipeline &p, const xchar *s) {
     p.commands().push_back(Pipeline::CommandPointer(new CommandStub(s)));
 }
 
-void checkForEachLineMode(const Pipeline &pl, const String &expected) {
+void checkForEachLineMode(const Pipeline &pl, const xstring &expected) {
     forEachLineMode([&pl, &expected](Printer &p) {
         p << pl;
         CHECK(p.toString() == expected);

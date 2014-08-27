@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 #include "common/Maybe.hh"
-#include "common/String.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Printable.hh"
 #include "language/syntax/WordComponent.hh"
 
@@ -46,7 +46,7 @@ private:
 
     std::vector<ComponentPointer> mComponents;
 
-    mutable common::Maybe<common::Maybe<common::String>>
+    mutable common::Maybe<common::Maybe<common::xstring>>
             mMaybeConstantValueCache;
 
 public:
@@ -81,7 +81,7 @@ public:
 
 private:
 
-    common::Maybe<common::String> computeMaybeConstantValue() const;
+    common::Maybe<common::xstring> computeMaybeConstantValue() const;
 
 public:
 
@@ -91,7 +91,7 @@ public:
      * returns a reference to a maybe object containing the constant value.
      * Otherwise, returns a reference to an empty maybe object.
      */
-    const common::Maybe<common::String> &maybeConstantValue() const;
+    const common::Maybe<common::xstring> &maybeConstantValue() const;
 
     /** Returns true if all components of this word are raw strings. */
     bool isRawString() const;

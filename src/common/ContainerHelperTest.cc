@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 #include "common/ContainerHelper.hh"
-#include "common/String.hh" // for test of overloading
+#include "common/xstring.hh" // for test of overloading
 
 namespace {
 

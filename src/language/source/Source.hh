@@ -21,8 +21,8 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include "common/String.hh"
 #include "common/xchar.hh"
+#include "common/xstring.hh"
 #include "language/source/Location.hh"
 
 namespace sesh {
@@ -38,7 +38,7 @@ class Source {
 
 public:
 
-    using String = common::String;
+    using String = common::xstring;
     using Char = String::value_type;
     using Size = String::size_type;
     using Difference = String::difference_type;

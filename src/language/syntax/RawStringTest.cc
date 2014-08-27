@@ -20,15 +20,15 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common/String.hh"
 #include "common/xchar.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 #include "language/syntax/RawString.hh"
 
 namespace {
 
-using sesh::common::String;
+using sesh::common::xstring;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::forEachLineMode;
@@ -49,7 +49,7 @@ TEST_CASE("Raw string constructors and value") {
 }
 
 TEST_CASE("Raw string, append constant value") {
-    String s;
+    xstring s;
     CHECK(RawString(L("1")).appendConstantValue(s));
     CHECK(s == L("1"));
     CHECK(RawString(L("ABC")).appendConstantValue(s));

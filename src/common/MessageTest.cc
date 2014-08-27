@@ -23,22 +23,22 @@
 #include <utility>
 #include "boost/format.hpp"
 #include "common/Message.hh"
-#include "common/String.hh"
 #include "common/xchar.hh"
+#include "common/xstring.hh"
 
 namespace {
 
 using sesh::common::Message;
-using sesh::common::String;
 using sesh::common::xchar;
+using sesh::common::xstring;
 
 TEST_CASE("Message, construction") {
-    const String s = L("test");
+    const xstring s = L("test");
     Message<> m1;
     Message<> m2(nullptr);
     Message<> m3(L("test"));
     Message<> m4(s);
-    Message<> m5(String(L("test")));
+    Message<> m5(xstring(L("test")));
 }
 
 TEST_CASE("Message, special member functions without arguments") {
@@ -59,7 +59,7 @@ TEST_CASE("Message, format string") {
     CHECK(m2.formatString() == L("ABC"));
 
     CHECK(Message<>().formatString() == L(""));
-    CHECK(Message<>(String(L("test"))).formatString() == L("test"));
+    CHECK(Message<>(xstring(L("test"))).formatString() == L("test"));
 }
 
 TEST_CASE("Message, format without arguments") {
@@ -89,7 +89,8 @@ TEST_CASE("Message, format with arguments") {
 TEST_CASE("Message, to string") {
     CHECK(Message<>(L("ABC%%")).toString() == L("ABC%"));
     CHECK((Message<int>(L("%1%%%")) % 33).toString() == L("33%"));
-    CHECK((Message<String, xchar>(L("[%1%:%2%]")) % L("S") % L('C')).toString()
+    CHECK((Message<xstring, xchar>(L("[%1%:%2%]")) % L("S") % L('C'))
+            .toString()
             == L("[S:C]"));
 }
 

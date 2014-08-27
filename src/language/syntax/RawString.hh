@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include <utility>
-#include "common/String.hh"
+#include "common/xstring.hh"
 #include "language/syntax/WordComponent.hh"
 
 namespace sesh {
@@ -40,13 +40,13 @@ class RawString : public WordComponent {
 
 private:
 
-    common::String mValue;
+    common::xstring mValue;
 
 public:
 
     RawString() : mValue() { }
-    explicit RawString(const common::String &s) : mValue(s) { }
-    explicit RawString(common::String &&s) noexcept : mValue(std::move(s)) { }
+    explicit RawString(const common::xstring &s) : mValue(s) { }
+    explicit RawString(common::xstring &&s) noexcept : mValue(std::move(s)) { }
 
     RawString(const RawString &) = default;
     RawString(RawString &&) = default;
@@ -56,10 +56,10 @@ public:
 
     bool isRawString() const noexcept override { return true; }
 
-    common::String &value() { return mValue; }
-    const common::String &value() const { return mValue; }
+    common::xstring &value() { return mValue; }
+    const common::xstring &value() const { return mValue; }
 
-    bool appendConstantValue(common::String &) const override;
+    bool appendConstantValue(common::xstring &) const override;
 
     void print(Printer &) const override;
 

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_String_hh
-#define INCLUDED_common_String_hh
+#ifndef INCLUDED_common_xstring_hh
+#define INCLUDED_common_xstring_hh
 
 #include "buildconfig.h"
 
@@ -30,10 +30,10 @@ namespace common {
  * The string type that is used throughout the program (except when calling an
  * OS API function).
  */
-using String = std::basic_string<xchar>;
+using xstring = std::basic_string<xchar>;
 
-/** The character traits type of String. */
-using CharTraits = String::traits_type;
+/** The character traits type of xstring. */
+using xchar_traits = xstring::traits_type;
 
 /** Checks if the given string contains the given character. */
 template<typename CharT, typename Traits, typename Allocator>
@@ -48,6 +48,6 @@ bool contains(
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_String_hh
+#endif // #ifndef INCLUDED_common_xstring_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

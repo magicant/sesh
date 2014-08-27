@@ -18,16 +18,16 @@
 #include "buildconfig.h"
 #include "RawString.hh"
 
-#include "common/String.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Printer.hh"
 
-using sesh::common::String;
+using sesh::common::xstring;
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
-bool RawString::appendConstantValue(String &s) const {
+bool RawString::appendConstantValue(xstring &s) const {
     s += value();
     return true;
 }

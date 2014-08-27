@@ -26,15 +26,15 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include "common/String.hh"
 #include "common/Trie.hh"
 #include "common/xchar.hh"
+#include "common/xstring.hh"
 
 namespace {
 
-using sesh::common::String;
 using sesh::common::Trie;
 using sesh::common::xchar;
+using sesh::common::xstring;
 
 TEST_CASE("Trie, default construction") {
     Trie<xchar, int> t;
@@ -155,7 +155,7 @@ TEST_CASE("Trie, node value") {
 }
 
 TEST_CASE("Trie, emplace child") {
-    Trie<String, int> t;
+    Trie<xstring, int> t;
 
     auto a1 = t.emplaceChild(3, L('a'));
     CHECK(a1.first.empty());

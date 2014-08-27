@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "common/String.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Printable.hh"
 
 namespace sesh {
@@ -45,7 +45,7 @@ public:
      * environment state, appends the string to the argument and returns true.
      * Otherwise, returns false without any side effects.
      */
-    virtual bool appendConstantValue(common::String &) const = 0;
+    virtual bool appendConstantValue(common::xstring &) const = 0;
 
 }; // class WordComponent
 

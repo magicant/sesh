@@ -23,7 +23,7 @@
 #include <functional>
 #include "boost/format.hpp"
 #include "common/OutputStream.hh"
-#include "common/String.hh"
+#include "common/xstring.hh"
 
 namespace sesh {
 namespace common {
@@ -62,7 +62,7 @@ class Message<> {
 
 public:
 
-    using String = common::String;
+    using String = common::xstring;
     using Char = String::value_type;
     using CharTraits = String::traits_type;
     using Allocator = String::allocator_type;

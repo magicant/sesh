@@ -110,13 +110,13 @@ src_sesh_SOURCES = \
 	src/common/Reference.hh \
 	src/common/SharedFunction.hh \
 	src/common/StaticCast.hh \
-	src/common/String.hh \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
 	src/common/Try.hh \
 	src/common/TypeTag.hh \
 	src/common/Variant.hh \
 	src/common/xchar.hh \
+	src/common/xstring.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
 	src/language/source/Buffer.cc \

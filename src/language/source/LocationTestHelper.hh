@@ -22,7 +22,6 @@
 
 #include <cstddef>
 #include <memory>
-#include "common/String.hh"
 #include "language/source/Location.hh"
 #include "language/source/OriginTestHelper.hh"
 
