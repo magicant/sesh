@@ -27,7 +27,7 @@
 
 namespace {
 
-using sesh::common::DIRECT_INITIALIZE;
+using sesh::common::DirectInitialize;
 using sesh::common::SharedFunction;
 using sesh::common::makeSharedFunction;
 
@@ -64,7 +64,7 @@ public:
 TEST_CASE("Shared function: direct initialization, assignment, and call") {
     int i = 0;
     double d = 1.0;
-    const SharedFunction<FunctionStub> f1(DIRECT_INITIALIZE, i, d);
+    const SharedFunction<FunctionStub> f1(DirectInitialize(), i, d);
     const SharedFunction<FunctionStub> f2 = f1;
     CHECK(f2(0.0, 42) == 'A');
     CHECK(i == 42);
@@ -101,7 +101,8 @@ TEST_CASE("Shared function: construction from const shared pointer") {
 }
 
 TEST_CASE("Shared function: simple function pointer") {
-    const SharedFunction<int(*)(int)> sf(DIRECT_INITIALIZE, std::ref(id<int>));
+    using SF = SharedFunction<int(*)(int)>;
+    const SF sf(DirectInitialize(), std::ref(id<int>));
     std::function<int(int)> f = sf;
     CHECK(f(2) == 2);
 }
@@ -110,7 +111,7 @@ TEST_CASE("Shared function: insertion to std::function") {
     int i = 0;
     double d = 1.0;
     const std::function<char(double, int)> f(
-            SharedFunction<FunctionStub>(DIRECT_INITIALIZE, i, d));
+            SharedFunction<FunctionStub>(DirectInitialize(), i, d));
     CHECK(f(0.0, 42) == 'A');
     CHECK(i == 42);
     CHECK(d == 0.0);

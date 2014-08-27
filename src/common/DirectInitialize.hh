@@ -27,9 +27,6 @@ namespace common {
 class DirectInitialize {
 };
 
-/** A value of DirectInitialize. */
-constexpr DirectInitialize DIRECT_INITIALIZE = DirectInitialize();
-
 } // namespace common
 } // namespace sesh
 

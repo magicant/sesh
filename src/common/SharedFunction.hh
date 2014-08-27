@@ -74,7 +74,7 @@ public:
      */
     template<typename... Arg>
     static SharedFunction create(Arg &&... arg) {
-        return SharedFunction(DIRECT_INITIALIZE, std::forward<Arg>(arg)...);
+        return SharedFunction(DirectInitialize(), std::forward<Arg>(arg)...);
     }
 
     /**
@@ -126,7 +126,7 @@ public:
  */
 template<typename F, typename G = const typename std::decay<F>::type>
 SharedFunction<G> makeSharedFunction(F &&f) {
-    return SharedFunction<G>(DIRECT_INITIALIZE, std::forward<F>(f));
+    return SharedFunction<G>(DirectInitialize(), std::forward<F>(f));
 }
 
 } // namespace common
