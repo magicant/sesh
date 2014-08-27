@@ -24,11 +24,11 @@
 #include <new>
 #include <stdexcept>
 #include <system_error>
-#include "common/EnumIterator.hh"
 #include "common/EnumSet.hh"
 #include "common/ErrnoHelper.hh"
 #include "common/TypeTag.hh"
 #include "common/Variant.hh"
+#include "common/enum_iterator.hh"
 #include "helpermacros.h"
 #include "os/capi.h"
 #include "os/io/FileDescriptionAccessMode.hh"

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_EnumIterator_hh
-#define INCLUDED_common_EnumIterator_hh
+#ifndef INCLUDED_common_enum_iterator_hh
+#define INCLUDED_common_enum_iterator_hh
 
 #include "buildconfig.h"
 
@@ -33,7 +33,7 @@ namespace common {
 namespace enum_iterator_impl {
 
 template<typename E>
-using Base = boost::transform_iterator<
+using base = boost::transform_iterator<
         StaticCast<E, typename std::underlying_type<E>::type>,
         boost::counting_iterator<typename std::underlying_type<E>::type>>;
 
@@ -44,46 +44,45 @@ using Base = boost::transform_iterator<
  * underlying integral value.
  */
 template<typename E>
-class EnumIterator : public enum_iterator_impl::Base<E> {
+class enum_iterator : public enum_iterator_impl::base<E> {
 
 public:
 
-    using Enum = E;
-    using UnderlyingType = typename std::underlying_type<E>::type;
+    using underlying_type = typename std::underlying_type<E>::type;
 
-    explicit EnumIterator(UnderlyingType v) :
-            enum_iterator_impl::Base<E>(
+    explicit enum_iterator(underlying_type v) :
+            enum_iterator_impl::base<E>(
                     boost::make_counting_iterator(v),
-                    StaticCast<E, UnderlyingType>()) { }
+                    StaticCast<E, underlying_type>()) { }
 
-    EnumIterator(E e) : EnumIterator(static_cast<UnderlyingType>(e)) { }
+    enum_iterator(E e) : enum_iterator(static_cast<underlying_type>(e)) { }
 
-}; // template<typename E> class EnumIterator
+}; // template<typename E> class enum_iterator
 
 namespace enum_iterator_impl {
 
 template<typename E>
-class FullRange {
+class full_range {
 
 private:
 
-    using U = typename EnumIterator<E>::UnderlyingType;
+    using U = typename enum_iterator<E>::underlying_type;
 
 public:
 
-    EnumIterator<E> begin() const {
-        EnumIterator<E> i(static_cast<U>(0));
+    enum_iterator<E> begin() const {
+        enum_iterator<E> i(static_cast<U>(0));
         return i;
     }
 
-    EnumIterator<E> end() const {
+    enum_iterator<E> end() const {
         constexpr U max = static_cast<U>(EnumTraits<E>::max);
         static_assert(max < std::numeric_limits<U>::max(), "overflow");
-        EnumIterator<E> i(max + 1);
+        enum_iterator<E> i(max + 1);
         return i;
     }
 
-}; // template<typename E> class FullRange
+}; // template<typename E> class full_range
 
 } // namespace enum_iterator_impl
 
@@ -98,14 +97,14 @@ public:
  * EnumTraits&lt;E>::max}.
  */
 template<typename E>
-enum_iterator_impl::FullRange<E> enumerators() noexcept {
-    enum_iterator_impl::FullRange<E> range;
+enum_iterator_impl::full_range<E> enumerators() noexcept {
+    enum_iterator_impl::full_range<E> range;
     return range;
 }
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_EnumIterator_hh
+#endif // #ifndef INCLUDED_common_enum_iterator_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

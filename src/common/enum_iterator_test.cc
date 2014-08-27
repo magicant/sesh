@@ -22,12 +22,12 @@
 
 #include <type_traits>
 #include <vector>
-#include "common/EnumIterator.hh"
 #include "common/EnumTraits.hh"
+#include "common/enum_iterator.hh"
 
 namespace {
 
-using sesh::common::EnumIterator;
+using sesh::common::enum_iterator;
 using sesh::common::enumerators;
 
 enum A { A0, A1, A2, A3, };
@@ -52,14 +52,14 @@ public:
 namespace {
 
 TEST_CASE("Enum iterator: basic iteration on unscoped enumeration") {
-    EnumIterator<A> i = A1;
-    using UnderlyingType = decltype(i)::UnderlyingType;
+    enum_iterator<A> i = A1;
+    using underlying_type = decltype(i)::underlying_type;
 
     CHECK(*i == A1);
     ++i;
     CHECK(*i == A2);
     i += 2;
-    CHECK(i == EnumIterator<A>(static_cast<UnderlyingType>(4)));
+    CHECK(i == enum_iterator<A>(static_cast<underlying_type>(4)));
     --i;
     CHECK(*i == A3);
     i--;
@@ -71,18 +71,18 @@ TEST_CASE("Enum iterator: basic iteration on unscoped enumeration") {
 }
 
 TEST_CASE("Enum iterator: basic iteration on scoped enumeration") {
-    EnumIterator<B> i = B::B3;
+    enum_iterator<B> i = B::B3;
     CHECK(*i == B::B3);
     ++i;
     CHECK(*i == B::B4);
     i += 2;
-    CHECK(i == EnumIterator<B>(6));
+    CHECK(i == enum_iterator<B>(6));
     --i;
     CHECK(*i == B::B5);
 }
 
 TEST_CASE("Enum iterator: direct construction from underlying type") {
-    EnumIterator<B> i(3);
+    enum_iterator<B> i(3);
     CHECK(*i == B::B3);
 }
 
