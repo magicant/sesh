@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_Copy_hh
-#define INCLUDED_common_Copy_hh
+#ifndef INCLUDED_common_copy_hh
+#define INCLUDED_common_copy_hh
 
 #include "buildconfig.h"
 
@@ -43,7 +43,7 @@ template<
         typename R = typename std::decay<T>::type,
         typename S = typename std::conditional<
                 std::is_rvalue_reference<T &&>::value, T &&, R>::type>
-constexpr S copyOrMove(T &&t)
+constexpr S copy_or_move(T &&t)
         noexcept(std::is_rvalue_reference<T &&>::value ||
                 (std::is_nothrow_constructible<R, T &&>::value &&
                 std::is_nothrow_destructible<R>::value)) {
@@ -53,6 +53,6 @@ constexpr S copyOrMove(T &&t)
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_Copy_hh
+#endif // #ifndef INCLUDED_common_copy_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
