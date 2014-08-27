@@ -25,7 +25,7 @@ namespace common {
 
 /**
  * An empty function object class.
- * @see Empty
+ * @see empty
  */
 class Nop {
 

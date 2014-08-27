@@ -25,10 +25,10 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include "common/Empty.hh"
 #include "common/Maybe.hh"
 #include "common/Try.hh"
 #include "common/TypeTag.hh"
+#include "common/empty.hh"
 
 namespace sesh {
 namespace async {
@@ -58,7 +58,7 @@ public:
 
 private:
 
-    using Empty = common::Empty;
+    using Empty = common::empty;
     using Try = common::Try<T>;
     using ForwardSource = std::weak_ptr<Delay>;
     using ForwardTarget = std::shared_ptr<Delay>;
