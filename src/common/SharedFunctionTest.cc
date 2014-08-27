@@ -22,13 +22,13 @@
 
 #include <functional>
 #include <memory>
-#include "common/DirectInitialize.hh"
 #include "common/SharedFunction.hh"
+#include "common/direct_initialize.hh"
 
 namespace {
 
-using sesh::common::DirectInitialize;
 using sesh::common::SharedFunction;
+using sesh::common::direct_initialize;
 using sesh::common::makeSharedFunction;
 
 template<typename T>
@@ -64,7 +64,7 @@ public:
 TEST_CASE("Shared function: direct initialization, assignment, and call") {
     int i = 0;
     double d = 1.0;
-    const SharedFunction<FunctionStub> f1(DirectInitialize(), i, d);
+    const SharedFunction<FunctionStub> f1(direct_initialize(), i, d);
     const SharedFunction<FunctionStub> f2 = f1;
     CHECK(f2(0.0, 42) == 'A');
     CHECK(i == 42);
@@ -102,7 +102,7 @@ TEST_CASE("Shared function: construction from const shared pointer") {
 
 TEST_CASE("Shared function: simple function pointer") {
     using SF = SharedFunction<int(*)(int)>;
-    const SF sf(DirectInitialize(), std::ref(id<int>));
+    const SF sf(direct_initialize(), std::ref(id<int>));
     std::function<int(int)> f = sf;
     CHECK(f(2) == 2);
 }
@@ -111,7 +111,7 @@ TEST_CASE("Shared function: insertion to std::function") {
     int i = 0;
     double d = 1.0;
     const std::function<char(double, int)> f(
-            SharedFunction<FunctionStub>(DirectInitialize(), i, d));
+            SharedFunction<FunctionStub>(direct_initialize(), i, d));
     CHECK(f(0.0, 42) == 'A');
     CHECK(i == 42);
     CHECK(d == 0.0);

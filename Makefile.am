@@ -89,7 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/DirectInitialize.hh \
 	src/common/Empty.hh \
 	src/common/EnumIterator.hh \
 	src/common/EnumSet.hh \
@@ -115,6 +114,7 @@ src_sesh_SOURCES = \
 	src/common/common_result.hh \
 	src/common/container_helper.hh \
 	src/common/copy.hh \
+	src/common/direct_initialize.hh \
 	src/common/xchar.hh \
 	src/common/xstring.hh \
 	src/helpermacros.h \

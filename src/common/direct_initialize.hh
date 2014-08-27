@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_DirectInitialize_hh
-#define INCLUDED_common_DirectInitialize_hh
+#ifndef INCLUDED_common_direct_initialize_hh
+#define INCLUDED_common_direct_initialize_hh
 
 #include "buildconfig.h"
 
@@ -24,12 +24,12 @@ namespace sesh {
 namespace common {
 
 /** An empty dummy type to disambiguate some overload resolution. */
-class DirectInitialize {
+class direct_initialize {
 };
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_DirectInitialize_hh
+#endif // #ifndef INCLUDED_common_direct_initialize_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

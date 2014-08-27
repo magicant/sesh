@@ -24,7 +24,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include "common/DirectInitialize.hh"
+#include "common/direct_initialize.hh"
 
 namespace sesh {
 namespace common {
@@ -62,7 +62,7 @@ public:
      * @param arg arguments that are passed to std::make_shared.
      */
     template<typename... Arg>
-    explicit SharedFunction(DirectInitialize, Arg &&... arg) :
+    explicit SharedFunction(direct_initialize, Arg &&... arg) :
             mFunction(std::make_shared<F>(std::forward<Arg>(arg)...)) { }
 
     /**
@@ -74,7 +74,7 @@ public:
      */
     template<typename... Arg>
     static SharedFunction create(Arg &&... arg) {
-        return SharedFunction(DirectInitialize(), std::forward<Arg>(arg)...);
+        return SharedFunction(direct_initialize(), std::forward<Arg>(arg)...);
     }
 
     /**
@@ -126,7 +126,7 @@ public:
  */
 template<typename F, typename G = const typename std::decay<F>::type>
 SharedFunction<G> makeSharedFunction(F &&f) {
-    return SharedFunction<G>(DirectInitialize(), std::forward<F>(f));
+    return SharedFunction<G>(direct_initialize(), std::forward<F>(f));
 }
 
 } // namespace common
