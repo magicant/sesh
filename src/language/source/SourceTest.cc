@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <stdexcept>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 #include "language/source/Source.hh"
 #include "language/source/SourceTestHelper.hh"
 

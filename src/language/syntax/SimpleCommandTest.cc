@@ -21,8 +21,8 @@
 #include "catch.hpp"
 
 #include <utility>
-#include "common/Char.hh"
 #include "common/String.hh"
+#include "common/xchar.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"

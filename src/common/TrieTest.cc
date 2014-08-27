@@ -26,23 +26,23 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include "common/Char.hh"
 #include "common/String.hh"
 #include "common/Trie.hh"
+#include "common/xchar.hh"
 
 namespace {
 
-using sesh::common::Char;
 using sesh::common::String;
 using sesh::common::Trie;
+using sesh::common::xchar;
 
 TEST_CASE("Trie, default construction") {
-    Trie<Char, int> t;
+    Trie<xchar, int> t;
 }
 
 TEST_CASE("Trie, construction with comparator and key_comp") {
-    auto comp = [](Char a, Char b) { return a > b; };
-    Trie<Char, int, decltype(comp)> t(comp);
+    auto comp = [](xchar a, xchar b) { return a > b; };
+    Trie<xchar, int, decltype(comp)> t(comp);
     CHECK_FALSE(t.key_comp()(L('!'), L('!')));
     CHECK(t.key_comp()(L('\1'), L('\0')));
 

@@ -21,12 +21,12 @@
 #include "buildconfig.h"
 
 #include <ostream>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 
 namespace sesh {
 namespace common {
 
-using OutputStream = std::basic_ostream<Char>;
+using OutputStream = std::basic_ostream<xchar>;
 
 } // namespace common
 } // namespace sesh

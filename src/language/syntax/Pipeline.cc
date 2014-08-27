@@ -20,7 +20,7 @@
 
 #include <utility>
 #include <vector>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 #include "language/syntax/Printer.hh"
 
 namespace sesh {

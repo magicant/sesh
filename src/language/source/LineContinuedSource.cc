@@ -21,7 +21,7 @@
 #include <exception>
 #include <stdexcept>
 #include <utility>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 
 namespace sesh {
 namespace language {

@@ -21,8 +21,8 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include "common/Char.hh"
 #include "common/String.hh"
+#include "common/xchar.hh"
 #include "language/source/Location.hh"
 
 namespace sesh {

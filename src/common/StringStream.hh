@@ -21,15 +21,15 @@
 #include "buildconfig.h"
 
 #include <sstream>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 
 namespace sesh {
 namespace common {
 
-using StringBuffer = std::basic_stringbuf<Char>;
-using InputStringStream = std::basic_istringstream<Char>;
-using OutputStringStream = std::basic_ostringstream<Char>;
-using StringStream = std::basic_stringstream<Char>;
+using StringBuffer = std::basic_stringbuf<xchar>;
+using InputStringStream = std::basic_istringstream<xchar>;
+using OutputStringStream = std::basic_ostringstream<xchar>;
+using StringStream = std::basic_stringstream<xchar>;
 
 } // namespace common
 } // namespace sesh

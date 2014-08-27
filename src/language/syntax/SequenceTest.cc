@@ -20,8 +20,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common/Char.hh"
 #include "common/String.hh"
+#include "common/xchar.hh"
 #include "language/syntax/AndOrList.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/ConditionalPipeline.hh"

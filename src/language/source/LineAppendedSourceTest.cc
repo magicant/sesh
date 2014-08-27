@@ -21,7 +21,7 @@
 #include "catch.hpp"
 
 #include <utility>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 #include "language/source/LineAppendedSource.hh"
 #include "language/source/LocationTestHelper.hh"
 #include "language/source/SourceTestHelper.hh"

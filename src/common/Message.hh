@@ -22,7 +22,6 @@
 
 #include <functional>
 #include "boost/format.hpp"
-#include "common/Char.hh"
 #include "common/OutputStream.hh"
 #include "common/String.hh"
 

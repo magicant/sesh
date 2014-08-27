@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_Char_hh
-#define INCLUDED_common_Char_hh
+#ifndef INCLUDED_common_xchar_hh
+#define INCLUDED_common_xchar_hh
 
 #include "buildconfig.h"
 
@@ -27,11 +27,11 @@ namespace common {
  * The character type that is used throughout the program (except when calling
  * an OS API function).
  */
-using Char = wchar_t;
+using xchar = wchar_t;
 
 /**
  * This macro converts a character or string literal of the char type to an
- * equivalent literal of the Char type.
+ * equivalent literal of the xchar type.
  */
 #define L(x) L_(x)
 #define L_(x) L##x
@@ -41,6 +41,6 @@ using Char = wchar_t;
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_Char_hh
+#endif // #ifndef INCLUDED_common_xchar_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

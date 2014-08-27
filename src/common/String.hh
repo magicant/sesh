@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include <string>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 
 namespace sesh {
 namespace common {
@@ -30,7 +30,7 @@ namespace common {
  * The string type that is used throughout the program (except when calling an
  * OS API function).
  */
-using String = std::basic_string<Char>;
+using String = std::basic_string<xchar>;
 
 /** The character traits type of String. */
 using CharTraits = String::traits_type;

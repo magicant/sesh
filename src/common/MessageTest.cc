@@ -22,15 +22,15 @@
 
 #include <utility>
 #include "boost/format.hpp"
-#include "common/Char.hh"
 #include "common/Message.hh"
 #include "common/String.hh"
+#include "common/xchar.hh"
 
 namespace {
 
-using sesh::common::Char;
 using sesh::common::Message;
 using sesh::common::String;
+using sesh::common::xchar;
 
 TEST_CASE("Message, construction") {
     const String s = L("test");
@@ -73,12 +73,12 @@ TEST_CASE("Message, format without arguments") {
 }
 
 TEST_CASE("Message, format with arguments") {
-    Message<int, Char> m1(L("%2%%1%"));
-    Message<int, Char>::Format f1 = m1.toFormat();
+    Message<int, xchar> m1(L("%2%%1%"));
+    Message<int, xchar>::Format f1 = m1.toFormat();
     CHECK((f1 % 1 % L('A')).str() == L("A1"));
 
-    Message<Char> &&m2 = std::move(m1) % 2;
-    Message<Char>::Format f2 = m2.toFormat();
+    Message<xchar> &&m2 = std::move(m1) % 2;
+    Message<xchar>::Format f2 = m2.toFormat();
     CHECK((f2 % L('B')).str() == L("B2"));
 
     Message<> &&m3 = std::move(m2) % L('C');
@@ -89,7 +89,7 @@ TEST_CASE("Message, format with arguments") {
 TEST_CASE("Message, to string") {
     CHECK(Message<>(L("ABC%%")).toString() == L("ABC%"));
     CHECK((Message<int>(L("%1%%%")) % 33).toString() == L("33%"));
-    CHECK((Message<String, Char>(L("[%1%:%2%]")) % L("S") % L('C')).toString()
+    CHECK((Message<String, xchar>(L("[%1%:%2%]")) % L("S") % L('C')).toString()
             == L("[S:C]"));
 }
 

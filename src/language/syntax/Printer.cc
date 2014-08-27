@@ -18,8 +18,8 @@
 #include "buildconfig.h"
 #include "Printer.hh"
 
-#include "common/Char.hh"
 #include "common/String.hh"
+#include "common/xchar.hh"
 
 namespace sesh {
 namespace language {

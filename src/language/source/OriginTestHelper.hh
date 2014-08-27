@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 #include "language/source/Origin.hh"
 
 namespace sesh {
@@ -32,7 +32,7 @@ class OriginStub : public Origin {
 
 public:
 
-    constexpr static const common::Char
+    constexpr static const common::xchar
             *DUMMY_NAME = L("dummy origin"),
             *DUMMY_DESCRIPTION = L("dummy description");
 

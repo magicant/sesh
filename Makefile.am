@@ -89,7 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/Char.hh \
 	src/common/CommonResult.hh \
 	src/common/ContainerHelper.hh \
 	src/common/Copy.hh \
@@ -117,6 +116,7 @@ src_sesh_SOURCES = \
 	src/common/Try.hh \
 	src/common/TypeTag.hh \
 	src/common/Variant.hh \
+	src/common/xchar.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
 	src/language/source/Buffer.cc \

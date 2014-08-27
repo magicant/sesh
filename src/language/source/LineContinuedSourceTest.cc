@@ -21,7 +21,7 @@
 #include "catch.hpp"
 
 #include <stdexcept>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 #include "language/source/LineContinuedSource.hh"
 #include "language/source/SourceTestHelper.hh"
 
