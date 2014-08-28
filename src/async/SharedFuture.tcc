@@ -24,7 +24,7 @@
 #include <exception>
 #include <utility>
 #include "async/Future.tcc"
-#include "common/Identity.hh"
+#include "common/identity.hh"
 #include "common/Maybe.hh"
 #include "common/Try.hh"
 
@@ -174,7 +174,7 @@ SharedFutureBase<T>::recover(F &&function) const {
 
 template<typename T>
 void SharedFutureBase<T>::forward(Promise<T> &&receiver) const {
-    map(common::Identity(), std::move(receiver));
+    map(common::identity(), std::move(receiver));
 }
 
 template<typename T>

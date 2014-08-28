@@ -184,7 +184,7 @@ FutureBase<T>::recover(F &&function) && {
 
 template<typename T>
 void FutureBase<T>::forward(Promise<T> &&receiver) && {
-    // std::move(*this).map(common::Identity(), std::move(receiver));
+    // std::move(*this).map(common::identity(), std::move(receiver));
     /*
      * Mapping would leave intermediate delay objects that will not be
      * deallocated until the final result is set. This would cause an
