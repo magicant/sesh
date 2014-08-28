@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_ErrnoHelper_hh
-#define INCLUDED_common_ErrnoHelper_hh
+#ifndef INCLUDED_common_errno_helper_hh
+#define INCLUDED_common_errno_helper_hh
 
 #include "buildconfig.h"
 
@@ -27,18 +27,18 @@ namespace sesh {
 namespace common {
 
 /** Returns an error code object for the current errno value. */
-inline std::error_code errnoCode() {
+inline std::error_code errno_code() {
     return make_error_code(static_cast<std::errc>(errno));
 }
 
 /** Returns an error condition object for the current errno value. */
-inline std::error_condition errnoCondition() {
+inline std::error_condition errno_condition() {
     return make_error_condition(static_cast<std::errc>(errno));
 }
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_ErrnoHelper_hh
+#endif // #ifndef INCLUDED_common_errno_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

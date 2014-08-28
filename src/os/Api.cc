@@ -24,11 +24,11 @@
 #include <new>
 #include <stdexcept>
 #include <system_error>
-#include "common/ErrnoHelper.hh"
 #include "common/TypeTag.hh"
 #include "common/Variant.hh"
 #include "common/enum_iterator.hh"
 #include "common/enum_set.hh"
+#include "common/errno_helper.hh"
 #include "helpermacros.h"
 #include "os/capi.h"
 #include "os/io/FileDescriptionAccessMode.hh"
@@ -45,7 +45,7 @@ using sesh::common::TypeTag;
 using sesh::common::Variant;
 using sesh::common::enum_set;
 using sesh::common::enumerators;
-using sesh::common::errnoCode;
+using sesh::common::errno_code;
 using sesh::os::io::FileDescriptionAccessMode;
 using sesh::os::io::FileDescriptionAttribute;
 using sesh::os::io::FileDescriptionStatus;
@@ -389,7 +389,7 @@ class ApiImpl : public Api {
             final override {
         int flags = sesh_osapi_fcntl_getfl(fd.value());
         if (flags == -1)
-            return errnoCode();
+            return errno_code();
         return std::unique_ptr<FileDescriptionStatus>(
                 new FileDescriptionStatusImpl(flags));
     }
@@ -399,7 +399,7 @@ class ApiImpl : public Api {
             final override {
         const auto &i = static_cast<const FileDescriptionStatusImpl &>(s);
         if (sesh_osapi_fcntl_setfl(fd.value(), i.rawFlags()) == -1)
-            return errnoCode();
+            return errno_code();
         return std::error_code();
     }
 
@@ -416,7 +416,7 @@ class ApiImpl : public Api {
         int modes = toRawModes(fileModes);
         int fd = sesh_osapi_open(path, flags, modes);
         if (fd < 0)
-            return errnoCode();
+            return errno_code();
         return FileDescriptor(fd);
     }
 
@@ -426,7 +426,7 @@ class ApiImpl : public Api {
             return std::error_code();
         }
 
-        std::error_code ec = errnoCode();
+        std::error_code ec = errno_code();
         if (ec == std::errc::bad_file_descriptor)
             fd.clear();
         return ec;
@@ -437,7 +437,7 @@ class ApiImpl : public Api {
             const final override {
         std::size_t bytesRead =
                 sesh_osapi_read(fd.value(), buffer, maxBytesToRead);
-        if (std::error_code ec = errnoCode())
+        if (std::error_code ec = errno_code())
             return ec;
         return bytesRead;
     }
@@ -449,7 +449,7 @@ class ApiImpl : public Api {
             const final override {
         std::size_t bytesWritten =
                 sesh_osapi_write(fd.value(), bytes, bytesToWrite);
-        if (std::error_code ec = errnoCode())
+        if (std::error_code ec = errno_code())
             return ec;
         return bytesWritten;
     }
@@ -489,7 +489,7 @@ class ApiImpl : public Api {
                 signalMaskImpl == nullptr ? nullptr : signalMaskImpl->get());
         if (pselectResult == 0)
             return std::error_code();
-        return errnoCode();
+        return errno_code();
     }
 
     std::error_code sigprocmask(
@@ -521,7 +521,7 @@ class ApiImpl : public Api {
                 oldMaskImpl == nullptr ? nullptr : oldMaskImpl->get());
         if (sigprocmaskResult == 0)
             return std::error_code();
-        return errnoCode();
+        return errno_code();
     }
 
     std::error_code sigaction(
@@ -539,7 +539,7 @@ class ApiImpl : public Api {
                 oldAction == nullptr ? nullptr : &oldActionImpl);
 
         if (sigactionResult != 0)
-            return errnoCode();
+            return errno_code();
 
         if (oldAction != nullptr)
             convert(oldActionImpl, *oldAction);
