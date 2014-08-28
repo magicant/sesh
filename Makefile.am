@@ -26,7 +26,6 @@ TESTPROGRAMS = \
 	src/async/FutureTest \
 	src/async/PromiseTest \
 	src/async/SharedFutureTest \
-	src/common/EnumSetTest \
 	src/common/MaybeTest \
 	src/common/MessageTest \
 	src/common/ReferenceTest \
@@ -37,6 +36,7 @@ TESTPROGRAMS = \
 	src/common/VariantTest \
 	src/common/container_helper_test \
 	src/common/enum_iterator_test \
+	src/common/enum_set_test \
 	src/language/source/BufferTest \
 	src/language/source/LineAppendedSourceTest \
 	src/language/source/LineContinuedSourceTest \
@@ -89,7 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/EnumSet.hh \
 	src/common/EnumTraits.hh \
 	src/common/ErrnoHelper.hh \
 	src/common/ErrorLevel.hh \
@@ -115,6 +114,7 @@ src_sesh_SOURCES = \
 	src/common/direct_initialize.hh \
 	src/common/empty.hh \
 	src/common/enum_iterator.hh \
+	src/common/enum_set.hh \
 	src/common/xchar.hh \
 	src/common/xstring.hh \
 	src/helpermacros.h \
@@ -210,8 +210,6 @@ src_async_PromiseTest_SOURCES = \
 	src/async/PromiseTest.cc
 src_async_SharedFutureTest_SOURCES = \
 	src/async/SharedFutureTest.cc
-src_common_EnumSetTest_SOURCES = \
-	src/common/EnumSetTest.cc
 src_common_MaybeTest_SOURCES = \
 	src/common/MaybeTest.cc
 src_common_MessageTest_SOURCES = \
@@ -234,6 +232,8 @@ src_common_container_helper_test_SOURCES = \
 	src/common/container_helper_test.cc
 src_common_enum_iterator_test_SOURCES = \
 	src/common/enum_iterator_test.cc
+src_common_enum_set_test_SOURCES = \
+	src/common/enum_set_test.cc
 src_language_source_BufferTest_SOURCES = \
 	src/common/Message.cc \
 	src/language/source/Buffer.cc \

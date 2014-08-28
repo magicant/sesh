@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_EnumSet_hh
-#define INCLUDED_common_EnumSet_hh
+#ifndef INCLUDED_common_enum_set_hh
+#define INCLUDED_common_enum_set_hh
 
 #include "buildconfig.h"
 
@@ -39,31 +39,31 @@ namespace common {
  * this enumeration.
  */
 template<typename E>
-class EnumSet {
+class enum_set {
 
 private:
 
-    constexpr static std::size_t toSize(E e) noexcept {
+    constexpr static std::size_t to_size(E e) noexcept {
         return static_cast<std::size_t>(e);
     }
 
-    constexpr static std::size_t N = toSize(EnumTraits<E>::max) + 1;
+    constexpr static std::size_t N = to_size(EnumTraits<E>::max) + 1;
 
     static_assert(N != 0, "Too large enumeration");
 
-    std::bitset<N> mBitset;
+    std::bitset<N> m_bitset;
 
-    constexpr EnumSet(std::bitset<N> s) noexcept : mBitset(s) { }
+    constexpr enum_set(std::bitset<N> s) noexcept : m_bitset(s) { }
 
 public:
 
-    using Enum = E;
+    using value_type = E;
 
     using reference = typename std::bitset<N>::reference;
 
-    constexpr EnumSet() = default;
+    constexpr enum_set() = default;
 
-    EnumSet(std::initializer_list<E> values) : EnumSet() {
+    enum_set(std::initializer_list<E> values) : enum_set() {
         for (E value : values)
             set(value);
     }
@@ -73,105 +73,105 @@ public:
     }
 
     constexpr bool operator[](E e) const {
-        return mBitset[toSize(e)];
+        return m_bitset[to_size(e)];
     }
     reference operator[](E e) {
-        return mBitset[toSize(e)];
+        return m_bitset[to_size(e)];
     }
 
     bool test(E e) const {
-        return mBitset.test(toSize(e));
+        return m_bitset.test(to_size(e));
     }
 
     bool all() const {
-        return mBitset.all();
+        return m_bitset.all();
     }
     bool any() const {
-        return mBitset.any();
+        return m_bitset.any();
     }
     bool none() const {
-        return mBitset.none();
+        return m_bitset.none();
     }
 
     std::size_t count() const {
-        return mBitset.count();
+        return m_bitset.count();
     }
 
-    EnumSet &set() noexcept {
-        mBitset.set();
+    enum_set &set() noexcept {
+        m_bitset.set();
         return *this;
     }
-    EnumSet &set(E e, bool value = true) {
-        mBitset.set(toSize(e), value);
+    enum_set &set(E e, bool value = true) {
+        m_bitset.set(to_size(e), value);
         return *this;
     }
-    EnumSet &reset() noexcept {
-        mBitset.reset();
+    enum_set &reset() noexcept {
+        m_bitset.reset();
         return *this;
     }
-    EnumSet &reset(E e) {
-        mBitset.reset(toSize(e));
+    enum_set &reset(E e) {
+        m_bitset.reset(to_size(e));
         return *this;
     }
-    EnumSet &flip() noexcept {
-        mBitset.flip();
+    enum_set &flip() noexcept {
+        m_bitset.flip();
         return *this;
     }
-    EnumSet &flip(E e) {
-        mBitset.flip(toSize(e));
+    enum_set &flip(E e) {
+        m_bitset.flip(to_size(e));
         return *this;
     }
 
-    bool operator==(const EnumSet &s) const noexcept {
-        return mBitset == s.mBitset;
+    bool operator==(const enum_set &s) const noexcept {
+        return m_bitset == s.m_bitset;
     }
-    bool operator!=(const EnumSet &s) const noexcept {
-        return mBitset != s.mBitset;
-    }
-
-    EnumSet operator~() const noexcept {
-        return EnumSet(~mBitset);
-    }
-    EnumSet operator&(const EnumSet &s) const noexcept {
-        return EnumSet(mBitset & s.mBitset);
-    }
-    EnumSet operator|(const EnumSet &s) const noexcept {
-        return EnumSet(mBitset | s.mBitset);
-    }
-    EnumSet operator^(const EnumSet &s) const noexcept {
-        return EnumSet(mBitset ^ s.mBitset);
+    bool operator!=(const enum_set &s) const noexcept {
+        return m_bitset != s.m_bitset;
     }
 
-    EnumSet &operator&=(const EnumSet &s) {
-        mBitset &= s.mBitset;
+    enum_set operator~() const noexcept {
+        return enum_set(~m_bitset);
+    }
+    enum_set operator&(const enum_set &s) const noexcept {
+        return enum_set(m_bitset & s.m_bitset);
+    }
+    enum_set operator|(const enum_set &s) const noexcept {
+        return enum_set(m_bitset | s.m_bitset);
+    }
+    enum_set operator^(const enum_set &s) const noexcept {
+        return enum_set(m_bitset ^ s.m_bitset);
+    }
+
+    enum_set &operator&=(const enum_set &s) {
+        m_bitset &= s.m_bitset;
         return *this;
     }
-    EnumSet &operator|=(const EnumSet &s) {
-        mBitset |= s.mBitset;
+    enum_set &operator|=(const enum_set &s) {
+        m_bitset |= s.m_bitset;
         return *this;
     }
-    EnumSet &operator^=(const EnumSet &s) {
-        mBitset ^= s.mBitset;
+    enum_set &operator^=(const enum_set &s) {
+        m_bitset ^= s.m_bitset;
         return *this;
     }
 
     unsigned long to_ulong() const {
-        return mBitset.to_ulong();
+        return m_bitset.to_ulong();
     }
     unsigned long long to_ullong() const {
-        return mBitset.to_ullong();
+        return m_bitset.to_ullong();
     }
 
     std::size_t hash() const noexcept {
-        return std::hash<std::bitset<N>>()(mBitset);
+        return std::hash<std::bitset<N>>()(m_bitset);
     }
 
-}; // template<typename E> class EnumSet
+}; // template<typename E> class enum_set
 
 /** Creates a enum set that contains the given enumerators. */
 template<typename E, typename... E2>
-EnumSet<E> enumSetOf(E head, E2... tail) {
-    return EnumSet<E>{ head, tail..., };
+enum_set<E> enum_set_of(E head, E2... tail) {
+    return enum_set<E>{ head, tail..., };
 }
 
 } // namespace common
@@ -180,16 +180,16 @@ EnumSet<E> enumSetOf(E head, E2... tail) {
 namespace std {
 
 template<typename E>
-struct hash<sesh::common::EnumSet<E>> {
+struct hash<sesh::common::enum_set<E>> {
 
-    std::size_t operator()(const sesh::common::EnumSet<E> &s) const noexcept {
+    std::size_t operator()(const sesh::common::enum_set<E> &s) const noexcept {
         return s.hash();
     }
 
-}; // template<typename E> struct hash<sesh::common::EnumSet<E>>
+}; // template<typename E> struct hash<sesh::common::enum_set<E>>
 
 } // namespace std
 
-#endif // #ifndef INCLUDED_common_EnumSet_hh
+#endif // #ifndef INCLUDED_common_enum_set_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

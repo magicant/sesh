@@ -24,11 +24,11 @@
 #include <new>
 #include <stdexcept>
 #include <system_error>
-#include "common/EnumSet.hh"
 #include "common/ErrnoHelper.hh"
 #include "common/TypeTag.hh"
 #include "common/Variant.hh"
 #include "common/enum_iterator.hh"
+#include "common/enum_set.hh"
 #include "helpermacros.h"
 #include "os/capi.h"
 #include "os/io/FileDescriptionAccessMode.hh"
@@ -41,9 +41,9 @@
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::common::EnumSet;
 using sesh::common::TypeTag;
 using sesh::common::Variant;
+using sesh::common::enum_set;
 using sesh::common::enumerators;
 using sesh::common::errnoCode;
 using sesh::os::io::FileDescriptionAccessMode;
@@ -152,8 +152,8 @@ int toRawFlag(FileDescriptorOpenMode mode) {
 /** @return -1 if the access mode is not supported. */
 int toRawFlags(
         FileDescriptionAccessMode accessMode,
-        EnumSet<FileDescriptionAttribute> attributes,
-        EnumSet<FileDescriptorOpenMode> openModes) {
+        enum_set<FileDescriptionAttribute> attributes,
+        enum_set<FileDescriptorOpenMode> openModes) {
     int rawFlags = toRawFlag(accessMode);
     if (rawFlags == -1)
         return -1;
@@ -169,7 +169,7 @@ int toRawFlags(
     return rawFlags;
 }
 
-int toRawModes(EnumSet<FileMode> modes) {
+int toRawModes(enum_set<FileMode> modes) {
     return sesh_osapi_mode_to_raw(static_cast<int>(modes.to_ulong()));
 }
 
@@ -406,9 +406,9 @@ class ApiImpl : public Api {
     Variant<FileDescriptor, std::error_code> open(
             const char *path,
             FileDescriptionAccessMode accessMode,
-            EnumSet<FileDescriptionAttribute> attributes,
-            EnumSet<FileDescriptorOpenMode> openModes,
-            EnumSet<FileMode> fileModes) const final override {
+            enum_set<FileDescriptionAttribute> attributes,
+            enum_set<FileDescriptorOpenMode> openModes,
+            enum_set<FileMode> fileModes) const final override {
         int flags = toRawFlags(accessMode, attributes, openModes);
         if (flags == -1)
             return std::make_error_code(std::errc::invalid_argument);
