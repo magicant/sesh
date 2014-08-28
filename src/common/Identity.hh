@@ -39,9 +39,6 @@ public:
 
 }; // class Identity
 
-/** A value of Identity. */
-constexpr Identity IDENTITY = Identity();
-
 } // namespace common
 } // namespace sesh
 
