@@ -25,7 +25,7 @@ namespace common {
 
 /**
  * An empty class.
- * @see Nop
+ * @see nop
  */
 class empty {
 };

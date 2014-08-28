@@ -26,8 +26,8 @@
 #include "async/Future.hh"
 #include "async/Promise.hh"
 #include "async/SharedFuture.hh"
-#include "common/Nop.hh"
 #include "common/Try.hh"
+#include "common/nop.hh"
 
 namespace {
 
@@ -39,8 +39,8 @@ using sesh::async::createFailedFutureOf;
 using sesh::async::createFuture;
 using sesh::async::createFutureOf;
 using sesh::async::createPromiseFuturePair;
-using sesh::common::Nop;
 using sesh::common::Try;
+using sesh::common::nop;
 
 class ThrowingCopyable {
 public:
@@ -124,7 +124,7 @@ TEST_CASE("Shared future: is comparable with null pointer") {
 TEST_CASE("Shared future: validness after adding callback") {
     const auto delay = std::make_shared<Delay<int>>();
     const SharedFuture<int> f = Future<int>(delay);
-    f.then(Nop());
+    f.then(nop());
     CHECK(f.isValid());
 }
 

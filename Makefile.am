@@ -92,7 +92,6 @@ src_sesh_SOURCES = \
 	src/common/Maybe.hh \
 	src/common/Message.cc \
 	src/common/Message.hh \
-	src/common/Nop.hh \
 	src/common/OutputStream.hh \
 	src/common/Reference.hh \
 	src/common/SharedFunction.hh \
@@ -115,6 +114,7 @@ src_sesh_SOURCES = \
 	src/common/functional_initialize.hh \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
+	src/common/nop.hh \
 	src/common/xchar.hh \
 	src/common/xstring.hh \
 	src/helpermacros.h \

@@ -21,8 +21,8 @@
 #include "catch.hpp"
 
 #include <system_error>
-#include "common/Nop.hh"
 #include "common/TypeTagTestHelper.hh"
+#include "common/nop.hh"
 #include "os/signaling/HandlerConfiguration.hh"
 #include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalErrorCode.hh"
@@ -31,7 +31,7 @@
 
 namespace {
 
-using sesh::common::Nop;
+using sesh::common::nop;
 using sesh::os::signaling::HandlerConfiguration;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::HandlerConfigurationApiFake;
@@ -154,7 +154,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: signal is blocked when handler is set") {
-    auto result = c->addHandler(1, Nop());
+    auto result = c->addHandler(1, nop());
     CHECK(signalMask().test(1));
 
     result.value<Canceler>()();
@@ -166,7 +166,7 @@ TEST_CASE_METHOD(
         "Handler configuration: mask is restored when handler is unset") {
     signalMask().set(1);
 
-    auto result = c->addHandler(1, Nop());
+    auto result = c->addHandler(1, nop());
     CHECK(signalMask().test(1));
 
     result.value<Canceler>()();
@@ -258,7 +258,7 @@ TEST_CASE_METHOD(
         Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: failed ignore w/ handler") {
     actions().emplace(5, Ignore());
-    c->addHandler(5, Nop());
+    c->addHandler(5, nop());
 
     std::error_code e = c->setTrap(
             5,
@@ -304,7 +304,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         Fixture<HandlerConfigurationApiFake>,
         "Handler configuration: add handler and ignore") {
-    c->addHandler(5, Nop());
+    c->addHandler(5, nop());
     c->setTrap(
             5,
             HandlerConfiguration::Handler(),
@@ -376,7 +376,7 @@ TEST_CASE_METHOD(
         "Handler configuration: signal is blocked when trap is set") {
     c->setTrap(
             5,
-            HandlerConfiguration::Handler(Nop()),
+            HandlerConfiguration::Handler(nop()),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(signalMask().test(5));
 
@@ -394,7 +394,7 @@ TEST_CASE_METHOD(
 
     c->setTrap(
             5,
-            HandlerConfiguration::Handler(Nop()),
+            HandlerConfiguration::Handler(nop()),
             HandlerConfiguration::SettingPolicy::FORCE);
     CHECK(signalMask().test(5));
 
@@ -420,8 +420,8 @@ TEST_CASE_METHOD(
         "Handler configuration: mask for pselect with handlers") {
     signalMask().set(1);
     signalMask().set(2);
-    auto actionResult2 = c->addHandler(2, Nop());
-    auto actionResult3 = c->addHandler(3, Nop());
+    auto actionResult2 = c->addHandler(2, nop());
+    auto actionResult3 = c->addHandler(3, nop());
 
     const SignalNumberSet *set = c->maskForPselect();
     REQUIRE(set != nullptr);

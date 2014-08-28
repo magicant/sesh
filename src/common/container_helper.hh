@@ -130,7 +130,7 @@ std::vector<T> make_vector_of(Arg &&... arg) {
      * pack expansion. XXX To work around the GCC 4.8 bug, we use a dummy array
      * here.
      */
-    // Nop{(v.push_back(std::forward<Arg>(arg)), 0)...};
+    // nop{(v.push_back(std::forward<Arg>(arg)), 0)...};
     int dummy[] {(v.push_back(std::forward<Arg>(arg)), 0)..., 0};
     (void) dummy;
 

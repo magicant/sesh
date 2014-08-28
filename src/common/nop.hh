@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_Nop_hh
-#define INCLUDED_common_Nop_hh
+#ifndef INCLUDED_common_nop_hh
+#define INCLUDED_common_nop_hh
 
 #include "buildconfig.h"
 
@@ -27,23 +27,23 @@ namespace common {
  * An empty function object class.
  * @see empty
  */
-class Nop {
+class nop {
 
 public:
 
     /** Constructor that does nothing. */
     template<typename... Arg>
-    constexpr explicit Nop(Arg &&...) noexcept { }
+    constexpr explicit nop(Arg &&...) noexcept { }
 
     /** Function call operator that does nothing. */
     template<typename... Arg>
     void operator()(Arg &&...) const volatile noexcept { }
 
-}; // class Nop
+}; // class nop
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_Nop_hh
+#endif // #ifndef INCLUDED_common_nop_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
