@@ -1295,7 +1295,7 @@ public:
             typename U = typename std::decay<
                     typename std::result_of<F()>::type>::type>
     static Variant resultOf(F &&f) {
-        return Variant(FUNCTIONAL_INITIALIZE, std::forward<F>(f));
+        return Variant(FunctionalInitialize(), std::forward<F>(f));
     }
 
 };

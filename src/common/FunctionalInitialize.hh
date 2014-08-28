@@ -29,9 +29,6 @@ namespace common {
  */
 class FunctionalInitialize { };
 
-/** A value of FunctionalInitialize. */
-constexpr FunctionalInitialize FUNCTIONAL_INITIALIZE = FunctionalInitialize();
-
 } // namespace common
 } // namespace sesh
 
