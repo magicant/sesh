@@ -89,7 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/ErrorLevel.hh \
 	src/common/FunctionalInitialize.hh \
 	src/common/Identity.hh \
 	src/common/IntegerSequence.hh \
@@ -115,6 +114,7 @@ src_sesh_SOURCES = \
 	src/common/enum_set.hh \
 	src/common/enum_traits.hh \
 	src/common/errno_helper.hh \
+	src/common/error_level.hh \
 	src/common/xchar.hh \
 	src/common/xstring.hh \
 	src/helpermacros.h \
