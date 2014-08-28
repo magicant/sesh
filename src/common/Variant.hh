@@ -28,9 +28,9 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "common/FunctionalInitialize.hh"
 #include "common/TypeTag.hh"
 #include "common/common_result.hh"
+#include "common/functional_initialize.hh"
 
 namespace sesh {
 namespace common {
@@ -192,7 +192,7 @@ public:
      */
     template<typename F>
     // constexpr XXX C++11 7.1.5.4
-    explicit Union(FunctionalInitialize, TypeTag<Head>, F &&f)
+    explicit Union(functional_initialize, TypeTag<Head>, F &&f)
             noexcept(noexcept(std::declval<F>()()) &&
                     std::is_nothrow_constructible<
                         Head, typename std::result_of<F()>::type>::value) :
@@ -205,9 +205,9 @@ public:
      */
     template<typename U, typename F>
     // constexpr XXX C++11 7.1.5.4
-    explicit Union(FunctionalInitialize fi, TypeTag<U> tag, F &&f)
+    explicit Union(functional_initialize fi, TypeTag<U> tag, F &&f)
             noexcept(std::is_nothrow_constructible<
-                TailUnion, FunctionalInitialize, TypeTag<U>, F &&>::value) :
+                TailUnion, functional_initialize, TypeTag<U>, F &&>::value) :
             mTail(fi, tag, std::forward<F>(f)) { }
 
 };
@@ -524,9 +524,9 @@ public:
      * @param f the function that constructs the new contained value.
      */
     template<typename U, typename F>
-    VariantBase(FunctionalInitialize fi, TypeTag<U> tag, F &&f)
+    VariantBase(functional_initialize fi, TypeTag<U> tag, F &&f)
             noexcept(std::is_nothrow_constructible<
-                    Value, FunctionalInitialize, TypeTag<U>, F &&>::value) :
+                    Value, functional_initialize, TypeTag<U>, F &&>::value) :
             Tag(tag), mValue(fi, tag, std::forward<F>(f)) { }
 
     /**
@@ -545,9 +545,9 @@ public:
             typename F,
             typename U = typename std::decay<
                     typename std::result_of<F()>::type>::type>
-    VariantBase(FunctionalInitialize fi, F &&f)
+    VariantBase(functional_initialize fi, F &&f)
             noexcept(std::is_nothrow_constructible<
-                VariantBase, FunctionalInitialize, TypeTag<U>, F &&>::value) :
+                VariantBase, functional_initialize, TypeTag<U>, F &&>::value) :
             VariantBase(fi, TypeTag<U>(), std::forward<F>(f)) { }
 
     /**
@@ -1295,7 +1295,7 @@ public:
             typename U = typename std::decay<
                     typename std::result_of<F()>::type>::type>
     static Variant resultOf(F &&f) {
-        return Variant(FunctionalInitialize(), std::forward<F>(f));
+        return Variant(functional_initialize(), std::forward<F>(f));
     }
 
 };

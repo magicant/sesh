@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_FunctionalInitialize_hh
-#define INCLUDED_common_FunctionalInitialize_hh
+#ifndef INCLUDED_common_functional_initialize_hh
+#define INCLUDED_common_functional_initialize_hh
 
 #include "buildconfig.h"
 
@@ -27,11 +27,11 @@ namespace common {
  * A dummy object type that is passed to the constructor of a container to
  * initialize the contained value by calling a function.
  */
-class FunctionalInitialize { };
+class functional_initialize { };
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_FunctionalInitialize_hh
+#endif // #ifndef INCLUDED_common_functional_initialize_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

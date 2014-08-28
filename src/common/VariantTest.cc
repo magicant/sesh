@@ -26,17 +26,17 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "common/FunctionalInitialize.hh"
 #include "common/TypeTag.hh"
 #include "common/Variant.hh"
 #include "common/container_helper.hh"
+#include "common/functional_initialize.hh"
 
 namespace {
 
-using sesh::common::FunctionalInitialize;
 using sesh::common::TypeTag;
 using sesh::common::Variant;
 using sesh::common::contains;
+using sesh::common::functional_initialize;
 
 enum class Action {
     STANDARD_CONSTRUCTION,
@@ -143,7 +143,7 @@ TEST_CASE("Single variant construction & destruction") {
     Variant<int>(TypeTag<int>());
     Variant<int>(TypeTag<int>(), 123);
     Variant<int>(123);
-    Variant<int>(FunctionalInitialize(), [] { return 123; });
+    Variant<int>(functional_initialize(), [] { return 123; });
 
     static_assert(
             noexcept(Variant<int>(TypeTag<int>())),
@@ -155,10 +155,10 @@ TEST_CASE("Single variant construction & destruction") {
     auto throwing = []() noexcept(false) { return 0; };
     auto nonthrowing = []() noexcept(true) { return 0; };
     static_assert(
-            !noexcept(Variant<int>(FunctionalInitialize(), throwing)),
+            !noexcept(Variant<int>(functional_initialize(), throwing)),
             "functional initialize propagates noexcept(false)");
     static_assert(
-            noexcept(Variant<int>(FunctionalInitialize(), nonthrowing)),
+            noexcept(Variant<int>(functional_initialize(), nonthrowing)),
             "functional initialize propagates noexcept(true)");
 
     std::vector<Action> actions;
@@ -172,7 +172,7 @@ TEST_CASE("Single variant construction & destruction") {
             Exception);
     CHECK_THROWS_AS(
             Variant<DefaultThrows>(
-                    FunctionalInitialize(),
+                    functional_initialize(),
                     []() -> DefaultThrows { throw Exception(); }),
             Exception);
 }
@@ -203,8 +203,8 @@ TEST_CASE("Double variant construction & destruction") {
     Variant<A, B>(TypeTag<B>(), 0, 0.0);
     Variant<A, B>{A()};
     Variant<A, B>{B(0, 0.0)};
-    Variant<A, B>(FunctionalInitialize(), [] { return A(); });
-    Variant<A, B>(FunctionalInitialize(), [] { return B(0, 0.0); });
+    Variant<A, B>(functional_initialize(), [] { return A(); });
+    Variant<A, B>(functional_initialize(), [] { return B(0, 0.0); });
 
     static_assert(
             noexcept(Variant<A, B>(TypeTag<A>())),
@@ -219,11 +219,11 @@ TEST_CASE("Double variant construction & destruction") {
     auto throwing = []() noexcept(false) { return 0; };
     auto nonthrowing = []() noexcept(true) { return 0.0; };
     static_assert(
-            !noexcept(Variant<int, double>(FunctionalInitialize(), throwing)),
+            !noexcept(Variant<int, double>(functional_initialize(), throwing)),
             "functional initialize propagates noexcept(false)");
     static_assert(
             noexcept(
-                Variant<int, double>(FunctionalInitialize(), nonthrowing)),
+                Variant<int, double>(functional_initialize(), nonthrowing)),
             "functional initialize propagates noexcept(true)");
 }
 
@@ -272,10 +272,10 @@ TEST_CASE("Quad variant construction & destruction") {
     Variant<A, B, C, D>{B()};
     Variant<A, B, C, D>{C()};
     Variant<A, B, C, D>{D()};
-    Variant<A, B, C, D>(FunctionalInitialize(), [] { return A(); });
-    Variant<A, B, C, D>(FunctionalInitialize(), [] { return B(); });
-    Variant<A, B, C, D>(FunctionalInitialize(), [] { return C(); });
-    Variant<A, B, C, D>(FunctionalInitialize(), [] { return D(); });
+    Variant<A, B, C, D>(functional_initialize(), [] { return A(); });
+    Variant<A, B, C, D>(functional_initialize(), [] { return B(); });
+    Variant<A, B, C, D>(functional_initialize(), [] { return C(); });
+    Variant<A, B, C, D>(functional_initialize(), [] { return D(); });
 }
 
 TEST_CASE("Double variant copy initialization") {
@@ -300,7 +300,7 @@ TEST_CASE("Double variant value") {
     const float F1 = 456.0f, F2 = 567.0f;
 
     Variant<int, float> i(TypeTag<int>(), I1);
-    Variant<int, float> f(FunctionalInitialize(), [=] { return F1; });
+    Variant<int, float> f(functional_initialize(), [=] { return F1; });
 
     CHECK(i.value<int>() == I1);
     CHECK(f.value<float>() == F1);
@@ -317,7 +317,7 @@ TEST_CASE("Double variant constant value") {
     const float F = 456.0;
 
     const Variant<int, float> i(TypeTag<int>(), I);
-    const Variant<int, float> f(FunctionalInitialize(), [=] { return F; });
+    const Variant<int, float> f(functional_initialize(), [=] { return F; });
 
     CHECK(i.value<int>() == I);
     CHECK(f.value<float>() == F);
