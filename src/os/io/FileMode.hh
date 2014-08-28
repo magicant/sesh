@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "common/EnumTraits.hh"
+#include "common/enum_traits.hh"
 
 namespace sesh {
 
@@ -50,7 +50,7 @@ enum class FileMode {
 namespace common {
 
 template<>
-class EnumTraits<os::io::FileMode> {
+class enum_traits<os::io::FileMode> {
 public:
     constexpr static os::io::FileMode max = os::io::FileMode::SET_USER_ID;
 };

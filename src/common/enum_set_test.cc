@@ -21,6 +21,7 @@
 #include "catch.hpp"
 
 #include "common/enum_set.hh"
+#include "common/enum_traits.hh"
 
 namespace {
 
@@ -35,10 +36,10 @@ namespace sesh {
 namespace common {
 
 template<>
-class EnumTraits<E> {
+class enum_traits<E> {
 public:
     constexpr static E max = E::C;
-}; // template<> struct EnumTraits<E>
+}; // template<> struct enum_traits<E>
 
 } // namespace common
 } // namespace sesh

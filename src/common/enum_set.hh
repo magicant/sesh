@@ -24,7 +24,7 @@
 #include <cstddef>
 #include <functional>
 #include <initializer_list>
-#include "common/EnumTraits.hh"
+#include "common/enum_traits.hh"
 
 namespace sesh {
 namespace common {
@@ -35,7 +35,7 @@ namespace common {
  * This class template is a std::bitset wrapper that is more convenient for use
  * with enumerations, especially scoped ones.
  *
- * @tparam E An enumeration type. {@link EnumTraits} must be specialized for
+ * @tparam E An enumeration type. {@link enum_traits} must be specialized for
  * this enumeration.
  */
 template<typename E>
@@ -47,7 +47,7 @@ private:
         return static_cast<std::size_t>(e);
     }
 
-    constexpr static std::size_t N = to_size(EnumTraits<E>::max) + 1;
+    constexpr static std::size_t N = to_size(enum_traits<E>::max) + 1;
 
     static_assert(N != 0, "Too large enumeration");
 

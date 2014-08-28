@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_EnumTraits_hh
-#define INCLUDED_common_EnumTraits_hh
+#ifndef INCLUDED_common_enum_traits_hh
+#define INCLUDED_common_enum_traits_hh
 
 #include "buildconfig.h"
 
@@ -29,10 +29,10 @@ namespace common {
  *
  * A specialization of this template must have the following public members:
 @code
-template<> class EnumTraits<SomeEnumType> {
+template<> class enum_traits<some_enum_type> {
 public:
-    // The maximum value of the SomeEnumType enumerators.
-    constexpr static SomeEnumType max = ...;
+    // The maximum value of the some_enum_type enumerators.
+    constexpr static some_enum_type max = ...;
 };
 @endcode
  *
@@ -41,11 +41,11 @@ public:
  * @tparam E An enumeration type.
  */
 template<typename E>
-class EnumTraits;
+class enum_traits;
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_EnumTraits_hh
+#endif // #ifndef INCLUDED_common_enum_traits_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

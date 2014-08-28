@@ -24,7 +24,7 @@
 #include <type_traits>
 #include "boost/iterator/counting_iterator.hpp"
 #include "boost/iterator/transform_iterator.hpp"
-#include "common/EnumTraits.hh"
+#include "common/enum_traits.hh"
 #include "common/StaticCast.hh"
 
 namespace sesh {
@@ -76,7 +76,7 @@ public:
     }
 
     enum_iterator<E> end() const {
-        constexpr U max = static_cast<U>(EnumTraits<E>::max);
+        constexpr U max = static_cast<U>(enum_traits<E>::max);
         static_assert(max < std::numeric_limits<U>::max(), "overflow");
         enum_iterator<E> i(max + 1);
         return i;
@@ -94,7 +94,7 @@ public:
  * @tparam E An enumeration type. Its first enumerator must have an underlying
  * value of zero. All enumerators must be defined successively (as an integer
  * sequence). The last enumerator must be specified by {@code
- * EnumTraits&lt;E>::max}.
+ * enum_traits&lt;E>::max}.
  */
 template<typename E>
 enum_iterator_impl::full_range<E> enumerators() noexcept {

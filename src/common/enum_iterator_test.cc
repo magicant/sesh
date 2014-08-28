@@ -22,8 +22,8 @@
 
 #include <type_traits>
 #include <vector>
-#include "common/EnumTraits.hh"
 #include "common/enum_iterator.hh"
+#include "common/enum_traits.hh"
 
 namespace {
 
@@ -41,7 +41,7 @@ namespace sesh {
 namespace common {
 
 template<>
-class EnumTraits<C> {
+class enum_traits<C> {
 public:
     constexpr static C max = C::C2;
 };

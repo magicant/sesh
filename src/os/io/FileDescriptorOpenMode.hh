@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "common/EnumTraits.hh"
+#include "common/enum_traits.hh"
 
 namespace sesh {
 
@@ -45,7 +45,7 @@ enum class FileDescriptorOpenMode {
 namespace common {
 
 template<>
-class EnumTraits<os::io::FileDescriptorOpenMode> {
+class enum_traits<os::io::FileDescriptorOpenMode> {
 public:
     constexpr static os::io::FileDescriptorOpenMode max =
             os::io::FileDescriptorOpenMode::TTY_INITIALIZE;

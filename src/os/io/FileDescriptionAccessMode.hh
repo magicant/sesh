@@ -20,8 +20,6 @@
 
 #include "buildconfig.h"
 
-#include "common/EnumTraits.hh"
-
 namespace sesh {
 namespace os {
 namespace io {
