@@ -28,9 +28,9 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "common/TypeTag.hh"
 #include "common/common_result.hh"
 #include "common/functional_initialize.hh"
+#include "common/type_tag.hh"
 
 namespace sesh {
 namespace common {
@@ -77,7 +77,7 @@ template<typename T>
 class IsTypeTag : public std::false_type { };
 
 template<typename T>
-class IsTypeTag<TypeTag<T>> : public std::true_type { };
+class IsTypeTag<type_tag<T>> : public std::true_type { };
 
 class MoveIfNoexcept { };
 
@@ -173,7 +173,7 @@ public:
      */
     template<typename... Arg>
     // constexpr XXX C++11 7.1.5.4
-    explicit Union(TypeTag<Head>, Arg &&... arg)
+    explicit Union(type_tag<Head>, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<Head, Arg...>::value) :
             mHead(std::forward<Arg>(arg)...) { }
 
@@ -182,7 +182,7 @@ public:
      */
     template<typename U, typename... Arg>
     // constexpr XXX C++11 7.1.5.4
-    explicit Union(TypeTag<U> tag, Arg &&... arg)
+    explicit Union(type_tag<U> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
             mTail(tag, std::forward<Arg>(arg)...) { }
 
@@ -192,7 +192,7 @@ public:
      */
     template<typename F>
     // constexpr XXX C++11 7.1.5.4
-    explicit Union(functional_initialize, TypeTag<Head>, F &&f)
+    explicit Union(functional_initialize, type_tag<Head>, F &&f)
             noexcept(noexcept(std::declval<F>()()) &&
                     std::is_nothrow_constructible<
                         Head, typename std::result_of<F()>::type>::value) :
@@ -205,9 +205,9 @@ public:
      */
     template<typename U, typename F>
     // constexpr XXX C++11 7.1.5.4
-    explicit Union(functional_initialize fi, TypeTag<U> tag, F &&f)
+    explicit Union(functional_initialize fi, type_tag<U> tag, F &&f)
             noexcept(std::is_nothrow_constructible<
-                TailUnion, functional_initialize, TypeTag<U>, F &&>::value) :
+                TailUnion, functional_initialize, type_tag<U>, F &&>::value) :
             mTail(fi, tag, std::forward<F>(f)) { }
 
 };
@@ -232,7 +232,7 @@ public:
             mVisitor(std::forward<Visitor>(visitor)) { }
 
     template<typename T, typename R = CopyReference<Union, T>>
-    constexpr auto operator()(TypeTag<T>) const
+    constexpr auto operator()(type_tag<T>) const
             noexcept(noexcept(std::declval<Visitor>()(std::declval<R>())))
             -> typename std::result_of<Visitor(R)>::type {
         return std::forward<Visitor>(mVisitor)(
@@ -260,7 +260,7 @@ public:
                     typename std::remove_reference<T>::type>::type>
     void operator()(T &&v) const
             noexcept(std::is_nothrow_constructible<V, T &&>::value) {
-        new (std::addressof(mTarget)) Union(TypeTag<V>(), std::forward<T>(v));
+        new (std::addressof(mTarget)) Union(type_tag<V>(), std::forward<T>(v));
     }
 
 };
@@ -282,7 +282,7 @@ public:
     void operator()(T &v) const
             noexcept(std::is_nothrow_move_constructible<T>::value) {
         new (std::addressof(mTarget)) Union(
-                TypeTag<T>(), std::move_if_noexcept(v));
+                type_tag<T>(), std::move_if_noexcept(v));
     }
 
 };
@@ -410,7 +410,7 @@ public:
 
 /** Fundamental implementation of variant. */
 template<typename... T>
-class VariantBase : private TypeTag<T...> {
+class VariantBase : private type_tag<T...> {
 
     /*
      * The type tag sub-object is contained as a base class object rather than
@@ -423,7 +423,7 @@ public:
      * The type of the type tag which specifies the type of the contained
      * value.
      */
-    using Tag = TypeTag<T...>;
+    using Tag = type_tag<T...>;
 
 private:
 
@@ -464,7 +464,7 @@ public:
     /** Returns the integral value that identifies the parameter type. */
     template<typename U>
     constexpr static Tag tag() noexcept {
-        return TypeTag<U>();
+        return type_tag<U>();
     }
 
     /**
@@ -486,7 +486,7 @@ public:
      * @param arg the arguments forwarded to the constructor.
      */
     template<typename U, typename... Arg>
-    explicit VariantBase(TypeTag<U> tag, Arg &&... arg)
+    explicit VariantBase(type_tag<U> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
             Tag(tag), mValue(tag, std::forward<Arg>(arg)...) { }
 
@@ -499,7 +499,7 @@ public:
      * @tparam U the argument type.
      * @tparam V the type of the new contained value to be constructed.
      *     Inferred from the argument type. If V is a specialization of
-     *     TypeTag, this constructor overload cannot be used.
+     *     type_tag, this constructor overload cannot be used.
      * @param v the argument forwarded to the constructor.
      */
     template<
@@ -509,7 +509,7 @@ public:
             typename = typename std::enable_if<!IsTypeTag<V>::value>::type>
     VariantBase(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
-            VariantBase(TypeTag<V>(), std::forward<U>(v)) { }
+            VariantBase(type_tag<V>(), std::forward<U>(v)) { }
 
     /**
      * Creates a new variant by move-constructing its contained value from the
@@ -524,9 +524,9 @@ public:
      * @param f the function that constructs the new contained value.
      */
     template<typename U, typename F>
-    VariantBase(functional_initialize fi, TypeTag<U> tag, F &&f)
+    VariantBase(functional_initialize fi, type_tag<U> tag, F &&f)
             noexcept(std::is_nothrow_constructible<
-                    Value, functional_initialize, TypeTag<U>, F &&>::value) :
+                    Value, functional_initialize, type_tag<U>, F &&>::value) :
             Tag(tag), mValue(fi, tag, std::forward<F>(f)) { }
 
     /**
@@ -547,8 +547,9 @@ public:
                     typename std::result_of<F()>::type>::type>
     VariantBase(functional_initialize fi, F &&f)
             noexcept(std::is_nothrow_constructible<
-                VariantBase, functional_initialize, TypeTag<U>, F &&>::value) :
-            VariantBase(fi, TypeTag<U>(), std::forward<F>(f)) { }
+                VariantBase, functional_initialize, type_tag<U>, F &&>
+                ::value) :
+            VariantBase(fi, type_tag<U>(), std::forward<F>(f)) { }
 
     /**
      * Returns a reference to the value of the template parameter type.
@@ -815,7 +816,7 @@ public:
             this->~VariantBase();
             new (this) VariantBase(std::forward<Arg>(arg)...);
         } catch (...) {
-            reconstructOrTerminate(TypeTag<Fallback>());
+            reconstructOrTerminate(type_tag<Fallback>());
             throw;
         }
     }
@@ -885,7 +886,7 @@ public:
      */
     template<typename U, typename V = typename std::decay<U>::type>
     void reset(U &&v) noexcept {
-        emplace(TypeTag<V>(), std::forward<U>(v));
+        emplace(type_tag<V>(), std::forward<U>(v));
     }
 
     /**
@@ -1249,7 +1250,7 @@ public:
     static Variant create(Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value &&
                     std::is_nothrow_destructible<U>::value) {
-        return Variant(TypeTag<U>(), std::forward<Arg>(arg)...);
+        return Variant(type_tag<U>(), std::forward<Arg>(arg)...);
     }
 
     /**
@@ -1276,7 +1277,7 @@ public:
                 std::is_nothrow_constructible<
                     U, std::initializer_list<ListArg> &, Arg &&...>::value &&
                 std::is_nothrow_destructible<U>::value) {
-        return Variant(TypeTag<U>(), list, std::forward<Arg>(arg)...);
+        return Variant(type_tag<U>(), list, std::forward<Arg>(arg)...);
     }
 
     /**

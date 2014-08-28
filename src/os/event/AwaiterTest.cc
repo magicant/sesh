@@ -26,7 +26,7 @@
 #include <utility>
 #include "async/Future.hh"
 #include "common/Try.hh"
-#include "common/TypeTagTestHelper.hh"
+#include "common/type_tag_test_helper.hh"
 #include "os/event/AwaiterTestHelper.hh"
 #include "os/event/PselectApi.hh"
 #include "os/event/ReadableFileDescriptor.hh"

@@ -26,13 +26,13 @@
 #include <utility>
 #include "common/container_helper.hh"
 #include "common/Maybe.hh"
-#include "common/TypeTag.hh"
+#include "common/type_tag.hh"
 
 namespace {
 
 using sesh::common::Maybe;
-using sesh::common::TypeTag;
 using sesh::common::contains;
+using sesh::common::type_tag;
 
 enum class Action {
     STANDARD_CONSTRUCTION,
@@ -122,10 +122,10 @@ TEST_CASE("Maybe empty construction") {
 }
 
 TEST_CASE("Maybe non-empty construction with tag") {
-    Maybe<int> m1((TypeTag<int>()));
-    Maybe<int> m2(TypeTag<int>(), 123);
-    Maybe<std::string> m3((TypeTag<std::string>()));
-    Maybe<std::string> m4(TypeTag<std::string>(), 5, '*');
+    Maybe<int> m1((type_tag<int>()));
+    Maybe<int> m2(type_tag<int>(), 123);
+    Maybe<std::string> m3((type_tag<std::string>()));
+    Maybe<std::string> m4(type_tag<std::string>(), 5, '*');
 }
 
 TEST_CASE("Maybe non-empty construction by copy and move") {
@@ -155,7 +155,7 @@ TEST_CASE("Maybe value") {
     const Maybe<int> m2(m1);
     CHECK(m2.value() == 456);
 
-    Maybe<std::string> m3(TypeTag<std::string>(), 5, '*');
+    Maybe<std::string> m3(type_tag<std::string>(), 5, '*');
     Maybe<std::string> m4(std::move(m3));
     CHECK(m4.value() == "*****");
 }

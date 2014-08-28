@@ -24,11 +24,11 @@
 #include <new>
 #include <stdexcept>
 #include <system_error>
-#include "common/TypeTag.hh"
 #include "common/Variant.hh"
 #include "common/enum_iterator.hh"
 #include "common/enum_set.hh"
 #include "common/errno_helper.hh"
+#include "common/type_tag.hh"
 #include "helpermacros.h"
 #include "os/capi.h"
 #include "os/io/FileDescriptionAccessMode.hh"
@@ -41,11 +41,11 @@
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::common::TypeTag;
 using sesh::common::Variant;
 using sesh::common::enum_set;
 using sesh::common::enumerators;
 using sesh::common::errno_code;
+using sesh::common::type_tag;
 using sesh::os::io::FileDescriptionAccessMode;
 using sesh::os::io::FileDescriptionAttribute;
 using sesh::os::io::FileDescriptionStatus;
@@ -193,13 +193,13 @@ void convert(const SignalAction &from, struct sesh_osapi_signal_action &to) {
 void convert(const struct sesh_osapi_signal_action &from, SignalAction &to) {
     switch (from.type) {
     case SESH_OSAPI_SIG_DFL:
-        to.emplace(TypeTag<Api::Default>());
+        to.emplace(type_tag<Api::Default>());
         break;
     case SESH_OSAPI_SIG_IGN:
-        to.emplace(TypeTag<Api::Ignore>());
+        to.emplace(type_tag<Api::Ignore>());
         break;
     case SESH_OSAPI_SIG_HANDLER:
-        to.emplace(TypeTag<sesh_osapi_signal_handler *>(), from.handler);
+        to.emplace(type_tag<sesh_osapi_signal_handler *>(), from.handler);
         break;
     }
 }

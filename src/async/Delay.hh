@@ -27,8 +27,8 @@
 #include <utility>
 #include "common/Maybe.hh"
 #include "common/Try.hh"
-#include "common/TypeTag.hh"
 #include "common/empty.hh"
+#include "common/type_tag.hh"
 
 namespace sesh {
 namespace async {
@@ -66,8 +66,8 @@ private:
     using Input = common::Variant<Empty, Try, ForwardSource>;
     using Output = common::Variant<Empty, Callback, ForwardTarget>;
 
-    Input mInput = Input(common::TypeTag<Empty>());
-    Output mOutput = Output(common::TypeTag<Empty>());
+    Input mInput = Input(common::type_tag<Empty>());
+    Output mOutput = Output(common::type_tag<Empty>());
 
     void fireIfReady() {
         if (mInput.tag() != mInput.template tag<Try>())
@@ -101,9 +101,9 @@ public:
 
         try {
             mInput.template emplaceWithFallback<Empty>(
-                    common::TypeTag<Try>(), std::forward<Arg>(arg)...);
+                    common::type_tag<Try>(), std::forward<Arg>(arg)...);
         } catch (...) {
-            mInput.emplace(common::TypeTag<Try>(), std::current_exception());
+            mInput.emplace(common::type_tag<Try>(), std::current_exception());
         }
 
         fireIfReady();
@@ -182,8 +182,9 @@ public:
                     std::move(to->mOutput.template value<Callback>()));
 
         // Connect
-        to->mInput.emplace(common::TypeTag<ForwardSource>(), from);
-        from->mOutput.emplace(common::TypeTag<ForwardTarget>(), std::move(to));
+        to->mInput.emplace(common::type_tag<ForwardSource>(), from);
+        from->mOutput.emplace(
+                common::type_tag<ForwardTarget>(), std::move(to));
     }
 
 }; // template<typename T> class Delay

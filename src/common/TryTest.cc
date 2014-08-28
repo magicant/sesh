@@ -22,35 +22,35 @@
 
 #include <exception>
 #include "common/Try.hh"
-#include "common/TypeTag.hh"
+#include "common/type_tag.hh"
 
 namespace {
 
 using sesh::common::Try;
-using sesh::common::TypeTag;
+using sesh::common::type_tag;
 
 TEST_CASE("Try, construction") {
-    Try<int> r1(TypeTag<int>(), 5);
-    Try<int> r2((TypeTag<std::exception_ptr>()));
+    Try<int> r1(type_tag<int>(), 5);
+    Try<int> r2((type_tag<std::exception_ptr>()));
     (void) r1, (void) r2;
 }
 
 TEST_CASE("Try, has value") {
-    Try<int> r1(TypeTag<int>(), 5);
-    Try<int> r2((TypeTag<std::exception_ptr>()));
+    Try<int> r1(type_tag<int>(), 5);
+    Try<int> r2((type_tag<std::exception_ptr>()));
     CHECK(r1.hasValue());
     CHECK_FALSE(r2.hasValue());
 }
 
 TEST_CASE("Try, conversion to bool") {
-    Try<int> r1(TypeTag<int>(), 5);
-    Try<int> r2((TypeTag<std::exception_ptr>()));
+    Try<int> r1(type_tag<int>(), 5);
+    Try<int> r2((type_tag<std::exception_ptr>()));
     CHECK(r1);
     CHECK_FALSE(r2);
 }
 
 TEST_CASE("Try, operator*, value") {
-    Try<int> r(TypeTag<int>(), 42);
+    Try<int> r(type_tag<int>(), 42);
     CHECK(*r == 42);
     CHECK_NOTHROW(*r = 123);
     CHECK(*const_cast<const Try<int> &>(r) == 123);
@@ -58,7 +58,7 @@ TEST_CASE("Try, operator*, value") {
 
 TEST_CASE("Try, operator*, exception") {
     class E {};
-    Try<int> r(TypeTag<std::exception_ptr>(), std::make_exception_ptr(E()));
+    Try<int> r(type_tag<std::exception_ptr>(), std::make_exception_ptr(E()));
     CHECK_THROWS_AS(*r, E);
     CHECK_THROWS_AS(*const_cast<const Try<int> &>(r), E);
 }
@@ -68,7 +68,7 @@ TEST_CASE("Try, operator->, value") {
         int get() noexcept { return 1; }
         int get() const noexcept { return 2; }
     };
-    Try<V> r((TypeTag<V>()));
+    Try<V> r((type_tag<V>()));
     CHECK(r->get() == 1);
     CHECK(const_cast<const Try<V> &>(r)->get() == 2);
 }

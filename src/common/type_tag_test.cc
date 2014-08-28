@@ -21,19 +21,19 @@
 #include "catch.hpp"
 
 #include <type_traits>
-#include "common/TypeTag.hh"
+#include "common/type_tag.hh"
 
 namespace {
 
-using sesh::common::TypeTag;
+using sesh::common::type_tag;
 
-constexpr TypeTag<int> INT{};
-constexpr TypeTag<char> CHAR{};
-constexpr TypeTag<float> FLOAT{};
-constexpr TypeTag<TypeTag<int>> INT_TAG{};
+constexpr type_tag<int> INT{};
+constexpr type_tag<char> CHAR{};
+constexpr type_tag<float> FLOAT{};
+constexpr type_tag<type_tag<int>> INT_TAG{};
 
 static_assert(
-        sizeof(TypeTag<>) > 0,
+        sizeof(type_tag<>) > 0,
         "empty type tag is a valid type, if not constructible");
 
 TEST_CASE("Type tag: comparison of single-type tags") {
@@ -53,7 +53,7 @@ TEST_CASE("Type tag: conversion from single-type tag to enumeration") {
 
 TEST_CASE("Type tag: application with single-type tag") {
     bool called = false;
-    auto i = INT.apply([&called](TypeTag<int>) { return called = true, 42; });
+    auto i = INT.apply([&called](type_tag<int>) { return called = true, 42; });
     static_assert(
             std::is_same<decltype(i), int>::value, "apply should return int");
     CHECK(i == 42);
@@ -62,9 +62,9 @@ TEST_CASE("Type tag: application with single-type tag") {
 
 namespace double_type_tag {
 
-using Tag = TypeTag<int, char>;
-constexpr Tag INT2 = INT;
-constexpr Tag CHAR2 = CHAR;
+using tag = type_tag<int, char>;
+constexpr tag INT2 = INT;
+constexpr tag CHAR2 = CHAR;
 
 TEST_CASE("Type tag: equality of double-type tags") {
     CHECK(INT2 == INT2);
@@ -124,23 +124,23 @@ TEST_CASE("Type tag: conversion from double-type tag to enumeration") {
 namespace apply {
 
 struct F {
-    bool &intCalled, &charCalled;
-    void operator()(TypeTag<int>) { intCalled = true; }
-    void operator()(const TypeTag<char> &) { charCalled = true; }
+    bool &int_called, &char_called;
+    void operator()(type_tag<int>) { int_called = true; }
+    void operator()(const type_tag<char> &) { char_called = true; }
 };
 
 TEST_CASE("Type tag: application with double-type tag of int") {
-    bool intCalled = false, charCalled = false;
-    INT2.apply(F{intCalled, charCalled});
-    CHECK(intCalled);
-    CHECK_FALSE(charCalled);
+    bool int_called = false, char_called = false;
+    INT2.apply(F{int_called, char_called});
+    CHECK(int_called);
+    CHECK_FALSE(char_called);
 }
 
 TEST_CASE("Type tag: application with double-type tag of char") {
-    bool intCalled = false, charCalled = false;
-    CHAR2.apply(F{intCalled, charCalled});
-    CHECK_FALSE(intCalled);
-    CHECK(charCalled);
+    bool int_called = false, char_called = false;
+    CHAR2.apply(F{int_called, char_called});
+    CHECK_FALSE(int_called);
+    CHECK(char_called);
 }
 
 } // namespace apply
@@ -149,16 +149,16 @@ TEST_CASE("Type tag: application with double-type tag of char") {
 
 namespace quad_type_tag {
 
-using Tag = TypeTag<int, char, float, TypeTag<int>>;
+using Tag = type_tag<int, char, float, type_tag<int>>;
 constexpr Tag INT4 = INT;
 constexpr Tag CHAR4 = CHAR;
 constexpr Tag FLOAT4 = FLOAT;
 constexpr Tag INT_TAG4 = INT_TAG;
 
 TEST_CASE("Type tag: conversion from double- to quad-type tag") {
-    Tag i = TypeTag<int, char>(INT);
-    Tag f = TypeTag<char, float, int>(FLOAT);
-    Tag c = TypeTag<float, int, TypeTag<int>, char>(CHAR);
+    Tag i = type_tag<int, char>(INT);
+    Tag f = type_tag<char, float, int>(FLOAT);
+    Tag c = type_tag<float, int, type_tag<int>, char>(CHAR);
     CHECK(i == INT4);
     CHECK(f == FLOAT4);
     CHECK(c == CHAR4);
@@ -233,34 +233,34 @@ TEST_CASE("Type tag: conversion from quad-type tag to enumeration") {
 namespace apply_behavior {
 
 template<typename T>
-struct TypeTagAcceptor {
-    int operator()(TypeTag<T>) { return 42; }
-    template<typename U> int operator()(TypeTag<U>) { FAIL(); return 0; }
+struct type_tag_acceptor {
+    int operator()(type_tag<T>) { return 42; }
+    template<typename U> int operator()(type_tag<U>) { FAIL(); return 0; }
 };
 
 TEST_CASE("Type tag: application with quad-type tag") {
-    CHECK(INT4.apply(TypeTagAcceptor<int>()) == 42);
-    CHECK(CHAR4.apply(TypeTagAcceptor<char>()) == 42);
-    CHECK(FLOAT4.apply(TypeTagAcceptor<float>()) == 42);
-    CHECK(INT_TAG4.apply(TypeTagAcceptor<TypeTag<int>>()) == 42);
+    CHECK(INT4.apply(type_tag_acceptor<int>()) == 42);
+    CHECK(CHAR4.apply(type_tag_acceptor<char>()) == 42);
+    CHECK(FLOAT4.apply(type_tag_acceptor<float>()) == 42);
+    CHECK(INT_TAG4.apply(type_tag_acceptor<type_tag<int>>()) == 42);
 }
 
 } // namespace apply_behavior
 
 namespace apply_throw {
 
-struct NoThrow {
-    template<typename T> void operator()(TypeTag<T>) noexcept { }
+struct no_throw {
+    template<typename T> void operator()(type_tag<T>) noexcept { }
 };
 
-struct Throw {
-    void operator()(TypeTag<TypeTag<int>>) { }
-    template<typename T> void operator()(TypeTag<T>) noexcept { }
+struct throwing {
+    void operator()(type_tag<type_tag<int>>) { }
+    template<typename T> void operator()(type_tag<T>) noexcept { }
 };
 
 TEST_CASE("Type tag: exception specification of apply") {
-    CHECK(noexcept(FLOAT4.apply(NoThrow())));
-    CHECK_FALSE(noexcept(FLOAT4.apply(Throw())));
+    CHECK(noexcept(FLOAT4.apply(no_throw())));
+    CHECK_FALSE(noexcept(FLOAT4.apply(throwing())));
 }
 
 } // namespace apply_throw

@@ -23,8 +23,8 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include "common/TypeTag.hh"
 #include "common/Variant.hh"
+#include "common/type_tag.hh"
 
 namespace sesh {
 namespace common {
@@ -58,7 +58,7 @@ private:
 public:
 
     /** Constructs a maybe object that contains nothing. */
-    Maybe() noexcept : mValue(TypeTag<Nil>()) { }
+    Maybe() noexcept : mValue(type_tag<Nil>()) { }
 
     /**
      * Constructs a non-empty maybe object by directly constructing the
@@ -70,7 +70,7 @@ public:
      * @param arg arguments to the contained object's constructor.
      */
     template<typename... Arg>
-    explicit Maybe(TypeTag<T> tag, Arg &&... arg)
+    explicit Maybe(type_tag<T> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<T, Arg...>::value) :
             mValue(tag, std::forward<Arg>(arg)...) { }
     // XXX support initializer_list?
@@ -80,14 +80,14 @@ public:
      * object.
      */
     Maybe(const T &v) noexcept(std::is_nothrow_copy_constructible<T>::value) :
-            mValue(TypeTag<T>(), v) { }
+            mValue(type_tag<T>(), v) { }
 
     /**
      * Constructs a non-empty maybe object by move-constructing the contained
      * object.
      */
     Maybe(T &&v) noexcept(std::is_nothrow_move_constructible<T>::value) :
-            mValue(TypeTag<T>(), std::move(v)) { }
+            mValue(type_tag<T>(), std::move(v)) { }
 
     Maybe(const Maybe &) = default;
     Maybe(Maybe &&) = default;
@@ -112,7 +112,7 @@ public:
             noexcept(std::is_nothrow_destructible<T>::value &&
                     std::is_nothrow_constructible<T, Arg...>::value) {
         mValue.template emplaceWithFallback<Nil>(
-                TypeTag<T>(), std::forward<Arg>(arg)...);
+                type_tag<T>(), std::forward<Arg>(arg)...);
     }
     // XXX support initializer_list?
 
@@ -121,7 +121,7 @@ public:
      * object if any.
      */
     void clear() noexcept(std::is_nothrow_destructible<T>::value) {
-        mValue.template emplaceWithFallback<Nil>(TypeTag<Nil>());
+        mValue.template emplaceWithFallback<Nil>(type_tag<Nil>());
     }
 
     /** Returns true if and only if this maybe object is non-empty. */
@@ -309,7 +309,7 @@ bool operator<(const Maybe<T> &a, const Maybe<T> &b)
 template<typename T, typename... Arg>
 Maybe<T> createMaybe(Arg &&... arg)
         noexcept(std::is_nothrow_constructible<T, Arg &&...>::value) {
-    return Maybe<T>(TypeTag<T>(), std::forward<Arg>(arg)...);
+    return Maybe<T>(type_tag<T>(), std::forward<Arg>(arg)...);
 }
 
 /**
@@ -325,9 +325,9 @@ Maybe<T> createMaybe(Arg &&... arg)
  */
 template<typename T, typename U = typename std::decay<T>::type>
 Maybe<U> createMaybeOf(T &&v)
-        noexcept(std::is_nothrow_constructible<Maybe<U>, TypeTag<U>, T &&>::
+        noexcept(std::is_nothrow_constructible<Maybe<U>, type_tag<U>, T &&>::
                 value) {
-    return Maybe<U>(TypeTag<U>(), std::forward<T>(v));
+    return Maybe<U>(type_tag<U>(), std::forward<T>(v));
 }
 
 } // namespace common

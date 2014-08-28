@@ -32,11 +32,11 @@ TESTPROGRAMS = \
 	src/common/SharedFunctionTest \
 	src/common/TrieTest \
 	src/common/TryTest \
-	src/common/TypeTagTest \
 	src/common/VariantTest \
 	src/common/container_helper_test \
 	src/common/enum_iterator_test \
 	src/common/enum_set_test \
+	src/common/type_tag_test \
 	src/language/source/BufferTest \
 	src/language/source/LineAppendedSourceTest \
 	src/language/source/LineContinuedSourceTest \
@@ -99,7 +99,6 @@ src_sesh_SOURCES = \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
 	src/common/Try.hh \
-	src/common/TypeTag.hh \
 	src/common/Variant.hh \
 	src/common/common_result.hh \
 	src/common/container_helper.hh \
@@ -115,6 +114,7 @@ src_sesh_SOURCES = \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
 	src/common/nop.hh \
+	src/common/type_tag.hh \
 	src/common/xchar.hh \
 	src/common/xstring.hh \
 	src/helpermacros.h \
@@ -223,9 +223,6 @@ src_common_TrieTest_SOURCES = \
 	src/common/TrieTest.cc
 src_common_TryTest_SOURCES = \
 	src/common/TryTest.cc
-src_common_TypeTagTest_SOURCES = \
-	src/common/TypeTag.hh \
-	src/common/TypeTagTest.cc
 src_common_VariantTest_SOURCES = \
 	src/common/VariantTest.cc
 src_common_container_helper_test_SOURCES = \
@@ -234,6 +231,9 @@ src_common_enum_iterator_test_SOURCES = \
 	src/common/enum_iterator_test.cc
 src_common_enum_set_test_SOURCES = \
 	src/common/enum_set_test.cc
+src_common_type_tag_test_SOURCES = \
+	src/common/type_tag.hh \
+	src/common/type_tag_test.cc
 src_language_source_BufferTest_SOURCES = \
 	src/common/Message.cc \
 	src/language/source/Buffer.cc \
@@ -382,7 +382,7 @@ src_os_signaling_HandlerConfigurationTest_SOURCES = \
 	src/os/signaling/SignalErrorCategory.cc
 
 TESTHEADERS = \
-	src/common/TypeTagTestHelper.hh \
+	src/common/type_tag_test_helper.hh \
 	src/language/source/DiagnosticMessageTestHelper.hh \
 	src/language/source/LocationTestHelper.hh \
 	src/language/source/OriginTestHelper.hh \

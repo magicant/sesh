@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_TypeTag_hh
-#define INCLUDED_common_TypeTag_hh
+#ifndef INCLUDED_common_type_tag_hh
+#define INCLUDED_common_type_tag_hh
 
 #include "buildconfig.h"
 
@@ -30,109 +30,109 @@ namespace common {
 namespace type_tag_impl {
 
 template<std::size_t SIZE>
-struct TypeTagValue;
+struct type_tag_value;
 
 template<>
-struct TypeTagValue<0> {
+struct type_tag_value<0> {
     enum class type { };
 };
 
 template<>
-struct TypeTagValue<1> {
-    enum class type { V0, };
+struct type_tag_value<1> {
+    enum class type { v0, };
 };
 
 template<>
-struct TypeTagValue<2> {
-    enum class type { V0, V1, };
+struct type_tag_value<2> {
+    enum class type { v0, v1, };
 };
 
 template<>
-struct TypeTagValue<3> {
-    enum class type { V0, V1, V2, };
+struct type_tag_value<3> {
+    enum class type { v0, v1, v2, };
 };
 
 template<>
-struct TypeTagValue<4> {
-    enum class type { V0, V1, V2, V3, };
+struct type_tag_value<4> {
+    enum class type { v0, v1, v2, v3, };
 };
 
 template<>
-struct TypeTagValue<5> {
-    enum class type { V0, V1, V2, V3, V4, };
+struct type_tag_value<5> {
+    enum class type { v0, v1, v2, v3, v4, };
 };
 
 template<>
-struct TypeTagValue<6> {
-    enum class type { V0, V1, V2, V3, V4, V5, };
+struct type_tag_value<6> {
+    enum class type { v0, v1, v2, v3, v4, v5, };
 };
 
 template<>
-struct TypeTagValue<7> {
-    enum class type { V0, V1, V2, V3, V4, V5, V6, };
+struct type_tag_value<7> {
+    enum class type { v0, v1, v2, v3, v4, v5, v6, };
 };
 
 template<>
-struct TypeTagValue<8> {
-    enum class type { V0, V1, V2, V3, V4, V5, V6, V7, };
+struct type_tag_value<8> {
+    enum class type { v0, v1, v2, v3, v4, v5, v6, v7, };
 };
 
 template<>
-struct TypeTagValue<9> {
-    enum class type { V0, V1, V2, V3, V4, V5, V6, V7, V8, };
+struct type_tag_value<9> {
+    enum class type { v0, v1, v2, v3, v4, v5, v6, v7, v8, };
 };
 
 template<>
-struct TypeTagValue<10> {
-    enum class type { V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, };
+struct type_tag_value<10> {
+    enum class type { v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, };
 };
 
 template<>
-struct TypeTagValue<11> {
-    enum class type { V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, };
+struct type_tag_value<11> {
+    enum class type { v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, };
 };
 
 template<>
-struct TypeTagValue<12> {
-    enum class type { V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, };
+struct type_tag_value<12> {
+    enum class type { v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, };
 };
 
 template<>
-struct TypeTagValue<13> {
-    enum class type { V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, };
+struct type_tag_value<13> {
+    enum class type { v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, };
 };
 
 template<>
-struct TypeTagValue<14> {
+struct type_tag_value<14> {
     enum class type {
-        V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, };
+        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, };
 };
 
 template<>
-struct TypeTagValue<15> {
+struct type_tag_value<15> {
     enum class type {
-        V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, };
+        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, };
 };
 
 template<>
-struct TypeTagValue<16> {
+struct type_tag_value<16> {
     enum class type {
-        V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15,
+        v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15,
     };
 };
 
 template<typename T, typename Head, typename... Tail>
 constexpr
 typename std::enable_if<std::is_same<T, Head>::value, int>::type
-indexOf() noexcept {
+index_of() noexcept {
     return 0;
 }
 
 template<typename T, typename Head, typename... Tail>
 constexpr
 typename std::enable_if<!std::is_same<T, Head>::value, int>::type
-indexOf() noexcept {
-    return indexOf<T, Tail...>() + 1;
+index_of() noexcept {
+    return index_of<T, Tail...>() + 1;
 }
 
 } // namespace type_tag_impl
@@ -141,15 +141,15 @@ indexOf() noexcept {
  * The type tag is an enumeration-like type to render distinct values which
  * each corresponds to one of the template parameter types.
  *
- * Note that the specialization {@code TypeTag<>} cannot be instantiated since
+ * Note that the specialization {@code type_tag<>} cannot be instantiated since
  * it cannot represent any type.
  */
 template<typename...>
-class TypeTag;
+class type_tag;
 
 /** The empty type tag. This class cannot be instantiated. */
 template<>
-class TypeTag<> {
+class type_tag<> {
 
 public:
 
@@ -160,24 +160,24 @@ public:
     constexpr static std::size_t variety() noexcept { return 0; }
 
     /** The underlying enumeration type. */
-    using Value = typename type_tag_impl::TypeTagValue<0>::type;
+    using value_type = typename type_tag_impl::type_tag_value<0>::type;
 
-    constexpr TypeTag() noexcept = delete;
-    constexpr explicit TypeTag(Value) noexcept = delete;
+    constexpr type_tag() noexcept = delete;
+    constexpr explicit type_tag(value_type) noexcept = delete;
 
-    constexpr /*explicit*/ operator Value() const noexcept = delete;
+    constexpr /*explicit*/ operator value_type() const noexcept = delete;
 
     template<typename F>
     [[noreturn]] constexpr void apply(F &&f) const = delete;
 
-}; // template<> class TypeTag<>
+}; // template<> class type_tag<>
 
 /**
- * An object of this TypeTag class template specialization always represents
+ * An object of this type_tag class template specialization always represents
  * the template parameter type T.
  */
 template<typename T>
-class TypeTag<T> {
+class type_tag<T> {
 
 public:
 
@@ -188,60 +188,60 @@ public:
     constexpr static std::size_t variety() noexcept { return 1; }
 
     /** The underlying enumeration type. */
-    using Value = typename type_tag_impl::TypeTagValue<variety()>::type;
+    using value_type = typename type_tag_impl::type_tag_value<variety()>::type;
 
     /**
      * This class template specialization is default-constructible because all
      * objects represent the same type.
      */
-    constexpr TypeTag() noexcept = default;
+    constexpr type_tag() noexcept = default;
 
     /**
      * Constructs a type tag object from the specified underlying enumerator.
      */
-    constexpr explicit TypeTag(Value) noexcept { }
+    constexpr explicit type_tag(value_type) noexcept { }
 
     /**
      * Converts this tag to its underlying enumerator. This conversion is
      * mainly for use in the switch statement.
      */
-    constexpr /*explicit*/ operator Value() const noexcept {
-        return Value::V0;
+    constexpr /*explicit*/ operator value_type() const noexcept {
+        return value_type::v0;
     }
 
     /**
      * Applies the argument function to this type tag.
-     * @tparam F A type which is callable with TypeTag.
+     * @tparam F A type which is callable with type_tag.
      * @param f A reference to the function object that is called.
      * @return The result of the function call.
      */
     template<typename F>
     constexpr auto apply(F &&f) const
-            noexcept(noexcept(std::forward<F>(f)(std::declval<TypeTag>())))
-            -> decltype(std::forward<F>(f)(std::declval<TypeTag>())) {
-        return std::forward<F>(f)(TypeTag());
+            noexcept(noexcept(std::forward<F>(f)(std::declval<type_tag>())))
+            -> decltype(std::forward<F>(f)(std::declval<type_tag>())) {
+        return std::forward<F>(f)(type_tag());
     }
 
-}; // template<typename T> class TypeTag<T>
+}; // template<typename T> class type_tag<T>
 
 /** Single-typed type tag objects always compare equal. */
 template<typename T>
-constexpr bool operator==(TypeTag<T>, TypeTag<T>) noexcept {
+constexpr bool operator==(type_tag<T>, type_tag<T>) noexcept {
     return true;
 }
 
 /** Single-typed type tag objects always compare equal. */
 template<typename T>
-constexpr bool operator<(TypeTag<T>, TypeTag<T>) noexcept {
+constexpr bool operator<(type_tag<T>, type_tag<T>) noexcept {
     return false;
 }
 
 /**
- * An object of this TypeTag class template specialization represents one of
+ * An object of this type_tag class template specialization represents one of
  * the template parameter types.
  */
 template<typename T1, typename T2, typename... TN>
-class TypeTag<T1, T2, TN...> {
+class type_tag<T1, T2, TN...> {
 
 public:
 
@@ -254,11 +254,11 @@ public:
     }
 
     /** The underlying enumeration type. */
-    using Value = typename type_tag_impl::TypeTagValue<variety()>::type;
+    using value_type = typename type_tag_impl::type_tag_value<variety()>::type;
 
 private:
 
-    Value mValue;
+    value_type m_value;
 
 public:
 
@@ -267,7 +267,7 @@ public:
      * @param v A valid underlying enumerator. If the value is not any of the
      * valid enumerators of the enumeration type, the behavior is undefined.
      */
-    constexpr explicit TypeTag(Value v) noexcept : mValue(v) { }
+    constexpr explicit type_tag(value_type v) noexcept : m_value(v) { }
 
     /**
      * Constructs a type tag object that represents the type represented by the
@@ -275,17 +275,19 @@ public:
      * @tparam T The type represented by the new type tag object.
      */
     template<typename T>
-    constexpr TypeTag(TypeTag<T>) noexcept :
-            mValue(static_cast<Value>(
-                        type_tag_impl::indexOf<T, T1, T2, TN...>())) { }
+    constexpr type_tag(type_tag<T>) noexcept :
+            m_value(static_cast<value_type>(
+                        type_tag_impl::index_of<T, T1, T2, TN...>())) { }
 
 private:
 
-    class Converter {
+    class converter {
     public:
         template<typename T>
-        constexpr TypeTag operator()(TypeTag<T> t) const noexcept { return t; }
-    }; // class Converter
+        constexpr type_tag operator()(type_tag<T> t) const noexcept {
+            return t;
+        }
+    }; // class converter
 
 public:
 
@@ -296,71 +298,71 @@ public:
      * T1, T2, TN...}.
      */
     template<typename U1, typename U2, typename... UN>
-    constexpr TypeTag(TypeTag<U1, U2, UN...> t) noexcept :
-            TypeTag(t.apply(Converter())) { }
+    constexpr type_tag(type_tag<U1, U2, UN...> t) noexcept :
+            type_tag(t.apply(converter())) { }
 
     /** @return true if and only if the two objects represent the same type. */
-    constexpr bool operator==(TypeTag that) const noexcept {
-        return this->mValue == that.mValue;
+    constexpr bool operator==(type_tag that) const noexcept {
+        return this->m_value == that.m_value;
     }
 
     /** Compares two type tags. */
-    constexpr bool operator<(TypeTag that) const noexcept {
-        return this->mValue < that.mValue;
+    constexpr bool operator<(type_tag that) const noexcept {
+        return this->m_value < that.m_value;
     }
 
     /**
      * Converts this tag to its underlying enumerator. This conversion is
      * mainly for use in the switch statement.
      */
-    constexpr /*explicit*/ operator Value() const noexcept {
-        return mValue;
+    constexpr /*explicit*/ operator value_type() const noexcept {
+        return m_value;
     }
 
     /**
      * Applies the argument function to this type tag.
-     * @tparam F A type which is callable with {@code TypeTag<T>} for any type
+     * @tparam F A type which is callable with {@code type_tag<T>} for any type
      * T that may be represented by this type tag. The return type must be the
-     * same for all possible {@code TypeTag<T>} argument.
+     * same for all possible {@code type_tag<T>} argument.
      * @param f A reference to the function object that is called.
      * @return The result of the function call.
      */
     template<typename F>
     constexpr auto apply(F &&f) const
             noexcept(
-                noexcept(std::declval<F>()(std::declval<TypeTag<T1>>())) &&
-                noexcept(std::declval<TypeTag<T2, TN...>>().apply(
+                noexcept(std::declval<F>()(std::declval<type_tag<T1>>())) &&
+                noexcept(std::declval<type_tag<T2, TN...>>().apply(
                     std::declval<F>())))
-            -> decltype(std::declval<F>()(std::declval<TypeTag<T1>>())) {
+            -> decltype(std::declval<F>()(std::declval<type_tag<T1>>())) {
         static_assert(
                 std::is_same<
-                    decltype(std::declval<F>()(std::declval<TypeTag<T1>>())),
-                    decltype(std::declval<F>()(std::declval<TypeTag<T2>>()))
+                    decltype(std::declval<F>()(std::declval<type_tag<T1>>())),
+                    decltype(std::declval<F>()(std::declval<type_tag<T2>>()))
                 >::value,
                 "The return types must be the same");
-        using TypeTag2 = TypeTag<T2, TN...>;
-        using Value2 = typename TypeTag2::Value;
-        return mValue == Value::V0 /* *this == TypeTag<T1>() */ ?
-                std::forward<F>(f)(TypeTag<T1>()) :
-                TypeTag2(static_cast<Value2>(static_cast<int>(mValue) - 1))
+        using type_tag_2 = type_tag<T2, TN...>;
+        using value_2 = typename type_tag_2::value_type;
+        return m_value == value_type::v0 /* *this == type_tag<T1>() */ ?
+                std::forward<F>(f)(type_tag<T1>()) :
+                type_tag_2(static_cast<value_2>(static_cast<int>(m_value) - 1))
                     .apply(std::forward<F>(f));
     }
 
-}; // class TypeTag<T1, T2, TN...>
+}; // class type_tag<T1, T2, TN...>
 
 template<typename T, typename T1, typename T2, typename... TN>
-constexpr bool operator==(TypeTag<T> l, TypeTag<T1, T2, TN...> r) noexcept {
+constexpr bool operator==(type_tag<T> l, type_tag<T1, T2, TN...> r) noexcept {
     return r == l; // "l" is implicitly converted to "decltype(r)".
 }
 
 template<typename T, typename T1, typename T2, typename... TN>
-constexpr bool operator<(TypeTag<T> l, TypeTag<T1, T2, TN...> r) noexcept {
+constexpr bool operator<(type_tag<T> l, type_tag<T1, T2, TN...> r) noexcept {
     return decltype(r)(l) < r;
 }
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_TypeTag_hh
+#endif // #ifndef INCLUDED_common_type_tag_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

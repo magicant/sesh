@@ -25,21 +25,21 @@
 #include <tuple>
 #include "async/Delay.hh"
 #include "common/Try.hh"
-#include "common/TypeTag.hh"
 #include "common/copy.hh"
+#include "common/type_tag.hh"
 
 namespace {
 
 using sesh::async::Delay;
 using sesh::common::Try;
-using sesh::common::TypeTag;
 using sesh::common::copy;
+using sesh::common::type_tag;
 
 TEST_CASE("Delay: set result and callback") {
     using T = std::tuple<int, float, char>;
     Delay<T> s;
 
-    s.setResult(TypeTag<T>(), 42, 3.0f, 'a');
+    s.setResult(type_tag<T>(), 42, 3.0f, 'a');
 
     unsigned callCount = 0;
     s.setCallback([&callCount](Try<T> &&r) {
