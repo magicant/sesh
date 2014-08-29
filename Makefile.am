@@ -26,7 +26,6 @@ TESTPROGRAMS = \
 	src/async/FutureTest \
 	src/async/PromiseTest \
 	src/async/SharedFutureTest \
-	src/common/MessageTest \
 	src/common/ReferenceTest \
 	src/common/SharedFunctionTest \
 	src/common/TrieTest \
@@ -35,6 +34,7 @@ TESTPROGRAMS = \
 	src/common/enum_iterator_test \
 	src/common/enum_set_test \
 	src/common/maybe_test \
+	src/common/message_test \
 	src/common/type_tag_test \
 	src/common/variant_test \
 	src/language/source/BufferTest \
@@ -89,8 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/Message.cc \
-	src/common/Message.hh \
 	src/common/OutputStream.hh \
 	src/common/Reference.hh \
 	src/common/SharedFunction.hh \
@@ -112,6 +110,8 @@ src_sesh_SOURCES = \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
 	src/common/maybe.hh \
+	src/common/message.cc \
+	src/common/message.hh \
 	src/common/nop.hh \
 	src/common/type_tag.hh \
 	src/common/variant.hh \
@@ -210,9 +210,6 @@ src_async_PromiseTest_SOURCES = \
 	src/async/PromiseTest.cc
 src_async_SharedFutureTest_SOURCES = \
 	src/async/SharedFutureTest.cc
-src_common_MessageTest_SOURCES = \
-	src/common/Message.cc \
-	src/common/MessageTest.cc
 src_common_ReferenceTest_SOURCES = \
 	src/common/ReferenceTest.cc
 src_common_SharedFunctionTest_SOURCES = \
@@ -229,34 +226,37 @@ src_common_enum_set_test_SOURCES = \
 	src/common/enum_set_test.cc
 src_common_maybe_test_SOURCES = \
 	src/common/maybe_test.cc
+src_common_message_test_SOURCES = \
+	src/common/message.cc \
+	src/common/message_test.cc
 src_common_type_tag_test_SOURCES = \
 	src/common/type_tag.hh \
 	src/common/type_tag_test.cc
 src_common_variant_test_SOURCES = \
 	src/common/variant_test.cc
 src_language_source_BufferTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/Buffer.cc \
 	src/language/source/BufferTest.cc \
 	src/language/source/Source.cc
 src_language_source_LineAppendedSourceTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/LineAppendedSource.cc \
 	src/language/source/LineAppendedSourceTest.cc \
 	src/language/source/Location.cc \
 	src/language/source/Source.cc
 src_language_source_LineContinuedSourceTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/LineContinuedSource.cc \
 	src/language/source/LineContinuedSourceTest.cc \
 	src/language/source/Location.cc \
 	src/language/source/Source.cc
 src_language_source_LocationTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/Location.cc \
 	src/language/source/LocationTest.cc
 src_language_source_SourceTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/Source.cc \
 	src/language/source/SourceTest.cc
 src_language_syntax_AndOrListTest_SOURCES = \

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_Message_hh
-#define INCLUDED_common_Message_hh
+#ifndef INCLUDED_common_message_hh
+#define INCLUDED_common_message_hh
 
 #include "buildconfig.h"
 
@@ -40,14 +40,14 @@ namespace common {
  * provided argument values intact.
  *
  * The template parameters specify the types of argument values that have to be
- * supplied to form a complete message. A message of type <code>Message&lt;int,
+ * supplied to form a complete message. A message of type <code>message&lt;int,
  * double></code>, for example, needs an int and double value. The
- * <code>Message&lt;></code> type represents a complete message.
+ * <code>message&lt;></code> type represents a complete message.
  *
  * @tparam Arg Types of arguments required to complete the message.
  */
 template<typename... Arg>
-class Message;
+class message;
 
 /**
  * Complete message.
@@ -58,34 +58,35 @@ class Message;
  * public API of this class.
  */
 template<>
-class Message<> {
+class message<> {
 
 public:
 
-    using String = common::xstring;
-    using Char = String::value_type;
-    using CharTraits = String::traits_type;
-    using Allocator = String::allocator_type;
-    using Format = boost::basic_format<Char, CharTraits, Allocator>;
+    using string_type = common::xstring;
+    using char_type = string_type::value_type;
+    using char_traits = string_type::traits_type;
+    using allocator_type = string_type::allocator_type;
+    using format_type =
+            boost::basic_format<char_type, char_traits, allocator_type>;
 
 protected:
 
-    using ArgumentFeeder = std::function<Format &(Format &)>;
+    using argument_feeder_type = std::function<format_type &(format_type &)>;
 
 private:
 
-    String mFormatString;
+    string_type m_format_string;
 
     /** Never null. */
-    ArgumentFeeder mFeedArguments;
+    argument_feeder_type m_feed_arguments;
 
 public:
 
-    /** @see Message<>::Message(String &&) */
-    explicit Message(const Char * = nullptr);
+    /** @see message<>::message(string_type &&) */
+    explicit message(const char_type * = nullptr);
 
-    /** @see Message<>::Message(String &&) */
-    explicit Message(const String &);
+    /** @see message<>::message(string_type &&) */
+    explicit message(const string_type &);
 
     /**
      * Constructs a message object with the specified format string.
@@ -94,20 +95,20 @@ public:
      * the caller must make sure to match the argument types required by the
      * format string with the class template parameters.
      */
-    explicit Message(String &&);
+    explicit message(string_type &&);
 
     /**
      * Returns a boost::format object.
      *
      * The remaining argument count of the return value matches the number of
-     * template parameters of the Message template class. For a complete
+     * template parameters of the message template class. For a complete
      * message, it is zero. The number of expected, bound, and fed arguments of
      * the return value is unspecified.
      */
-    Format toFormat() const;
+    format_type to_format() const;
 
     /** Converts the complete message to a string. */
-    String toString() const;
+    string_type to_string() const;
 
     /**
      * The format string for this message.
@@ -116,20 +117,20 @@ public:
      * since this function returns a direct reference to the string object. The
      * caller is responsible to keep the format valid.
      */
-    String &formatString() noexcept {
-        return mFormatString;
+    string_type &format_string() noexcept {
+        return m_format_string;
     }
-    const String &formatString() const noexcept {
-        return mFormatString;
+    const string_type &format_string() const noexcept {
+        return m_format_string;
     }
 
 protected:
 
-    ArgumentFeeder &argumentFeeder() noexcept {
-        return mFeedArguments;
+    argument_feeder_type &argument_feeder() noexcept {
+        return m_feed_arguments;
     }
-    const ArgumentFeeder &argumentFeeder() const noexcept {
-        return mFeedArguments;
+    const argument_feeder_type &argument_feeder() const noexcept {
+        return m_feed_arguments;
     }
 
 };
@@ -141,30 +142,30 @@ protected:
  * operator without copying the message object.
  */
 template<typename Head, typename... Tail>
-class Message<Head, Tail...> : private Message<Tail...> {
+class message<Head, Tail...> : private message<Tail...> {
 
 public:
 
-    using String = typename Message<Tail...>::String;
-    using Char = typename Message<Tail...>::Char;
-    using CharTraits = typename Message<Tail...>::CharTraits;
-    using Allocator = typename Message<Tail...>::Allocator;
-    using Format = typename Message<Tail...>::Format;
+    using typename message<Tail...>::string_type;
+    using typename message<Tail...>::char_type;
+    using typename message<Tail...>::char_traits;
+    using typename message<Tail...>::allocator_type;
+    using typename message<Tail...>::format_type;
 
-    using Message<Tail...>::Message;
+    using message<Tail...>::message;
 
-    using Message<Tail...>::toFormat;
+    using message<Tail...>::to_format;
 
 protected:
 
-    using Message<Tail...>::argumentFeeder;
+    using message<Tail...>::argument_feeder;
 
 public:
 
     /** Binds an argument value to this message object. */
-    Message<Tail...> &&operator%(const Head &value) && {
-        auto &old = argumentFeeder();
-        argumentFeeder() = [old, value](Format &f) -> Format & {
+    message<Tail...> &&operator%(const Head &value) && {
+        auto &old = argument_feeder();
+        argument_feeder() = [old, value](format_type &f) -> format_type & {
             return old(f) % value;
         };
         return std::move(*this);
@@ -175,6 +176,6 @@ public:
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_Message_hh
+#endif // #ifndef INCLUDED_common_message_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

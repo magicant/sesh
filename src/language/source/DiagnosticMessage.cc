@@ -19,10 +19,9 @@
 #include "DiagnosticMessage.hh"
 
 #include <utility>
-#include "common/Message.hh"
 #include "common/error_level.hh"
+#include "common/message.hh"
 
-using sesh::common::Message;
 using sesh::common::error_level;
 
 namespace sesh {
@@ -30,7 +29,7 @@ namespace language {
 namespace source {
 
 DiagnosticMessage::DiagnosticMessage(
-        Position p, Message<> &&m, error_level el) :
+        Position p, common::message<> &&m, error_level el) :
         mPosition(std::move(p)),
         mErrorLevel(el),
         mMessage(std::move(m)) { }

@@ -16,45 +16,44 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Message.hh"
+#include "message.hh"
 
 #include <utility>
 #include "boost/format.hpp"
+#include "common/identity.hh"
+
+using sesh::common::identity;
 
 namespace sesh {
 namespace common {
 
 namespace {
 
-using Char = Message<>::Char;
+using char_type = message<>::char_type;
 
-const Char *defaultString(const Char *s) {
+const char_type *default_string(const char_type *s) noexcept {
     return s == nullptr ? L("") : s;
-}
-
-Message<>::Format &id(Message<>::Format &f) {
-    return f;
 }
 
 } // namespace
 
-Message<>::Message(const Char *s) :
-        mFormatString(defaultString(s)), mFeedArguments(id) { }
+message<>::message(const char_type *s) :
+        m_format_string(default_string(s)), m_feed_arguments(identity()) { }
 
-Message<>::Message(const String &s) :
-        mFormatString(s), mFeedArguments(id) { }
+message<>::message(const string_type &s) :
+        m_format_string(s), m_feed_arguments(identity()) { }
 
-Message<>::Message(String &&s) :
-        mFormatString(std::move(s)), mFeedArguments(id) { }
+message<>::message(string_type &&s) :
+        m_format_string(std::move(s)), m_feed_arguments(identity()) { }
 
-auto Message<>::toFormat() const -> Format {
-    Format f(mFormatString);
-    mFeedArguments(f);
+auto message<>::to_format() const -> format_type {
+    format_type f(m_format_string);
+    m_feed_arguments(f);
     return f;
 }
 
-auto Message<>::toString() const -> String {
-    return toFormat().str();
+auto message<>::to_string() const -> string_type {
+    return to_format().str();
 }
 
 } // namespace common

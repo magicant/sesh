@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "common/Message.hh"
+#include "common/message.hh"
 #include "language/source/DiagnosticMessage.hh"
 
 namespace sesh {

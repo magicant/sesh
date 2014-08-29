@@ -39,12 +39,12 @@ public:
     // XXX LLVM 3.4 libc++ seems to require a user-provided default constructor
     OriginStub() noexcept : Origin() { }
 
-    common::Message<> name() const override {
-        return common::Message<>(DUMMY_NAME);
+    common::message<> name() const override {
+        return common::message<>(DUMMY_NAME);
     }
 
-    common::Message<> description() const override {
-        return common::Message<>(DUMMY_DESCRIPTION);
+    common::message<> description() const override {
+        return common::message<>(DUMMY_DESCRIPTION);
     }
 
 }; // class OriginStub

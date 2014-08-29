@@ -22,75 +22,75 @@
 
 #include <utility>
 #include "boost/format.hpp"
-#include "common/Message.hh"
+#include "common/message.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"
 
 namespace {
 
-using sesh::common::Message;
+using sesh::common::message;
 using sesh::common::xchar;
 using sesh::common::xstring;
 
 TEST_CASE("Message, construction") {
     const xstring s = L("test");
-    Message<> m1;
-    Message<> m2(nullptr);
-    Message<> m3(L("test"));
-    Message<> m4(s);
-    Message<> m5(xstring(L("test")));
+    message<> m1;
+    message<> m2(nullptr);
+    message<> m3(L("test"));
+    message<> m4(s);
+    message<> m5(xstring(L("test")));
 }
 
 TEST_CASE("Message, special member functions without arguments") {
-    Message<> m1;
-    Message<> m2(m1);
-    Message<> m3(std::move(m2));
+    message<> m1;
+    message<> m2(m1);
+    message<> m3(std::move(m2));
     m2 = m3;
     m3 = std::move(m2);
 }
 
 TEST_CASE("Message, format string") {
-    Message<> m1;
-    CHECK(m1.formatString() == L(""));
-    m1.formatString() = L("123");
-    CHECK(m1.formatString() == L("123"));
+    message<> m1;
+    CHECK(m1.format_string() == L(""));
+    m1.format_string() = L("123");
+    CHECK(m1.format_string() == L("123"));
 
-    const Message<> m2(L("ABC"));
-    CHECK(m2.formatString() == L("ABC"));
+    const message<> m2(L("ABC"));
+    CHECK(m2.format_string() == L("ABC"));
 
-    CHECK(Message<>().formatString() == L(""));
-    CHECK(Message<>(xstring(L("test"))).formatString() == L("test"));
+    CHECK(message<>().format_string() == L(""));
+    CHECK(message<>(xstring(L("test"))).format_string() == L("test"));
 }
 
 TEST_CASE("Message, format without arguments") {
-    const Message<> m(L("123"));
-    Message<>::Format f(m.toFormat());
+    const message<> m(L("123"));
+    message<>::format_type f(m.to_format());
     CHECK(f.str() == L("123"));
 
-    CHECK(Message<>(L"%%").toFormat().str() == L("%"));
+    CHECK(message<>(L"%%").to_format().str() == L("%"));
 
-    CHECK((Message<int>(L("%1%")).toFormat() % 100).str() == L("100"));
+    CHECK((message<int>(L("%1%")).to_format() % 100).str() == L("100"));
 }
 
 TEST_CASE("Message, format with arguments") {
-    Message<int, xchar> m1(L("%2%%1%"));
-    Message<int, xchar>::Format f1 = m1.toFormat();
+    message<int, xchar> m1(L("%2%%1%"));
+    message<int, xchar>::format_type f1 = m1.to_format();
     CHECK((f1 % 1 % L('A')).str() == L("A1"));
 
-    Message<xchar> &&m2 = std::move(m1) % 2;
-    Message<xchar>::Format f2 = m2.toFormat();
+    message<xchar> &&m2 = std::move(m1) % 2;
+    message<xchar>::format_type f2 = m2.to_format();
     CHECK((f2 % L('B')).str() == L("B2"));
 
-    Message<> &&m3 = std::move(m2) % L('C');
-    Message<>::Format f3 = m3.toFormat();
+    message<> &&m3 = std::move(m2) % L('C');
+    message<>::format_type f3 = m3.to_format();
     CHECK(f3.str() == L("C2"));
 }
 
 TEST_CASE("Message, to string") {
-    CHECK(Message<>(L("ABC%%")).toString() == L("ABC%"));
-    CHECK((Message<int>(L("%1%%%")) % 33).toString() == L("33%"));
-    CHECK((Message<xstring, xchar>(L("[%1%:%2%]")) % L("S") % L('C'))
-            .toString()
+    CHECK(message<>(L("ABC%%")).to_string() == L("ABC%"));
+    CHECK((message<int>(L("%1%%%")) % 33).to_string() == L("33%"));
+    CHECK((message<xstring, xchar>(L("[%1%:%2%]")) % L("S") % L('C'))
+            .to_string()
             == L("[S:C]"));
 }
 
