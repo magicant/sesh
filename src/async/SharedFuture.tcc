@@ -24,9 +24,9 @@
 #include <exception>
 #include <utility>
 #include "async/Future.tcc"
-#include "common/identity.hh"
-#include "common/Maybe.hh"
 #include "common/Try.hh"
+#include "common/identity.hh"
+#include "common/maybe.hh"
 
 namespace sesh {
 namespace async {
@@ -41,7 +41,7 @@ public:
 
 private:
 
-    common::Maybe<common::Try<T>> mResult;
+    common::maybe<common::Try<T>> mResult;
 
     /** Empty after the result is set and all callbacks are called. */
     std::vector<Callback> mCallbacks;
@@ -69,7 +69,7 @@ void SharedFutureBase<T>::Impl::setResult(common::Try<T> &&t) {
 
 template<typename T>
 void SharedFutureBase<T>::Impl::addCallback(Callback &&c) {
-    if (mResult.hasValue())
+    if (mResult.has_value())
         return c(*mResult);
     mCallbacks.push_back(std::move(c));
 }

@@ -31,7 +31,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "common/Maybe.hh"
+#include "common/maybe.hh"
 
 namespace sesh {
 namespace common {
@@ -90,7 +90,7 @@ private:
 
     ChildMap mChildren;
 
-    Maybe<Value> mValue;
+    maybe<Value> mValue;
 
     /**
      * The number of values that exist under this node, that is, the number of
@@ -151,7 +151,7 @@ private:
 public:
 
     /** Checks if this node has a value. */
-    bool hasValue() const noexcept { return mValue.hasValue(); }
+    bool hasValue() const noexcept { return mValue.has_value(); }
 
     /**
      * Returns a reference to the value of this node. The behavior is undefined
@@ -171,7 +171,7 @@ public:
      * There is no non-const version of this method because the trie
      * implementation has to keep track of the number of values.
      */
-    const Maybe<Value> &maybeValue() const noexcept { return mValue; }
+    const maybe<Value> &maybeValue() const noexcept { return mValue; }
 
     /**
      * If this node contains no value, creates one by emplacement. All the

@@ -109,14 +109,14 @@ TEST_CASE("Trie, construction from initializer list") {
 
 TEST_CASE("Trie, node value") {
     Trie<char, std::pair<int, int>> t;
-    CHECK_FALSE(t.maybeValue().hasValue());
+    CHECK_FALSE(t.maybeValue().has_value());
     CHECK_FALSE(t.hasValue());
 
     auto e1 = t.emplaceValue(1, 2);
     CHECK(e1.first.first == 1);
     CHECK(e1.first.second == 2);
     CHECK(e1.second);
-    CHECK(t.maybeValue().hasValue());
+    CHECK(t.maybeValue().has_value());
     CHECK(t.hasValue());
     CHECK(std::addressof(e1.first) == std::addressof(t.maybeValue().value()));
     CHECK(std::addressof(e1.first) == std::addressof(t.value()));
@@ -126,7 +126,7 @@ TEST_CASE("Trie, node value") {
     CHECK(e2.first.first == 1);
     CHECK(e2.first.second == 2);
     CHECK_FALSE(e2.second);
-    CHECK(t.maybeValue().hasValue());
+    CHECK(t.maybeValue().has_value());
     CHECK(t.hasValue());
     CHECK(std::addressof(e2.first) == std::addressof(t.maybeValue().value()));
     CHECK(std::addressof(e2.first) == std::addressof(t.value()));
@@ -139,11 +139,11 @@ TEST_CASE("Trie, node value") {
     CHECK(std::addressof(intPair1) == std::addressof(t.value()));
 
     t.eraseValue();
-    CHECK_FALSE(t.maybeValue().hasValue());
+    CHECK_FALSE(t.maybeValue().has_value());
     CHECK_FALSE(t.hasValue());
 
     t.eraseValue(); // already erased; no effect
-    CHECK_FALSE(t.maybeValue().hasValue());
+    CHECK_FALSE(t.maybeValue().has_value());
     CHECK_FALSE(t.hasValue());
 
     auto &intPair2 = t.getOrCreateValue();

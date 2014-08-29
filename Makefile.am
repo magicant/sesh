@@ -89,7 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/Maybe.hh \
 	src/common/Message.cc \
 	src/common/Message.hh \
 	src/common/OutputStream.hh \
@@ -112,6 +111,7 @@ src_sesh_SOURCES = \
 	src/common/functional_initialize.hh \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
+	src/common/maybe.hh \
 	src/common/nop.hh \
 	src/common/type_tag.hh \
 	src/common/variant.hh \

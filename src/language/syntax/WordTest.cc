@@ -46,24 +46,24 @@ class NonConstant : public WordComponent {
 
 TEST_CASE("Word, constant value") {
     Word w1, w2;
-    REQUIRE(w1.maybeConstantValue().hasValue());
+    REQUIRE(w1.maybeConstantValue().has_value());
     CHECK(w1.maybeConstantValue().value() == xstring());
 
     w1.addComponent(Word::ComponentPointer(new RawString(L("ABC"))));
-    REQUIRE(w1.maybeConstantValue().hasValue());
+    REQUIRE(w1.maybeConstantValue().has_value());
     CHECK(w1.maybeConstantValue().value() == L("ABC"));
 
     w1.addComponent(Word::ComponentPointer(new RawString(L("123"))));
-    REQUIRE(w1.maybeConstantValue().hasValue());
+    REQUIRE(w1.maybeConstantValue().has_value());
     CHECK(w1.maybeConstantValue().value() == L("ABC123"));
 
     w1.addComponent(Word::ComponentPointer(new NonConstant));
-    CHECK_FALSE(w1.maybeConstantValue().hasValue());
+    CHECK_FALSE(w1.maybeConstantValue().has_value());
 
-    CHECK(w2.maybeConstantValue().hasValue());
+    CHECK(w2.maybeConstantValue().has_value());
     w2.append(std::move(w1));
-    CHECK_FALSE(w2.maybeConstantValue().hasValue());
-    REQUIRE(w1.maybeConstantValue().hasValue());
+    CHECK_FALSE(w2.maybeConstantValue().has_value());
+    REQUIRE(w1.maybeConstantValue().has_value());
     CHECK(w1.maybeConstantValue().value() == xstring());
 }
 

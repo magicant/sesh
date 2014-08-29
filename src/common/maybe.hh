@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_Maybe_hh
-#define INCLUDED_common_Maybe_hh
+#ifndef INCLUDED_common_maybe_hh
+#define INCLUDED_common_maybe_hh
 
 #include "buildconfig.h"
 
@@ -30,7 +30,7 @@ namespace sesh {
 namespace common {
 
 /**
- * <code>Maybe&lt;T></code> is a container that contains zero or one instance
+ * <code>maybe&lt;T></code> is a container that contains zero or one instance
  * of <code>T</code>. Maybe allows construction and destruction of the
  * contained object at any time.
  *
@@ -38,7 +38,7 @@ namespace common {
  * non-pointer decayed type (see std::decay).
  */
 template<typename T>
-class Maybe {
+class maybe {
 
 private:
 
@@ -51,14 +51,14 @@ private:
     static_assert(!std::is_member_pointer<T>::value,
             "Maybe cannot contain member pointer");
 
-    class Nil { };
+    class nil { };
 
-    variant<Nil, T> mValue;
+    variant<nil, T> m_value;
 
 public:
 
     /** Constructs a maybe object that contains nothing. */
-    Maybe() noexcept : mValue(type_tag<Nil>()) { }
+    maybe() noexcept : m_value(type_tag<nil>()) { }
 
     /**
      * Constructs a non-empty maybe object by directly constructing the
@@ -70,33 +70,33 @@ public:
      * @param arg arguments to the contained object's constructor.
      */
     template<typename... Arg>
-    explicit Maybe(type_tag<T> tag, Arg &&... arg)
+    explicit maybe(type_tag<T> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<T, Arg...>::value) :
-            mValue(tag, std::forward<Arg>(arg)...) { }
+            m_value(tag, std::forward<Arg>(arg)...) { }
     // XXX support initializer_list?
 
     /**
      * Constructs a non-empty maybe object by copy-constructing the contained
      * object.
      */
-    Maybe(const T &v) noexcept(std::is_nothrow_copy_constructible<T>::value) :
-            mValue(type_tag<T>(), v) { }
+    maybe(const T &v) noexcept(std::is_nothrow_copy_constructible<T>::value) :
+            m_value(type_tag<T>(), v) { }
 
     /**
      * Constructs a non-empty maybe object by move-constructing the contained
      * object.
      */
-    Maybe(T &&v) noexcept(std::is_nothrow_move_constructible<T>::value) :
-            mValue(type_tag<T>(), std::move(v)) { }
+    maybe(T &&v) noexcept(std::is_nothrow_move_constructible<T>::value) :
+            m_value(type_tag<T>(), std::move(v)) { }
 
-    Maybe(const Maybe &) = default;
-    Maybe(Maybe &&) = default;
-    Maybe &operator=(const Maybe &) = default;
-    Maybe &operator=(Maybe &&) = default;
+    maybe(const maybe &) = default;
+    maybe(maybe &&) = default;
+    maybe &operator=(const maybe &) = default;
+    maybe &operator=(maybe &&) = default;
     // XXX: GCC 4.8.1 rejects implicit exception-specification in an explicitly
     // defaulted destructor declaration if the destructor allows some
     // exception.
-    /* ~Maybe() = default; */
+    /* ~maybe() = default; */
 
     /**
      * Destructs the currently contained object (if any) and constructs a new
@@ -111,7 +111,7 @@ public:
     void emplace(Arg &&... arg)
             noexcept(std::is_nothrow_destructible<T>::value &&
                     std::is_nothrow_constructible<T, Arg...>::value) {
-        mValue.template emplace_with_fallback<Nil>(
+        m_value.template emplace_with_fallback<nil>(
                 type_tag<T>(), std::forward<Arg>(arg)...);
     }
     // XXX support initializer_list?
@@ -121,28 +121,28 @@ public:
      * object if any.
      */
     void clear() noexcept(std::is_nothrow_destructible<T>::value) {
-        mValue.template emplace_with_fallback<Nil>(type_tag<Nil>());
+        m_value.template emplace_with_fallback<nil>(type_tag<nil>());
     }
 
     /** Returns true if and only if this maybe object is non-empty. */
-    bool hasValue() const noexcept {
-        return mValue.tag() != mValue.template tag<Nil>();
+    bool has_value() const noexcept {
+        return m_value.tag() != m_value.template tag<nil>();
     }
 
-    /** Same as {@link #hasValue()}. */
-    explicit operator bool() const noexcept { return hasValue(); }
+    /** Same as {@link #has_value()}. */
+    explicit operator bool() const noexcept { return has_value(); }
 
     /**
      * Returns a reference to the contained object. The maybe object must not
      * be empty.
      */
-    T &value() noexcept { return mValue.template value<T>(); }
+    T &value() noexcept { return m_value.template value<T>(); }
 
     /**
      * Returns a reference to the contained object. The maybe object must not
      * be empty.
      */
-    const T &value() const noexcept { return mValue.template value<T>(); }
+    const T &value() const noexcept { return m_value.template value<T>(); }
 
     /**
      * Returns a reference to the contained object. The maybe object must not
@@ -174,8 +174,8 @@ public:
      * @param alternative an object to which reference is returned if this
      * maybe object is empty.
      */
-    T &valueOr(T &alternative) noexcept {
-        return hasValue() ? value() : alternative;
+    T &value_or(T &alternative) noexcept {
+        return has_value() ? value() : alternative;
     }
 
     /**
@@ -184,8 +184,8 @@ public:
      * @param alternative an object to which reference is returned if this
      * maybe object is empty.
      */
-    const T &valueOr(const T &alternative) const noexcept {
-        return hasValue() ? value() : alternative;
+    const T &value_or(const T &alternative) const noexcept {
+        return has_value() ? value() : alternative;
     }
 
     /**
@@ -203,10 +203,10 @@ public:
             typename = typename std::enable_if<
                     std::is_constructible<T, U &&>::value &&
                     std::is_assignable<T &, U &&>::value>::type>
-    Maybe &operator=(U &&v)
+    maybe &operator=(U &&v)
             noexcept(std::is_nothrow_constructible<T, U &&>::value &&
                     std::is_nothrow_assignable<T &, U &&>::value) {
-        if (hasValue())
+        if (has_value())
             value() = std::forward<U>(v);
         else
             emplace(std::forward<U>(v));
@@ -224,11 +224,11 @@ public:
      * Requirements: The contained type must be swappable and
      * move-constructible.
      */
-    void swap(Maybe &other)
-            noexcept(decltype(mValue)::is_nothrow_swappable &&
-                    decltype(mValue)::is_nothrow_move_constructible) {
-        if (this->hasValue()) {
-            if (other.hasValue()) {
+    void swap(maybe &other)
+            noexcept(decltype(m_value)::is_nothrow_swappable &&
+                    decltype(m_value)::is_nothrow_move_constructible) {
+        if (this->has_value()) {
+            if (other.has_value()) {
                 using std::swap;
                 swap(this->value(), other.value());
             } else {
@@ -236,7 +236,7 @@ public:
                 this->clear();
             }
         } else {
-            if (other.hasValue()) {
+            if (other.has_value()) {
                 this->emplace(std::move(other.value()));
                 other.clear();
             } else {
@@ -258,7 +258,7 @@ public:
  * Requirements: The contained type must be swappable and move-constructible.
  */
 template<typename T>
-void swap(Maybe<T> &a, Maybe<T> &b) noexcept(noexcept(a.swap(b))) {
+void swap(maybe<T> &a, maybe<T> &b) noexcept(noexcept(a.swap(b))) {
     a.swap(b);
 }
 
@@ -272,12 +272,12 @@ void swap(Maybe<T> &a, Maybe<T> &b) noexcept(noexcept(a.swap(b))) {
  * Requirements: The contained objects must be comparable with the == operator.
  */
 template<typename T>
-bool operator==(const Maybe<T> &a, const Maybe<T> &b)
+bool operator==(const maybe<T> &a, const maybe<T> &b)
         noexcept(noexcept(a.value() == b.value())) {
-    if (a.hasValue())
-        return b.hasValue() && a.value() == b.value();
+    if (a.has_value())
+        return b.has_value() && a.value() == b.value();
     else
-        return !b.hasValue();
+        return !b.has_value();
 }
 
 /**
@@ -291,9 +291,9 @@ bool operator==(const Maybe<T> &a, const Maybe<T> &b)
  * operator.
  */
 template<typename T>
-bool operator<(const Maybe<T> &a, const Maybe<T> &b)
+bool operator<(const maybe<T> &a, const maybe<T> &b)
         noexcept(noexcept(a.value() < b.value())) {
-    return b.hasValue() && (!a.hasValue() || a.value() < b.value());
+    return b.has_value() && (!a.has_value() || a.value() < b.value());
 }
 
 /**
@@ -307,14 +307,14 @@ bool operator<(const Maybe<T> &a, const Maybe<T> &b)
  * @param arg arguments to the contained object's constructor.
  */
 template<typename T, typename... Arg>
-Maybe<T> createMaybe(Arg &&... arg)
+maybe<T> make_maybe(Arg &&... arg)
         noexcept(std::is_nothrow_constructible<T, Arg &&...>::value) {
-    return Maybe<T>(type_tag<T>(), std::forward<Arg>(arg)...);
+    return maybe<T>(type_tag<T>(), std::forward<Arg>(arg)...);
 }
 
 /**
  * Creates a new maybe object that contains the argument. This is a
- * single-argument version of {@link createMaybe} that allows inference of the
+ * single-argument version of {@link make_maybe} that allows inference of the
  * contained type.
  *
  * Propagates any exception thrown by the constructor.
@@ -324,15 +324,15 @@ Maybe<T> createMaybe(Arg &&... arg)
  * @param v a reference to the original value.
  */
 template<typename T, typename U = typename std::decay<T>::type>
-Maybe<U> createMaybeOf(T &&v)
-        noexcept(std::is_nothrow_constructible<Maybe<U>, type_tag<U>, T &&>::
+maybe<U> make_maybe_of(T &&v)
+        noexcept(std::is_nothrow_constructible<maybe<U>, type_tag<U>, T &&>::
                 value) {
-    return Maybe<U>(type_tag<U>(), std::forward<T>(v));
+    return maybe<U>(type_tag<U>(), std::forward<T>(v));
 }
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_Maybe_hh
+#endif // #ifndef INCLUDED_common_maybe_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

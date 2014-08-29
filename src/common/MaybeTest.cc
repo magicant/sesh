@@ -25,13 +25,13 @@
 #include <string>
 #include <utility>
 #include "common/container_helper.hh"
-#include "common/Maybe.hh"
+#include "common/maybe.hh"
 #include "common/type_tag.hh"
 
 namespace {
 
-using sesh::common::Maybe;
 using sesh::common::contains;
+using sesh::common::maybe;
 using sesh::common::type_tag;
 
 enum class Action {
@@ -105,179 +105,179 @@ struct DestructorThrows {
 void swap(MoveOnly &, MoveOnly &) noexcept { }
 
 TEST_CASE("Maybe empty construction") {
-    Maybe<int> m1;
-    const Maybe<int> m2(m1);
-    const Maybe<int> m3(std::move(m2));
+    maybe<int> m1;
+    const maybe<int> m2(m1);
+    const maybe<int> m3(std::move(m2));
 
-    Maybe<NonConstructible> m4;
-    const Maybe<NonConstructible> m5(m4);
-    const Maybe<NonConstructible> m6(std::move(m5));
+    maybe<NonConstructible> m4;
+    const maybe<NonConstructible> m5(m4);
+    const maybe<NonConstructible> m6(std::move(m5));
 
-    Maybe<CopyOnly> m7;
-    Maybe<CopyOnly> m8(m7);
-    Maybe<CopyOnly> m9(std::move(m8));
+    maybe<CopyOnly> m7;
+    maybe<CopyOnly> m8(m7);
+    maybe<CopyOnly> m9(std::move(m8));
 
-    Maybe<MoveOnly> m10;
-    Maybe<MoveOnly> m11(std::move(m10));
+    maybe<MoveOnly> m10;
+    maybe<MoveOnly> m11(std::move(m10));
 }
 
 TEST_CASE("Maybe non-empty construction with tag") {
-    Maybe<int> m1((type_tag<int>()));
-    Maybe<int> m2(type_tag<int>(), 123);
-    Maybe<std::string> m3((type_tag<std::string>()));
-    Maybe<std::string> m4(type_tag<std::string>(), 5, '*');
+    maybe<int> m1((type_tag<int>()));
+    maybe<int> m2(type_tag<int>(), 123);
+    maybe<std::string> m3((type_tag<std::string>()));
+    maybe<std::string> m4(type_tag<std::string>(), 5, '*');
 }
 
 TEST_CASE("Maybe non-empty construction by copy and move") {
-    Maybe<int> m1(123);
+    maybe<int> m1(123);
 
     CopyOnly c;
-    Maybe<CopyOnly> m2(c);
+    maybe<CopyOnly> m2(c);
 
-    Maybe<MoveOnly> m3((MoveOnly()));
+    maybe<MoveOnly> m3((MoveOnly()));
 }
 
 TEST_CASE("Maybe has value") {
-    Maybe<int> m1;
-    CHECK(!m1.hasValue());
+    maybe<int> m1;
+    CHECK(!m1.has_value());
     CHECK_FALSE(m1);
 
-    Maybe<int> m2(123);
-    CHECK(m2.hasValue());
+    maybe<int> m2(123);
+    CHECK(m2.has_value());
     CHECK(m2);
 }
 
 TEST_CASE("Maybe value") {
-    Maybe<int> m1(123);
+    maybe<int> m1(123);
     CHECK(m1.value() == 123);
     m1.value() = 456;
 
-    const Maybe<int> m2(m1);
+    const maybe<int> m2(m1);
     CHECK(m2.value() == 456);
 
-    Maybe<std::string> m3(type_tag<std::string>(), 5, '*');
-    Maybe<std::string> m4(std::move(m3));
+    maybe<std::string> m3(type_tag<std::string>(), 5, '*');
+    maybe<std::string> m4(std::move(m3));
     CHECK(m4.value() == "*****");
 }
 
 TEST_CASE("Maybe *") {
-    Maybe<std::string> m1("");
+    maybe<std::string> m1("");
     CHECK_NOTHROW((*m1).assign(3, '*'));
 
-    const Maybe<std::string> m2(m1);
+    const maybe<std::string> m2(m1);
     CHECK(*m1 == "***");
 }
 
 TEST_CASE("Maybe ->") {
-    Maybe<std::string> m1("");
+    maybe<std::string> m1("");
     CHECK_NOTHROW(m1->assign(3, '*'));
 
-    const Maybe<std::string> m2(m1);
+    const maybe<std::string> m2(m1);
     CHECK(m1->size() == 3);
 }
 
 TEST_CASE("Maybe value or") {
     int i = 123;
 
-    Maybe<int> m1;
-    CHECK(m1.valueOr(123) == 123);
-    m1.valueOr(i) = 456;
-    CHECK_FALSE(m1.hasValue());
+    maybe<int> m1;
+    CHECK(m1.value_or(123) == 123);
+    m1.value_or(i) = 456;
+    CHECK_FALSE(m1.has_value());
     CHECK(i == 456);
 
-    const Maybe<int> m1c(m1);
-    CHECK(m1c.valueOr(123) == 123);
+    const maybe<int> m1c(m1);
+    CHECK(m1c.value_or(123) == 123);
 
-    Maybe<int> m2(456);
-    CHECK(m2.valueOr(123) == 456);
-    m2.valueOr(i) = 789;
+    maybe<int> m2(456);
+    CHECK(m2.value_or(123) == 456);
+    m2.value_or(i) = 789;
     CHECK(m2.value() == 789);
     CHECK(i == 456);
 
-    const Maybe<int> m2c(m2);
-    CHECK(m2c.valueOr(123) == 789);
+    const maybe<int> m2c(m2);
+    CHECK(m2c.value_or(123) == 789);
 }
 
 TEST_CASE("Maybe emplacement") {
-    Maybe<std::string> m;
+    maybe<std::string> m;
 
     m.emplace("test");
-    REQUIRE(m.hasValue());
+    REQUIRE(m.has_value());
     CHECK(m.value() == "test");
 
     m.emplace(3, '!');
-    REQUIRE(m.hasValue());
+    REQUIRE(m.has_value());
     CHECK(m.value() == "!!!");
 }
 
 TEST_CASE("Maybe emplacement with exception from constructor") {
-    Maybe<DefaultThrows> m;
+    maybe<DefaultThrows> m;
 
-    CHECK_FALSE(m.hasValue());
+    CHECK_FALSE(m.has_value());
     CHECK_THROWS_AS(m.emplace(), Exception);
-    CHECK_FALSE(m.hasValue());
+    CHECK_FALSE(m.has_value());
 
     CHECK_NOTHROW(m.emplace(0));
-    CHECK(m.hasValue());
+    CHECK(m.has_value());
     CHECK_THROWS_AS(m.emplace(), Exception);
-    CHECK_FALSE(m.hasValue());
+    CHECK_FALSE(m.has_value());
 }
 
 TEST_CASE("Maybe emplacement with exception from destructor") {
-    Maybe<DestructorThrows> m;
+    maybe<DestructorThrows> m;
 
     CHECK_NOTHROW(m.emplace());
-    CHECK(m.hasValue());
+    CHECK(m.has_value());
 
     CHECK_THROWS_AS(m.emplace(), Exception);
-    CHECK_FALSE(m.hasValue());
+    CHECK_FALSE(m.has_value());
 }
 
 TEST_CASE("Maybe clear") {
-    Maybe<int> m(0);
+    maybe<int> m(0);
     m.clear();
-    CHECK_FALSE(m.hasValue());
+    CHECK_FALSE(m.has_value());
     m.clear();
-    CHECK_FALSE(m.hasValue());
+    CHECK_FALSE(m.has_value());
 }
 
 TEST_CASE("Maybe clear with exception from destructor") {
-    Maybe<DestructorThrows> m;
+    maybe<DestructorThrows> m;
 
     CHECK_NOTHROW(m.emplace());
-    CHECK(m.hasValue());
+    CHECK(m.has_value());
 
     CHECK_THROWS_AS(m.clear(), Exception);
-    CHECK_FALSE(m.hasValue());
+    CHECK_FALSE(m.has_value());
 }
 
 TEST_CASE("Maybe assignment") {
-    Maybe<long> m1;
-    const Maybe<long> m2(123L);
+    maybe<long> m1;
+    const maybe<long> m2(123L);
 
     m1 = m1;
-    CHECK_FALSE(m1.hasValue());
+    CHECK_FALSE(m1.has_value());
 
     m1 = m2;
-    REQUIRE(m1.hasValue());
+    REQUIRE(m1.has_value());
     CHECK(m1.value() == 123L);
 
-    m1 = Maybe<long>(456L);
-    REQUIRE(m1.hasValue());
+    m1 = maybe<long>(456L);
+    REQUIRE(m1.has_value());
     CHECK(m1.value() == 456L);
 
-    m1 = Maybe<long>();
-    CHECK_FALSE(m1.hasValue());
+    m1 = maybe<long>();
+    CHECK_FALSE(m1.has_value());
 
     m1 = 789;
-    REQUIRE(m1.hasValue());
+    REQUIRE(m1.has_value());
     CHECK(m1.value() == 789L);
 }
 
 TEST_CASE("Maybe assignment optimization") {
     std::vector<Action> actions1, actions2;
     {
-        Maybe<Stub> m;
+        maybe<Stub> m;
 
         m = Stub(actions1);
         CHECK(actions1.size() == 3);
@@ -298,56 +298,56 @@ TEST_CASE("Maybe assignment optimization") {
 }
 
 TEST_CASE("Maybe swap, both non-empty") {
-    Maybe<std::string> m1("ABC");
-    Maybe<std::string> m2("XYZ");
+    maybe<std::string> m1("ABC");
+    maybe<std::string> m2("XYZ");
 
     using std::swap;
     swap(m1, m2);
-    REQUIRE(m1.hasValue());
-    REQUIRE(m2.hasValue());
+    REQUIRE(m1.has_value());
+    REQUIRE(m2.has_value());
     CHECK(m1.value() == "XYZ");
     CHECK(m2.value() == "ABC");
 
     m2.swap(m1);
-    REQUIRE(m1.hasValue());
-    REQUIRE(m2.hasValue());
+    REQUIRE(m1.has_value());
+    REQUIRE(m2.has_value());
     CHECK(m1.value() == "ABC");
     CHECK(m2.value() == "XYZ");
 }
 
 TEST_CASE("Maybe swap, empty and non-empty") {
-    Maybe<MoveOnly> m1;
-    Maybe<MoveOnly> m2 = MoveOnly();
+    maybe<MoveOnly> m1;
+    maybe<MoveOnly> m2 = MoveOnly();
 
     m1.swap(m2);
-    CHECK(m1.hasValue());
-    CHECK_FALSE(m2.hasValue());
+    CHECK(m1.has_value());
+    CHECK_FALSE(m2.has_value());
 
     m1.swap(m2);
-    CHECK_FALSE(m1.hasValue());
-    CHECK(m2.hasValue());
+    CHECK_FALSE(m1.has_value());
+    CHECK(m2.has_value());
 
     using std::swap;
     swap(m1, m2);
-    CHECK(m1.hasValue());
-    CHECK_FALSE(m2.hasValue());
+    CHECK(m1.has_value());
+    CHECK_FALSE(m2.has_value());
 
     swap(m1, m2);
-    CHECK_FALSE(m1.hasValue());
-    CHECK(m2.hasValue());
+    CHECK_FALSE(m1.has_value());
+    CHECK(m2.has_value());
 }
 
 TEST_CASE("Maybe swap, both empty") {
-    Maybe<int> m1, m2;
+    maybe<int> m1, m2;
     m1.swap(m2);
-    CHECK_FALSE(m1.hasValue());
-    CHECK_FALSE(m2.hasValue());
+    CHECK_FALSE(m1.has_value());
+    CHECK_FALSE(m2.has_value());
 }
 
 TEST_CASE("Maybe ==") {
-    Maybe<int> m1;
-    Maybe<int> m2(0);
-    Maybe<int> m3(1);
+    maybe<int> m1;
+    maybe<int> m2(0);
+    maybe<int> m3(1);
 
     CHECK(m1 == m1);
     CHECK_FALSE(m1 == m2);
@@ -361,9 +361,9 @@ TEST_CASE("Maybe ==") {
 }
 
 TEST_CASE("Maybe <") {
-    Maybe<int> m1;
-    Maybe<int> m2(0);
-    Maybe<int> m3(1);
+    maybe<int> m1;
+    maybe<int> m2(0);
+    maybe<int> m3(1);
 
     CHECK_FALSE(m1 < m1);
     CHECK(m1 < m2);
@@ -377,61 +377,61 @@ TEST_CASE("Maybe <") {
 }
 
 TEST_CASE("Maybe, create maybe") {
-    using sesh::common::createMaybe;
+    using sesh::common::make_maybe;
 
-    Maybe<int> m1 = createMaybe<int>(123);
-    REQUIRE(m1.hasValue());
+    maybe<int> m1 = make_maybe<int>(123);
+    REQUIRE(m1.has_value());
     CHECK(m1.value() == 123);
 
-    Maybe<std::string> m2 = createMaybe<std::string>("ABC", 2);
-    REQUIRE(m2.hasValue());
+    maybe<std::string> m2 = make_maybe<std::string>("ABC", 2);
+    REQUIRE(m2.has_value());
     CHECK(m2.value() == "AB");
 
-    auto m3 = createMaybe<MoveOnly>();
-    CHECK(m3.hasValue());
+    auto m3 = make_maybe<MoveOnly>();
+    CHECK(m3.has_value());
 
     std::vector<Action> actions;
     {
-        auto m4 = createMaybe<Stub>(Stub(actions));
-        CHECK(m4.hasValue());
+        auto m4 = make_maybe<Stub>(Stub(actions));
+        CHECK(m4.has_value());
     }
     CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
     actions.clear();
 
     {
         Stub s(actions);
-        auto m5 = createMaybe<Stub>(s);
-        CHECK(m5.hasValue());
+        auto m5 = make_maybe<Stub>(s);
+        CHECK(m5.has_value());
     }
     CHECK(contains(actions, Action::COPY_CONSTRUCTION));
 }
 
 TEST_CASE("Maybe, create maybe of") {
-    using sesh::common::createMaybeOf;
+    using sesh::common::make_maybe_of;
 
-    Maybe<int> m1 = createMaybeOf(123);
-    REQUIRE(m1.hasValue());
+    maybe<int> m1 = make_maybe_of(123);
+    REQUIRE(m1.has_value());
     CHECK(m1.value() == 123);
 
-    Maybe<std::string> m2 = createMaybeOf<std::string>("ABC");
-    REQUIRE(m2.hasValue());
+    maybe<std::string> m2 = make_maybe_of<std::string>("ABC");
+    REQUIRE(m2.has_value());
     CHECK(m2.value() == "ABC");
 
-    auto m3 = createMaybeOf(MoveOnly());
-    CHECK(m3.hasValue());
+    auto m3 = make_maybe_of(MoveOnly());
+    CHECK(m3.has_value());
 
     std::vector<Action> actions;
     {
-        auto m4 = createMaybeOf(Stub(actions));
-        CHECK(m4.hasValue());
+        auto m4 = make_maybe_of(Stub(actions));
+        CHECK(m4.has_value());
     }
     CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
     actions.clear();
 
     {
         Stub s(actions);
-        auto m5 = createMaybeOf(s);
-        CHECK(m5.hasValue());
+        auto m5 = make_maybe_of(s);
+        CHECK(m5.has_value());
     }
     CHECK(contains(actions, Action::COPY_CONSTRUCTION));
 }

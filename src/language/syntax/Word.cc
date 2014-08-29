@@ -23,11 +23,11 @@
 #include <iterator>
 #include <utility>
 #include <vector>
-#include "common/Maybe.hh"
+#include "common/maybe.hh"
 #include "common/xstring.hh"
 
-using sesh::common::Maybe;
-using sesh::common::createMaybeOf;
+using sesh::common::make_maybe_of;
+using sesh::common::maybe;
 using sesh::common::xstring;
 
 namespace sesh {
@@ -52,16 +52,16 @@ void Word::append(Word &&w) {
     w.mComponents.clear();
 }
 
-Maybe<xstring> Word::computeMaybeConstantValue() const {
+maybe<xstring> Word::computeMaybeConstantValue() const {
     xstring constantValue;
     for (const ComponentPointer &c : components())
         if (!c->appendConstantValue(constantValue))
-            return Maybe<xstring>();
-    return createMaybeOf(std::move(constantValue));
+            return maybe<xstring>();
+    return make_maybe_of(std::move(constantValue));
 }
 
-const Maybe<xstring> &Word::maybeConstantValue() const {
-    if (!mMaybeConstantValueCache.hasValue())
+const maybe<xstring> &Word::maybeConstantValue() const {
+    if (!mMaybeConstantValueCache.has_value())
         mMaybeConstantValueCache.emplace(computeMaybeConstantValue());
     return mMaybeConstantValueCache.value();
 }
