@@ -32,11 +32,11 @@ TESTPROGRAMS = \
 	src/common/SharedFunctionTest \
 	src/common/TrieTest \
 	src/common/TryTest \
-	src/common/VariantTest \
 	src/common/container_helper_test \
 	src/common/enum_iterator_test \
 	src/common/enum_set_test \
 	src/common/type_tag_test \
+	src/common/variant_test \
 	src/language/source/BufferTest \
 	src/language/source/LineAppendedSourceTest \
 	src/language/source/LineContinuedSourceTest \
@@ -223,8 +223,6 @@ src_common_TrieTest_SOURCES = \
 	src/common/TrieTest.cc
 src_common_TryTest_SOURCES = \
 	src/common/TryTest.cc
-src_common_VariantTest_SOURCES = \
-	src/common/VariantTest.cc
 src_common_container_helper_test_SOURCES = \
 	src/common/container_helper_test.cc
 src_common_enum_iterator_test_SOURCES = \
@@ -234,6 +232,8 @@ src_common_enum_set_test_SOURCES = \
 src_common_type_tag_test_SOURCES = \
 	src/common/type_tag.hh \
 	src/common/type_tag_test.cc
+src_common_variant_test_SOURCES = \
+	src/common/variant_test.cc
 src_language_source_BufferTest_SOURCES = \
 	src/common/Message.cc \
 	src/language/source/Buffer.cc \

@@ -38,101 +38,101 @@ using sesh::common::functional_initialize;
 using sesh::common::type_tag;
 using sesh::common::variant;
 
-enum class Action {
-    STANDARD_CONSTRUCTION,
-    COPY_CONSTRUCTION,
-    MOVE_CONSTRUCTION,
-    COPY_ASSIGNMENT,
-    MOVE_ASSIGNMENT,
-    DESTRUCTION,
+enum class action {
+    standard_construction,
+    copy_construction,
+    move_construction,
+    copy_assignment,
+    move_assignment,
+    destruction,
 };
 
-class Stub {
+class stub {
 
 private:
 
-    std::vector<Action> &mVector;
+    std::vector<action> &m_vector;
 
 public:
 
-    Stub(std::vector<Action> &v) noexcept : mVector(v) {
-        mVector.emplace_back(Action::STANDARD_CONSTRUCTION);
+    stub(std::vector<action> &v) noexcept : m_vector(v) {
+        m_vector.emplace_back(action::standard_construction);
     }
 
-    Stub(const Stub &s) noexcept : mVector(s.mVector) {
-        mVector.emplace_back(Action::COPY_CONSTRUCTION);
+    stub(const stub &s) noexcept : m_vector(s.m_vector) {
+        m_vector.emplace_back(action::copy_construction);
     }
 
-    Stub(Stub &&s) noexcept : mVector(s.mVector) {
-        mVector.emplace_back(Action::MOVE_CONSTRUCTION);
+    stub(stub &&s) noexcept : m_vector(s.m_vector) {
+        m_vector.emplace_back(action::move_construction);
     }
 
-    Stub &operator=(const Stub &) {
-        mVector.emplace_back(Action::COPY_ASSIGNMENT);
+    stub &operator=(const stub &) {
+        m_vector.emplace_back(action::copy_assignment);
         return *this;
     }
 
-    Stub &operator=(Stub &&) {
-        mVector.emplace_back(Action::MOVE_ASSIGNMENT);
+    stub &operator=(stub &&) {
+        m_vector.emplace_back(action::move_assignment);
         return *this;
     }
 
-    ~Stub() {
-        mVector.emplace_back(Action::DESTRUCTION);
+    ~stub() {
+        m_vector.emplace_back(action::destruction);
     }
 
 };
 
-struct Exception : public std::exception {
+struct exception : public std::exception {
     using std::exception::exception;
 };
-struct DefaultMayThrow {
-    DefaultMayThrow() noexcept(false) { }
+struct default_may_throw {
+    default_may_throw() noexcept(false) { }
 };
-struct DefaultThrows {
-    DefaultThrows() { throw Exception(); }
-    ~DefaultThrows() noexcept(false) {
-        FAIL("DefaultThrows destructor must not be called");
+struct default_throws {
+    default_throws() { throw exception(); }
+    ~default_throws() noexcept(false) {
+        FAIL("default_throws destructor must not be called");
     }
 };
-struct CopyMayThrow {
-    CopyMayThrow() = default;
-    CopyMayThrow(const CopyMayThrow &) noexcept(false) { }
+struct copy_may_throw {
+    copy_may_throw() = default;
+    copy_may_throw(const copy_may_throw &) noexcept(false) { }
 };
-struct CopyThrows {
-    CopyThrows() = default;
-    CopyThrows(const CopyThrows &) { throw Exception(); }
-    CopyThrows(CopyThrows &&) = default;
-    CopyThrows &operator=(const CopyThrows &) = default;
+struct copy_throws {
+    copy_throws() = default;
+    copy_throws(const copy_throws &) { throw exception(); }
+    copy_throws(copy_throws &&) = default;
+    copy_throws &operator=(const copy_throws &) = default;
 };
-struct NonCopyable {
-    NonCopyable() = default;
-    NonCopyable(const NonCopyable &) = delete;
+struct non_copyable {
+    non_copyable() = default;
+    non_copyable(const non_copyable &) = delete;
 };
-struct MoveMayThrow {
-    MoveMayThrow() = default;
-    MoveMayThrow(MoveMayThrow &&) noexcept(false) { }
+struct move_may_throw {
+    move_may_throw() = default;
+    move_may_throw(move_may_throw &&) noexcept(false) { }
 };
-struct MoveThrows {
-    MoveThrows() = default;
-    MoveThrows(MoveThrows &&) { throw Exception(); }
-    MoveThrows &operator=(const MoveThrows &) = default;
+struct move_throws {
+    move_throws() = default;
+    move_throws(move_throws &&) { throw exception(); }
+    move_throws &operator=(const move_throws &) = default;
 };
-struct NonMovable {
-    NonMovable() = default;
-    NonMovable(const NonMovable &) = delete;
-    NonMovable(NonMovable &&) = delete;
+struct non_movable {
+    non_movable() = default;
+    non_movable(const non_movable &) = delete;
+    non_movable(non_movable &&) = delete;
 };
-struct NonCopyAssignable {
-    NonCopyAssignable &operator=(const NonCopyAssignable &) = delete;
+struct non_copy_assignable {
+    non_copy_assignable &operator=(const non_copy_assignable &) = delete;
 };
-struct NonMoveAssignable {
-    NonMoveAssignable() = default;
-    NonMoveAssignable(NonMoveAssignable &&) = default;
-    NonMoveAssignable &operator=(NonMoveAssignable &&) = delete;
+struct non_move_assignable {
+    non_move_assignable() = default;
+    non_move_assignable(non_move_assignable &&) = default;
+    non_move_assignable &operator=(non_move_assignable &&) = delete;
 };
-struct NonDestructible {
-    ~NonDestructible() noexcept(false) { }
+struct non_destructible {
+    ~non_destructible() noexcept(false) { }
 };
 
 static_assert(
@@ -161,35 +161,36 @@ TEST_CASE("Single variant construction & destruction") {
             noexcept(variant<int>(functional_initialize(), nonthrowing)),
             "functional initialize propagates noexcept(true)");
 
-    std::vector<Action> actions;
-    variant<Stub>(type_tag<Stub>(), actions);
+    std::vector<action> actions;
+    variant<stub>(type_tag<stub>(), actions);
     CHECK(actions.size() == 2);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::DESTRUCTION);
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::destruction);
 
     CHECK_THROWS_AS(
-            variant<DefaultThrows>(type_tag<DefaultThrows>()),
-            Exception);
+            variant<default_throws>(type_tag<default_throws>()),
+            exception);
     CHECK_THROWS_AS(
-            variant<DefaultThrows>(
+            variant<default_throws>(
                     functional_initialize(),
-                    []() -> DefaultThrows { throw Exception(); }),
-            Exception);
+                    []() -> default_throws { throw exception(); }),
+            exception);
 }
 
 //TEST_CASE("Single variant throwing destructor") {
     static_assert(
-            !noexcept(variant<DefaultMayThrow>(type_tag<DefaultMayThrow>())),
-            "DefaultMayThrow constructor may throw");
+            !noexcept(
+                    variant<default_may_throw>(type_tag<default_may_throw>())),
+            "default_may_throw constructor may throw");
 //}
 
 //TEST_CASE("Single variant throwing destructor") {
     static_assert(
-            !noexcept(variant<NonDestructible>(type_tag<NonDestructible>())),
-            "NonDestructible destructor may throw");
+            !noexcept(variant<non_destructible>(type_tag<non_destructible>())),
+            "non_destructible destructor may throw");
     static_assert(
-            !variant<NonDestructible>::is_nothrow_destructible,
-            "NonDestructible destructor may throw");
+            !variant<non_destructible>::is_nothrow_destructible,
+            "non_destructible destructor may throw");
 //}
 
 TEST_CASE("Double variant construction & destruction") {
@@ -229,34 +230,34 @@ TEST_CASE("Double variant construction & destruction") {
 
 //TEST_CASE("Double variant throwing constructor") {
     static_assert(
-            !noexcept(variant<DefaultMayThrow, int>(
-                    type_tag<DefaultMayThrow>())),
-            "DefaultMayThrow constructor may throw");
+            !noexcept(variant<default_may_throw, int>(
+                    type_tag<default_may_throw>())),
+            "default_may_throw constructor may throw");
     static_assert(
-            !noexcept(variant<int, DefaultMayThrow>(
-                    type_tag<DefaultMayThrow>())),
-            "DefaultMayThrow constructor may throw");
+            !noexcept(variant<int, default_may_throw>(
+                    type_tag<default_may_throw>())),
+            "default_may_throw constructor may throw");
     static_assert(
-            !noexcept(variant<DefaultMayThrow, DefaultMayThrow>(
-                    type_tag<DefaultMayThrow>())),
-            "DefaultMayThrow constructor may throw");
+            !noexcept(variant<default_may_throw, default_may_throw>(
+                    type_tag<default_may_throw>())),
+            "default_may_throw constructor may throw");
 //}
 
 //TEST_CASE("Double variant throwing destructor") {
     static_assert(
-            !noexcept(variant<int, NonDestructible>(
-                    type_tag<NonDestructible>())),
-            "NonDestructible destructor is throwing");
+            !noexcept(variant<int, non_destructible>(
+                    type_tag<non_destructible>())),
+            "non_destructible destructor is throwing");
     static_assert(
-            !variant<int, NonDestructible>::is_nothrow_destructible,
-            "NonDestructible destructor is throwing");
+            !variant<int, non_destructible>::is_nothrow_destructible,
+            "non_destructible destructor is throwing");
     static_assert(
-            !noexcept(variant<NonDestructible, int>(
-                    type_tag<NonDestructible>())),
-            "NonDestructible destructor is throwing");
+            !noexcept(variant<non_destructible, int>(
+                    type_tag<non_destructible>())),
+            "non_destructible destructor is throwing");
     static_assert(
-            !variant<NonDestructible, int>::is_nothrow_destructible,
-            "NonDestructible destructor is throwing");
+            !variant<non_destructible, int>::is_nothrow_destructible,
+            "non_destructible destructor is throwing");
 //}
 
 TEST_CASE("Quad variant construction & destruction") {
@@ -324,27 +325,27 @@ TEST_CASE("Double variant constant value") {
 }
 
 TEST_CASE("Double variant r-value") {
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v(type_tag<Stub>(), actions);
+        variant<int, stub> v(type_tag<stub>(), actions);
         CHECK(actions.size() == 1);
 
-        Stub stubCopy(v.value<Stub>());
+        stub stub_copy(v.value<stub>());
         CHECK(actions.size() == 2);
 
-        Stub stubMove(std::move(v).value<Stub>());
+        stub stub_move(std::move(v).value<stub>());
         CHECK(actions.size() == 3);
     }
     CHECK(actions.size() == 6);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::COPY_CONSTRUCTION);
-    CHECK(actions.at(2) == Action::MOVE_CONSTRUCTION);
-    CHECK(actions.at(3) == Action::DESTRUCTION);
-    CHECK(actions.at(4) == Action::DESTRUCTION);
-    CHECK(actions.at(5) == Action::DESTRUCTION);
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::copy_construction);
+    CHECK(actions.at(2) == action::move_construction);
+    CHECK(actions.at(3) == action::destruction);
+    CHECK(actions.at(4) == action::destruction);
+    CHECK(actions.at(5) == action::destruction);
 }
 
-struct TemplateVisitor {
+struct template_visitor {
     template<typename T>
     std::string operator()(T v) { return std::to_string(v); }
     // A local class cannot have a template member.
@@ -352,16 +353,16 @@ struct TemplateVisitor {
 
 TEST_CASE("Double variant apply with templated visitor") {
     variant<int, double> vi = 3;
-    std::string si = vi.apply(TemplateVisitor());
+    std::string si = vi.apply(template_visitor());
     CHECK(si == "3");
 
     variant<int, double> vd = 1.5;
-    std::string sd = vd.apply(TemplateVisitor());
+    std::string sd = vd.apply(template_visitor());
     CHECK(sd == "1.500000");
 }
 
 TEST_CASE("Double variant apply, contained value l/r-value") {
-    struct Visitor {
+    struct visitor {
         std::string operator()(int &) { return "int &"; }
         std::string operator()(const int &) { return "const int &"; }
         std::string operator()(int &&) { return "int &&"; }
@@ -371,25 +372,25 @@ TEST_CASE("Double variant apply, contained value l/r-value") {
     };
 
     auto vi = variant<int, double>::create<int>();
-    CHECK(vi.apply(Visitor()) == "int &");
-    CHECK(std::move(vi).apply(Visitor()) == "int &&");
+    CHECK(vi.apply(visitor()) == "int &");
+    CHECK(std::move(vi).apply(visitor()) == "int &&");
 
     const auto cvi = variant<int, double>::create<int>();
-    CHECK(cvi.apply(Visitor()) == "const int &");
-    CHECK(std::move(cvi).apply(Visitor()) == "const int &");
+    CHECK(cvi.apply(visitor()) == "const int &");
+    CHECK(std::move(cvi).apply(visitor()) == "const int &");
 
     auto vd = variant<int, double>::create<double>();
-    CHECK(vd.apply(Visitor()) == "double &");
-    CHECK(std::move(vd).apply(Visitor()) == "double &&");
+    CHECK(vd.apply(visitor()) == "double &");
+    CHECK(std::move(vd).apply(visitor()) == "double &&");
 
     const auto cvd = variant<int, double>::create<double>();
-    CHECK(cvd.apply(Visitor()) == "const double &");
-    CHECK(std::move(cvd).apply(Visitor()) == "const double &");
+    CHECK(cvd.apply(visitor()) == "const double &");
+    CHECK(std::move(cvd).apply(visitor()) == "const double &");
 }
 
 TEST_CASE("Double variant apply, visitor l/r-value") {
-    struct Visitor {
-        Visitor() { }
+    struct visitor {
+        visitor() { }
         std::string operator()(int) & { return "int, &"; }
         std::string operator()(int) const & { return "int, const &"; }
         std::string operator()(int) && { return "int, &&"; }
@@ -401,16 +402,16 @@ TEST_CASE("Double variant apply, visitor l/r-value") {
     auto vi = variant<int, double>::create<int>();
     auto vd = variant<int, double>::create<double>();
 
-    Visitor visitor;
-    CHECK(vi.apply(visitor) == "int, &");
-    CHECK(vd.apply(visitor) == "double, &");
+    visitor v;
+    CHECK(vi.apply(v) == "int, &");
+    CHECK(vd.apply(v) == "double, &");
 
-    const Visitor constVisitor;
-    CHECK(vi.apply(constVisitor) == "int, const &");
-    CHECK(vd.apply(constVisitor) == "double, const &");
+    const visitor cv;
+    CHECK(vi.apply(cv) == "int, const &");
+    CHECK(vd.apply(cv) == "double, const &");
 
-    CHECK(vi.apply(Visitor()) == "int, &&");
-    CHECK(vd.apply(Visitor()) == "double, &&");
+    CHECK(vi.apply(visitor()) == "int, &&");
+    CHECK(vd.apply(visitor()) == "double, &&");
 }
 
 TEST_CASE("Double variant copy construction") {
@@ -425,38 +426,38 @@ TEST_CASE("Double variant copy construction") {
             noexcept(variant<int, double>::is_nothrow_copy_constructible),
             "int and double are no-throw copy constructible");
 
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v3(type_tag<Stub>(), actions);
+        variant<int, stub> v3(type_tag<stub>(), actions);
         CHECK(actions.size() == 1);
 
-        variant<int, Stub> v4(v3);
+        variant<int, stub> v4(v3);
         CHECK(actions.size() == 2);
     }
     CHECK(actions.size() == 4);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::COPY_CONSTRUCTION);
-    CHECK(actions.at(2) == Action::DESTRUCTION);
-    CHECK(actions.at(3) == Action::DESTRUCTION);
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::copy_construction);
+    CHECK(actions.at(2) == action::destruction);
+    CHECK(actions.at(3) == action::destruction);
 }
 
 TEST_CASE("Double variant throwing copy constructor") {
-    variant<int, CopyMayThrow> v1((type_tag<CopyMayThrow>()));
-    variant<int, CopyMayThrow> v2(v1);
+    variant<int, copy_may_throw> v1((type_tag<copy_may_throw>()));
+    variant<int, copy_may_throw> v2(v1);
 
     static_assert(
-            noexcept(variant<int, CopyMayThrow>::
+            noexcept(variant<int, copy_may_throw>::
                     is_nothrow_copy_constructible),
-            "CopyMayThrow has a copy constructor that may throw");
+            "copy_may_throw has a copy constructor that may throw");
 }
 
 TEST_CASE("Double variant deleted copy constructor") {
-    variant<int, NonCopyable> v1((type_tag<NonCopyable>()));
-    // variant<int, NonCopyable> v2(v1);
+    variant<int, non_copyable> v1((type_tag<non_copyable>()));
+    // variant<int, non_copyable> v2(v1);
 
     static_assert(
-            !std::is_copy_constructible<variant<int, NonCopyable>>::value,
-            "NonCopyable has no copy constructor");
+            !std::is_copy_constructible<variant<int, non_copyable>>::value,
+            "non_copyable has no copy constructor");
 }
 
 TEST_CASE("Double/quad variant copy construction to supertype") {
@@ -486,77 +487,77 @@ TEST_CASE("Double variant move construction") {
             noexcept(variant<int, double>::is_nothrow_move_constructible),
             "int and double are no-throw move constructible");
 
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v3(type_tag<Stub>(), actions);
+        variant<int, stub> v3(type_tag<stub>(), actions);
         CHECK(actions.size() == 1);
 
-        variant<int, Stub> v4(std::move(v3));
+        variant<int, stub> v4(std::move(v3));
         CHECK(actions.size() == 2);
     }
     CHECK(actions.size() == 4);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION);
-    CHECK(actions.at(2) == Action::DESTRUCTION);
-    CHECK(actions.at(3) == Action::DESTRUCTION);
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::move_construction);
+    CHECK(actions.at(2) == action::destruction);
+    CHECK(actions.at(3) == action::destruction);
 }
 
 TEST_CASE("Double variant throwing move constructor") {
-    variant<int, MoveMayThrow> v1((type_tag<MoveMayThrow>()));
-    variant<int, MoveMayThrow> v2(std::move(v1));
+    variant<int, move_may_throw> v1((type_tag<move_may_throw>()));
+    variant<int, move_may_throw> v2(std::move(v1));
 
     static_assert(
-            noexcept(variant<int, MoveMayThrow>::
+            noexcept(variant<int, move_may_throw>::
                     is_nothrow_move_constructible),
-            "MoveMayThrow has a move constructor that may throw");
+            "move_may_throw has a move constructor that may throw");
 }
 
 TEST_CASE("Double variant deleted move constructor") {
-    variant<int, NonMovable> v1((type_tag<NonMovable>()));
-    // variant<int, NonMovable> v2(std::move(v1));
+    variant<int, non_movable> v1((type_tag<non_movable>()));
+    // variant<int, non_movable> v2(std::move(v1));
 
     static_assert(
-            !std::is_move_constructible<variant<int, NonMovable>>::value,
-            "NonMovable has no move constructor");
+            !std::is_move_constructible<variant<int, non_movable>>::value,
+            "non_movable has no move constructor");
 }
 
 TEST_CASE("Double/quad variant move construction to supertype") {
-    struct MoveOnlyInt {
-        int mValue;
-        MoveOnlyInt(int i) noexcept : mValue(i) { }
-        MoveOnlyInt(MoveOnlyInt &&) = default;
+    struct move_only_int {
+        int value;
+        move_only_int(int i) noexcept : value(i) { }
+        move_only_int(move_only_int &&) = default;
     };
-    struct MoveOnlyDouble {
-        double mValue;
-        MoveOnlyDouble(double d) noexcept : mValue(d) { }
-        MoveOnlyDouble(MoveOnlyDouble &&) = default;
+    struct move_only_double {
+        double value;
+        move_only_double(double d) noexcept : value(d) { }
+        move_only_double(move_only_double &&) = default;
     };
     const int I = 3;
     const double D = -7.0;
 
-    using V2 = variant<MoveOnlyInt, MoveOnlyDouble>;
-    using V4 = variant<float, MoveOnlyDouble, int, MoveOnlyInt>;
+    using V2 = variant<move_only_int, move_only_double>;
+    using V4 = variant<float, move_only_double, int, move_only_int>;
 
-    V2 v2i(type_tag<MoveOnlyInt>(), I);
-    V2 v2d(type_tag<MoveOnlyDouble>(), D);
+    V2 v2i(type_tag<move_only_int>(), I);
+    V2 v2d(type_tag<move_only_double>(), D);
 
     V4 v4i(std::move(v2i));
     V4 v4d(std::move(v2d));
 
-    REQUIRE(v4i.tag() == v4i.tag<MoveOnlyInt>());
-    REQUIRE(v4d.tag() == v4d.tag<MoveOnlyDouble>());
-    CHECK(v4i.value<MoveOnlyInt>().mValue == I);
-    CHECK(v4d.value<MoveOnlyDouble>().mValue == D);
+    REQUIRE(v4i.tag() == v4i.tag<move_only_int>());
+    REQUIRE(v4d.tag() == v4d.tag<move_only_double>());
+    CHECK(v4i.value<move_only_int>().value == I);
+    CHECK(v4d.value<move_only_double>().value == D);
 }
 
 TEST_CASE("Double variant emplacement") {
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v(type_tag<int>(), 1);
+        variant<int, stub> v(type_tag<int>(), 1);
         CHECK(v.value<int>() == 1);
 
-        CHECK_NOTHROW(v.emplace(type_tag<Stub>(), actions));
-        CHECK(v.tag() == v.tag<Stub>());
+        CHECK_NOTHROW(v.emplace(type_tag<stub>(), actions));
+        CHECK(v.tag() == v.tag<stub>());
         CHECK(actions.size() == 1);
 
         CHECK_NOTHROW(v.emplace(2));
@@ -565,18 +566,18 @@ TEST_CASE("Double variant emplacement") {
         CHECK(actions.size() == 2);
     }
     CHECK(actions.size() == 2);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::DESTRUCTION);
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::destruction);
 }
 
 TEST_CASE("Double variant emplacement with fallback") {
-    variant<int, MoveThrows> v(type_tag<int>(), 1);
-    CHECK_NOTHROW(v.emplace_with_fallback<int>(type_tag<MoveThrows>()));
-    CHECK(v.tag() == v.tag<MoveThrows>());
+    variant<int, move_throws> v(type_tag<int>(), 1);
+    CHECK_NOTHROW(v.emplace_with_fallback<int>(type_tag<move_throws>()));
+    CHECK(v.tag() == v.tag<move_throws>());
     CHECK_NOTHROW(v.emplace_with_fallback<int>(2));
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 2);
-    CHECK_THROWS_AS(v.emplace_with_fallback<int>(MoveThrows()), Exception);
+    CHECK_THROWS_AS(v.emplace_with_fallback<int>(move_throws()), exception);
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 0);
 }
@@ -591,37 +592,37 @@ TEST_CASE("Double variant emplacement with backup, without actual backup") {
 }
 
 TEST_CASE("Double variant emplacement with backup, with actual backup") {
-    variant<int, DefaultMayThrow> v = 1;
-    CHECK_NOTHROW(v.emplace_with_backup(type_tag<DefaultMayThrow>()));
-    CHECK(v.tag() == v.tag<DefaultMayThrow>());
+    variant<int, default_may_throw> v = 1;
+    CHECK_NOTHROW(v.emplace_with_backup(type_tag<default_may_throw>()));
+    CHECK(v.tag() == v.tag<default_may_throw>());
 }
 
 TEST_CASE("Double variant emplacement with backup; "
         "exception in new value construction") {
-    variant<int, DefaultThrows> v = 1;
+    variant<int, default_throws> v = 1;
     CHECK_THROWS_AS(
-            v.emplace_with_backup(type_tag<DefaultThrows>()), Exception);
+            v.emplace_with_backup(type_tag<default_throws>()), exception);
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 1);
 }
 
 TEST_CASE("Double variant emplacement with backup; "
         "exception in backup construction") {
-    using V = variant<MoveThrows, DefaultMayThrow>;
-    V v((type_tag<MoveThrows>()));
+    using V = variant<move_throws, default_may_throw>;
+    V v((type_tag<move_throws>()));
     CHECK_THROWS_AS(
-            v.emplace_with_backup(type_tag<DefaultMayThrow>()), Exception);
-    CHECK(v.tag() == v.tag<MoveThrows>());
+            v.emplace_with_backup(type_tag<default_may_throw>()), exception);
+    CHECK(v.tag() == v.tag<move_throws>());
 }
 
 TEST_CASE("Double variant reset") {
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v(type_tag<int>(), 1);
+        variant<int, stub> v(type_tag<int>(), 1);
         CHECK(v.value<int>() == 1);
 
-        CHECK_NOTHROW(v.reset(Stub(actions)));
-        CHECK(v.tag() == v.tag<Stub>());
+        CHECK_NOTHROW(v.reset(stub(actions)));
+        CHECK(v.tag() == v.tag<stub>());
         CHECK(actions.size() == 3);
 
         CHECK_NOTHROW(v.reset(2));
@@ -629,63 +630,63 @@ TEST_CASE("Double variant reset") {
         CHECK(v.value<int>() == 2);
         CHECK(actions.size() == 4);
 
-        Stub stub(actions);
+        stub s(actions);
         CHECK(actions.size() == 5);
-        CHECK_NOTHROW(v.reset(stub));
-        CHECK(v.tag() == v.tag<Stub>());
+        CHECK_NOTHROW(v.reset(s));
+        CHECK(v.tag() == v.tag<stub>());
         CHECK(actions.size() == 6);
-        CHECK_NOTHROW(v.reset(stub));
-        CHECK(v.tag() == v.tag<Stub>());
+        CHECK_NOTHROW(v.reset(s));
+        CHECK(v.tag() == v.tag<stub>());
         CHECK(actions.size() == 8);
     }
     CHECK(actions.size() == 10);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION); // of temporary
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of variant value
-    CHECK(actions.at(2) == Action::DESTRUCTION); // of temporary
-    CHECK(actions.at(3) == Action::DESTRUCTION); // of variant value
-    CHECK(actions.at(4) == Action::STANDARD_CONSTRUCTION); // of local
-    CHECK(actions.at(5) == Action::COPY_CONSTRUCTION); // of variant value
-    CHECK(actions.at(6) == Action::DESTRUCTION); // of variant value
-    CHECK(actions.at(7) == Action::COPY_CONSTRUCTION); // of variant value
-    CHECK(actions.at(8) == Action::DESTRUCTION); // of local
-    CHECK(actions.at(9) == Action::DESTRUCTION); // of variant value
+    CHECK(actions.at(0) == action::standard_construction); // of temporary
+    CHECK(actions.at(1) == action::move_construction); // of variant value
+    CHECK(actions.at(2) == action::destruction); // of temporary
+    CHECK(actions.at(3) == action::destruction); // of variant value
+    CHECK(actions.at(4) == action::standard_construction); // of local
+    CHECK(actions.at(5) == action::copy_construction); // of variant value
+    CHECK(actions.at(6) == action::destruction); // of variant value
+    CHECK(actions.at(7) == action::copy_construction); // of variant value
+    CHECK(actions.at(8) == action::destruction); // of local
+    CHECK(actions.at(9) == action::destruction); // of variant value
 }
 
 TEST_CASE("Double variant assignment with same type") {
-    std::vector<Action> actions1, actions2;
+    std::vector<action> actions1, actions2;
     {
-        variant<int, Stub> v(type_tag<Stub>(), actions1);
-        Stub stub(actions2);
+        variant<int, stub> v(type_tag<stub>(), actions1);
+        stub s(actions2);
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
 
-        CHECK_NOTHROW(v.assign(stub));
-        CHECK(v.tag() == v.tag<Stub>());
+        CHECK_NOTHROW(v.assign(s));
+        CHECK(v.tag() == v.tag<stub>());
         CHECK(actions1.size() == 2);
         CHECK(actions2.size() == 1);
 
-        CHECK_NOTHROW(v.assign(std::move(stub)));
-        CHECK(v.tag() == v.tag<Stub>());
+        CHECK_NOTHROW(v.assign(std::move(s)));
+        CHECK(v.tag() == v.tag<stub>());
         CHECK(actions1.size() == 3);
         CHECK(actions2.size() == 1);
     }
     CHECK(actions1.size() == 4);
-    CHECK(actions1.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions1.at(1) == Action::COPY_ASSIGNMENT);
-    CHECK(actions1.at(2) == Action::MOVE_ASSIGNMENT);
-    CHECK(actions1.at(3) == Action::DESTRUCTION);
+    CHECK(actions1.at(0) == action::standard_construction);
+    CHECK(actions1.at(1) == action::copy_assignment);
+    CHECK(actions1.at(2) == action::move_assignment);
+    CHECK(actions1.at(3) == action::destruction);
     CHECK(actions2.size() == 2);
-    CHECK(actions2.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions2.at(1) == Action::DESTRUCTION);
+    CHECK(actions2.at(0) == action::standard_construction);
+    CHECK(actions2.at(1) == action::destruction);
 }
 
 TEST_CASE("Double variant assignment with different types") {
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v(type_tag<int>(), 1);
+        variant<int, stub> v(type_tag<int>(), 1);
 
-        CHECK_NOTHROW(v.assign(Stub(actions)));
-        CHECK(v.tag() == v.tag<Stub>());
+        CHECK_NOTHROW(v.assign(stub(actions)));
+        CHECK(v.tag() == v.tag<stub>());
         CHECK(actions.size() == 3);
 
         CHECK_NOTHROW(v.assign(100));
@@ -693,126 +694,126 @@ TEST_CASE("Double variant assignment with different types") {
         CHECK(v.value<int>() == 100);
         CHECK(actions.size() == 4);
 
-        Stub stub(actions);
+        stub s(actions);
         CHECK(actions.size() == 5);
-        CHECK_NOTHROW(v.assign(stub));
-        REQUIRE(v.tag() == v.tag<Stub>());
+        CHECK_NOTHROW(v.assign(s));
+        REQUIRE(v.tag() == v.tag<stub>());
         CHECK(actions.size() == 6);
     }
     CHECK(actions.size() == 8);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION); // of temporary
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of variant value
-    CHECK(actions.at(2) == Action::DESTRUCTION); // of temporary
-    CHECK(actions.at(3) == Action::DESTRUCTION); // of variant value
-    CHECK(actions.at(4) == Action::STANDARD_CONSTRUCTION); // of local
-    CHECK(actions.at(5) == Action::COPY_CONSTRUCTION); // of variant value
-    CHECK(actions.at(6) == Action::DESTRUCTION); // of local
-    CHECK(actions.at(7) == Action::DESTRUCTION); // of variant value
+    CHECK(actions.at(0) == action::standard_construction); // of temporary
+    CHECK(actions.at(1) == action::move_construction); // of variant value
+    CHECK(actions.at(2) == action::destruction); // of temporary
+    CHECK(actions.at(3) == action::destruction); // of variant value
+    CHECK(actions.at(4) == action::standard_construction); // of local
+    CHECK(actions.at(5) == action::copy_construction); // of variant value
+    CHECK(actions.at(6) == action::destruction); // of local
+    CHECK(actions.at(7) == action::destruction); // of variant value
 }
 
 TEST_CASE("Double variant copy assignment with same tag") {
-    std::vector<Action> actions1, actions2;
+    std::vector<action> actions1, actions2;
     {
-        variant<int, Stub> v1(type_tag<Stub>(), actions1);
-        const variant<int, Stub> v2(type_tag<Stub>(), actions2);
+        variant<int, stub> v1(type_tag<stub>(), actions1);
+        const variant<int, stub> v2(type_tag<stub>(), actions2);
 
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
 
         CHECK_NOTHROW(v1 = v2);
-        CHECK(v1.tag() == v1.tag<Stub>());
+        CHECK(v1.tag() == v1.tag<stub>());
         CHECK(actions1.size() == 2);
         CHECK(actions2.size() == 1);
     }
     CHECK(actions1.size() == 3);
-    CHECK(actions1.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions1.at(1) == Action::COPY_ASSIGNMENT);
-    CHECK(actions1.at(2) == Action::DESTRUCTION);
+    CHECK(actions1.at(0) == action::standard_construction);
+    CHECK(actions1.at(1) == action::copy_assignment);
+    CHECK(actions1.at(2) == action::destruction);
     CHECK(actions2.size() == 2);
-    CHECK(actions2.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions2.at(1) == Action::DESTRUCTION);
+    CHECK(actions2.at(0) == action::standard_construction);
+    CHECK(actions2.at(1) == action::destruction);
 }
 
 TEST_CASE("Double variant copy assignment with different tag") {
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v1(type_tag<int>(), 1);
-        const variant<int, Stub> v2(type_tag<Stub>(), actions);
+        variant<int, stub> v1(type_tag<int>(), 1);
+        const variant<int, stub> v2(type_tag<stub>(), actions);
         CHECK(actions.size() == 1);
 
         CHECK_NOTHROW(v1 = v2);
-        CHECK(v1.tag() == v1.tag<Stub>());
+        CHECK(v1.tag() == v1.tag<stub>());
         CHECK(actions.size() == 2);
     }
     CHECK(actions.size() == 4);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::COPY_CONSTRUCTION);
-    CHECK(actions.at(2) == Action::DESTRUCTION);
-    CHECK(actions.at(3) == Action::DESTRUCTION);
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::copy_construction);
+    CHECK(actions.at(2) == action::destruction);
+    CHECK(actions.at(3) == action::destruction);
 }
 
 TEST_CASE("Double variant copy assignment with same tag & exception") {
-    struct ThrowingStub : public Stub {
-        using Stub::Stub;
-        ThrowingStub &operator=(const ThrowingStub &) { throw Exception(); }
+    struct throwing_stub : public stub {
+        using stub::stub;
+        throwing_stub &operator=(const throwing_stub &) { throw exception(); }
     };
 
-    std::vector<Action> actions1, actions2;
+    std::vector<action> actions1, actions2;
     {
-        variant<int, ThrowingStub> v1(type_tag<ThrowingStub>(), actions1);
-        const variant<int, ThrowingStub> v2(
-                type_tag<ThrowingStub>(), actions2);
+        variant<int, throwing_stub> v1(type_tag<throwing_stub>(), actions1);
+        const variant<int, throwing_stub> v2(
+                type_tag<throwing_stub>(), actions2);
 
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
 
-        CHECK_THROWS_AS(v1 = v2, Exception);
-        CHECK(v1.tag() == v1.tag<ThrowingStub>());
+        CHECK_THROWS_AS(v1 = v2, exception);
+        CHECK(v1.tag() == v1.tag<throwing_stub>());
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
     }
     CHECK(actions1.size() == 2);
-    CHECK(actions1.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions1.at(1) == Action::DESTRUCTION);
+    CHECK(actions1.at(0) == action::standard_construction);
+    CHECK(actions1.at(1) == action::destruction);
     CHECK(actions2.size() == 2);
-    CHECK(actions2.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions2.at(1) == Action::DESTRUCTION);
+    CHECK(actions2.at(0) == action::standard_construction);
+    CHECK(actions2.at(1) == action::destruction);
 }
 
 TEST_CASE("Double variant copy assignment with different tag & exception") {
     static_assert(
-            std::is_copy_assignable<variant<int, Stub>>::value,
-            "int and Stub are copy-assignable");
+            std::is_copy_assignable<variant<int, stub>>::value,
+            "int and stub are copy-assignable");
     static_assert(
             std::is_nothrow_copy_assignable<variant<int, double>>::value,
             "int and double are no-throw copy-assignable");
     static_assert(
-            !std::is_nothrow_copy_assignable<variant<CopyThrows>>::value,
-            "MoveThrows is copy-assignable but throwing");
+            !std::is_nothrow_copy_assignable<variant<copy_throws>>::value,
+            "copy_throws is copy-assignable but throwing");
 
-    std::vector<Action> actions;
-    variant<Stub, CopyThrows> v1(type_tag<Stub>(), actions);
-    variant<Stub, CopyThrows> v2((type_tag<CopyThrows>()));
-    CHECK_THROWS_AS(v1 = v2, Exception);
-    CHECK(v1.tag() == v1.tag<Stub>());
-    CHECK(v2.tag() == v1.tag<CopyThrows>());
+    std::vector<action> actions;
+    variant<stub, copy_throws> v1(type_tag<stub>(), actions);
+    variant<stub, copy_throws> v2((type_tag<copy_throws>()));
+    CHECK_THROWS_AS(v1 = v2, exception);
+    CHECK(v1.tag() == v1.tag<stub>());
+    CHECK(v2.tag() == v1.tag<copy_throws>());
     CHECK(actions.size() == 5);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of backup
-    CHECK(actions.at(2) == Action::DESTRUCTION); // of v1
-    CHECK(actions.at(3) == Action::MOVE_CONSTRUCTION); // of v1
-    CHECK(actions.at(4) == Action::DESTRUCTION); // of backup
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::move_construction); // of backup
+    CHECK(actions.at(2) == action::destruction); // of v1
+    CHECK(actions.at(3) == action::move_construction); // of v1
+    CHECK(actions.at(4) == action::destruction); // of backup
 }
 
 TEST_CASE("Double variant no copy assignment") {
-    using V = variant<Stub, NonCopyAssignable>;
+    using V = variant<stub, non_copy_assignable>;
 
-    V v((type_tag<NonCopyAssignable>()));
+    V v((type_tag<non_copy_assignable>()));
     // v = v;
 
     static_assert(
             !std::is_copy_assignable<V>::value,
-            "NonCopyAssignable is not copy-assignable");
+            "non_copy_assignable is not copy-assignable");
 }
 
 TEST_CASE("Double/quad variant copy assignment to supertype") {
@@ -833,123 +834,123 @@ TEST_CASE("Double/quad variant copy assignment to supertype") {
     CHECK(v4fi.value<int>() == I);
     CHECK(v4ld.value<double>() == D);
 
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v2s(type_tag<int>(), I);
-        variant<Stub> v1s(type_tag<Stub>(), actions);
+        variant<int, stub> v2s(type_tag<int>(), I);
+        variant<stub> v1s(type_tag<stub>(), actions);
         v2s = v1s;
-        CHECK(v2s.tag() == v2s.tag<Stub>());
+        CHECK(v2s.tag() == v2s.tag<stub>());
     }
     CHECK(actions.size() == 4);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::COPY_CONSTRUCTION);
-    CHECK(actions.at(2) == Action::DESTRUCTION);
-    CHECK(actions.at(3) == Action::DESTRUCTION);
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::copy_construction);
+    CHECK(actions.at(2) == action::destruction);
+    CHECK(actions.at(3) == action::destruction);
 }
 
 TEST_CASE("Double variant move assignment with same tag") {
-    std::vector<Action> actions1, actions2;
+    std::vector<action> actions1, actions2;
     {
-        variant<int, Stub> v1(type_tag<Stub>(), actions1);
-        variant<int, Stub> v2(type_tag<Stub>(), actions2);
+        variant<int, stub> v1(type_tag<stub>(), actions1);
+        variant<int, stub> v2(type_tag<stub>(), actions2);
 
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
 
         CHECK_NOTHROW(v1 = std::move(v2));
-        CHECK(v1.tag() == v1.tag<Stub>());
+        CHECK(v1.tag() == v1.tag<stub>());
         CHECK(actions1.size() == 2);
         CHECK(actions2.size() == 1);
     }
     CHECK(actions1.size() == 3);
-    CHECK(actions1.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions1.at(1) == Action::MOVE_ASSIGNMENT);
-    CHECK(actions1.at(2) == Action::DESTRUCTION);
+    CHECK(actions1.at(0) == action::standard_construction);
+    CHECK(actions1.at(1) == action::move_assignment);
+    CHECK(actions1.at(2) == action::destruction);
     CHECK(actions2.size() == 2);
-    CHECK(actions2.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions2.at(1) == Action::DESTRUCTION);
+    CHECK(actions2.at(0) == action::standard_construction);
+    CHECK(actions2.at(1) == action::destruction);
 }
 
 TEST_CASE("Double variant move assignment with different tag") {
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v1(type_tag<int>(), 1);
-        variant<int, Stub> v2(type_tag<Stub>(), actions);
+        variant<int, stub> v1(type_tag<int>(), 1);
+        variant<int, stub> v2(type_tag<stub>(), actions);
         CHECK(actions.size() == 1);
 
         CHECK_NOTHROW(v1 = std::move(v2));
-        CHECK(v1.tag() == v1.tag<Stub>());
+        CHECK(v1.tag() == v1.tag<stub>());
         CHECK(actions.size() == 2);
     }
     CHECK(actions.size() == 4);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION);
-    CHECK(actions.at(2) == Action::DESTRUCTION);
-    CHECK(actions.at(3) == Action::DESTRUCTION);
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::move_construction);
+    CHECK(actions.at(2) == action::destruction);
+    CHECK(actions.at(3) == action::destruction);
 }
 
 TEST_CASE("Double variant move assignment with same tag & exception") {
-    struct ThrowingStub : public Stub {
-        using Stub::Stub;
-        ThrowingStub(ThrowingStub &&) = default;
-        ThrowingStub &operator=(ThrowingStub &&) { throw Exception(); }
+    struct throwing_stub : public stub {
+        using stub::stub;
+        throwing_stub(throwing_stub &&) = default;
+        throwing_stub &operator=(throwing_stub &&) { throw exception(); }
     };
 
-    std::vector<Action> actions1, actions2;
+    std::vector<action> actions1, actions2;
     {
-        variant<int, ThrowingStub> v1(type_tag<ThrowingStub>(), actions1);
-        variant<int, ThrowingStub> v2(type_tag<ThrowingStub>(), actions2);
+        variant<int, throwing_stub> v1(type_tag<throwing_stub>(), actions1);
+        variant<int, throwing_stub> v2(type_tag<throwing_stub>(), actions2);
 
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
 
-        CHECK_THROWS_AS(v1 = std::move(v2), Exception);
-        CHECK(v1.tag() == v1.tag<ThrowingStub>());
+        CHECK_THROWS_AS(v1 = std::move(v2), exception);
+        CHECK(v1.tag() == v1.tag<throwing_stub>());
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
     }
     CHECK(actions1.size() == 2);
-    CHECK(actions1.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions1.at(1) == Action::DESTRUCTION);
+    CHECK(actions1.at(0) == action::standard_construction);
+    CHECK(actions1.at(1) == action::destruction);
     CHECK(actions2.size() == 2);
-    CHECK(actions2.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions2.at(1) == Action::DESTRUCTION);
+    CHECK(actions2.at(0) == action::standard_construction);
+    CHECK(actions2.at(1) == action::destruction);
 }
 
 TEST_CASE("Double variant move assignment with different tag & exception") {
     static_assert(
-            std::is_move_assignable<variant<int, Stub>>::value,
-            "int and Stub are move-assignable");
+            std::is_move_assignable<variant<int, stub>>::value,
+            "int and stub are move-assignable");
     static_assert(
             std::is_nothrow_move_assignable<variant<int, double>>::value,
             "int and double are no-throw move-assignable");
     static_assert(
-            !std::is_nothrow_move_assignable<variant<MoveThrows>>::value,
-            "MoveThrows is move-assignable but throwing");
+            !std::is_nothrow_move_assignable<variant<move_throws>>::value,
+            "move_throws is move-assignable but throwing");
 
-    std::vector<Action> actions;
-    variant<Stub, MoveThrows> v1(type_tag<Stub>(), actions);
-    variant<Stub, MoveThrows> v2((type_tag<MoveThrows>()));
-    CHECK_THROWS_AS(v1 = std::move(v2), Exception);
-    CHECK(v1.tag() == v1.tag<Stub>());
-    CHECK(v2.tag() == v1.tag<MoveThrows>());
+    std::vector<action> actions;
+    variant<stub, move_throws> v1(type_tag<stub>(), actions);
+    variant<stub, move_throws> v2((type_tag<move_throws>()));
+    CHECK_THROWS_AS(v1 = std::move(v2), exception);
+    CHECK(v1.tag() == v1.tag<stub>());
+    CHECK(v2.tag() == v1.tag<move_throws>());
     CHECK(actions.size() == 5);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION); // of backup
-    CHECK(actions.at(2) == Action::DESTRUCTION); // of v1
-    CHECK(actions.at(3) == Action::MOVE_CONSTRUCTION); // of v1
-    CHECK(actions.at(4) == Action::DESTRUCTION); // of backup
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::move_construction); // of backup
+    CHECK(actions.at(2) == action::destruction); // of v1
+    CHECK(actions.at(3) == action::move_construction); // of v1
+    CHECK(actions.at(4) == action::destruction); // of backup
 }
 
 TEST_CASE("Double variant no move assignment") {
-    using V = variant<Stub, NonMoveAssignable>;
+    using V = variant<stub, non_move_assignable>;
 
-    V v((type_tag<NonMoveAssignable>()));
+    V v((type_tag<non_move_assignable>()));
 //    v = std::move(v);
 
     static_assert(
             !std::is_move_assignable<V>::value,
-            "NonMoveAssignable is not move-assignable");
+            "non_move_assignable is not move-assignable");
 }
 
 TEST_CASE("Double/quad variant move assignment to supertype") {
@@ -967,17 +968,17 @@ TEST_CASE("Double/quad variant move assignment to supertype") {
     CHECK(v4fi.value<int>() == I);
     CHECK(v4ld.value<double>() == D);
 
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v2s(type_tag<int>(), I);
-        v2s = variant<Stub>(type_tag<Stub>(), actions);
-        CHECK(v2s.tag() == v2s.tag<Stub>());
+        variant<int, stub> v2s(type_tag<int>(), I);
+        v2s = variant<stub>(type_tag<stub>(), actions);
+        CHECK(v2s.tag() == v2s.tag<stub>());
     }
     CHECK(actions.size() == 4);
-    CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions.at(1) == Action::MOVE_CONSTRUCTION);
-    CHECK(actions.at(2) == Action::DESTRUCTION);
-    CHECK(actions.at(3) == Action::DESTRUCTION);
+    CHECK(actions.at(0) == action::standard_construction);
+    CHECK(actions.at(1) == action::move_construction);
+    CHECK(actions.at(2) == action::destruction);
+    CHECK(actions.at(3) == action::destruction);
 }
 
 TEST_CASE("Double variant create") {
@@ -1003,30 +1004,30 @@ TEST_CASE("Double variant create") {
 }
 
 TEST_CASE("Double variant of") {
-    int intArray[] = {19};
+    int int_array[] = {19};
 
-    variant<int *, const char *> v1 = intArray;
+    variant<int *, const char *> v1 = int_array;
     variant<int *, const char *> v2 = "char array";
 
     REQUIRE(v1.tag() == v1.tag<int *>());
-    CHECK(v1.value<int *>() == intArray);
+    CHECK(v1.value<int *>() == int_array);
     REQUIRE(v2.tag() == v2.tag<const char *>());
     CHECK(v2.value<const char *>()[0] == 'c');
 
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        variant<int, Stub> v3 = Stub(actions);
-        CHECK(v3.tag() == v3.tag<Stub>());
+        variant<int, stub> v3 = stub(actions);
+        CHECK(v3.tag() == v3.tag<stub>());
     }
-    CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
+    CHECK_FALSE(contains(actions, action::copy_construction));
     actions.clear();
 
     {
-        Stub s(actions);
-        variant<int, Stub> v4 = s;
-        CHECK(v4.tag() == v4.tag<Stub>());
+        stub s(actions);
+        variant<int, stub> v4 = s;
+        CHECK(v4.tag() == v4.tag<stub>());
     }
-    CHECK(contains(actions, Action::COPY_CONSTRUCTION));
+    CHECK(contains(actions, action::copy_construction));
 }
 
 TEST_CASE("Double variant result of") {
@@ -1082,8 +1083,8 @@ TEST_CASE("Double variant swapping with different type") {
 }
 
 //TEST_CASE("Double variant unswappable") {
-//    variant<int, MoveThrows> v1(type_tag<int>(), 3);
-//    variant<int, MoveThrows> v2((type_tag<MoveThrows>()));
+//    variant<int, move_throws> v1(type_tag<int>(), 3);
+//    variant<int, move_throws> v2((type_tag<move_throws>()));
 //    swap(v1, v2);
 //}
 
@@ -1092,8 +1093,8 @@ TEST_CASE("Double variant swapping with different type") {
             variant<int, double>::is_nothrow_swappable,
             "int swap never throws");
     static_assert(
-            !variant<int, CopyMayThrow>::is_nothrow_swappable,
-            "CopyMayThrow swap may throw");
+            !variant<int, copy_may_throw>::is_nothrow_swappable,
+            "copy_may_throw swap may throw");
 //}
 
 TEST_CASE("Double variant operator==") {
