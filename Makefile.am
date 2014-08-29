@@ -26,7 +26,6 @@ TESTPROGRAMS = \
 	src/async/FutureTest \
 	src/async/PromiseTest \
 	src/async/SharedFutureTest \
-	src/common/MaybeTest \
 	src/common/MessageTest \
 	src/common/ReferenceTest \
 	src/common/SharedFunctionTest \
@@ -35,6 +34,7 @@ TESTPROGRAMS = \
 	src/common/container_helper_test \
 	src/common/enum_iterator_test \
 	src/common/enum_set_test \
+	src/common/maybe_test \
 	src/common/type_tag_test \
 	src/common/variant_test \
 	src/language/source/BufferTest \
@@ -210,8 +210,6 @@ src_async_PromiseTest_SOURCES = \
 	src/async/PromiseTest.cc
 src_async_SharedFutureTest_SOURCES = \
 	src/async/SharedFutureTest.cc
-src_common_MaybeTest_SOURCES = \
-	src/common/MaybeTest.cc
 src_common_MessageTest_SOURCES = \
 	src/common/Message.cc \
 	src/common/MessageTest.cc
@@ -229,6 +227,8 @@ src_common_enum_iterator_test_SOURCES = \
 	src/common/enum_iterator_test.cc
 src_common_enum_set_test_SOURCES = \
 	src/common/enum_set_test.cc
+src_common_maybe_test_SOURCES = \
+	src/common/maybe_test.cc
 src_common_type_tag_test_SOURCES = \
 	src/common/type_tag.hh \
 	src/common/type_tag_test.cc
