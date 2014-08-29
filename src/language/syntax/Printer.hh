@@ -23,8 +23,8 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include "common/OutputStream.hh"
 #include "common/StringStream.hh"
+#include "common/xostream.hh"
 #include "common/xstring.hh"
 
 namespace sesh {
@@ -91,11 +91,11 @@ public:
 
     common::xstring toString() const;
 
-    common::OutputStream &delayedCharacters() noexcept {
+    common::xostream &delayedCharacters() noexcept {
         return mDelayedCharacters;
     }
 
-    common::OutputStream &delayedLines() noexcept {
+    common::xostream &delayedLines() noexcept {
         return mDelayedLines;
     }
 

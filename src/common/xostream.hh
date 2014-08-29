@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_OutputStream_hh
-#define INCLUDED_common_OutputStream_hh
+#ifndef INCLUDED_common_xostream_hh
+#define INCLUDED_common_xostream_hh
 
 #include "buildconfig.h"
 
@@ -26,11 +26,11 @@
 namespace sesh {
 namespace common {
 
-using OutputStream = std::basic_ostream<xchar>;
+using xostream = std::basic_ostream<xchar>;
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_OutputStream_hh
+#endif // #ifndef INCLUDED_common_xostream_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -22,7 +22,6 @@
 
 #include <functional>
 #include "boost/format.hpp"
-#include "common/OutputStream.hh"
 #include "common/xstring.hh"
 
 namespace sesh {
