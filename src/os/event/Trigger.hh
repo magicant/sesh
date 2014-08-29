@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "common/Variant.hh"
+#include "common/variant.hh"
 #include "os/event/ErrorFileDescriptor.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Signal.hh"
@@ -33,7 +33,7 @@ namespace os {
 namespace event {
 
 /** A trigger describes the cause of an event. */
-using Trigger = common::Variant<
+using Trigger = common::variant<
         Timeout,
         ReadableFileDescriptor,
         WritableFileDescriptor,

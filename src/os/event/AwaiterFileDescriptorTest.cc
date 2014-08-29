@@ -23,8 +23,8 @@
 #include <stdexcept>
 #include "async/Future.hh"
 #include "common/Try.hh"
-#include "common/Variant.hh"
 #include "common/type_tag_test_helper.hh"
+#include "common/variant.hh"
 #include "os/event/AwaiterTestHelper.hh"
 #include "os/event/ErrorFileDescriptor.hh"
 #include "os/event/PselectApi.hh"
@@ -43,7 +43,7 @@ namespace {
 
 using sesh::async::Future;
 using sesh::common::Try;
-using sesh::common::Variant;
+using sesh::common::variant;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::ErrorFileDescriptor;
 using sesh::os::event::ReadableFileDescriptor;
@@ -58,7 +58,7 @@ using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
 
 using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
-using TriggerFileDescriptor = Variant<
+using TriggerFileDescriptor = variant<
         ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
 
 TEST_CASE_METHOD(

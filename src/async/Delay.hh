@@ -63,8 +63,8 @@ private:
     using ForwardSource = std::weak_ptr<Delay>;
     using ForwardTarget = std::shared_ptr<Delay>;
 
-    using Input = common::Variant<Empty, Try, ForwardSource>;
-    using Output = common::Variant<Empty, Callback, ForwardTarget>;
+    using Input = common::variant<Empty, Try, ForwardSource>;
+    using Output = common::variant<Empty, Callback, ForwardTarget>;
 
     Input mInput = Input(common::type_tag<Empty>());
     Output mOutput = Output(common::type_tag<Empty>());
@@ -100,7 +100,7 @@ public:
                     std::forward<Arg>(arg)...);
 
         try {
-            mInput.template emplaceWithFallback<Empty>(
+            mInput.template emplace_with_fallback<Empty>(
                     common::type_tag<Try>(), std::forward<Arg>(arg)...);
         } catch (...) {
             mInput.emplace(common::type_tag<Try>(), std::current_exception());
@@ -128,7 +128,7 @@ public:
             return;
         }
 
-        mOutput.template emplaceWithFallback<Empty>(std::move(f));
+        mOutput.template emplace_with_fallback<Empty>(std::move(f));
 
         fireIfReady();
     }

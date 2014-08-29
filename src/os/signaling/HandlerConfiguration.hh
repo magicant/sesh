@@ -23,7 +23,7 @@
 #include <functional>
 #include <memory>
 #include <system_error>
-#include "common/Variant.hh"
+#include "common/variant.hh"
 #include "os/signaling/HandlerConfigurationApi.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
@@ -66,7 +66,7 @@ public:
 
     using Canceler = std::function<std::error_code()>;
 
-    using AddHandlerResult = common::Variant<Canceler, std::error_code>;
+    using AddHandlerResult = common::variant<Canceler, std::error_code>;
 
     /**
      * Adds a handler for a signal.
@@ -89,7 +89,7 @@ public:
      */
     class Default { };
 
-    using TrapAction = common::Variant<Default, Handler>;
+    using TrapAction = common::variant<Default, Handler>;
 
     /** Defines the condition in which {@link #setTrap} should fail. */
     enum class SettingPolicy {

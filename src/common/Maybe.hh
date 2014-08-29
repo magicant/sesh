@@ -23,8 +23,8 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include "common/Variant.hh"
 #include "common/type_tag.hh"
+#include "common/variant.hh"
 
 namespace sesh {
 namespace common {
@@ -53,7 +53,7 @@ private:
 
     class Nil { };
 
-    Variant<Nil, T> mValue;
+    variant<Nil, T> mValue;
 
 public:
 
@@ -111,7 +111,7 @@ public:
     void emplace(Arg &&... arg)
             noexcept(std::is_nothrow_destructible<T>::value &&
                     std::is_nothrow_constructible<T, Arg...>::value) {
-        mValue.template emplaceWithFallback<Nil>(
+        mValue.template emplace_with_fallback<Nil>(
                 type_tag<T>(), std::forward<Arg>(arg)...);
     }
     // XXX support initializer_list?
@@ -121,7 +121,7 @@ public:
      * object if any.
      */
     void clear() noexcept(std::is_nothrow_destructible<T>::value) {
-        mValue.template emplaceWithFallback<Nil>(type_tag<Nil>());
+        mValue.template emplace_with_fallback<Nil>(type_tag<Nil>());
     }
 
     /** Returns true if and only if this maybe object is non-empty. */
@@ -225,8 +225,8 @@ public:
      * move-constructible.
      */
     void swap(Maybe &other)
-            noexcept(decltype(mValue)::IS_NOTHROW_SWAPPABLE &&
-                    decltype(mValue)::IS_NOTHROW_MOVE_CONSTRUCTIBLE) {
+            noexcept(decltype(mValue)::is_nothrow_swappable &&
+                    decltype(mValue)::is_nothrow_move_constructible) {
         if (this->hasValue()) {
             if (other.hasValue()) {
                 using std::swap;

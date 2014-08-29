@@ -31,8 +31,8 @@
 #include "async/Promise.hh"
 #include "common/SharedFunction.hh"
 #include "common/Try.hh"
-#include "common/Variant.hh"
 #include "common/container_helper.hh"
+#include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/TimeApi.hh"
 #include "os/event/PselectApi.hh"
@@ -48,8 +48,8 @@ using sesh::async::Promise;
 using sesh::async::createPromiseFuturePair;
 using sesh::common::SharedFunction;
 using sesh::common::Try;
-using sesh::common::Variant;
 using sesh::common::find_if;
+using sesh::common::variant;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfiguration;
@@ -65,7 +65,7 @@ namespace event {
 
 namespace {
 
-using FileDescriptorTrigger = Variant<
+using FileDescriptorTrigger = variant<
         ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
 
 class PendingEvent {

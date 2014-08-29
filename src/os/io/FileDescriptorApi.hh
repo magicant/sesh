@@ -22,8 +22,8 @@
 
 #include <memory>
 #include <system_error>
-#include "common/Variant.hh"
 #include "common/enum_set.hh"
+#include "common/variant.hh"
 #include "os/io/FileDescriptionAccessMode.hh"
 #include "os/io/FileDescriptionAttribute.hh"
 #include "os/io/FileDescriptor.hh"
@@ -45,7 +45,7 @@ public:
      * The file mode set argument is ignored unless the CREATE flag is included
      * in the file descriptor open mode set argument.
      */
-    virtual common::Variant<FileDescriptor, std::error_code> open(
+    virtual common::variant<FileDescriptor, std::error_code> open(
             const char *path,
             FileDescriptionAccessMode,
             common::enum_set<FileDescriptionAttribute>,

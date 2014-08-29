@@ -19,14 +19,11 @@
 #include "NonBlockingFileDescriptor.hh"
 
 #include <utility>
-#include "common/Variant.hh"
 #include "helpermacros.h"
 #include "os/io/FileDescriptionApi.hh"
 #include "os/io/FileDescriptionAttribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
-
-using sesh::common::Variant;
 
 namespace sesh {
 namespace os {

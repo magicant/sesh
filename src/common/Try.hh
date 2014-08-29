@@ -22,8 +22,8 @@
 
 #include <exception>
 #include <memory>
+#include "common/variant.hh"
 #include "helpermacros.h"
-#include "common/Variant.hh"
 
 namespace sesh {
 namespace common {
@@ -33,11 +33,11 @@ namespace common {
  * value of the template parameter type or an exception.
  */
 template<typename T>
-class Try : public common::Variant<T, std::exception_ptr> {
+class Try : public common::variant<T, std::exception_ptr> {
 
 public:
 
-    using common::Variant<T, std::exception_ptr>::Variant;
+    using common::variant<T, std::exception_ptr>::variant;
 
     /** Checks if this value has an actual result rather than an exception. */
     bool hasValue() const noexcept {

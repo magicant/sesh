@@ -27,7 +27,6 @@
 #include <utility>
 #include "async/Future.hh"
 #include "common/Try.hh"
-#include "common/Variant.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/Awaiter.hh"
 #include "os/event/AwaiterTestHelper.hh"
@@ -43,7 +42,6 @@ namespace {
 
 using sesh::async::Future;
 using sesh::common::Try;
-using sesh::common::Variant;
 using sesh::os::event::Awaiter;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::ReadableFileDescriptor;

@@ -26,17 +26,17 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "common/Variant.hh"
 #include "common/container_helper.hh"
 #include "common/functional_initialize.hh"
 #include "common/type_tag.hh"
+#include "common/variant.hh"
 
 namespace {
 
-using sesh::common::Variant;
 using sesh::common::contains;
 using sesh::common::functional_initialize;
 using sesh::common::type_tag;
+using sesh::common::variant;
 
 enum class Action {
     STANDARD_CONSTRUCTION,
@@ -136,42 +136,42 @@ struct NonDestructible {
 };
 
 static_assert(
-        sizeof(Variant<>) > 0,
+        sizeof(variant<>) > 0,
         "Empty variant is a valid type, even if not constructible");
 
 TEST_CASE("Single variant construction & destruction") {
-    Variant<int>(type_tag<int>());
-    Variant<int>(type_tag<int>(), 123);
-    Variant<int>(123);
-    Variant<int>(functional_initialize(), [] { return 123; });
+    variant<int>(type_tag<int>());
+    variant<int>(type_tag<int>(), 123);
+    variant<int>(123);
+    variant<int>(functional_initialize(), [] { return 123; });
 
     static_assert(
-            noexcept(Variant<int>(type_tag<int>())),
+            noexcept(variant<int>(type_tag<int>())),
             "int is no-throw constructible & destructible");
     static_assert(
-            Variant<int>::IS_NOTHROW_DESTRUCTIBLE,
+            variant<int>::is_nothrow_destructible,
             "int is no-throw destructible");
 
     auto throwing = []() noexcept(false) { return 0; };
     auto nonthrowing = []() noexcept(true) { return 0; };
     static_assert(
-            !noexcept(Variant<int>(functional_initialize(), throwing)),
+            !noexcept(variant<int>(functional_initialize(), throwing)),
             "functional initialize propagates noexcept(false)");
     static_assert(
-            noexcept(Variant<int>(functional_initialize(), nonthrowing)),
+            noexcept(variant<int>(functional_initialize(), nonthrowing)),
             "functional initialize propagates noexcept(true)");
 
     std::vector<Action> actions;
-    Variant<Stub>(type_tag<Stub>(), actions);
+    variant<Stub>(type_tag<Stub>(), actions);
     CHECK(actions.size() == 2);
     CHECK(actions.at(0) == Action::STANDARD_CONSTRUCTION);
     CHECK(actions.at(1) == Action::DESTRUCTION);
 
     CHECK_THROWS_AS(
-            Variant<DefaultThrows>(type_tag<DefaultThrows>()),
+            variant<DefaultThrows>(type_tag<DefaultThrows>()),
             Exception);
     CHECK_THROWS_AS(
-            Variant<DefaultThrows>(
+            variant<DefaultThrows>(
                     functional_initialize(),
                     []() -> DefaultThrows { throw Exception(); }),
             Exception);
@@ -179,16 +179,16 @@ TEST_CASE("Single variant construction & destruction") {
 
 //TEST_CASE("Single variant throwing destructor") {
     static_assert(
-            !noexcept(Variant<DefaultMayThrow>(type_tag<DefaultMayThrow>())),
+            !noexcept(variant<DefaultMayThrow>(type_tag<DefaultMayThrow>())),
             "DefaultMayThrow constructor may throw");
 //}
 
 //TEST_CASE("Single variant throwing destructor") {
     static_assert(
-            !noexcept(Variant<NonDestructible>(type_tag<NonDestructible>())),
+            !noexcept(variant<NonDestructible>(type_tag<NonDestructible>())),
             "NonDestructible destructor may throw");
     static_assert(
-            !Variant<NonDestructible>::IS_NOTHROW_DESTRUCTIBLE,
+            !variant<NonDestructible>::is_nothrow_destructible,
             "NonDestructible destructor may throw");
 //}
 
@@ -199,63 +199,63 @@ TEST_CASE("Double variant construction & destruction") {
         B(int, double) noexcept(false) { }
     };
 
-    Variant<A, B>(type_tag<A>());
-    Variant<A, B>(type_tag<B>(), 0, 0.0);
-    Variant<A, B>{A()};
-    Variant<A, B>{B(0, 0.0)};
-    Variant<A, B>(functional_initialize(), [] { return A(); });
-    Variant<A, B>(functional_initialize(), [] { return B(0, 0.0); });
+    variant<A, B>(type_tag<A>());
+    variant<A, B>(type_tag<B>(), 0, 0.0);
+    variant<A, B>{A()};
+    variant<A, B>{B(0, 0.0)};
+    variant<A, B>(functional_initialize(), [] { return A(); });
+    variant<A, B>(functional_initialize(), [] { return B(0, 0.0); });
 
     static_assert(
-            noexcept(Variant<A, B>(type_tag<A>())),
+            noexcept(variant<A, B>(type_tag<A>())),
             "A is no-throw constructible & destructible");
     static_assert(
-            !noexcept(Variant<A, B>(type_tag<B>(), 0, 0.0)),
+            !noexcept(variant<A, B>(type_tag<B>(), 0, 0.0)),
             "B is not no-throw constructible");
     static_assert(
-            Variant<A, B>::IS_NOTHROW_DESTRUCTIBLE,
+            variant<A, B>::is_nothrow_destructible,
             "A and B are no-throw destructible");
 
     auto throwing = []() noexcept(false) { return 0; };
     auto nonthrowing = []() noexcept(true) { return 0.0; };
     static_assert(
-            !noexcept(Variant<int, double>(functional_initialize(), throwing)),
+            !noexcept(variant<int, double>(functional_initialize(), throwing)),
             "functional initialize propagates noexcept(false)");
     static_assert(
             noexcept(
-                Variant<int, double>(functional_initialize(), nonthrowing)),
+                variant<int, double>(functional_initialize(), nonthrowing)),
             "functional initialize propagates noexcept(true)");
 }
 
 //TEST_CASE("Double variant throwing constructor") {
     static_assert(
-            !noexcept(Variant<DefaultMayThrow, int>(
+            !noexcept(variant<DefaultMayThrow, int>(
                     type_tag<DefaultMayThrow>())),
             "DefaultMayThrow constructor may throw");
     static_assert(
-            !noexcept(Variant<int, DefaultMayThrow>(
+            !noexcept(variant<int, DefaultMayThrow>(
                     type_tag<DefaultMayThrow>())),
             "DefaultMayThrow constructor may throw");
     static_assert(
-            !noexcept(Variant<DefaultMayThrow, DefaultMayThrow>(
+            !noexcept(variant<DefaultMayThrow, DefaultMayThrow>(
                     type_tag<DefaultMayThrow>())),
             "DefaultMayThrow constructor may throw");
 //}
 
 //TEST_CASE("Double variant throwing destructor") {
     static_assert(
-            !noexcept(Variant<int, NonDestructible>(
+            !noexcept(variant<int, NonDestructible>(
                     type_tag<NonDestructible>())),
             "NonDestructible destructor is throwing");
     static_assert(
-            !Variant<int, NonDestructible>::IS_NOTHROW_DESTRUCTIBLE,
+            !variant<int, NonDestructible>::is_nothrow_destructible,
             "NonDestructible destructor is throwing");
     static_assert(
-            !noexcept(Variant<NonDestructible, int>(
+            !noexcept(variant<NonDestructible, int>(
                     type_tag<NonDestructible>())),
             "NonDestructible destructor is throwing");
     static_assert(
-            !Variant<NonDestructible, int>::IS_NOTHROW_DESTRUCTIBLE,
+            !variant<NonDestructible, int>::is_nothrow_destructible,
             "NonDestructible destructor is throwing");
 //}
 
@@ -264,34 +264,34 @@ TEST_CASE("Quad variant construction & destruction") {
     class B { };
     class C { };
     class D { };
-    Variant<A, B, C, D>(type_tag<A>());
-    Variant<A, B, C, D>(type_tag<B>());
-    Variant<A, B, C, D>(type_tag<C>());
-    Variant<A, B, C, D>(type_tag<D>());
-    Variant<A, B, C, D>{A()};
-    Variant<A, B, C, D>{B()};
-    Variant<A, B, C, D>{C()};
-    Variant<A, B, C, D>{D()};
-    Variant<A, B, C, D>(functional_initialize(), [] { return A(); });
-    Variant<A, B, C, D>(functional_initialize(), [] { return B(); });
-    Variant<A, B, C, D>(functional_initialize(), [] { return C(); });
-    Variant<A, B, C, D>(functional_initialize(), [] { return D(); });
+    variant<A, B, C, D>(type_tag<A>());
+    variant<A, B, C, D>(type_tag<B>());
+    variant<A, B, C, D>(type_tag<C>());
+    variant<A, B, C, D>(type_tag<D>());
+    variant<A, B, C, D>{A()};
+    variant<A, B, C, D>{B()};
+    variant<A, B, C, D>{C()};
+    variant<A, B, C, D>{D()};
+    variant<A, B, C, D>(functional_initialize(), [] { return A(); });
+    variant<A, B, C, D>(functional_initialize(), [] { return B(); });
+    variant<A, B, C, D>(functional_initialize(), [] { return C(); });
+    variant<A, B, C, D>(functional_initialize(), [] { return D(); });
 }
 
 TEST_CASE("Double variant copy initialization") {
-    Variant<int, type_tag<int>> vi = 0;
+    variant<int, type_tag<int>> vi = 0;
     CHECK(vi.tag() == vi.tag<int>());
 
     // Implicit conversion from type_tag is disabled to disambiguate overloads.
-//    Variant<int, type_tag<int>> vt = type_tag<int>();
+//    variant<int, type_tag<int>> vt = type_tag<int>();
 //    CHECK(vt.tag() == vt.tag<type_tag<int>>());
 }
 
 TEST_CASE("Double variant direct initialization") {
-    Variant<int, type_tag<int>> vi((type_tag<int>()));
+    variant<int, type_tag<int>> vi((type_tag<int>()));
     CHECK(vi.tag() == vi.tag<int>());
 
-    Variant<int, type_tag<int>> vt((type_tag<type_tag<int>>()));
+    variant<int, type_tag<int>> vt((type_tag<type_tag<int>>()));
     CHECK(vt.tag() == vt.tag<type_tag<int>>());
 }
 
@@ -299,8 +299,8 @@ TEST_CASE("Double variant value") {
     const int I1 = 123, I2 = 234;
     const float F1 = 456.0f, F2 = 567.0f;
 
-    Variant<int, float> i(type_tag<int>(), I1);
-    Variant<int, float> f(functional_initialize(), [=] { return F1; });
+    variant<int, float> i(type_tag<int>(), I1);
+    variant<int, float> f(functional_initialize(), [=] { return F1; });
 
     CHECK(i.value<int>() == I1);
     CHECK(f.value<float>() == F1);
@@ -316,8 +316,8 @@ TEST_CASE("Double variant constant value") {
     const int I = 123;
     const float F = 456.0;
 
-    const Variant<int, float> i(type_tag<int>(), I);
-    const Variant<int, float> f(functional_initialize(), [=] { return F; });
+    const variant<int, float> i(type_tag<int>(), I);
+    const variant<int, float> f(functional_initialize(), [=] { return F; });
 
     CHECK(i.value<int>() == I);
     CHECK(f.value<float>() == F);
@@ -326,7 +326,7 @@ TEST_CASE("Double variant constant value") {
 TEST_CASE("Double variant r-value") {
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v(type_tag<Stub>(), actions);
+        variant<int, Stub> v(type_tag<Stub>(), actions);
         CHECK(actions.size() == 1);
 
         Stub stubCopy(v.value<Stub>());
@@ -351,11 +351,11 @@ struct TemplateVisitor {
 };
 
 TEST_CASE("Double variant apply with templated visitor") {
-    Variant<int, double> vi = 3;
+    variant<int, double> vi = 3;
     std::string si = vi.apply(TemplateVisitor());
     CHECK(si == "3");
 
-    Variant<int, double> vd = 1.5;
+    variant<int, double> vd = 1.5;
     std::string sd = vd.apply(TemplateVisitor());
     CHECK(sd == "1.500000");
 }
@@ -370,19 +370,19 @@ TEST_CASE("Double variant apply, contained value l/r-value") {
         std::string operator()(double &&) { return "double &&"; }
     };
 
-    auto vi = Variant<int, double>::create<int>();
+    auto vi = variant<int, double>::create<int>();
     CHECK(vi.apply(Visitor()) == "int &");
     CHECK(std::move(vi).apply(Visitor()) == "int &&");
 
-    const auto cvi = Variant<int, double>::create<int>();
+    const auto cvi = variant<int, double>::create<int>();
     CHECK(cvi.apply(Visitor()) == "const int &");
     CHECK(std::move(cvi).apply(Visitor()) == "const int &");
 
-    auto vd = Variant<int, double>::create<double>();
+    auto vd = variant<int, double>::create<double>();
     CHECK(vd.apply(Visitor()) == "double &");
     CHECK(std::move(vd).apply(Visitor()) == "double &&");
 
-    const auto cvd = Variant<int, double>::create<double>();
+    const auto cvd = variant<int, double>::create<double>();
     CHECK(cvd.apply(Visitor()) == "const double &");
     CHECK(std::move(cvd).apply(Visitor()) == "const double &");
 }
@@ -398,8 +398,8 @@ TEST_CASE("Double variant apply, visitor l/r-value") {
         std::string operator()(double) && { return "double, &&"; }
     };
 
-    auto vi = Variant<int, double>::create<int>();
-    auto vd = Variant<int, double>::create<double>();
+    auto vi = variant<int, double>::create<int>();
+    auto vd = variant<int, double>::create<double>();
 
     Visitor visitor;
     CHECK(vi.apply(visitor) == "int, &");
@@ -414,23 +414,23 @@ TEST_CASE("Double variant apply, visitor l/r-value") {
 }
 
 TEST_CASE("Double variant copy construction") {
-    Variant<int, double> v1(type_tag<int>(), 7);
-    Variant<int, double> v2(v1);
+    variant<int, double> v1(type_tag<int>(), 7);
+    variant<int, double> v2(v1);
     CHECK(v1.tag() == v1.tag<int>());
     CHECK(v2.tag() == v2.tag<int>());
     CHECK(v1.value<int>() == 7);
     CHECK(v2.value<int>() == 7);
 
     static_assert(
-            noexcept(Variant<int, double>::IS_NOTHROW_COPY_CONSTRUCTIBLE),
+            noexcept(variant<int, double>::is_nothrow_copy_constructible),
             "int and double are no-throw copy constructible");
 
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v3(type_tag<Stub>(), actions);
+        variant<int, Stub> v3(type_tag<Stub>(), actions);
         CHECK(actions.size() == 1);
 
-        Variant<int, Stub> v4(v3);
+        variant<int, Stub> v4(v3);
         CHECK(actions.size() == 2);
     }
     CHECK(actions.size() == 4);
@@ -441,21 +441,21 @@ TEST_CASE("Double variant copy construction") {
 }
 
 TEST_CASE("Double variant throwing copy constructor") {
-    Variant<int, CopyMayThrow> v1((type_tag<CopyMayThrow>()));
-    Variant<int, CopyMayThrow> v2(v1);
+    variant<int, CopyMayThrow> v1((type_tag<CopyMayThrow>()));
+    variant<int, CopyMayThrow> v2(v1);
 
     static_assert(
-            noexcept(Variant<int, CopyMayThrow>::
-                    IS_NOTHROW_COPY_CONSTRUCTIBLE),
+            noexcept(variant<int, CopyMayThrow>::
+                    is_nothrow_copy_constructible),
             "CopyMayThrow has a copy constructor that may throw");
 }
 
 TEST_CASE("Double variant deleted copy constructor") {
-    Variant<int, NonCopyable> v1((type_tag<NonCopyable>()));
-    // Variant<int, NonCopyable> v2(v1);
+    variant<int, NonCopyable> v1((type_tag<NonCopyable>()));
+    // variant<int, NonCopyable> v2(v1);
 
     static_assert(
-            !std::is_copy_constructible<Variant<int, NonCopyable>>::value,
+            !std::is_copy_constructible<variant<int, NonCopyable>>::value,
             "NonCopyable has no copy constructor");
 }
 
@@ -463,11 +463,11 @@ TEST_CASE("Double/quad variant copy construction to supertype") {
     const int I = 17;
     const double D = 2.5;
 
-    const Variant<int, double> v2i(type_tag<int>(), I);
-    const Variant<int, double> v2d(type_tag<double>(), D);
+    const variant<int, double> v2i(type_tag<int>(), I);
+    const variant<int, double> v2d(type_tag<double>(), D);
 
-    const Variant<double, float, int, long> v4i(v2i);
-    const Variant<double, float, int, long> v4d(v2d);
+    const variant<double, float, int, long> v4i(v2i);
+    const variant<double, float, int, long> v4d(v2d);
 
     REQUIRE(v4i.tag() == v4i.tag<int>());
     REQUIRE(v4d.tag() == v4d.tag<double>());
@@ -476,22 +476,22 @@ TEST_CASE("Double/quad variant copy construction to supertype") {
 }
 
 TEST_CASE("Double variant move construction") {
-    Variant<int, double> v1(type_tag<int>(), 7);
-    Variant<int, double> v2(std::move(v1));
+    variant<int, double> v1(type_tag<int>(), 7);
+    variant<int, double> v2(std::move(v1));
     REQUIRE(v1.tag() == v1.tag<int>());
     REQUIRE(v2.tag() == v2.tag<int>());
     CHECK(v2.value<int>() == 7);
 
     static_assert(
-            noexcept(Variant<int, double>::IS_NOTHROW_MOVE_CONSTRUCTIBLE),
+            noexcept(variant<int, double>::is_nothrow_move_constructible),
             "int and double are no-throw move constructible");
 
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v3(type_tag<Stub>(), actions);
+        variant<int, Stub> v3(type_tag<Stub>(), actions);
         CHECK(actions.size() == 1);
 
-        Variant<int, Stub> v4(std::move(v3));
+        variant<int, Stub> v4(std::move(v3));
         CHECK(actions.size() == 2);
     }
     CHECK(actions.size() == 4);
@@ -502,21 +502,21 @@ TEST_CASE("Double variant move construction") {
 }
 
 TEST_CASE("Double variant throwing move constructor") {
-    Variant<int, MoveMayThrow> v1((type_tag<MoveMayThrow>()));
-    Variant<int, MoveMayThrow> v2(std::move(v1));
+    variant<int, MoveMayThrow> v1((type_tag<MoveMayThrow>()));
+    variant<int, MoveMayThrow> v2(std::move(v1));
 
     static_assert(
-            noexcept(Variant<int, MoveMayThrow>::
-                    IS_NOTHROW_MOVE_CONSTRUCTIBLE),
+            noexcept(variant<int, MoveMayThrow>::
+                    is_nothrow_move_constructible),
             "MoveMayThrow has a move constructor that may throw");
 }
 
 TEST_CASE("Double variant deleted move constructor") {
-    Variant<int, NonMovable> v1((type_tag<NonMovable>()));
-    // Variant<int, NonMovable> v2(std::move(v1));
+    variant<int, NonMovable> v1((type_tag<NonMovable>()));
+    // variant<int, NonMovable> v2(std::move(v1));
 
     static_assert(
-            !std::is_move_constructible<Variant<int, NonMovable>>::value,
+            !std::is_move_constructible<variant<int, NonMovable>>::value,
             "NonMovable has no move constructor");
 }
 
@@ -534,8 +534,8 @@ TEST_CASE("Double/quad variant move construction to supertype") {
     const int I = 3;
     const double D = -7.0;
 
-    using V2 = Variant<MoveOnlyInt, MoveOnlyDouble>;
-    using V4 = Variant<float, MoveOnlyDouble, int, MoveOnlyInt>;
+    using V2 = variant<MoveOnlyInt, MoveOnlyDouble>;
+    using V4 = variant<float, MoveOnlyDouble, int, MoveOnlyInt>;
 
     V2 v2i(type_tag<MoveOnlyInt>(), I);
     V2 v2d(type_tag<MoveOnlyDouble>(), D);
@@ -552,7 +552,7 @@ TEST_CASE("Double/quad variant move construction to supertype") {
 TEST_CASE("Double variant emplacement") {
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v(type_tag<int>(), 1);
+        variant<int, Stub> v(type_tag<int>(), 1);
         CHECK(v.value<int>() == 1);
 
         CHECK_NOTHROW(v.emplace(type_tag<Stub>(), actions));
@@ -570,52 +570,54 @@ TEST_CASE("Double variant emplacement") {
 }
 
 TEST_CASE("Double variant emplacement with fallback") {
-    Variant<int, MoveThrows> v(type_tag<int>(), 1);
-    CHECK_NOTHROW(v.emplaceWithFallback<int>(type_tag<MoveThrows>()));
+    variant<int, MoveThrows> v(type_tag<int>(), 1);
+    CHECK_NOTHROW(v.emplace_with_fallback<int>(type_tag<MoveThrows>()));
     CHECK(v.tag() == v.tag<MoveThrows>());
-    CHECK_NOTHROW(v.emplaceWithFallback<int>(2));
+    CHECK_NOTHROW(v.emplace_with_fallback<int>(2));
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 2);
-    CHECK_THROWS_AS(v.emplaceWithFallback<int>(MoveThrows()), Exception);
+    CHECK_THROWS_AS(v.emplace_with_fallback<int>(MoveThrows()), Exception);
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 0);
 }
 
 TEST_CASE("Double variant emplacement with backup, without actual backup") {
-    Variant<int, double> v = 1.0;
-    static_assert(noexcept(v.emplaceWithBackup(2)), "emplacement is noexcept");
-    v.emplaceWithBackup(2);
+    variant<int, double> v = 1.0;
+    static_assert(
+            noexcept(v.emplace_with_backup(2)), "emplacement is noexcept");
+    v.emplace_with_backup(2);
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 2);
 }
 
 TEST_CASE("Double variant emplacement with backup, with actual backup") {
-    Variant<int, DefaultMayThrow> v = 1;
-    CHECK_NOTHROW(v.emplaceWithBackup(type_tag<DefaultMayThrow>()));
+    variant<int, DefaultMayThrow> v = 1;
+    CHECK_NOTHROW(v.emplace_with_backup(type_tag<DefaultMayThrow>()));
     CHECK(v.tag() == v.tag<DefaultMayThrow>());
 }
 
 TEST_CASE("Double variant emplacement with backup; "
         "exception in new value construction") {
-    Variant<int, DefaultThrows> v = 1;
-    CHECK_THROWS_AS(v.emplaceWithBackup(type_tag<DefaultThrows>()), Exception);
+    variant<int, DefaultThrows> v = 1;
+    CHECK_THROWS_AS(
+            v.emplace_with_backup(type_tag<DefaultThrows>()), Exception);
     REQUIRE(v.tag() == v.tag<int>());
     CHECK(v.value<int>() == 1);
 }
 
 TEST_CASE("Double variant emplacement with backup; "
         "exception in backup construction") {
-    using V = Variant<MoveThrows, DefaultMayThrow>;
+    using V = variant<MoveThrows, DefaultMayThrow>;
     V v((type_tag<MoveThrows>()));
     CHECK_THROWS_AS(
-            v.emplaceWithBackup(type_tag<DefaultMayThrow>()), Exception);
+            v.emplace_with_backup(type_tag<DefaultMayThrow>()), Exception);
     CHECK(v.tag() == v.tag<MoveThrows>());
 }
 
 TEST_CASE("Double variant reset") {
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v(type_tag<int>(), 1);
+        variant<int, Stub> v(type_tag<int>(), 1);
         CHECK(v.value<int>() == 1);
 
         CHECK_NOTHROW(v.reset(Stub(actions)));
@@ -652,7 +654,7 @@ TEST_CASE("Double variant reset") {
 TEST_CASE("Double variant assignment with same type") {
     std::vector<Action> actions1, actions2;
     {
-        Variant<int, Stub> v(type_tag<Stub>(), actions1);
+        variant<int, Stub> v(type_tag<Stub>(), actions1);
         Stub stub(actions2);
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
@@ -680,7 +682,7 @@ TEST_CASE("Double variant assignment with same type") {
 TEST_CASE("Double variant assignment with different types") {
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v(type_tag<int>(), 1);
+        variant<int, Stub> v(type_tag<int>(), 1);
 
         CHECK_NOTHROW(v.assign(Stub(actions)));
         CHECK(v.tag() == v.tag<Stub>());
@@ -711,8 +713,8 @@ TEST_CASE("Double variant assignment with different types") {
 TEST_CASE("Double variant copy assignment with same tag") {
     std::vector<Action> actions1, actions2;
     {
-        Variant<int, Stub> v1(type_tag<Stub>(), actions1);
-        const Variant<int, Stub> v2(type_tag<Stub>(), actions2);
+        variant<int, Stub> v1(type_tag<Stub>(), actions1);
+        const variant<int, Stub> v2(type_tag<Stub>(), actions2);
 
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
@@ -734,8 +736,8 @@ TEST_CASE("Double variant copy assignment with same tag") {
 TEST_CASE("Double variant copy assignment with different tag") {
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v1(type_tag<int>(), 1);
-        const Variant<int, Stub> v2(type_tag<Stub>(), actions);
+        variant<int, Stub> v1(type_tag<int>(), 1);
+        const variant<int, Stub> v2(type_tag<Stub>(), actions);
         CHECK(actions.size() == 1);
 
         CHECK_NOTHROW(v1 = v2);
@@ -757,8 +759,8 @@ TEST_CASE("Double variant copy assignment with same tag & exception") {
 
     std::vector<Action> actions1, actions2;
     {
-        Variant<int, ThrowingStub> v1(type_tag<ThrowingStub>(), actions1);
-        const Variant<int, ThrowingStub> v2(
+        variant<int, ThrowingStub> v1(type_tag<ThrowingStub>(), actions1);
+        const variant<int, ThrowingStub> v2(
                 type_tag<ThrowingStub>(), actions2);
 
         CHECK(actions1.size() == 1);
@@ -779,18 +781,18 @@ TEST_CASE("Double variant copy assignment with same tag & exception") {
 
 TEST_CASE("Double variant copy assignment with different tag & exception") {
     static_assert(
-            std::is_copy_assignable<Variant<int, Stub>>::value,
+            std::is_copy_assignable<variant<int, Stub>>::value,
             "int and Stub are copy-assignable");
     static_assert(
-            std::is_nothrow_copy_assignable<Variant<int, double>>::value,
+            std::is_nothrow_copy_assignable<variant<int, double>>::value,
             "int and double are no-throw copy-assignable");
     static_assert(
-            !std::is_nothrow_copy_assignable<Variant<CopyThrows>>::value,
+            !std::is_nothrow_copy_assignable<variant<CopyThrows>>::value,
             "MoveThrows is copy-assignable but throwing");
 
     std::vector<Action> actions;
-    Variant<Stub, CopyThrows> v1(type_tag<Stub>(), actions);
-    Variant<Stub, CopyThrows> v2((type_tag<CopyThrows>()));
+    variant<Stub, CopyThrows> v1(type_tag<Stub>(), actions);
+    variant<Stub, CopyThrows> v2((type_tag<CopyThrows>()));
     CHECK_THROWS_AS(v1 = v2, Exception);
     CHECK(v1.tag() == v1.tag<Stub>());
     CHECK(v2.tag() == v1.tag<CopyThrows>());
@@ -803,7 +805,7 @@ TEST_CASE("Double variant copy assignment with different tag & exception") {
 }
 
 TEST_CASE("Double variant no copy assignment") {
-    using V = Variant<Stub, NonCopyAssignable>;
+    using V = variant<Stub, NonCopyAssignable>;
 
     V v((type_tag<NonCopyAssignable>()));
     // v = v;
@@ -817,11 +819,11 @@ TEST_CASE("Double/quad variant copy assignment to supertype") {
     const int I = 17;
     const double D = 2.5;
 
-    const Variant<int, double> v2i(type_tag<int>(), I);
-    const Variant<int, double> v2d(type_tag<double>(), D);
+    const variant<int, double> v2i(type_tag<int>(), I);
+    const variant<int, double> v2d(type_tag<double>(), D);
 
-    Variant<double, float, int, long> v4fi(type_tag<float>(), 1.23f);
-    Variant<double, float, int, long> v4ld(type_tag<long>(), 92L);
+    variant<double, float, int, long> v4fi(type_tag<float>(), 1.23f);
+    variant<double, float, int, long> v4ld(type_tag<long>(), 92L);
 
     v4fi = v2i;
     v4ld = v2d;
@@ -833,8 +835,8 @@ TEST_CASE("Double/quad variant copy assignment to supertype") {
 
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v2s(type_tag<int>(), I);
-        Variant<Stub> v1s(type_tag<Stub>(), actions);
+        variant<int, Stub> v2s(type_tag<int>(), I);
+        variant<Stub> v1s(type_tag<Stub>(), actions);
         v2s = v1s;
         CHECK(v2s.tag() == v2s.tag<Stub>());
     }
@@ -848,8 +850,8 @@ TEST_CASE("Double/quad variant copy assignment to supertype") {
 TEST_CASE("Double variant move assignment with same tag") {
     std::vector<Action> actions1, actions2;
     {
-        Variant<int, Stub> v1(type_tag<Stub>(), actions1);
-        Variant<int, Stub> v2(type_tag<Stub>(), actions2);
+        variant<int, Stub> v1(type_tag<Stub>(), actions1);
+        variant<int, Stub> v2(type_tag<Stub>(), actions2);
 
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
@@ -871,8 +873,8 @@ TEST_CASE("Double variant move assignment with same tag") {
 TEST_CASE("Double variant move assignment with different tag") {
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v1(type_tag<int>(), 1);
-        Variant<int, Stub> v2(type_tag<Stub>(), actions);
+        variant<int, Stub> v1(type_tag<int>(), 1);
+        variant<int, Stub> v2(type_tag<Stub>(), actions);
         CHECK(actions.size() == 1);
 
         CHECK_NOTHROW(v1 = std::move(v2));
@@ -895,8 +897,8 @@ TEST_CASE("Double variant move assignment with same tag & exception") {
 
     std::vector<Action> actions1, actions2;
     {
-        Variant<int, ThrowingStub> v1(type_tag<ThrowingStub>(), actions1);
-        Variant<int, ThrowingStub> v2(type_tag<ThrowingStub>(), actions2);
+        variant<int, ThrowingStub> v1(type_tag<ThrowingStub>(), actions1);
+        variant<int, ThrowingStub> v2(type_tag<ThrowingStub>(), actions2);
 
         CHECK(actions1.size() == 1);
         CHECK(actions2.size() == 1);
@@ -916,18 +918,18 @@ TEST_CASE("Double variant move assignment with same tag & exception") {
 
 TEST_CASE("Double variant move assignment with different tag & exception") {
     static_assert(
-            std::is_move_assignable<Variant<int, Stub>>::value,
+            std::is_move_assignable<variant<int, Stub>>::value,
             "int and Stub are move-assignable");
     static_assert(
-            std::is_nothrow_move_assignable<Variant<int, double>>::value,
+            std::is_nothrow_move_assignable<variant<int, double>>::value,
             "int and double are no-throw move-assignable");
     static_assert(
-            !std::is_nothrow_move_assignable<Variant<MoveThrows>>::value,
+            !std::is_nothrow_move_assignable<variant<MoveThrows>>::value,
             "MoveThrows is move-assignable but throwing");
 
     std::vector<Action> actions;
-    Variant<Stub, MoveThrows> v1(type_tag<Stub>(), actions);
-    Variant<Stub, MoveThrows> v2((type_tag<MoveThrows>()));
+    variant<Stub, MoveThrows> v1(type_tag<Stub>(), actions);
+    variant<Stub, MoveThrows> v2((type_tag<MoveThrows>()));
     CHECK_THROWS_AS(v1 = std::move(v2), Exception);
     CHECK(v1.tag() == v1.tag<Stub>());
     CHECK(v2.tag() == v1.tag<MoveThrows>());
@@ -940,7 +942,7 @@ TEST_CASE("Double variant move assignment with different tag & exception") {
 }
 
 TEST_CASE("Double variant no move assignment") {
-    using V = Variant<Stub, NonMoveAssignable>;
+    using V = variant<Stub, NonMoveAssignable>;
 
     V v((type_tag<NonMoveAssignable>()));
 //    v = std::move(v);
@@ -954,11 +956,11 @@ TEST_CASE("Double/quad variant move assignment to supertype") {
     const int I = 17;
     const double D = 2.5;
 
-    Variant<double, float, int, long> v4fi(type_tag<float>(), 1.23f);
-    Variant<double, float, int, long> v4ld(type_tag<long>(), 92L);
+    variant<double, float, int, long> v4fi(type_tag<float>(), 1.23f);
+    variant<double, float, int, long> v4ld(type_tag<long>(), 92L);
 
-    v4fi = Variant<int, double>(type_tag<int>(), I);
-    v4ld = Variant<int, double>(type_tag<double>(), D);
+    v4fi = variant<int, double>(type_tag<int>(), I);
+    v4ld = variant<int, double>(type_tag<double>(), D);
 
     REQUIRE(v4fi.tag() == v4fi.tag<int>());
     REQUIRE(v4ld.tag() == v4ld.tag<double>());
@@ -967,8 +969,8 @@ TEST_CASE("Double/quad variant move assignment to supertype") {
 
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v2s(type_tag<int>(), I);
-        v2s = Variant<Stub>(type_tag<Stub>(), actions);
+        variant<int, Stub> v2s(type_tag<int>(), I);
+        v2s = variant<Stub>(type_tag<Stub>(), actions);
         CHECK(v2s.tag() == v2s.tag<Stub>());
     }
     CHECK(actions.size() == 4);
@@ -979,13 +981,13 @@ TEST_CASE("Double/quad variant move assignment to supertype") {
 }
 
 TEST_CASE("Double variant create") {
-    Variant<int, double>::create<int>(4);
-    Variant<int, double>::create<double>(3.14);
+    variant<int, double>::create<int>(4);
+    variant<int, double>::create<double>(3.14);
 
-    Variant<int, double> v1(Variant<int, double>::create<int>(2));
-    Variant<int, double> v2(Variant<int, double>::create<double>(5.5));
+    variant<int, double> v1(variant<int, double>::create<int>(2));
+    variant<int, double> v2(variant<int, double>::create<double>(5.5));
 
-    using V = Variant<std::string, std::wstring, std::vector<char>>;
+    using V = variant<std::string, std::wstring, std::vector<char>>;
     V v3 = V::create<std::string>("Hello");
     V v4 = V::create<std::wstring>(7, '!');
     V v5 = V::create<std::vector<char>>({'?', '%'});
@@ -1003,8 +1005,8 @@ TEST_CASE("Double variant create") {
 TEST_CASE("Double variant of") {
     int intArray[] = {19};
 
-    Variant<int *, const char *> v1 = intArray;
-    Variant<int *, const char *> v2 = "char array";
+    variant<int *, const char *> v1 = intArray;
+    variant<int *, const char *> v2 = "char array";
 
     REQUIRE(v1.tag() == v1.tag<int *>());
     CHECK(v1.value<int *>() == intArray);
@@ -1013,7 +1015,7 @@ TEST_CASE("Double variant of") {
 
     std::vector<Action> actions;
     {
-        Variant<int, Stub> v3 = Stub(actions);
+        variant<int, Stub> v3 = Stub(actions);
         CHECK(v3.tag() == v3.tag<Stub>());
     }
     CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
@@ -1021,7 +1023,7 @@ TEST_CASE("Double variant of") {
 
     {
         Stub s(actions);
-        Variant<int, Stub> v4 = s;
+        variant<int, Stub> v4 = s;
         CHECK(v4.tag() == v4.tag<Stub>());
     }
     CHECK(contains(actions, Action::COPY_CONSTRUCTION));
@@ -1030,10 +1032,10 @@ TEST_CASE("Double variant of") {
 TEST_CASE("Double variant result of") {
     int i = 42;
     double d = 123.0;
-    Variant<int, double> vi =
-            Variant<int, double>::resultOf([&i] { return i; });
-    Variant<int, double> vd =
-            Variant<int, double>::resultOf([&d] { return d; });
+    variant<int, double> vi =
+            variant<int, double>::result_of([&i] { return i; });
+    variant<int, double> vd =
+            variant<int, double>::result_of([&d] { return d; });
     REQUIRE(vi.tag() == vi.tag<int>());
     CHECK(vi.value<int>() == 42);
     REQUIRE(vd.tag() == vd.tag<double>());
@@ -1043,8 +1045,8 @@ TEST_CASE("Double variant result of") {
 TEST_CASE("Double variant swapping with same type") {
     using std::swap; // test against the swappable concept
 
-    Variant<int, double> v1 = 7;
-    Variant<int, double> v2 = 13;
+    variant<int, double> v1 = 7;
+    variant<int, double> v2 = 13;
     swap(v1, v2);
     REQUIRE(v1.tag() == v1.tag<int>());
     CHECK(v1.value<int>() == 13);
@@ -1063,8 +1065,8 @@ TEST_CASE("Double variant swapping with same type") {
 TEST_CASE("Double variant swapping with different type") {
     using std::swap; // test against the swappable concept
 
-    Variant<int, double> v1 = 5;
-    Variant<int, double> v2 = 13.5;
+    variant<int, double> v1 = 5;
+    variant<int, double> v2 = 13.5;
 
     swap(v1, v2);
     REQUIRE(v1.tag() == v1.tag<double>());
@@ -1080,25 +1082,25 @@ TEST_CASE("Double variant swapping with different type") {
 }
 
 //TEST_CASE("Double variant unswappable") {
-//    Variant<int, MoveThrows> v1(type_tag<int>(), 3);
-//    Variant<int, MoveThrows> v2((type_tag<MoveThrows>()));
+//    variant<int, MoveThrows> v1(type_tag<int>(), 3);
+//    variant<int, MoveThrows> v2((type_tag<MoveThrows>()));
 //    swap(v1, v2);
 //}
 
 //TEST_CASE("Double variant throwing swapper") {
     static_assert(
-            Variant<int, double>::IS_NOTHROW_SWAPPABLE,
+            variant<int, double>::is_nothrow_swappable,
             "int swap never throws");
     static_assert(
-            !Variant<int, CopyMayThrow>::IS_NOTHROW_SWAPPABLE,
+            !variant<int, CopyMayThrow>::is_nothrow_swappable,
             "CopyMayThrow swap may throw");
 //}
 
 TEST_CASE("Double variant operator==") {
-    Variant<int, double> i1 = 42;
-    Variant<int, double> i2 = 123;
-    Variant<int, double> d1 = 42.0;
-    Variant<int, double> d2 = 123.0;
+    variant<int, double> i1 = 42;
+    variant<int, double> i2 = 123;
+    variant<int, double> d1 = 42.0;
+    variant<int, double> d2 = 123.0;
 
     CHECK(i1 == i1);
     CHECK(i2 == i2);
@@ -1123,10 +1125,10 @@ TEST_CASE("Double variant operator==") {
 }
 
 TEST_CASE("Double variant operator<") {
-    Variant<int, double> i1 = 42;
-    Variant<int, double> i2 = 123;
-    Variant<int, double> d1 = 42.0;
-    Variant<int, double> d2 = 123.0;
+    variant<int, double> i1 = 42;
+    variant<int, double> i2 = 123;
+    variant<int, double> d1 = 42.0;
+    variant<int, double> d2 = 123.0;
 
     CHECK_FALSE(i1 < i1);
     CHECK_FALSE(i2 < i2);

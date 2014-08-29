@@ -22,7 +22,7 @@
 
 #include <cstddef>
 #include <system_error>
-#include "common/Variant.hh"
+#include "common/variant.hh"
 #include "os/io/FileDescriptor.hh"
 
 namespace sesh {
@@ -34,7 +34,7 @@ class WriterApi {
 
 public:
 
-    using WriteResult = common::Variant<std::size_t, std::error_code>;
+    using WriteResult = common::variant<std::size_t, std::error_code>;
 
     /**
      * Writes bytes to the given file descriptor. This function may block on

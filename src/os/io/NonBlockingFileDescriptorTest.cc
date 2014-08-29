@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <system_error>
-#include "common/Variant.hh"
+#include "common/variant.hh"
 #include "os/io/FileDescriptionAccessMode.hh"
 #include "os/io/FileDescriptionApi.hh"
 #include "os/io/FileDescriptionAttribute.hh"
@@ -32,7 +32,7 @@
 
 namespace {
 
-using sesh::common::Variant;
+using sesh::common::variant;
 using sesh::os::io::FileDescriptionAccessMode;
 using sesh::os::io::FileDescriptionApi;
 using sesh::os::io::FileDescriptionAttribute;
@@ -48,7 +48,7 @@ public:
 
     constexpr static FileDescriptor::Value value() noexcept { return 3; }
 
-    Variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
     getFileDescriptionStatus(const FileDescriptor &fd) const override {
         CHECK(fd.isValid());
         CHECK(fd.value() == value());
@@ -130,7 +130,7 @@ public:
     explicit FileDescriptionApiMock(bool isNonBlocking) noexcept :
             isNonBlocking(isNonBlocking) { }
 
-    Variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
     getFileDescriptionStatus(const FileDescriptor &fd) const override {
         CHECK(fd.isValid());
         CHECK(fd.value() == value());

@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <system_error>
-#include "common/Variant.hh"
+#include "common/variant.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
 
@@ -42,7 +42,7 @@ public:
      * instance or a non-zero system error code.
      */
     virtual
-    common::Variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    common::variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
     getFileDescriptionStatus(const FileDescriptor &) const = 0;
 
     /**

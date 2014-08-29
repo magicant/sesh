@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <system_error>
-#include "common/Variant.hh"
+#include "common/variant.hh"
 #include "os/capitypes.h"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
@@ -62,7 +62,7 @@ public:
     class Ignore { };
 
     using SignalAction =
-            common::Variant<Default, Ignore, sesh_osapi_signal_handler *>;
+            common::variant<Default, Ignore, sesh_osapi_signal_handler *>;
 
     /**
      * Changes and/or queries the signal handler setting for a signal.

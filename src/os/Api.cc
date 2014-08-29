@@ -24,11 +24,11 @@
 #include <new>
 #include <stdexcept>
 #include <system_error>
-#include "common/Variant.hh"
 #include "common/enum_iterator.hh"
 #include "common/enum_set.hh"
 #include "common/errno_helper.hh"
 #include "common/type_tag.hh"
+#include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/capi.h"
 #include "os/io/FileDescriptionAccessMode.hh"
@@ -41,11 +41,11 @@
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::common::Variant;
 using sesh::common::enum_set;
 using sesh::common::enumerators;
 using sesh::common::errno_code;
 using sesh::common::type_tag;
+using sesh::common::variant;
 using sesh::os::io::FileDescriptionAccessMode;
 using sesh::os::io::FileDescriptionAttribute;
 using sesh::os::io::FileDescriptionStatus;
@@ -385,7 +385,7 @@ class ApiImpl : public Api {
     }
 
     auto getFileDescriptionStatus(const FileDescriptor &fd) const
-            -> Variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+            -> variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
             final override {
         int flags = sesh_osapi_fcntl_getfl(fd.value());
         if (flags == -1)
@@ -403,7 +403,7 @@ class ApiImpl : public Api {
         return std::error_code();
     }
 
-    Variant<FileDescriptor, std::error_code> open(
+    variant<FileDescriptor, std::error_code> open(
             const char *path,
             FileDescriptionAccessMode accessMode,
             enum_set<FileDescriptionAttribute> attributes,

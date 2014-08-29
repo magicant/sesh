@@ -29,8 +29,8 @@
 #include "async/Future.hh"
 #include "async/Promise.hh"
 #include "common/Try.hh"
-#include "common/Variant.hh"
 #include "common/type_tag_test_helper.hh"
+#include "common/variant.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Trigger.hh"
@@ -48,7 +48,7 @@ using sesh::async::createFailedFutureOf;
 using sesh::async::createFuture;
 using sesh::async::createPromiseFuturePair;
 using sesh::common::Try;
-using sesh::common::Variant;
+using sesh::common::variant;
 using sesh::os::event::Proactor;
 using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Trigger;
@@ -60,7 +60,7 @@ using sesh::os::io::read;
 
 using ResultPair = std::pair<
         NonBlockingFileDescriptor,
-        Variant<std::vector<char>, std::error_code>>;
+        variant<std::vector<char>, std::error_code>>;
 
 class UncallableReaderApi : public ReaderApi {
 

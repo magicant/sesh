@@ -99,7 +99,6 @@ src_sesh_SOURCES = \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
 	src/common/Try.hh \
-	src/common/Variant.hh \
 	src/common/common_result.hh \
 	src/common/container_helper.hh \
 	src/common/copy.hh \
@@ -115,6 +114,7 @@ src_sesh_SOURCES = \
 	src/common/integer_sequence.hh \
 	src/common/nop.hh \
 	src/common/type_tag.hh \
+	src/common/variant.hh \
 	src/common/xchar.hh \
 	src/common/xstring.hh \
 	src/helpermacros.h \
