@@ -15,45 +15,42 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_ReferenceTest_hh
-#define INCLUDED_common_ReferenceTest_hh
-
 #include "buildconfig.h"
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common/Reference.hh"
+#include "common/reference.hh"
 
 namespace {
 
-using sesh::common::Reference;
+using sesh::common::reference;
 
 unsigned identity(unsigned long v) noexcept {
     return static_cast<unsigned>(v);
 }
 
-struct NonCopyable {
-    NonCopyable() = default;
-    NonCopyable(const NonCopyable &) = delete;
-    NonCopyable(NonCopyable &&) = default;
-    NonCopyable &operator=(const NonCopyable &) = delete;
-    NonCopyable &operator=(NonCopyable &&) = default;
+struct non_copyable {
+    non_copyable() = default;
+    non_copyable(const non_copyable &) = delete;
+    non_copyable(non_copyable &&) = default;
+    non_copyable &operator=(const non_copyable &) = delete;
+    non_copyable &operator=(non_copyable &&) = default;
 };
 
 TEST_CASE("Reference, construction") {
     int i;
-    const Reference<int> r1 = i;
-    Reference<int> r2 = r1;
-    Reference<int> r3 = static_cast<Reference<int> &&>(r2);
-    Reference<int> r4 = std::ref(i);
+    const reference<int> r1 = i;
+    reference<int> r2 = r1;
+    reference<int> r3 = static_cast<reference<int> &&>(r2);
+    reference<int> r4 = std::ref(i);
     (void) r3, (void) r4;
 }
 
 TEST_CASE("Reference, get and assignment") {
     int i1 = 111, i2 = 222;
-    Reference<int> r1 = i1;
-    const Reference<int> r2 = i2;
+    reference<int> r1 = i1;
+    const reference<int> r2 = i2;
     CHECK(&r1.get() == &i1);
     CHECK(&r2.get() == &i2);
 
@@ -61,7 +58,7 @@ TEST_CASE("Reference, get and assignment") {
     CHECK(&r1.get() == &i2);
     CHECK(&r2.get() == &i2);
 
-    r1 = Reference<int>(i1);
+    r1 = reference<int>(i1);
     CHECK(&r1.get() == &i1);
     CHECK(&r2.get() == &i2);
 
@@ -71,25 +68,23 @@ TEST_CASE("Reference, get and assignment") {
 }
 
 TEST_CASE("Reference, operator()") {
-    Reference<unsigned(unsigned long)> r = identity;
+    reference<unsigned(unsigned long)> r = identity;
     CHECK(r(42L) == 42);
 }
 
 TEST_CASE("Reference, movability") {
-    struct Wrapper {
-        NonCopyable nc;
-        Reference<int> r;
-        Wrapper(int &i) : r(i) { }
+    struct wrapper {
+        non_copyable nc;
+        reference<int> r;
+        wrapper(int &i) : r(i) { }
     };
 
     int i;
-    Wrapper w1(i);
-    Wrapper w2 = static_cast<Wrapper &&>(w1);
-    w1 = static_cast<Wrapper &&>(w2);
+    wrapper w1(i);
+    wrapper w2 = static_cast<wrapper &&>(w1);
+    w1 = static_cast<wrapper &&>(w2);
 }
 
 } // namespace
-
-#endif // #ifndef INCLUDED_common_ReferenceTest_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

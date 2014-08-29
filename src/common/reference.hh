@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_Reference_hh
-#define INCLUDED_common_Reference_hh
+#ifndef INCLUDED_common_reference_hh
+#define INCLUDED_common_reference_hh
 
 #include "buildconfig.h"
 
@@ -26,7 +26,8 @@ namespace sesh {
 namespace common {
 
 /**
- * Reference is an extension of std::reference_wrapper that is truly movable.
+ * The reference class template is an extension of std::reference_wrapper that
+ * is truly movable.
  *
  * The C++11 standard is too strict as to when a implicitly-declared move
  * constructor and assignment operator can be implicitly defined. They are
@@ -41,35 +42,35 @@ namespace common {
  * operators.
  */
 template<typename T>
-class Reference : public std::reference_wrapper<T> {
+class reference : public std::reference_wrapper<T> {
 
 private:
 
-    using Base = std::reference_wrapper<T>;
+    using base = std::reference_wrapper<T>;
 
 public:
 
-    using Base::Base;
+    using base::base;
 
-    Reference(const Reference &r) noexcept : Base(r) { }
-    Reference(Reference &&r) noexcept : Base(r) { }
+    reference(const reference &r) noexcept : base(r) { }
+    reference(reference &&r) noexcept : base(r) { }
 
-    Reference(const Base &r) noexcept : Base(r) { }
+    reference(const base &r) noexcept : base(r) { }
 
-    Reference &operator=(const Reference &r) noexcept {
-        Base::operator=(r);
+    reference &operator=(const reference &r) noexcept {
+        base::operator=(r);
         return *this;
     }
-    Reference &operator=(Reference &&r) noexcept {
-        Base::operator=(r);
+    reference &operator=(reference &&r) noexcept {
+        base::operator=(r);
         return *this;
     }
 
-}; // class Reference
+}; // template<typename T> class reference
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_Reference_hh
+#endif // #ifndef INCLUDED_common_reference_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
