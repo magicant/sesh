@@ -34,91 +34,91 @@ using sesh::common::contains;
 using sesh::common::maybe;
 using sesh::common::type_tag;
 
-enum class Action {
-    STANDARD_CONSTRUCTION,
-    COPY_CONSTRUCTION,
-    MOVE_CONSTRUCTION,
-    COPY_ASSIGNMENT,
-    MOVE_ASSIGNMENT,
-    DESTRUCTION,
+enum class action {
+    standard_construction,
+    copy_construction,
+    move_construction,
+    copy_assignment,
+    move_assignment,
+    destruction,
 };
 
-class Stub {
+class stub {
 
 private:
 
-    std::vector<Action> &mVector;
+    std::vector<action> &m_vector;
 
 public:
 
-    Stub(std::vector<Action> &v) noexcept : mVector(v) {
-        mVector.emplace_back(Action::STANDARD_CONSTRUCTION);
+    stub(std::vector<action> &v) noexcept : m_vector(v) {
+        m_vector.emplace_back(action::standard_construction);
     }
 
-    Stub(const Stub &s) noexcept : mVector(s.mVector) {
-        mVector.emplace_back(Action::COPY_CONSTRUCTION);
+    stub(const stub &s) noexcept : m_vector(s.m_vector) {
+        m_vector.emplace_back(action::copy_construction);
     }
 
-    Stub(Stub &&s) noexcept : mVector(s.mVector) {
-        mVector.emplace_back(Action::MOVE_CONSTRUCTION);
+    stub(stub &&s) noexcept : m_vector(s.m_vector) {
+        m_vector.emplace_back(action::move_construction);
     }
 
-    Stub &operator=(const Stub &) {
-        mVector.emplace_back(Action::COPY_ASSIGNMENT);
+    stub &operator=(const stub &) {
+        m_vector.emplace_back(action::copy_assignment);
         return *this;
     }
 
-    Stub &operator=(Stub &&) {
-        mVector.emplace_back(Action::MOVE_ASSIGNMENT);
+    stub &operator=(stub &&) {
+        m_vector.emplace_back(action::move_assignment);
         return *this;
     }
 
-    ~Stub() {
-        mVector.emplace_back(Action::DESTRUCTION);
+    ~stub() {
+        m_vector.emplace_back(action::destruction);
     }
 
 };
 
-struct Exception : public std::exception {
+struct exception : public std::exception {
     using std::exception::exception;
 };
-struct NonConstructible {
-    NonConstructible() = delete;
+struct non_constructible {
+    non_constructible() = delete;
 };
-struct DefaultThrows {
-    DefaultThrows() { throw Exception(); }
-    DefaultThrows(int) { }
+struct default_throws {
+    default_throws() { throw exception(); }
+    default_throws(int) { }
 };
-struct CopyOnly {
-    CopyOnly() = default;
-    CopyOnly(const CopyOnly &) = default;
+struct copy_only {
+    copy_only() = default;
+    copy_only(const copy_only &) = default;
 };
-struct MoveOnly {
-    MoveOnly() = default;
-    MoveOnly(const MoveOnly &) = delete;
-    MoveOnly(MoveOnly &&) = default;
+struct move_only {
+    move_only() = default;
+    move_only(const move_only &) = delete;
+    move_only(move_only &&) = default;
 };
-struct DestructorThrows {
-    ~DestructorThrows() noexcept(false) { throw Exception(); }
+struct destructor_throws {
+    ~destructor_throws() noexcept(false) { throw exception(); }
 };
 
-void swap(MoveOnly &, MoveOnly &) noexcept { }
+void swap(move_only &, move_only &) noexcept { }
 
 TEST_CASE("Maybe empty construction") {
     maybe<int> m1;
     const maybe<int> m2(m1);
     const maybe<int> m3(std::move(m2));
 
-    maybe<NonConstructible> m4;
-    const maybe<NonConstructible> m5(m4);
-    const maybe<NonConstructible> m6(std::move(m5));
+    maybe<non_constructible> m4;
+    const maybe<non_constructible> m5(m4);
+    const maybe<non_constructible> m6(std::move(m5));
 
-    maybe<CopyOnly> m7;
-    maybe<CopyOnly> m8(m7);
-    maybe<CopyOnly> m9(std::move(m8));
+    maybe<copy_only> m7;
+    maybe<copy_only> m8(m7);
+    maybe<copy_only> m9(std::move(m8));
 
-    maybe<MoveOnly> m10;
-    maybe<MoveOnly> m11(std::move(m10));
+    maybe<move_only> m10;
+    maybe<move_only> m11(std::move(m10));
 }
 
 TEST_CASE("Maybe non-empty construction with tag") {
@@ -131,10 +131,10 @@ TEST_CASE("Maybe non-empty construction with tag") {
 TEST_CASE("Maybe non-empty construction by copy and move") {
     maybe<int> m1(123);
 
-    CopyOnly c;
-    maybe<CopyOnly> m2(c);
+    copy_only c;
+    maybe<copy_only> m2(c);
 
-    maybe<MoveOnly> m3((MoveOnly()));
+    maybe<move_only> m3((move_only()));
 }
 
 TEST_CASE("Maybe has value") {
@@ -211,25 +211,25 @@ TEST_CASE("Maybe emplacement") {
 }
 
 TEST_CASE("Maybe emplacement with exception from constructor") {
-    maybe<DefaultThrows> m;
+    maybe<default_throws> m;
 
     CHECK_FALSE(m.has_value());
-    CHECK_THROWS_AS(m.emplace(), Exception);
+    CHECK_THROWS_AS(m.emplace(), exception);
     CHECK_FALSE(m.has_value());
 
     CHECK_NOTHROW(m.emplace(0));
     CHECK(m.has_value());
-    CHECK_THROWS_AS(m.emplace(), Exception);
+    CHECK_THROWS_AS(m.emplace(), exception);
     CHECK_FALSE(m.has_value());
 }
 
 TEST_CASE("Maybe emplacement with exception from destructor") {
-    maybe<DestructorThrows> m;
+    maybe<destructor_throws> m;
 
     CHECK_NOTHROW(m.emplace());
     CHECK(m.has_value());
 
-    CHECK_THROWS_AS(m.emplace(), Exception);
+    CHECK_THROWS_AS(m.emplace(), exception);
     CHECK_FALSE(m.has_value());
 }
 
@@ -242,12 +242,12 @@ TEST_CASE("Maybe clear") {
 }
 
 TEST_CASE("Maybe clear with exception from destructor") {
-    maybe<DestructorThrows> m;
+    maybe<destructor_throws> m;
 
     CHECK_NOTHROW(m.emplace());
     CHECK(m.has_value());
 
-    CHECK_THROWS_AS(m.clear(), Exception);
+    CHECK_THROWS_AS(m.clear(), exception);
     CHECK_FALSE(m.has_value());
 }
 
@@ -275,26 +275,26 @@ TEST_CASE("Maybe assignment") {
 }
 
 TEST_CASE("Maybe assignment optimization") {
-    std::vector<Action> actions1, actions2;
+    std::vector<action> actions1, actions2;
     {
-        maybe<Stub> m;
+        maybe<stub> m;
 
-        m = Stub(actions1);
+        m = stub(actions1);
         CHECK(actions1.size() == 3);
 
-        m = Stub(actions2);
+        m = stub(actions2);
         CHECK(actions1.size() == 4);
         CHECK(actions2.size() == 2);
     }
     CHECK(actions1.size() == 5);
-    CHECK(actions1.at(0) == Action::STANDARD_CONSTRUCTION); // of temporary
-    CHECK(actions1.at(1) == Action::MOVE_CONSTRUCTION); // in maybe
-    CHECK(actions1.at(2) == Action::DESTRUCTION); // of temporary
-    CHECK(actions1.at(3) == Action::MOVE_ASSIGNMENT); // into maybe
-    CHECK(actions1.at(4) == Action::DESTRUCTION); // of maybe
+    CHECK(actions1.at(0) == action::standard_construction); // of temporary
+    CHECK(actions1.at(1) == action::move_construction); // in maybe
+    CHECK(actions1.at(2) == action::destruction); // of temporary
+    CHECK(actions1.at(3) == action::move_assignment); // into maybe
+    CHECK(actions1.at(4) == action::destruction); // of maybe
     CHECK(actions2.size() == 2);
-    CHECK(actions2.at(0) == Action::STANDARD_CONSTRUCTION);
-    CHECK(actions2.at(1) == Action::DESTRUCTION);
+    CHECK(actions2.at(0) == action::standard_construction);
+    CHECK(actions2.at(1) == action::destruction);
 }
 
 TEST_CASE("Maybe swap, both non-empty") {
@@ -316,8 +316,8 @@ TEST_CASE("Maybe swap, both non-empty") {
 }
 
 TEST_CASE("Maybe swap, empty and non-empty") {
-    maybe<MoveOnly> m1;
-    maybe<MoveOnly> m2 = MoveOnly();
+    maybe<move_only> m1;
+    maybe<move_only> m2 = move_only();
 
     m1.swap(m2);
     CHECK(m1.has_value());
@@ -387,23 +387,23 @@ TEST_CASE("Maybe, create maybe") {
     REQUIRE(m2.has_value());
     CHECK(m2.value() == "AB");
 
-    auto m3 = make_maybe<MoveOnly>();
+    auto m3 = make_maybe<move_only>();
     CHECK(m3.has_value());
 
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        auto m4 = make_maybe<Stub>(Stub(actions));
+        auto m4 = make_maybe<stub>(stub(actions));
         CHECK(m4.has_value());
     }
-    CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
+    CHECK_FALSE(contains(actions, action::copy_construction));
     actions.clear();
 
     {
-        Stub s(actions);
-        auto m5 = make_maybe<Stub>(s);
+        stub s(actions);
+        auto m5 = make_maybe<stub>(s);
         CHECK(m5.has_value());
     }
-    CHECK(contains(actions, Action::COPY_CONSTRUCTION));
+    CHECK(contains(actions, action::copy_construction));
 }
 
 TEST_CASE("Maybe, create maybe of") {
@@ -417,23 +417,23 @@ TEST_CASE("Maybe, create maybe of") {
     REQUIRE(m2.has_value());
     CHECK(m2.value() == "ABC");
 
-    auto m3 = make_maybe_of(MoveOnly());
+    auto m3 = make_maybe_of(move_only());
     CHECK(m3.has_value());
 
-    std::vector<Action> actions;
+    std::vector<action> actions;
     {
-        auto m4 = make_maybe_of(Stub(actions));
+        auto m4 = make_maybe_of(stub(actions));
         CHECK(m4.has_value());
     }
-    CHECK_FALSE(contains(actions, Action::COPY_CONSTRUCTION));
+    CHECK_FALSE(contains(actions, action::copy_construction));
     actions.clear();
 
     {
-        Stub s(actions);
+        stub s(actions);
         auto m5 = make_maybe_of(s);
         CHECK(m5.has_value());
     }
-    CHECK(contains(actions, Action::COPY_CONSTRUCTION));
+    CHECK(contains(actions, action::copy_construction));
 }
 
 } // namespace
