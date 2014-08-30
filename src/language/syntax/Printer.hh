@@ -23,8 +23,8 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include "common/StringStream.hh"
 #include "common/xostream.hh"
+#include "common/xsstream.hh"
 #include "common/xstring.hh"
 
 namespace sesh {
@@ -70,9 +70,9 @@ public:
 private:
 
     const LineMode mLineMode;
-    common::OutputStringStream mMainBuffer;
-    common::OutputStringStream mDelayedCharacters;
-    common::OutputStringStream mDelayedLines;
+    common::xostringstream mMainBuffer;
+    common::xostringstream mDelayedCharacters;
+    common::xostringstream mDelayedLines;
     std::size_t mIndentLevel;
 
 public:

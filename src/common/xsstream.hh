@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_StringStream_hh
-#define INCLUDED_common_StringStream_hh
+#ifndef INCLUDED_common_xsstream_hh
+#define INCLUDED_common_xsstream_hh
 
 #include "buildconfig.h"
 
@@ -26,14 +26,14 @@
 namespace sesh {
 namespace common {
 
-using StringBuffer = std::basic_stringbuf<xchar>;
-using InputStringStream = std::basic_istringstream<xchar>;
-using OutputStringStream = std::basic_ostringstream<xchar>;
-using StringStream = std::basic_stringstream<xchar>;
+using xstringbuf = std::basic_stringbuf<xchar>;
+using xistringstream = std::basic_istringstream<xchar>;
+using xostringstream = std::basic_ostringstream<xchar>;
+using xstringstream = std::basic_stringstream<xchar>;
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_StringStream_hh
+#endif // #ifndef INCLUDED_common_xsstream_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

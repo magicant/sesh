@@ -89,7 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/StringStream.hh \
 	src/common/Trie.hh \
 	src/common/Try.hh \
 	src/common/common_result.hh \
@@ -116,6 +115,7 @@ src_sesh_SOURCES = \
 	src/common/variant.hh \
 	src/common/xchar.hh \
 	src/common/xostream.hh \
+	src/common/xsstream.hh \
 	src/common/xstring.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
