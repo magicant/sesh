@@ -22,16 +22,16 @@
 #include <cstdint>
 #include <utility>
 #include "async/Future.hh"
-#include "common/Try.hh"
-#include "common/Variant.hh"
+#include "common/trial.hh"
+#include "common/variant.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Trigger.hh"
 
 using sesh::async::Future;
 using sesh::async::createFuture;
-using sesh::common::Try;
-using sesh::common::Variant;
+using sesh::common::trial;
+using sesh::common::variant;
 using sesh::os::event::Proactor;
 using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Trigger;
@@ -44,7 +44,7 @@ namespace {
 
 using ResultPair = std::pair<
         NonBlockingFileDescriptor,
-        Variant<std::vector<char>, std::error_code>>;
+        variant<std::vector<char>, std::error_code>>;
 
 struct Reader {
 
@@ -61,7 +61,7 @@ struct Reader {
         return ResultPair(std::move(fd), std::move(e));
     }
 
-    ResultPair operator()(Try<Trigger> &&t) {
+    ResultPair operator()(trial<Trigger> &&t) {
         try {
             *t;
         } catch (std::domain_error &) {

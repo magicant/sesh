@@ -25,10 +25,10 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include "common/Empty.hh"
-#include "common/Maybe.hh"
-#include "common/Try.hh"
-#include "common/TypeTag.hh"
+#include "common/empty.hh"
+#include "common/maybe.hh"
+#include "common/trial.hh"
+#include "common/type_tag.hh"
 
 namespace sesh {
 namespace async {
@@ -54,20 +54,20 @@ class Delay {
 
 public:
 
-    using Callback = std::function<void(common::Try<T> &&)>;
+    using Callback = std::function<void(common::trial<T> &&)>;
 
 private:
 
-    using Empty = common::Empty;
-    using Try = common::Try<T>;
+    using Empty = common::empty;
+    using Try = common::trial<T>;
     using ForwardSource = std::weak_ptr<Delay>;
     using ForwardTarget = std::shared_ptr<Delay>;
 
-    using Input = common::Variant<Empty, Try, ForwardSource>;
-    using Output = common::Variant<Empty, Callback, ForwardTarget>;
+    using Input = common::variant<Empty, Try, ForwardSource>;
+    using Output = common::variant<Empty, Callback, ForwardTarget>;
 
-    Input mInput = Input(common::TypeTag<Empty>());
-    Output mOutput = Output(common::TypeTag<Empty>());
+    Input mInput = Input(common::type_tag<Empty>());
+    Output mOutput = Output(common::type_tag<Empty>());
 
     void fireIfReady() {
         if (mInput.tag() != mInput.template tag<Try>())
@@ -82,9 +82,9 @@ private:
 public:
 
     /**
-     * Sets the result of this delay object by constructing Try&lt;T> with the
-     * arguments. If the constructor throws, the result is set to the exception
-     * thrown.
+     * Sets the result of this delay object by constructing {@code trial&lt;T>}
+     * with the arguments. If the constructor throws, the result is set to the
+     * exception thrown.
      *
      * The behavior is undefined if the result has already been set.
      *
@@ -100,10 +100,10 @@ public:
                     std::forward<Arg>(arg)...);
 
         try {
-            mInput.template emplaceWithFallback<Empty>(
-                    common::TypeTag<Try>(), std::forward<Arg>(arg)...);
+            mInput.template emplace_with_fallback<Empty>(
+                    common::type_tag<Try>(), std::forward<Arg>(arg)...);
         } catch (...) {
-            mInput.emplace(common::TypeTag<Try>(), std::current_exception());
+            mInput.emplace(common::type_tag<Try>(), std::current_exception());
         }
 
         fireIfReady();
@@ -128,7 +128,7 @@ public:
             return;
         }
 
-        mOutput.template emplaceWithFallback<Empty>(std::move(f));
+        mOutput.template emplace_with_fallback<Empty>(std::move(f));
 
         fireIfReady();
     }
@@ -182,8 +182,9 @@ public:
                     std::move(to->mOutput.template value<Callback>()));
 
         // Connect
-        to->mInput.emplace(common::TypeTag<ForwardSource>(), from);
-        from->mOutput.emplace(common::TypeTag<ForwardTarget>(), std::move(to));
+        to->mInput.emplace(common::type_tag<ForwardSource>(), from);
+        from->mOutput.emplace(
+                common::type_tag<ForwardTarget>(), std::move(to));
     }
 
 }; // template<typename T> class Delay

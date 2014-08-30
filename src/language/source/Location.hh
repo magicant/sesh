@@ -23,8 +23,7 @@
 #include <cstddef>
 #include <memory>
 #include <utility>
-#include "common/Message.hh"
-#include "common/String.hh"
+#include "common/message.hh"
 #include "language/source/Origin.hh"
 
 namespace sesh {

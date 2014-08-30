@@ -22,8 +22,8 @@
 
 #include <memory>
 #include <stdexcept>
-#include "common/Char.hh"
-#include "common/String.hh"
+#include "common/xchar.hh"
+#include "common/xstring.hh"
 #include "language/syntax/AndOrList.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/ConditionalPipeline.hh"
@@ -32,7 +32,7 @@
 
 namespace {
 
-using sesh::common::String;
+using sesh::common::xstring;
 using sesh::language::syntax::AndOrList;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
@@ -56,8 +56,8 @@ Pipeline pipelineStub() {
 void testAndOrListWithoutRest(
         Printer::LineMode lineMode,
         AndOrList::Synchronicity synchronicity,
-        const String withoutDelayed,
-        const String withDelayed) {
+        const xstring withoutDelayed,
+        const xstring withDelayed) {
     AndOrList aol(pipelineStub(), synchronicity);
     Printer p(lineMode);
 
@@ -75,8 +75,8 @@ void testAndOrListWithoutRest(
 void testAndOrListWithRest(
         Printer::LineMode lineMode,
         AndOrList::Synchronicity synchronicity,
-        const String withoutDelayed,
-        const String withDelayed) {
+        const xstring withoutDelayed,
+        const xstring withDelayed) {
     AndOrList aol(pipelineStub(), synchronicity);
     aol.rest().emplace_back(
             ConditionalPipeline::Condition::AND_THEN,

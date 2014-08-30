@@ -22,8 +22,8 @@
 
 #include <memory>
 #include <system_error>
-#include "common/EnumSet.hh"
-#include "common/Variant.hh"
+#include "common/enum_set.hh"
+#include "common/variant.hh"
 #include "os/io/FileDescriptionAccessMode.hh"
 #include "os/io/FileDescriptionAttribute.hh"
 #include "os/io/FileDescriptor.hh"
@@ -45,12 +45,12 @@ public:
      * The file mode set argument is ignored unless the CREATE flag is included
      * in the file descriptor open mode set argument.
      */
-    virtual common::Variant<FileDescriptor, std::error_code> open(
+    virtual common::variant<FileDescriptor, std::error_code> open(
             const char *path,
             FileDescriptionAccessMode,
-            common::EnumSet<FileDescriptionAttribute>,
-            common::EnumSet<FileDescriptorOpenMode>,
-            common::EnumSet<FileMode>) const = 0;
+            common::enum_set<FileDescriptionAttribute>,
+            common::enum_set<FileDescriptorOpenMode>,
+            common::enum_set<FileMode>) const = 0;
 
     /**
      * Closes the given file descriptor. This function may block on some

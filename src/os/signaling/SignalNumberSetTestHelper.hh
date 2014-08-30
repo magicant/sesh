@@ -24,7 +24,7 @@
 #include <iterator>
 #include <set>
 #include <utility>
-#include "common/ContainerHelper.hh"
+#include "common/container_helper.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 

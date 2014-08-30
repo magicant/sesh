@@ -26,8 +26,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "common/IntegerSequence.hh"
-#include "common/SharedFunction.hh"
+#include "common/shared_function.hh"
 
 namespace sesh {
 namespace async {
@@ -35,10 +34,9 @@ namespace future_impl {
 
 template<typename T>
 template<typename Function>
-typename std::enable_if<std::is_void<
-        typename std::result_of<
-                typename std::decay<Function>::type(common::Try<T> &&)>::type
->::value>::type
+typename std::enable_if<std::is_void<typename std::result_of<
+        typename std::decay<Function>::type(common::trial<T> &&)
+>::type>::value>::type
 FutureBase<T>::then(Function &&f) && {
     FutureBase copy = std::move(*this);
     copy.delay().setCallback(std::forward<Function>(f));
@@ -80,7 +78,7 @@ template<typename From>
 template<typename Function, typename To>
 void FutureBase<From>::then(Function &&f, Promise<To> &&p) && {
     using C = Composer<To, typename std::decay<Function>::type>;
-    std::move(*this).then(common::SharedFunction<C>::create(
+    std::move(*this).then(common::shared_function<C>::create(
             std::forward<Function>(f), std::move(p)));
 }
 
@@ -106,12 +104,12 @@ public:
     Mapper(F &&function) : mFunction(std::forward<F>(function)) { }
 
     template<typename From>
-    auto operator()(const common::Try<From> &r) -> decltype(mFunction(*r)) {
+    auto operator()(const common::trial<From> &r) -> decltype(mFunction(*r)) {
         return mFunction(*r);
     }
 
     template<typename From>
-    auto operator()(common::Try<From> &&r)
+    auto operator()(common::trial<From> &&r)
             -> decltype(mFunction(std::move(*r))) {
         return mFunction(std::move(*r));
     }
@@ -146,15 +144,15 @@ public:
     Recoverer(F &&function) : mFunction(std::forward<F>(function)) { }
 
     template<typename T>
-    T operator()(const common::Try<T> &r) {
-        if (r.hasValue())
+    T operator()(const common::trial<T> &r) {
+        if (r.has_value())
             return *r;
         return mFunction(r.template value<std::exception_ptr>());
     }
 
     template<typename T>
-    T operator()(common::Try<T> &&r) {
-        if (r.hasValue())
+    T operator()(common::trial<T> &&r) {
+        if (r.has_value())
             return std::move(*r);
         return mFunction(r.template value<std::exception_ptr>());
     }
@@ -184,7 +182,7 @@ FutureBase<T>::recover(F &&function) && {
 
 template<typename T>
 void FutureBase<T>::forward(Promise<T> &&receiver) && {
-    // std::move(*this).map(common::Identity(), std::move(receiver));
+    // std::move(*this).map(common::identity(), std::move(receiver));
     /*
      * Mapping would leave intermediate delay objects that will not be
      * deallocated until the final result is set. This would cause an
@@ -251,8 +249,8 @@ public:
     explicit Unwrapper(Promise<T> &&receiver) noexcept :
             mReceiver(std::move(receiver)) { }
 
-    void operator()(common::Try<Future<T>> &&r) {
-        if (r.hasValue())
+    void operator()(common::trial<Future<T>> &&r) {
+        if (r.has_value())
             return std::move(*r).forward(std::move(mReceiver));
 
         std::move(mReceiver).fail(r.template value<std::exception_ptr>());
@@ -263,7 +261,7 @@ public:
 template<typename T>
 void Future<Future<T>>::unwrap(Promise<T> &&p) && {
     std::move(*this).then(
-            common::SharedFunction<Unwrapper<T>>::create(std::move(p)));
+            common::shared_function<Unwrapper<T>>::create(std::move(p)));
 }
 
 template<typename T>

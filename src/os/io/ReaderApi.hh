@@ -22,7 +22,7 @@
 
 #include <cstddef>
 #include <system_error>
-#include "common/Variant.hh"
+#include "common/variant.hh"
 #include "os/io/FileDescriptor.hh"
 
 namespace sesh {
@@ -34,7 +34,7 @@ class ReaderApi {
 
 public:
 
-    using ReadResult = common::Variant<std::size_t, std::error_code>;
+    using ReadResult = common::variant<std::size_t, std::error_code>;
 
     /**
      * Reads bytes from the given file descriptor. This function may block on

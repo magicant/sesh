@@ -19,7 +19,7 @@
 #include "AndOrList.hh"
 
 #include <utility>
-#include "common/Char.hh"
+#include "common/xchar.hh"
 #include "language/syntax/Printer.hh"
 
 namespace sesh {

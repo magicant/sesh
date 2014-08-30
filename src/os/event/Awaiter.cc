@@ -29,10 +29,10 @@
 #include <vector>
 #include "async/Future.hh"
 #include "async/Promise.hh"
-#include "common/ContainerHelper.hh"
-#include "common/SharedFunction.hh"
-#include "common/Try.hh"
-#include "common/Variant.hh"
+#include "common/container_helper.hh"
+#include "common/shared_function.hh"
+#include "common/trial.hh"
+#include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/TimeApi.hh"
 #include "os/event/PselectApi.hh"
@@ -46,10 +46,10 @@
 using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::createPromiseFuturePair;
-using sesh::common::SharedFunction;
-using sesh::common::Try;
-using sesh::common::Variant;
 using sesh::common::find_if;
+using sesh::common::shared_function;
+using sesh::common::trial;
+using sesh::common::variant;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfiguration;
@@ -65,7 +65,7 @@ namespace event {
 
 namespace {
 
-using FileDescriptorTrigger = Variant<
+using FileDescriptorTrigger = variant<
         ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
 
 class PendingEvent {
@@ -325,7 +325,7 @@ AwaiterImpl::AwaiterImpl(
 void registerSignalTrigger(
         Signal s, std::shared_ptr<PendingEvent> &e, HandlerConfiguration &hc) {
     auto result = hc.addHandler(
-            s.number(), SharedFunction<SignalHandler>::create(e));
+            s.number(), shared_function<SignalHandler>::create(e));
     switch (result.tag()) {
     case decltype(result)::tag<HandlerConfiguration::Canceler>():
         return e->addCanceler(
@@ -339,7 +339,7 @@ void registerUserProvidedTrigger(
         UserProvidedTrigger &&t, std::shared_ptr<PendingEvent> &e) {
     using Result = UserProvidedTrigger::Result;
     std::weak_ptr<PendingEvent> w = e;
-    std::move(t.future()).then([w](Try<Result> &&t) {
+    std::move(t.future()).then([w](trial<Result> &&t) {
         if (std::shared_ptr<PendingEvent> e = w.lock()) {
             try {
                 e->fire(UserProvidedTrigger(std::move(*t)));

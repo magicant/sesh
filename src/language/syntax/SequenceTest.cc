@@ -20,8 +20,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "common/Char.hh"
-#include "common/String.hh"
+#include "common/xchar.hh"
+#include "common/xstring.hh"
 #include "language/syntax/AndOrList.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/ConditionalPipeline.hh"
@@ -31,7 +31,7 @@
 
 namespace {
 
-using sesh::common::String;
+using sesh::common::xstring;
 using sesh::language::syntax::AndOrList;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
@@ -40,8 +40,8 @@ using sesh::language::syntax::Printer;
 using sesh::language::syntax::Sequence;
 
 struct CommandStub : public Command {
-    String s;
-    CommandStub(String s) : Command(), s(s) { }
+    xstring s;
+    CommandStub(xstring s) : Command(), s(s) { }
     void print(Printer &p) const override {
         p << s;
         p.delayedCharacters() << L(' ');

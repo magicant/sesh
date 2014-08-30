@@ -25,8 +25,8 @@
 #include <system_error>
 #include <utility>
 #include "async/Future.hh"
-#include "common/Try.hh"
-#include "common/TypeTagTestHelper.hh"
+#include "common/trial.hh"
+#include "common/type_tag_test_helper.hh"
 #include "os/event/AwaiterTestHelper.hh"
 #include "os/event/PselectApi.hh"
 #include "os/event/ReadableFileDescriptor.hh"
@@ -60,7 +60,7 @@ std::ostream &operator<<(
 
 namespace {
 
-using sesh::common::Try;
+using sesh::common::trial;
 using sesh::async::Future;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::ReadableFileDescriptor;
@@ -85,7 +85,7 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: does nothing for empty trigger set") {
     Future<Trigger> f = a.expect();
-    std::move(f).then([](Try<Trigger> &&) { FAIL("callback called"); });
+    std::move(f).then([](trial<Trigger> &&) { FAIL("callback called"); });
     a.awaitEvents();
 }
 
@@ -96,8 +96,8 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(5)), ReadableFileDescriptor(3));
-    std::move(f).then([this, startTime](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, startTime](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         REQUIRE(t->tag() == t->tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(5));
         mutableSteadyClockNow() += std::chrono::seconds(2);
@@ -133,8 +133,8 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(10)), ReadableFileDescriptor(3));
-    std::move(f).then([this, startTime](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, startTime](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         REQUIRE(t->tag() == t->tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 3);
         mutableSteadyClockNow() += std::chrono::seconds(4);
@@ -195,7 +195,7 @@ TEST_CASE_METHOD(
     bool called = false;
     a.expect(fd).wrap().recover([this](std::exception_ptr) {
         return a.expect(Timeout(std::chrono::seconds(0)));
-    }).unwrap().then([&](Try<Trigger> &&) {
+    }).unwrap().then([&](trial<Trigger> &&) {
         called = true;
     });
     a.awaitEvents();
@@ -211,8 +211,8 @@ TEST_CASE_METHOD(
     bool called = false;
     auto f = a.expect(
             Timeout(std::chrono::seconds(1)), ReadableFileDescriptor(0));
-    std::move(f).then([&called](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([&called](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == t->tag<Timeout>());
         called = true;
     });

@@ -23,7 +23,7 @@
 #include <memory>
 #include <utility>
 #include "async/Future.hh"
-#include "common/Variant.hh"
+#include "common/variant.hh"
 
 namespace sesh {
 namespace os {
@@ -45,7 +45,7 @@ public:
 
 private:
 
-    using Value = common::Variant<async::Future<Result>, Result>;
+    using Value = common::variant<async::Future<Result>, Result>;
 
     Value mValue;
 

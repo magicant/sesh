@@ -25,8 +25,8 @@
 #include <system_error>
 #include <utility>
 #include "async/Future.hh"
-#include "common/Try.hh"
-#include "common/TypeTagTestHelper.hh"
+#include "common/trial.hh"
+#include "common/type_tag_test_helper.hh"
 #include "os/event/Awaiter.hh"
 #include "os/event/AwaiterTestHelper.hh"
 #include "os/event/PselectApi.hh"
@@ -60,7 +60,7 @@ std::ostream &operator<<(
 namespace {
 
 using sesh::async::Future;
-using sesh::common::Try;
+using sesh::common::trial;
 using sesh::os::event::Awaiter;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::Timeout;
@@ -95,8 +95,8 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(0)));
     bool callbackCalled = false;
-    std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(0));
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
@@ -133,8 +133,8 @@ TimeoutTest<durationInSecondsInt>::TimeoutTest() {
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Timeout(duration()));
     bool callbackCalled = false;
-    std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == duration());
         CHECK(steadyClockNow() == startTime + duration());
@@ -176,8 +176,8 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(-10)));
     bool callbackCalled = false;
-    std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(-10));
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
@@ -217,8 +217,8 @@ TEST_CASE_METHOD(
             Timeout(std::chrono::seconds(5)),
             Timeout(std::chrono::seconds(20)));
     bool callbackCalled = false;
-    std::move(f).then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(5));
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
@@ -255,8 +255,9 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f1 = a.expect(Timeout(std::chrono::seconds(10)));
     bool callback1Called = false;
-    std::move(f1).then([this, startTime, &callback1Called](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f1).then(
+            [this, startTime, &callback1Called](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(10));
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(11));
@@ -267,8 +268,9 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime + std::chrono::seconds(1);
     Future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(29)));
     bool callback2Called = false;
-    std::move(f2).then([this, startTime, &callback2Called](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f2).then(
+            [this, startTime, &callback2Called](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(29));
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(32));
@@ -331,7 +333,7 @@ TEST_CASE_METHOD(
         Future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(8)));
         mutableSteadyClockNow() += std::chrono::seconds(1);
         return f2;
-    }).unwrap().then([this, startTime, &callbackCalled](Try<Trigger> &&t) {
+    }).unwrap().then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(8));
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(113));

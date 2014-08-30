@@ -24,8 +24,8 @@
 #include <functional>
 #include <utility>
 #include "async/DelayHolder.hh"
-#include "common/FunctionalInitialize.hh"
-#include "common/TypeTag.hh"
+#include "common/functional_initialize.hh"
+#include "common/type_tag.hh"
 
 namespace sesh {
 namespace async {
@@ -65,7 +65,7 @@ public:
     void setResult(Arg &&... arg) && {
         Promise copy = std::move(*this);
         copy.delay().setResult(
-                common::TypeTag<T>(), std::forward<Arg>(arg)...);
+                common::type_tag<T>(), std::forward<Arg>(arg)...);
     }
 
     /**
@@ -82,7 +82,7 @@ public:
     void setResultFrom(F &&f) && {
         Promise copy = std::move(*this);
         copy.delay().setResult(
-                common::FunctionalInitialize(), std::forward<F>(f));
+                common::functional_initialize(), std::forward<F>(f));
     }
 
     /**

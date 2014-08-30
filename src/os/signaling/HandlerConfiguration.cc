@@ -23,17 +23,16 @@
 #include <map>
 #include <memory>
 #include <utility>
-#include "common/Maybe.hh"
-#include "common/SharedFunction.hh"
+#include "common/maybe.hh"
+#include "common/shared_function.hh"
 #include "helpermacros.h"
 #include "os/signaling/HandlerConfigurationApi.hh"
 #include "os/signaling/SignalErrorCode.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::common::Maybe;
-using sesh::common::SharedFunction;
-using sesh::common::createMaybeOf;
-using sesh::common::makeSharedFunction;
+using sesh::common::make_maybe_of;
+using sesh::common::maybe;
+using sesh::common::shared_function;
 
 namespace sesh {
 namespace os {
@@ -145,14 +144,14 @@ class SignalData {
 
 private:
 
-    Maybe<SignalAction> mInitialAction;
+    maybe<SignalAction> mInitialAction;
 
 public:
 
     SignalConfiguration configuration;
 
     /** Current action configuration on the native side. */
-    Maybe<ActionType> nativeAction;
+    maybe<ActionType> nativeAction;
 
     /** Number of signal instances caught. */
     unsigned catchCount = 0;
@@ -167,19 +166,19 @@ public:
             const SignalAction *newAction) {
         SignalAction oldAction = HandlerConfigurationApi::Default();
         std::error_code e = api.sigaction(n, newAction, &oldAction);
-        if (!mInitialAction.hasValue())
+        if (!mInitialAction.has_value())
             mInitialAction.emplace(std::move(oldAction));
         return e;
     }
 
     std::error_code getInitialActionIfUnknown(
             const HandlerConfigurationApi &api, SignalNumber n) {
-        if (mInitialAction.hasValue())
+        if (mInitialAction.has_value())
             return std::error_code();
         return sigaction(api, n, nullptr);
     }
 
-    const Maybe<SignalAction> &initialAction() const noexcept {
+    const maybe<SignalAction> &initialAction() const noexcept {
         return mInitialAction;
     }
 
@@ -235,7 +234,7 @@ private:
             return e;
 
         ActionType newType = data.configuration.nativeActionType();
-        Maybe<ActionType> maybeNewType = newType;
+        maybe<ActionType> maybeNewType = newType;
         if (maybeNewType == data.nativeAction)
             return std::error_code(); // no change, just return
 
@@ -305,7 +304,7 @@ public:
             return e;
         }
         return AddHandlerResult::create<Canceler>(
-                SharedFunction<HandlerCanceler>::create(
+                shared_function<HandlerCanceler>::create(
                         n, *this, std::move(canceler)));
     }
 

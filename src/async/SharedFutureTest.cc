@@ -26,8 +26,8 @@
 #include "async/Future.hh"
 #include "async/Promise.hh"
 #include "async/SharedFuture.hh"
-#include "common/Nop.hh"
-#include "common/Try.hh"
+#include "common/nop.hh"
+#include "common/trial.hh"
 
 namespace {
 
@@ -39,8 +39,8 @@ using sesh::async::createFailedFutureOf;
 using sesh::async::createFuture;
 using sesh::async::createFutureOf;
 using sesh::async::createPromiseFuturePair;
-using sesh::common::Nop;
-using sesh::common::Try;
+using sesh::common::nop;
+using sesh::common::trial;
 
 class ThrowingCopyable {
 public:
@@ -124,7 +124,7 @@ TEST_CASE("Shared future: is comparable with null pointer") {
 TEST_CASE("Shared future: validness after adding callback") {
     const auto delay = std::make_shared<Delay<int>>();
     const SharedFuture<int> f = Future<int>(delay);
-    f.then(Nop());
+    f.then(nop());
     CHECK(f.isValid());
 }
 
@@ -133,9 +133,9 @@ TEST_CASE("Shared future: callbacks added before setting result") {
     const SharedFuture<int> f = Future<int>(delay);
 
     int i = 0, j = 0;
-    f.then([&i](const Try<int> &r) { i = *r; });
-    f.then([f, &j](const Try<int> &) {
-        f.then([&j](const Try<int> &r) { j = *r; });
+    f.then([&i](const trial<int> &r) { i = *r; });
+    f.then([f, &j](const trial<int> &) {
+        f.then([&j](const trial<int> &r) { j = *r; });
     });
 
     CHECK(i == 0);
@@ -153,9 +153,9 @@ TEST_CASE("Shared future: callbacks added after setting result") {
     int i = 0, j = 0;
     CHECK(i == 0);
     CHECK(j == 0);
-    f.then([&i](const Try<int> &r) { i = *r; });
-    f.then([f, &j](const Try<int> &) {
-        f.then([&j](const Try<int> &r) { j = *r; });
+    f.then([&i](const trial<int> &r) { i = *r; });
+    f.then([f, &j](const trial<int> &) {
+        f.then([&j](const trial<int> &r) { j = *r; });
     });
     CHECK(i == 1);
     CHECK(j == 1);
@@ -168,17 +168,19 @@ TEST_CASE("Shared future: then") {
             createPromiseFuturePair<double>();
 
     double d = 0.0;
-    f1.then([](const Try<int> &t) { return *t * 2.0; }, std::move(pf2.first));
-    std::move(pf2.second).then([&d](Try<double> &&t) { d = *t; });
+    f1.then(
+            [](const trial<int> &t) { return *t * 2.0; },
+            std::move(pf2.first));
+    std::move(pf2.second).then([&d](trial<double> &&t) { d = *t; });
 
     CHECK(d == 0.0);
     delay->setResult(1);
     CHECK(d == 2.0);
 
     int i = 0;
-    f1.then([](const Try<int> &t) -> int {
+    f1.then([](const trial<int> &t) -> int {
         throw *t * 3;
-    }).then([&i](Try<int> &&t) {
+    }).then([&i](trial<int> &&t) {
         try {
             *t;
         } catch (int v) {
@@ -196,7 +198,7 @@ TEST_CASE("Shared future: map") {
 
     double d = 0.0;
     f1.map([](const int &i) { return i * 2.0; }, std::move(pf2.first));
-    std::move(pf2.second).then([&d](Try<double> &&t) { d = *t; });
+    std::move(pf2.second).then([&d](trial<double> &&t) { d = *t; });
 
     CHECK(d == 0.0);
     delay->setResult(1);
@@ -205,7 +207,7 @@ TEST_CASE("Shared future: map") {
     int i = 0;
     f1.map([](const int &j) -> int {
         throw j * 3;
-    }).then([&i](Try<int> &&t) {
+    }).then([&i](trial<int> &&t) {
         try {
             *t;
         } catch (int v) {
@@ -227,7 +229,7 @@ TEST_CASE("Shared future: recover, success") {
     f1.recover(f, std::move(pf2.first));
 
     int i = 0;
-    std::move(pf2.second).then([&i](Try<int> &&r) { i = *r; });
+    std::move(pf2.second).then([&i](trial<int> &&r) { i = *r; });
 
     CHECK(i == 0);
     delay->setResult(1);
@@ -246,7 +248,7 @@ TEST_CASE("Shared future: recover, failure") {
             CHECK(d == 1.0);
             return 2;
         }
-    }).then([&i](Try<int> &&t) {
+    }).then([&i](trial<int> &&t) {
         i = *t;
     });
 
@@ -261,7 +263,7 @@ TEST_CASE("Shared future: recover, failure") {
         } catch (double f) {
             throw 2.0 * f;
         }
-    }).then([&d](Try<int> &&t) {
+    }).then([&d](trial<int> &&t) {
         try {
             *t;
         } catch (double f) {
@@ -279,14 +281,14 @@ TEST_CASE("Shared future: forward") {
 
     int i = 0;
     f1.forward(std::move(pf2.first));
-    std::move(pf2.second).then([&i](Try<int> &&r) { i = *r; });
+    std::move(pf2.second).then([&i](trial<int> &&r) { i = *r; });
 
     CHECK(i == 0);
     delay->setResult(1);
     CHECK(i == 1);
 
     f1.forward(std::move(pf3.first));
-    std::move(pf3.second).then([&i](Try<int> &&r) { i = *r + 1; });
+    std::move(pf3.second).then([&i](trial<int> &&r) { i = *r + 1; });
     CHECK(i == 2);
 }
 
@@ -297,15 +299,15 @@ TEST_CASE("Shared future: wrap, success") {
     f1.wrap(std::move(pf2.first));
 
     int i = 0;
-    std::move(pf2.second).then([&i](Try<Future<int>> &&r) {
-        std::move(*r).then([&i](const Try<int> &r) {
+    std::move(pf2.second).then([&i](trial<Future<int>> &&r) {
+        std::move(*r).then([&i](const trial<int> &r) {
             i = *r;
         });
     });
     CHECK(i == 123);
 
-    f1.wrap().then([&i](Try<Future<int>> &&r) {
-        std::move(*r).then([&i](const Try<int> &r) {
+    f1.wrap().then([&i](trial<Future<int>> &&r) {
+        std::move(*r).then([&i](const trial<int> &r) {
             i = 2 * *r;
         });
     });
@@ -319,7 +321,7 @@ TEST_CASE("Shared future: wrap, failure in original future") {
     f1.wrap(std::move(pf2.first));
 
     double d = 0.0;
-    std::move(pf2.second).then([&d](Try<Future<int>> &&r) {
+    std::move(pf2.second).then([&d](trial<Future<int>> &&r) {
         try {
             *r;
         } catch (double v) {
@@ -328,7 +330,7 @@ TEST_CASE("Shared future: wrap, failure in original future") {
     });
     CHECK(d == 1.0);
 
-    f1.wrap().then([&d](Try<Future<int>> &&r) {
+    f1.wrap().then([&d](trial<Future<int>> &&r) {
         try {
             *r;
         } catch (double v) {
@@ -342,9 +344,9 @@ TEST_CASE("Shared future: wrap, throwing copy constructor") {
     const SharedFuture<ThrowingCopyable> f = createFuture<ThrowingCopyable>();
 
     int i = 0;
-    f.wrap().then([&i](Try<Future<ThrowingCopyable>> &&t) {
-        REQUIRE(t.hasValue());
-        std::move(*t).then([&i](Try<ThrowingCopyable> &&t) {
+    f.wrap().then([&i](trial<Future<ThrowingCopyable>> &&t) {
+        REQUIRE(t.has_value());
+        std::move(*t).then([&i](trial<ThrowingCopyable> &&t) {
             try {
                 *t;
             } catch (int v) {
@@ -362,15 +364,15 @@ TEST_CASE("Shared future: wrap shared, success") {
     f1.wrapShared(std::move(pf2.first));
 
     int i = 0;
-    std::move(pf2.second).then([&i](Try<SharedFuture<int>> &&r) {
-        r->then([&i](const Try<int> &r) {
+    std::move(pf2.second).then([&i](trial<SharedFuture<int>> &&r) {
+        r->then([&i](const trial<int> &r) {
             i = *r;
         });
     });
     CHECK(i == 123);
 
-    f1.wrapShared().then([&i](Try<SharedFuture<int>> &&r) {
-        r->then([&i](const Try<int> &r) {
+    f1.wrapShared().then([&i](trial<SharedFuture<int>> &&r) {
+        r->then([&i](const trial<int> &r) {
             i = 2 * *r;
         });
     });
@@ -384,7 +386,7 @@ TEST_CASE("Shared future: wrap shared, failure in original future") {
     f1.wrapShared(std::move(pf2.first));
 
     double d = 0.0;
-    std::move(pf2.second).then([&d](Try<SharedFuture<int>> &&r) {
+    std::move(pf2.second).then([&d](trial<SharedFuture<int>> &&r) {
         try {
             *r;
         } catch (double v) {
@@ -393,7 +395,7 @@ TEST_CASE("Shared future: wrap shared, failure in original future") {
     });
     CHECK(d == 1.0);
 
-    f1.wrapShared().then([&d](Try<SharedFuture<int>> &&r) {
+    f1.wrapShared().then([&d](trial<SharedFuture<int>> &&r) {
         try {
             *r;
         } catch (double v) {
@@ -407,9 +409,9 @@ TEST_CASE("Shared future: wrap shared, throwing copy constructor") {
     const SharedFuture<ThrowingCopyable> f = createFuture<ThrowingCopyable>();
 
     int i = 0;
-    f.wrapShared().then([&i](Try<SharedFuture<ThrowingCopyable>> &&t) {
-        REQUIRE(t.hasValue());
-        t->then([&i](const Try<ThrowingCopyable> &t) {
+    f.wrapShared().then([&i](trial<SharedFuture<ThrowingCopyable>> &&t) {
+        REQUIRE(t.has_value());
+        t->then([&i](const trial<ThrowingCopyable> &t) {
             try {
                 *t;
             } catch (int v) {
@@ -425,14 +427,14 @@ TEST_CASE("Shared future: unwrap, success") {
     const SharedFuture<SharedFuture<int>> f2 = f1.wrapShared();
     Future<int> f3 = f2.unwrap();
     int i = 0;
-    std::move(f3).then([&i](Try<int> &&t) {
+    std::move(f3).then([&i](trial<int> &&t) {
         i = *t;
     });
     CHECK(i == 123);
 
     std::pair<Promise<int>, Future<int>> pf = createPromiseFuturePair<int>();
     f2.unwrap(std::move(pf.first));
-    std::move(pf.second).then([&i](Try<int> &&t) {
+    std::move(pf.second).then([&i](trial<int> &&t) {
         i = 2 * *t;
     });
     CHECK(i == 246);
@@ -442,7 +444,7 @@ TEST_CASE("Shared future: unwrap, failure in first") {
     const SharedFuture<SharedFuture<int>> f =
             createFailedFutureOf<SharedFuture<int>>(1.0);
     double d = 0.0;
-    f.unwrap().then([&d](Try<int> &&t) {
+    f.unwrap().then([&d](trial<int> &&t) {
         try {
             *t;
         } catch (double v) {
@@ -456,7 +458,7 @@ TEST_CASE("Shared future: unwrap, failure in second") {
     const SharedFuture<int> f1 = createFailedFutureOf<int>(1.0);
     const SharedFuture<SharedFuture<int>> f2 = createFutureOf(f1);
     double d = 0.0;
-    f2.unwrap().then([&d](Try<int> &&t) {
+    f2.unwrap().then([&d](trial<int> &&t) {
         try {
             *t;
         } catch (double v) {
@@ -473,7 +475,7 @@ TEST_CASE("Future: unwrap shared, to promise, success") {
     std::move(f2).unwrap(std::move(pf3.first));
 
     int i = 0;
-    std::move(pf3.second).then([&i](Try<int> &&t) {
+    std::move(pf3.second).then([&i](trial<int> &&t) {
         i = *t;
     });
     CHECK(i == 123);
@@ -483,7 +485,7 @@ TEST_CASE("Future: unwrap shared, returning future, success") {
     const SharedFuture<int> f1 = createFutureOf(123);
     Future<SharedFuture<int>> f2 = f1.wrapShared();
     int i = 0;
-    std::move(f2).unwrap().then([&i](Try<int> &&t) {
+    std::move(f2).unwrap().then([&i](trial<int> &&t) {
         i = *t;
     });
     CHECK(i == 123);
@@ -492,7 +494,7 @@ TEST_CASE("Future: unwrap shared, returning future, success") {
 TEST_CASE("Future: unwrap shared, failure in first") {
     Future<SharedFuture<int>> f = createFailedFutureOf<SharedFuture<int>>(1.0);
     double d = 0.0;
-    std::move(f).unwrap().then([&d](Try<int> &&t) {
+    std::move(f).unwrap().then([&d](trial<int> &&t) {
         try {
             *t;
         } catch (double v) {
@@ -506,7 +508,7 @@ TEST_CASE("Future: unwrap shared, failure in second") {
     const SharedFuture<int> f1 = createFailedFutureOf<int>(1.0);
     Future<SharedFuture<int>> f2 = createFutureOf(f1);
     double d = 0.0;
-    std::move(f2).unwrap().then([&d](Try<int> &&t) {
+    std::move(f2).unwrap().then([&d](trial<int> &&t) {
         try {
             *t;
         } catch (double v) {

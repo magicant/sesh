@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <utility>
-#include "common/Message.hh"
+#include "common/message.hh"
 
 namespace sesh {
 namespace language {
@@ -45,7 +45,7 @@ public:
      * (localizable) short description surrounded by a pair of triangle
      * brackets.
      */
-    virtual common::Message<> name() const = 0;
+    virtual common::message<> name() const = 0;
 
     /**
      * Describes this origin.
@@ -54,7 +54,7 @@ public:
      *  - in alias substitution ll='ls -l'
      *  - in the file included by the dot built-in
      */
-    virtual common::Message<> description() const = 0;
+    virtual common::message<> description() const = 0;
 
 }; // class Origin
 

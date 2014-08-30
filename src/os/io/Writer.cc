@@ -23,14 +23,14 @@
 #include <system_error>
 #include <utility>
 #include "async/Future.hh"
-#include "common/Try.hh"
+#include "common/trial.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
 
 using sesh::async::Future;
 using sesh::async::createFuture;
-using sesh::common::Try;
+using sesh::common::trial;
 using sesh::os::event::Proactor;
 using sesh::os::event::Trigger;
 using sesh::os::event::WritableFileDescriptor;
@@ -60,7 +60,7 @@ struct Writer {
         return createFuture<ResultPair>(std::move(fd), e);
     }
 
-    Future<ResultPair> operator()(Try<Trigger> &&t) {
+    Future<ResultPair> operator()(trial<Trigger> &&t) {
         try {
             *t;
         } catch (std::domain_error &e) {

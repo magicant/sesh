@@ -29,7 +29,7 @@ namespace io {
 
 class FileDescriptionApiDummy : public FileDescriptionApi {
 
-    common::Variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    common::variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
     getFileDescriptionStatus(const FileDescriptor &) const override {
         return std::error_code();
     }

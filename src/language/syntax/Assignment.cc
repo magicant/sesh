@@ -20,8 +20,8 @@
 
 #include <stdexcept>
 #include <utility>
-#include "common/Char.hh"
-#include "common/String.hh"
+#include "common/xchar.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/Word.hh"
 
@@ -31,7 +31,7 @@ namespace syntax {
 
 namespace {
 
-using String = common::String;
+using common::xstring;
 
 void createWordIfNull(Assignment::WordPointer &w) {
     if (w == nullptr)
@@ -42,12 +42,12 @@ void createWordIfNull(Assignment::WordPointer &w) {
 
 Assignment::Assignment() : mVariableName(), mValue(new Word) { }
 
-Assignment::Assignment(const String &variableName, WordPointer &&value) :
+Assignment::Assignment(const xstring &variableName, WordPointer &&value) :
         mVariableName(variableName), mValue(std::move(value)) {
     createWordIfNull(mValue);
 }
 
-Assignment::Assignment(String &&variableName, WordPointer &&value) :
+Assignment::Assignment(xstring &&variableName, WordPointer &&value) :
         mVariableName(std::move(variableName)), mValue(std::move(value)) {
     createWordIfNull(mValue);
 }

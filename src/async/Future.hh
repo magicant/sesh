@@ -29,7 +29,7 @@
 #include "async/Delay.hh"
 #include "async/DelayHolder.hh"
 #include "async/Promise.hh"
-#include "common/Try.hh"
+#include "common/trial.hh"
 
 namespace sesh {
 namespace async {
@@ -57,13 +57,12 @@ public:
      * promise.
      *
      * @tparam F Type of the callback function. It must return void when called
-     * with an argument of type {@code common::Try<T> &&}.
+     * with an argument of type {@code common::trial<T> &&}.
      */
     template<typename F>
-    typename std::enable_if<std::is_void<
-            typename std::result_of<
-                    typename std::decay<F>::type(common::Try<T> &&)>::type
-    >::value>::type
+    typename std::enable_if<std::is_void<typename std::result_of<
+            typename std::decay<F>::type(common::trial<T> &&)
+    >::type>::value>::type
     then(F &&) &&;
 
     /**
@@ -75,7 +74,7 @@ public:
      * will be propagated to the promise.
      *
      * @tparam F Type of the callback function. It must be callable with an
-     * argument of type {@code common::Try<T> &&}.
+     * argument of type {@code common::trial<T> &&}.
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
@@ -91,13 +90,13 @@ public:
      * future.
      *
      * @tparam F Type of the callback function. It must be callable with an
-     * argument of type {@code common::Try<T> &&}.
+     * argument of type {@code common::trial<T> &&}.
      * @tparam R Result type of the callback. Must not be void.
      */
     template<
             typename F,
             typename R = typename std::result_of<
-                    typename std::decay<F>::type(common::Try<T> &&)>::type>
+                    typename std::decay<F>::type(common::trial<T> &&)>::type>
     typename std::enable_if<!std::is_void<R>::value, Future<R>>::type
     then(F &&) &&;
 

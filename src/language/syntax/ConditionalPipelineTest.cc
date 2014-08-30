@@ -22,8 +22,8 @@
 
 #include <memory>
 #include <stdexcept>
-#include "common/Char.hh"
-#include "common/String.hh"
+#include "common/xchar.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/ConditionalPipeline.hh"
 #include "language/syntax/Pipeline.hh"
@@ -31,8 +31,8 @@
 
 namespace {
 
-using sesh::common::Char;
-using sesh::common::String;
+using sesh::common::xchar;
+using sesh::common::xstring;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
 using sesh::language::syntax::Pipeline;
@@ -40,9 +40,9 @@ using sesh::language::syntax::Printer;
 
 class CommandStub : public Command {
 private:
-    String mString;
+    xstring mString;
 public:
-    explicit CommandStub(const Char *s) : Command(), mString(s) { }
+    explicit CommandStub(const xchar *s) : Command(), mString(s) { }
     void print(Printer &) const override;
 };
 
@@ -51,11 +51,11 @@ void CommandStub::print(Printer &p) const {
     p.delayedCharacters() << L(' ');
 }
 
-void addCommand(Pipeline &p, const Char *s) {
+void addCommand(Pipeline &p, const xchar *s) {
     p.commands().push_back(Pipeline::CommandPointer(new CommandStub(s)));
 }
 
-std::unique_ptr<Pipeline> newPipeline(const Char *s) {
+std::unique_ptr<Pipeline> newPipeline(const xchar *s) {
     std::unique_ptr<Pipeline> p(
             new Pipeline(Pipeline::ExitStatusType::NEGATED));
     addCommand(*p, s);

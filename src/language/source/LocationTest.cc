@@ -23,15 +23,12 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include "common/Char.hh"
-#include "common/String.hh"
 #include "language/source/Location.hh"
 #include "language/source/LocationTestHelper.hh"
 #include "language/source/OriginTestHelper.hh"
 
 namespace {
 
-using sesh::common::String;
 using sesh::language::source::LineLocation;
 using sesh::language::source::Location;
 using sesh::language::source::Origin;

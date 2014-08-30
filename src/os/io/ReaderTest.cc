@@ -28,9 +28,9 @@
 #include <vector>
 #include "async/Future.hh"
 #include "async/Promise.hh"
-#include "common/Try.hh"
-#include "common/TypeTagTestHelper.hh"
-#include "common/Variant.hh"
+#include "common/trial.hh"
+#include "common/type_tag_test_helper.hh"
+#include "common/variant.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Trigger.hh"
@@ -47,8 +47,8 @@ using sesh::async::Promise;
 using sesh::async::createFailedFutureOf;
 using sesh::async::createFuture;
 using sesh::async::createPromiseFuturePair;
-using sesh::common::Try;
-using sesh::common::Variant;
+using sesh::common::trial;
+using sesh::common::variant;
 using sesh::os::event::Proactor;
 using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Trigger;
@@ -60,7 +60,7 @@ using sesh::os::io::read;
 
 using ResultPair = std::pair<
         NonBlockingFileDescriptor,
-        Variant<std::vector<char>, std::error_code>>;
+        variant<std::vector<char>, std::error_code>>;
 
 class UncallableReaderApi : public ReaderApi {
 
@@ -97,8 +97,8 @@ TEST_CASE("Read: empty") {
     Future<ResultPair> f = read(api, p, dummyNonBlockingFileDescriptor(FD), 0);
 
     bool called = false;
-    std::move(f).then([FD, &called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
@@ -178,8 +178,8 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than available") {
             *this, *this, dummyNonBlockingFileDescriptor(FD), 1);
 
     bool called = false;
-    std::move(f).then([C, &called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([C, &called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
@@ -207,8 +207,8 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than buffer size") {
             *this, *this, dummyNonBlockingFileDescriptor(FD), 11);
 
     bool called = false;
-    std::move(f).then([&bytes, &called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([&bytes, &called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
@@ -246,8 +246,8 @@ TEST_CASE("Read: domain error in proactor") {
             api, p, dummyNonBlockingFileDescriptor(FD), {'C'});
 
     bool called = false;
-    std::move(f).then([FD, &called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::error_code>());
@@ -280,8 +280,8 @@ TEST_CASE("Read: read error") {
             api, proactor, dummyNonBlockingFileDescriptor(FD), {'A'});
 
     bool called = false;
-    std::move(f).then([FD, &called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::error_code>());

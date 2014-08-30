@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include "common/String.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Printable.hh"
 #include "language/syntax/Word.hh"
 
@@ -38,14 +38,14 @@ public:
 
 private:
 
-    common::String mVariableName;
+    common::xstring mVariableName;
     WordPointer mValue;
 
 public:
 
     Assignment();
-    Assignment(const common::String &variableName, WordPointer &&value);
-    Assignment(common::String &&variableName, WordPointer &&value);
+    Assignment(const common::xstring &variableName, WordPointer &&value);
+    Assignment(common::xstring &&variableName, WordPointer &&value);
 
     Assignment(const Assignment &) = delete;
     Assignment(Assignment &&) = default;
@@ -53,10 +53,10 @@ public:
     Assignment &operator=(Assignment &&) = default;
     ~Assignment() override = default;
 
-    common::String &variableName() noexcept {
+    common::xstring &variableName() noexcept {
         return mVariableName;
     }
-    const common::String &variableName() const noexcept {
+    const common::xstring &variableName() const noexcept {
         return mVariableName;
     }
 

@@ -20,8 +20,8 @@
 
 #include "buildconfig.h"
 
-#include "common/ErrorLevel.hh"
-#include "common/Message.hh"
+#include "common/error_level.hh"
+#include "common/message.hh"
 #include "language/source/Buffer.hh"
 
 namespace sesh {
@@ -41,17 +41,17 @@ public:
 private:
 
     Position mPosition;
-    common::ErrorLevel mErrorLevel;
-    common::Message<> mMessage;
+    common::error_level mErrorLevel;
+    common::message<> mMessage;
 
 public:
 
-    DiagnosticMessage(Position, common::Message<> &&, common::ErrorLevel);
+    DiagnosticMessage(Position, common::message<> &&, common::error_level);
 
     const Position &position() const noexcept { return mPosition; }
-    common::ErrorLevel errorLevel() const noexcept { return mErrorLevel; }
-    const common::Message<> &message() const noexcept { return mMessage; }
-    common::Message<> &message() noexcept { return mMessage; }
+    common::error_level errorLevel() const noexcept { return mErrorLevel; }
+    const common::message<> &message() const noexcept { return mMessage; }
+    common::message<> &message() noexcept { return mMessage; }
 
 }; // class DiagnosticMessage
 

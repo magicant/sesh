@@ -26,17 +26,17 @@ TESTPROGRAMS = \
 	src/async/FutureTest \
 	src/async/PromiseTest \
 	src/async/SharedFutureTest \
-	src/common/ContainerHelperTest \
-	src/common/EnumIteratorTest \
-	src/common/EnumSetTest \
-	src/common/MaybeTest \
-	src/common/MessageTest \
-	src/common/ReferenceTest \
-	src/common/SharedFunctionTest \
-	src/common/TrieTest \
-	src/common/TryTest \
-	src/common/TypeTagTest \
-	src/common/VariantTest \
+	src/common/container_helper_test \
+	src/common/enum_iterator_test \
+	src/common/enum_set_test \
+	src/common/maybe_test \
+	src/common/message_test \
+	src/common/reference_test \
+	src/common/shared_function_test \
+	src/common/trial_test \
+	src/common/trie_test \
+	src/common/type_tag_test \
+	src/common/variant_test \
 	src/language/source/BufferTest \
 	src/language/source/LineAppendedSourceTest \
 	src/language/source/LineContinuedSourceTest \
@@ -89,34 +89,34 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/Char.hh \
-	src/common/CommonResult.hh \
-	src/common/ContainerHelper.hh \
-	src/common/Copy.hh \
-	src/common/DirectInitialize.hh \
-	src/common/Empty.hh \
-	src/common/EnumIterator.hh \
-	src/common/EnumSet.hh \
-	src/common/EnumTraits.hh \
-	src/common/ErrnoHelper.hh \
-	src/common/ErrorLevel.hh \
-	src/common/FunctionalInitialize.hh \
-	src/common/Identity.hh \
-	src/common/IntegerSequence.hh \
-	src/common/Maybe.hh \
-	src/common/Message.cc \
-	src/common/Message.hh \
-	src/common/Nop.hh \
-	src/common/OutputStream.hh \
-	src/common/Reference.hh \
-	src/common/SharedFunction.hh \
-	src/common/StaticCast.hh \
-	src/common/String.hh \
-	src/common/StringStream.hh \
-	src/common/Trie.hh \
-	src/common/Try.hh \
-	src/common/TypeTag.hh \
-	src/common/Variant.hh \
+	src/common/common_result.hh \
+	src/common/container_helper.hh \
+	src/common/copy.hh \
+	src/common/direct_initialize.hh \
+	src/common/empty.hh \
+	src/common/enum_iterator.hh \
+	src/common/enum_set.hh \
+	src/common/enum_traits.hh \
+	src/common/errno_helper.hh \
+	src/common/error_level.hh \
+	src/common/functional_initialize.hh \
+	src/common/identity.hh \
+	src/common/integer_sequence.hh \
+	src/common/maybe.hh \
+	src/common/message.cc \
+	src/common/message.hh \
+	src/common/nop.hh \
+	src/common/reference.hh \
+	src/common/shared_function.hh \
+	src/common/static_cast_function.hh \
+	src/common/trial.hh \
+	src/common/trie.hh \
+	src/common/type_tag.hh \
+	src/common/variant.hh \
+	src/common/xchar.hh \
+	src/common/xostream.hh \
+	src/common/xsstream.hh \
+	src/common/xstring.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
 	src/language/source/Buffer.cc \
@@ -210,53 +210,53 @@ src_async_PromiseTest_SOURCES = \
 	src/async/PromiseTest.cc
 src_async_SharedFutureTest_SOURCES = \
 	src/async/SharedFutureTest.cc
-src_common_ContainerHelperTest_SOURCES = \
-	src/common/ContainerHelperTest.cc
-src_common_EnumIteratorTest_SOURCES = \
-	src/common/EnumIteratorTest.cc
-src_common_EnumSetTest_SOURCES = \
-	src/common/EnumSetTest.cc
-src_common_MaybeTest_SOURCES = \
-	src/common/MaybeTest.cc
-src_common_MessageTest_SOURCES = \
-	src/common/Message.cc \
-	src/common/MessageTest.cc
-src_common_ReferenceTest_SOURCES = \
-	src/common/ReferenceTest.cc
-src_common_SharedFunctionTest_SOURCES = \
-	src/common/SharedFunctionTest.cc
-src_common_TrieTest_SOURCES = \
-	src/common/TrieTest.cc
-src_common_TryTest_SOURCES = \
-	src/common/TryTest.cc
-src_common_TypeTagTest_SOURCES = \
-	src/common/TypeTag.hh \
-	src/common/TypeTagTest.cc
-src_common_VariantTest_SOURCES = \
-	src/common/VariantTest.cc
+src_common_container_helper_test_SOURCES = \
+	src/common/container_helper_test.cc
+src_common_enum_iterator_test_SOURCES = \
+	src/common/enum_iterator_test.cc
+src_common_enum_set_test_SOURCES = \
+	src/common/enum_set_test.cc
+src_common_maybe_test_SOURCES = \
+	src/common/maybe_test.cc
+src_common_message_test_SOURCES = \
+	src/common/message.cc \
+	src/common/message_test.cc
+src_common_reference_test_SOURCES = \
+	src/common/reference_test.cc
+src_common_shared_function_test_SOURCES = \
+	src/common/shared_function_test.cc
+src_common_trial_test_SOURCES = \
+	src/common/trial_test.cc
+src_common_trie_test_SOURCES = \
+	src/common/trie_test.cc
+src_common_type_tag_test_SOURCES = \
+	src/common/type_tag.hh \
+	src/common/type_tag_test.cc
+src_common_variant_test_SOURCES = \
+	src/common/variant_test.cc
 src_language_source_BufferTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/Buffer.cc \
 	src/language/source/BufferTest.cc \
 	src/language/source/Source.cc
 src_language_source_LineAppendedSourceTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/LineAppendedSource.cc \
 	src/language/source/LineAppendedSourceTest.cc \
 	src/language/source/Location.cc \
 	src/language/source/Source.cc
 src_language_source_LineContinuedSourceTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/LineContinuedSource.cc \
 	src/language/source/LineContinuedSourceTest.cc \
 	src/language/source/Location.cc \
 	src/language/source/Source.cc
 src_language_source_LocationTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/Location.cc \
 	src/language/source/LocationTest.cc
 src_language_source_SourceTest_SOURCES = \
-	src/common/Message.cc \
+	src/common/message.cc \
 	src/language/source/Source.cc \
 	src/language/source/SourceTest.cc
 src_language_syntax_AndOrListTest_SOURCES = \
@@ -382,7 +382,7 @@ src_os_signaling_HandlerConfigurationTest_SOURCES = \
 	src/os/signaling/SignalErrorCategory.cc
 
 TESTHEADERS = \
-	src/common/TypeTagTestHelper.hh \
+	src/common/type_tag_test_helper.hh \
 	src/language/source/DiagnosticMessageTestHelper.hh \
 	src/language/source/LocationTestHelper.hh \
 	src/language/source/OriginTestHelper.hh \

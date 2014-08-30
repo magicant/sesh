@@ -18,8 +18,8 @@
 #include "buildconfig.h"
 #include "Printer.hh"
 
-#include "common/Char.hh"
-#include "common/String.hh"
+#include "common/xchar.hh"
+#include "common/xstring.hh"
 
 namespace sesh {
 namespace language {
@@ -27,7 +27,7 @@ namespace syntax {
 
 namespace {
 
-using String = common::String;
+using common::xstring;
 
 } // namespace
 
@@ -39,12 +39,12 @@ Printer::Printer(LineMode lineMode) :
         mIndentLevel() {
 }
 
-String Printer::toString() const {
+xstring Printer::toString() const {
     return mMainBuffer.str();
 }
 
 void Printer::clearDelayedCharacters() {
-    mDelayedCharacters.str(String());
+    mDelayedCharacters.str(xstring());
 }
 
 void Printer::commitDelayedCharacters(){
@@ -73,7 +73,7 @@ void Printer::breakLine() {
         break;
     }
 
-    mDelayedLines.str(String());
+    mDelayedLines.str(xstring());
 }
 
 /**
@@ -86,7 +86,7 @@ void Printer::printIndent() {
     case LineMode::SINGLE_LINE:
         return;
     case LineMode::MULTI_LINE:
-        mMainBuffer << String(4 * mIndentLevel, L(' '));
+        mMainBuffer << xstring(4 * mIndentLevel, L(' '));
         return;
     }
 }

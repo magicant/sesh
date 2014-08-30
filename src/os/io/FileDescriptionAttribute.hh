@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "common/EnumTraits.hh"
+#include "common/enum_traits.hh"
 
 namespace sesh {
 
@@ -42,7 +42,7 @@ enum class FileDescriptionAttribute {
 namespace common {
 
 template<>
-class EnumTraits<os::io::FileDescriptionAttribute> {
+class enum_traits<os::io::FileDescriptionAttribute> {
 public:
     constexpr static os::io::FileDescriptionAttribute max =
             os::io::FileDescriptionAttribute::SYNC;

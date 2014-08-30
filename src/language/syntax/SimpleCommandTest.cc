@@ -21,8 +21,8 @@
 #include "catch.hpp"
 
 #include <utility>
-#include "common/Char.hh"
-#include "common/String.hh"
+#include "common/xchar.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Assignment.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
@@ -32,7 +32,7 @@
 
 namespace {
 
-using sesh::common::String;
+using sesh::common::xstring;
 using sesh::language::syntax::Assignment;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::RawString;
@@ -40,22 +40,22 @@ using sesh::language::syntax::SimpleCommand;
 using sesh::language::syntax::Word;
 using sesh::language::syntax::forEachLineMode;
 
-Assignment::WordPointer newWord(String s) {
+Assignment::WordPointer newWord(xstring s) {
     Assignment::WordPointer w(new Word);
     w->addComponent(Word::ComponentPointer(new RawString(s)));
     return w;
 }
 
-SimpleCommand::AssignmentPointer newAssignment(String name, String value) {
+SimpleCommand::AssignmentPointer newAssignment(xstring name, xstring value) {
     return SimpleCommand::AssignmentPointer(
             new Assignment(name, newWord(value)));
 }
 
-void addAssignment(SimpleCommand &sc, String name, String value) {
+void addAssignment(SimpleCommand &sc, xstring name, xstring value) {
     sc.assignments().push_back(newAssignment(name, value));
 }
 
-void addWord(SimpleCommand &sc, String s) {
+void addWord(SimpleCommand &sc, xstring s) {
     sc.words().push_back(newWord(s));
 }
 

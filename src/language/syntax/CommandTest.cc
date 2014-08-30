@@ -22,15 +22,14 @@
 
 #include <cstddef>
 #include <memory>
-#include "common/Char.hh"
-#include "common/String.hh"
+#include "common/xchar.hh"
+#include "common/xstring.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Printer.hh"
 
 namespace {
 
-using sesh::common::Char;
-using sesh::common::String;
+using sesh::common::xstring;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::Printer;
 

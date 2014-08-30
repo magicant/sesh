@@ -24,11 +24,11 @@
 #include <new>
 #include <stdexcept>
 #include <system_error>
-#include "common/EnumIterator.hh"
-#include "common/EnumSet.hh"
-#include "common/ErrnoHelper.hh"
-#include "common/TypeTag.hh"
-#include "common/Variant.hh"
+#include "common/enum_iterator.hh"
+#include "common/enum_set.hh"
+#include "common/errno_helper.hh"
+#include "common/type_tag.hh"
+#include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/capi.h"
 #include "os/io/FileDescriptionAccessMode.hh"
@@ -41,11 +41,11 @@
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::common::EnumSet;
-using sesh::common::TypeTag;
-using sesh::common::Variant;
+using sesh::common::enum_set;
 using sesh::common::enumerators;
-using sesh::common::errnoCode;
+using sesh::common::errno_code;
+using sesh::common::type_tag;
+using sesh::common::variant;
 using sesh::os::io::FileDescriptionAccessMode;
 using sesh::os::io::FileDescriptionAttribute;
 using sesh::os::io::FileDescriptionStatus;
@@ -152,8 +152,8 @@ int toRawFlag(FileDescriptorOpenMode mode) {
 /** @return -1 if the access mode is not supported. */
 int toRawFlags(
         FileDescriptionAccessMode accessMode,
-        EnumSet<FileDescriptionAttribute> attributes,
-        EnumSet<FileDescriptorOpenMode> openModes) {
+        enum_set<FileDescriptionAttribute> attributes,
+        enum_set<FileDescriptorOpenMode> openModes) {
     int rawFlags = toRawFlag(accessMode);
     if (rawFlags == -1)
         return -1;
@@ -169,7 +169,7 @@ int toRawFlags(
     return rawFlags;
 }
 
-int toRawModes(EnumSet<FileMode> modes) {
+int toRawModes(enum_set<FileMode> modes) {
     return sesh_osapi_mode_to_raw(static_cast<int>(modes.to_ulong()));
 }
 
@@ -193,13 +193,13 @@ void convert(const SignalAction &from, struct sesh_osapi_signal_action &to) {
 void convert(const struct sesh_osapi_signal_action &from, SignalAction &to) {
     switch (from.type) {
     case SESH_OSAPI_SIG_DFL:
-        to.emplace(TypeTag<Api::Default>());
+        to.emplace(type_tag<Api::Default>());
         break;
     case SESH_OSAPI_SIG_IGN:
-        to.emplace(TypeTag<Api::Ignore>());
+        to.emplace(type_tag<Api::Ignore>());
         break;
     case SESH_OSAPI_SIG_HANDLER:
-        to.emplace(TypeTag<sesh_osapi_signal_handler *>(), from.handler);
+        to.emplace(type_tag<sesh_osapi_signal_handler *>(), from.handler);
         break;
     }
 }
@@ -385,11 +385,11 @@ class ApiImpl : public Api {
     }
 
     auto getFileDescriptionStatus(const FileDescriptor &fd) const
-            -> Variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+            -> variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
             final override {
         int flags = sesh_osapi_fcntl_getfl(fd.value());
         if (flags == -1)
-            return errnoCode();
+            return errno_code();
         return std::unique_ptr<FileDescriptionStatus>(
                 new FileDescriptionStatusImpl(flags));
     }
@@ -399,16 +399,16 @@ class ApiImpl : public Api {
             final override {
         const auto &i = static_cast<const FileDescriptionStatusImpl &>(s);
         if (sesh_osapi_fcntl_setfl(fd.value(), i.rawFlags()) == -1)
-            return errnoCode();
+            return errno_code();
         return std::error_code();
     }
 
-    Variant<FileDescriptor, std::error_code> open(
+    variant<FileDescriptor, std::error_code> open(
             const char *path,
             FileDescriptionAccessMode accessMode,
-            EnumSet<FileDescriptionAttribute> attributes,
-            EnumSet<FileDescriptorOpenMode> openModes,
-            EnumSet<FileMode> fileModes) const final override {
+            enum_set<FileDescriptionAttribute> attributes,
+            enum_set<FileDescriptorOpenMode> openModes,
+            enum_set<FileMode> fileModes) const final override {
         int flags = toRawFlags(accessMode, attributes, openModes);
         if (flags == -1)
             return std::make_error_code(std::errc::invalid_argument);
@@ -416,7 +416,7 @@ class ApiImpl : public Api {
         int modes = toRawModes(fileModes);
         int fd = sesh_osapi_open(path, flags, modes);
         if (fd < 0)
-            return errnoCode();
+            return errno_code();
         return FileDescriptor(fd);
     }
 
@@ -426,7 +426,7 @@ class ApiImpl : public Api {
             return std::error_code();
         }
 
-        std::error_code ec = errnoCode();
+        std::error_code ec = errno_code();
         if (ec == std::errc::bad_file_descriptor)
             fd.clear();
         return ec;
@@ -437,7 +437,7 @@ class ApiImpl : public Api {
             const final override {
         std::size_t bytesRead =
                 sesh_osapi_read(fd.value(), buffer, maxBytesToRead);
-        if (std::error_code ec = errnoCode())
+        if (std::error_code ec = errno_code())
             return ec;
         return bytesRead;
     }
@@ -449,7 +449,7 @@ class ApiImpl : public Api {
             const final override {
         std::size_t bytesWritten =
                 sesh_osapi_write(fd.value(), bytes, bytesToWrite);
-        if (std::error_code ec = errnoCode())
+        if (std::error_code ec = errno_code())
             return ec;
         return bytesWritten;
     }
@@ -489,7 +489,7 @@ class ApiImpl : public Api {
                 signalMaskImpl == nullptr ? nullptr : signalMaskImpl->get());
         if (pselectResult == 0)
             return std::error_code();
-        return errnoCode();
+        return errno_code();
     }
 
     std::error_code sigprocmask(
@@ -521,7 +521,7 @@ class ApiImpl : public Api {
                 oldMaskImpl == nullptr ? nullptr : oldMaskImpl->get());
         if (sigprocmaskResult == 0)
             return std::error_code();
-        return errnoCode();
+        return errno_code();
     }
 
     std::error_code sigaction(
@@ -539,7 +539,7 @@ class ApiImpl : public Api {
                 oldAction == nullptr ? nullptr : &oldActionImpl);
 
         if (sigactionResult != 0)
-            return errnoCode();
+            return errno_code();
 
         if (oldAction != nullptr)
             convert(oldActionImpl, *oldAction);

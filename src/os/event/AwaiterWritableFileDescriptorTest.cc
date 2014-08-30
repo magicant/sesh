@@ -26,9 +26,8 @@
 #include <system_error>
 #include <utility>
 #include "async/Future.hh"
-#include "common/Try.hh"
-#include "common/TypeTagTestHelper.hh"
-#include "common/Variant.hh"
+#include "common/trial.hh"
+#include "common/type_tag_test_helper.hh"
 #include "os/event/Awaiter.hh"
 #include "os/event/AwaiterTestHelper.hh"
 #include "os/event/PselectApi.hh"
@@ -42,8 +41,7 @@
 namespace {
 
 using sesh::async::Future;
-using sesh::common::Try;
-using sesh::common::Variant;
+using sesh::common::trial;
 using sesh::os::event::Awaiter;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::Trigger;
@@ -61,8 +59,8 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(WritableFileDescriptor(4));
-    std::move(f).then([this, startTime](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, startTime](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<WritableFileDescriptor>());
         CHECK(t->value<WritableFileDescriptor>().value() == 4);
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
@@ -99,8 +97,8 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(
             WritableFileDescriptor(2), WritableFileDescriptor(0));
-    std::move(f).then([this, startTime](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, startTime](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<WritableFileDescriptor>());
         CHECK(t->value<WritableFileDescriptor>().value() == 0);
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
@@ -138,8 +136,8 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(
             WritableFileDescriptor(2), WritableFileDescriptor(0));
-    std::move(f).then([this, startTime](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, startTime](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<WritableFileDescriptor>());
         auto fd = t->value<WritableFileDescriptor>().value();
         if (fd != 0)
@@ -177,16 +175,16 @@ TEST_CASE_METHOD(
     mutableSteadyClockNow() = startTime;
 
     a.expect(WritableFileDescriptor(1)).then(
-            [this, startTime](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+            [this, startTime](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<WritableFileDescriptor>());
         CHECK(t->value<WritableFileDescriptor>().value() == 1);
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(9));
         mutableSteadyClockNow() += std::chrono::seconds(1);
     });
     a.expect(WritableFileDescriptor(3)).then(
-            [this, startTime](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+            [this, startTime](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<WritableFileDescriptor>());
         CHECK(t->value<WritableFileDescriptor>().value() == 3);
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(28));
@@ -238,8 +236,8 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutableSteadyClockNow() = startTime;
 
-    auto callback = [this, startTime](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    auto callback = [this, startTime](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<WritableFileDescriptor>());
         CHECK(t->value<WritableFileDescriptor>().value() == 7);
         mutableSteadyClockNow() += std::chrono::seconds(1);
