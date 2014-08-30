@@ -23,13 +23,13 @@
 #include <utility>
 #include "async/Delay.hh"
 #include "async/Promise.hh"
-#include "common/Try.hh"
+#include "common/trial.hh"
 
 namespace {
 
 using sesh::async::Delay;
 using sesh::async::Promise;
-using sesh::common::Try;
+using sesh::common::trial;
 
 TEST_CASE("Promise, default construction and invalidness") {
     Promise<Promise<int>> p;
@@ -58,7 +58,7 @@ TEST_CASE("Promise, setting result by construction, value") {
 
     int i = 0;
     double d = 0.0;
-    delay->setCallback([&i, &d](Try<P> &&r) { std::tie(i, d) = *r; });
+    delay->setCallback([&i, &d](trial<P> &&r) { std::tie(i, d) = *r; });
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
@@ -66,7 +66,7 @@ TEST_CASE("Promise, setting result by construction, value") {
 TEST_CASE("Promise, setting result by construction, invalidness") {
     auto delay = std::make_shared<Delay<int>>();
     Promise<int> p(delay);
-    delay->setCallback([&p](Try<int> &&) { CHECK_FALSE(p.isValid()); });
+    delay->setCallback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
     std::move(p).setResult(0);
 }
 
@@ -76,14 +76,14 @@ TEST_CASE("Promise, setting result by function, value") {
     std::move(p).setResultFrom([] { return 1; });
 
     int i = 0;
-    delay->setCallback([&i](Try<int> &&r) { i = *r; });
+    delay->setCallback([&i](trial<int> &&r) { i = *r; });
     CHECK(i == 1);
 }
 
 TEST_CASE("Promise, setting result by function, invalidness") {
     auto delay = std::make_shared<Delay<int>>();
     Promise<int> p(delay);
-    delay->setCallback([&p](Try<int> &&) { CHECK_FALSE(p.isValid()); });
+    delay->setCallback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
     std::move(p).setResultFrom([] { return 0; });
 }
 
@@ -93,7 +93,7 @@ TEST_CASE("Promise, setting result to exception, value") {
     std::move(p).fail(std::make_exception_ptr('\1'));
 
     char c = '\0';
-    delay->setCallback([&c](Try<int> &&r) {
+    delay->setCallback([&c](trial<int> &&r) {
         try {
             *r;
         } catch (char c2) {
@@ -106,7 +106,7 @@ TEST_CASE("Promise, setting result to exception, value") {
 TEST_CASE("Promise, setting result to exception, invalidness") {
     auto delay = std::make_shared<Delay<int>>();
     Promise<int> p(delay);
-    delay->setCallback([&p](Try<int> &&) { CHECK_FALSE(p.isValid()); });
+    delay->setCallback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
     std::move(p).fail(std::make_exception_ptr(0));
 }
 
@@ -120,7 +120,7 @@ TEST_CASE("Promise, setting result to current exception, value") {
     }
 
     char c = '\0';
-    delay->setCallback([&c](Try<int> &&r) {
+    delay->setCallback([&c](trial<int> &&r) {
         try {
             *r;
         } catch (char c2) {
@@ -133,7 +133,7 @@ TEST_CASE("Promise, setting result to current exception, value") {
 TEST_CASE("Promise, setting result to current exception, invalidness") {
     auto delay = std::make_shared<Delay<int>>();
     Promise<int> p(delay);
-    delay->setCallback([&p](Try<int> &&) { CHECK_FALSE(p.isValid()); });
+    delay->setCallback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
     try {
         throw 0;
     } catch (...) {

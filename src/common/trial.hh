@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_Try_hh
-#define INCLUDED_common_Try_hh
+#ifndef INCLUDED_common_trial_hh
+#define INCLUDED_common_trial_hh
 
 #include "buildconfig.h"
 
@@ -33,33 +33,33 @@ namespace common {
  * value of the template parameter type or an exception.
  */
 template<typename T>
-class Try : public common::variant<T, std::exception_ptr> {
+class trial : public common::variant<T, std::exception_ptr> {
 
 public:
 
     using common::variant<T, std::exception_ptr>::variant;
 
     /** Checks if this value has an actual result rather than an exception. */
-    bool hasValue() const noexcept {
+    bool has_value() const noexcept {
         switch (this->tag()) {
-        case Try::template tag<T>():
+        case trial::template tag<T>():
             return true;
-        case Try::template tag<std::exception_ptr>():
+        case trial::template tag<std::exception_ptr>():
             return false;
         }
         UNREACHABLE();
     }
 
     explicit operator bool() const noexcept {
-        return hasValue();
+        return has_value();
     }
 
     /** Returns a reference to the result value or throws the exception. */
     T &operator*() {
         switch (this->tag()) {
-        case Try::template tag<T>():
+        case trial::template tag<T>():
             return this->template value<T>();
-        case Try::template tag<std::exception_ptr>():
+        case trial::template tag<std::exception_ptr>():
             std::rethrow_exception(this->template value<std::exception_ptr>());
         }
         UNREACHABLE();
@@ -68,9 +68,9 @@ public:
     /** Returns a reference to the result value or throws the exception. */
     const T &operator*() const {
         switch (this->tag()) {
-        case Try::template tag<T>():
+        case trial::template tag<T>():
             return this->template value<T>();
-        case Try::template tag<std::exception_ptr>():
+        case trial::template tag<std::exception_ptr>():
             std::rethrow_exception(this->template value<std::exception_ptr>());
         }
         UNREACHABLE();
@@ -86,11 +86,11 @@ public:
         return std::addressof(**this);
     }
 
-}; // template<typename T> class Try
+}; // template<typename T> class trial
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_Try_hh
+#endif // #ifndef INCLUDED_common_trial_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

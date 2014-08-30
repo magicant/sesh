@@ -25,9 +25,9 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include "common/Try.hh"
 #include "common/empty.hh"
 #include "common/maybe.hh"
+#include "common/trial.hh"
 #include "common/type_tag.hh"
 
 namespace sesh {
@@ -54,12 +54,12 @@ class Delay {
 
 public:
 
-    using Callback = std::function<void(common::Try<T> &&)>;
+    using Callback = std::function<void(common::trial<T> &&)>;
 
 private:
 
     using Empty = common::empty;
-    using Try = common::Try<T>;
+    using Try = common::trial<T>;
     using ForwardSource = std::weak_ptr<Delay>;
     using ForwardTarget = std::shared_ptr<Delay>;
 
@@ -82,9 +82,9 @@ private:
 public:
 
     /**
-     * Sets the result of this delay object by constructing Try&lt;T> with the
-     * arguments. If the constructor throws, the result is set to the exception
-     * thrown.
+     * Sets the result of this delay object by constructing {@code trial&lt;T>}
+     * with the arguments. If the constructor throws, the result is set to the
+     * exception thrown.
      *
      * The behavior is undefined if the result has already been set.
      *

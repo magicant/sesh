@@ -24,7 +24,7 @@
 #include <memory>
 #include <utility>
 #include "async/Future.hh"
-#include "common/Try.hh"
+#include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/AwaiterTestHelper.hh"
 #include "os/event/PselectApi.hh"
@@ -38,7 +38,7 @@ using sesh::async::Future;
 using sesh::async::createFailedFutureOf;
 using sesh::async::createFutureOf;
 using sesh::async::createPromiseFuturePair;
-using sesh::common::Try;
+using sesh::common::trial;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::Trigger;
 using sesh::os::event::UserProvidedTrigger;
@@ -54,8 +54,8 @@ TEST_CASE_METHOD(
 
     std::shared_ptr<void> result = std::make_shared<int>(1);
     Future<Trigger> f = a.expect(UserProvidedTrigger(createFutureOf(result)));
-    std::move(f).then([this, &result](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, &result](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<UserProvidedTrigger>());
         CHECK(t->value<UserProvidedTrigger>().result() == result);
         mutableSteadyClockNow() += std::chrono::seconds(2);
@@ -74,7 +74,7 @@ TEST_CASE_METHOD(
 
     Future<Trigger> f = a.expect(UserProvidedTrigger(
                 createFailedFutureOf<std::shared_ptr<void>>(7)));
-    std::move(f).then([this](Try<Trigger> &&t) {
+    std::move(f).then([this](trial<Trigger> &&t) {
         try {
             *t;
         } catch (int i) {
@@ -99,8 +99,8 @@ TEST_CASE_METHOD(
     Future<Trigger> f = a.expect(
             UPT(createPromiseFuturePair<UPT::Result>().second),
             UPT(createFutureOf(result)));
-    std::move(f).then([this, &result](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this, &result](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<UserProvidedTrigger>());
         CHECK(t->value<UserProvidedTrigger>().result() == result);
         mutableSteadyClockNow() += std::chrono::seconds(2);
@@ -122,8 +122,8 @@ TEST_CASE_METHOD(
     });
     auto f3 = a.expect(UserProvidedTrigger(std::move(f2)));
     std::shared_ptr<void> actual;
-    std::move(f3).then([&actual](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f3).then([&actual](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<UserProvidedTrigger>());
         actual = t->value<UserProvidedTrigger>().result();
     });

@@ -24,9 +24,9 @@
 #include <exception>
 #include <utility>
 #include "async/Future.tcc"
-#include "common/Try.hh"
 #include "common/identity.hh"
 #include "common/maybe.hh"
+#include "common/trial.hh"
 
 namespace sesh {
 namespace async {
@@ -37,25 +37,25 @@ class SharedFutureBase<T>::Impl {
 
 public:
 
-    using Callback = std::function<void(const common::Try<T> &)>;
+    using Callback = std::function<void(const common::trial<T> &)>;
 
 private:
 
-    common::maybe<common::Try<T>> mResult;
+    common::maybe<common::trial<T>> mResult;
 
     /** Empty after the result is set and all callbacks are called. */
     std::vector<Callback> mCallbacks;
 
 public:
 
-    void setResult(common::Try<T> &&);
+    void setResult(common::trial<T> &&);
 
     void addCallback(Callback &&);
 
 }; // template<typename T> class SharedFuture<T>::Impl
 
 template<typename T>
-void SharedFutureBase<T>::Impl::setResult(common::Try<T> &&t) {
+void SharedFutureBase<T>::Impl::setResult(common::trial<T> &&t) {
     try {
         mResult.emplace(std::move(t));
     } catch (...) {
@@ -82,7 +82,7 @@ SharedFutureBase<T>::SharedFutureBase(Future<T> &&f) : mImpl() {
     mImpl = std::make_shared<Impl>();
 
     auto &impl = mImpl;
-    std::move(f).then([impl](common::Try<T> &&t) {
+    std::move(f).then([impl](common::trial<T> &&t) {
         impl->setResult(std::move(t));
     });
 }
@@ -111,10 +111,9 @@ SharedFutureBase<T>::operator bool() const noexcept {
 
 template<typename T>
 template<typename Function>
-typename std::enable_if<std::is_void<
-        typename std::result_of<
-            typename std::decay<Function>::type(const common::Try<T> &)>::type
->::value>::type
+typename std::enable_if<std::is_void<typename std::result_of<
+        typename std::decay<Function>::type(const common::trial<T> &)
+>::type>::value>::type
 SharedFutureBase<T>::then(Function &&f) const {
     mImpl->addCallback(std::forward<Function>(f));
 }
@@ -218,8 +217,8 @@ public:
     explicit SharedUnwrapper(Promise<T> &&receiver) noexcept :
             mReceiver(std::move(receiver)) { }
 
-    void operator()(const common::Try<SharedFuture<T>> &r) {
-        if (r.hasValue())
+    void operator()(const common::trial<SharedFuture<T>> &r) {
+        if (r.has_value())
             return r->forward(std::move(mReceiver));
 
         std::move(mReceiver).fail(r.template value<std::exception_ptr>());

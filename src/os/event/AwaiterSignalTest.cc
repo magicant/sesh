@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 #include "async/Future.hh"
-#include "common/Try.hh"
+#include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/Awaiter.hh"
 #include "os/event/AwaiterTestHelper.hh"
@@ -41,7 +41,7 @@
 namespace {
 
 using sesh::async::Future;
-using sesh::common::Try;
+using sesh::common::trial;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::Signal;
 using sesh::os::event::Trigger;
@@ -59,8 +59,8 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Signal(3));
-    std::move(f).then([this](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<Signal>());
         CHECK(t->value<Signal>().number() == 3);
         mutableSteadyClockNow() += std::chrono::seconds(2);
@@ -130,8 +130,8 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(100));
     mutableSteadyClockNow() = startTime;
     Future<Trigger> f = a.expect(Signal(2), Signal(6));
-    std::move(f).then([this](Try<Trigger> &&t) {
-        REQUIRE(t.hasValue());
+    std::move(f).then([this](trial<Trigger> &&t) {
+        REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<Signal>());
         CHECK(t->value<Signal>().number() == 6);
         mutableSteadyClockNow() += std::chrono::seconds(2);
@@ -176,8 +176,8 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     for (unsigned i = 0; i < 2; ++i) {
-        a.expect(Signal(1)).then([this](Try<Trigger> &&t) {
-            REQUIRE(t.hasValue());
+        a.expect(Signal(1)).then([this](trial<Trigger> &&t) {
+            REQUIRE(t.has_value());
             REQUIRE(t->tag() == Trigger::tag<Signal>());
             CHECK(t->value<Signal>().number() == 1);
             mutableSteadyClockNow() += std::chrono::seconds(1);
@@ -218,8 +218,8 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     for (SignalNumber sn : {1, 2}) {
-        a.expect(Signal(sn)).then([this, sn](Try<Trigger> &&t) {
-            REQUIRE(t.hasValue());
+        a.expect(Signal(sn)).then([this, sn](trial<Trigger> &&t) {
+            REQUIRE(t.has_value());
             REQUIRE(t->tag() == Trigger::tag<Signal>());
             CHECK(t->value<Signal>().number() == sn);
             mutableSteadyClockNow() += std::chrono::seconds(1);
@@ -263,8 +263,8 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
     for (SignalNumber sn : {1, 2}) {
-        a.expect(Signal(sn)).then([this, sn](Try<Trigger> &&t) {
-            REQUIRE(t.hasValue());
+        a.expect(Signal(sn)).then([this, sn](trial<Trigger> &&t) {
+            REQUIRE(t.has_value());
             REQUIRE(t->tag() == Trigger::tag<Signal>());
             CHECK(t->value<Signal>().number() == sn);
             mutableSteadyClockNow() += std::chrono::seconds(1);

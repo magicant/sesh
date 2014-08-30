@@ -29,9 +29,9 @@
 #include <vector>
 #include "async/Future.hh"
 #include "async/Promise.hh"
-#include "common/Try.hh"
 #include "common/container_helper.hh"
 #include "common/shared_function.hh"
+#include "common/trial.hh"
 #include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/TimeApi.hh"
@@ -46,9 +46,9 @@
 using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::createPromiseFuturePair;
-using sesh::common::Try;
 using sesh::common::find_if;
 using sesh::common::shared_function;
+using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
@@ -339,7 +339,7 @@ void registerUserProvidedTrigger(
         UserProvidedTrigger &&t, std::shared_ptr<PendingEvent> &e) {
     using Result = UserProvidedTrigger::Result;
     std::weak_ptr<PendingEvent> w = e;
-    std::move(t.future()).then([w](Try<Result> &&t) {
+    std::move(t.future()).then([w](trial<Result> &&t) {
         if (std::shared_ptr<PendingEvent> e = w.lock()) {
             try {
                 e->fire(UserProvidedTrigger(std::move(*t)));

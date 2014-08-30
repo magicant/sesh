@@ -28,8 +28,8 @@
 #include <utility>
 #include "async/Future.hh"
 #include "async/Promise.hh"
-#include "common/Try.hh"
 #include "common/copy.hh"
+#include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/Trigger.hh"
@@ -47,8 +47,8 @@ using sesh::async::Promise;
 using sesh::async::createFailedFutureOf;
 using sesh::async::createFuture;
 using sesh::async::createPromiseFuturePair;
-using sesh::common::Try;
 using sesh::common::copy;
+using sesh::common::trial;
 using sesh::os::event::Proactor;
 using sesh::os::event::Trigger;
 using sesh::os::event::WritableFileDescriptor;
@@ -96,8 +96,8 @@ TEST_CASE("Write: empty") {
             api, p, dummyNonBlockingFileDescriptor(FD), std::vector<char>());
 
     bool called = false;
-    std::move(f).then([FD, &called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         CHECK(r->second.value() == 0);
@@ -175,8 +175,8 @@ TEST_CASE_METHOD(WriteTestFixture, "Write: one byte") {
             std::vector<char>{C});
 
     bool called = false;
-    std::move(f).then([&called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([&called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         CHECK(r->second.value() == 0);
@@ -200,8 +200,8 @@ TEST_CASE_METHOD(WriteTestFixture, "Write: 25 bytes in three writes") {
             *this, *this, dummyNonBlockingFileDescriptor(FD), copy(bytes));
 
     bool called = false;
-    std::move(f).then([&called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([&called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         CHECK(r->second.value() == 0);
@@ -248,8 +248,8 @@ TEST_CASE("Write: domain error in proactor") {
             api, p, dummyNonBlockingFileDescriptor(FD), {'C'});
 
     bool called = false;
-    std::move(f).then([FD, &called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         CHECK(r->second ==
@@ -281,8 +281,8 @@ TEST_CASE("Write: write error") {
             api, proactor, dummyNonBlockingFileDescriptor(FD), {'A'});
 
     bool called = false;
-    std::move(f).then([FD, &called](Try<ResultPair> &&r) {
-        REQUIRE(r.hasValue());
+    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+        REQUIRE(r.has_value());
         CHECK(r->first.isValid());
         CHECK(r->first.value() == FD);
         CHECK(r->second == std::make_error_code(std::errc::io_error));
