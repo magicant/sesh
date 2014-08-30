@@ -49,21 +49,21 @@ struct MoveOnly {
 
 TEST_CASE("Future, default construction and invalidness") {
     Future<Future<int>> f;
-    CHECK_FALSE(f.isValid());
+    CHECK_FALSE(f.is_valid());
 }
 
 TEST_CASE("Future, construction and validness") {
     auto d = std::make_shared<delay<int>>();
     Future<int> f(d);
     d = nullptr;
-    CHECK(f.isValid());
+    CHECK(f.is_valid());
 }
 
 TEST_CASE("Future, invalidness after setting callback") {
     const auto d = std::make_shared<delay<int>>();
     Future<int> f(d);
     std::move(f).then(nop());
-    CHECK_FALSE(f.isValid());
+    CHECK_FALSE(f.is_valid());
 }
 
 TEST_CASE("Future, setting callback") {
@@ -82,7 +82,7 @@ TEST_CASE("Future, invalidness in callback") {
     auto d = std::make_shared<delay<int>>();
     d->set_result(0);
     Future<int> f(d);
-    std::move(f).then([&f](trial<int> &&) { CHECK_FALSE(f.isValid()); });
+    std::move(f).then([&f](trial<int> &&) { CHECK_FALSE(f.is_valid()); });
 }
 
 TEST_CASE("Create promise/future pair") {

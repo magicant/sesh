@@ -128,7 +128,7 @@ public:
         if (mIsReadyToWrite)
             return;
         mIsReadyToWrite = true;
-        if (mPromise.isValid())
+        if (mPromise.is_valid())
             std::move(mPromise).setResult(WritableFileDescriptor(FD));
     }
 

@@ -26,7 +26,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "async/DelayHolder.hh"
+#include "async/delay_holder.hh"
 #include "async/Promise.hh"
 #include "common/trial.hh"
 
@@ -40,11 +40,11 @@ class Future;
 
 /** A base class that implements most part of the future class. */
 template<typename T>
-class FutureBase : public DelayHolder<T> {
+class FutureBase : public delay_holder<T> {
 
 public:
 
-    using DelayHolder<T>::DelayHolder;
+    using delay_holder<T>::delay_holder;
 
     /**
      * Sets a callback function to receive the result from the associated

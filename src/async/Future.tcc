@@ -189,7 +189,7 @@ void FutureBase<T>::forward(Promise<T> &&receiver) && {
      * infinitely recursive algorithm to grow the delay object chain until it
      * eats up the heap.
      */
-    DelayHolder<T>::forward(std::move(*this), std::move(receiver));
+    delay_holder<T>::forward(std::move(*this), std::move(receiver));
 }
 
 template<typename F>

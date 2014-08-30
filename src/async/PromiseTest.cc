@@ -33,21 +33,21 @@ using sesh::common::trial;
 
 TEST_CASE("Promise, default construction and invalidness") {
     Promise<Promise<int>> p;
-    CHECK_FALSE(p.isValid());
+    CHECK_FALSE(p.is_valid());
 }
 
 TEST_CASE("Promise, construction and validness") {
     std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
     Promise<int> p(d);
     d = nullptr;
-    CHECK(p.isValid());
+    CHECK(p.is_valid());
 }
 
 TEST_CASE("Promise, invalidness after setting result") {
     const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
     Promise<int> p(d);
     std::move(p).setResult(0);
-    CHECK_FALSE(p.isValid());
+    CHECK_FALSE(p.is_valid());
 }
 
 TEST_CASE("Promise, setting result by construction, value") {
@@ -66,7 +66,7 @@ TEST_CASE("Promise, setting result by construction, value") {
 TEST_CASE("Promise, setting result by construction, invalidness") {
     auto d = std::make_shared<delay<int>>();
     Promise<int> p(d);
-    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
+    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.is_valid()); });
     std::move(p).setResult(0);
 }
 
@@ -83,7 +83,7 @@ TEST_CASE("Promise, setting result by function, value") {
 TEST_CASE("Promise, setting result by function, invalidness") {
     auto d = std::make_shared<delay<int>>();
     Promise<int> p(d);
-    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
+    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.is_valid()); });
     std::move(p).setResultFrom([] { return 0; });
 }
 
@@ -106,7 +106,7 @@ TEST_CASE("Promise, setting result to exception, value") {
 TEST_CASE("Promise, setting result to exception, invalidness") {
     auto d = std::make_shared<delay<int>>();
     Promise<int> p(d);
-    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
+    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.is_valid()); });
     std::move(p).fail(std::make_exception_ptr(0));
 }
 
@@ -133,7 +133,7 @@ TEST_CASE("Promise, setting result to current exception, value") {
 TEST_CASE("Promise, setting result to current exception, invalidness") {
     auto d = std::make_shared<delay<int>>();
     Promise<int> p(d);
-    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
+    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.is_valid()); });
     try {
         throw 0;
     } catch (...) {

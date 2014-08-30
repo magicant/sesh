@@ -92,7 +92,7 @@ public:
 
     void addTrigger(const FileDescriptorTrigger &t);
 
-    bool hasFired() const noexcept { return !mPromise.isValid(); }
+    bool hasFired() const noexcept { return !mPromise.is_valid(); }
 
     void fire(Trigger &&);
     void failWithCurrentException();

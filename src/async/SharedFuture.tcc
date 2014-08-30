@@ -76,7 +76,7 @@ void SharedFutureBase<T>::Impl::addCallback(Callback &&c) {
 
 template<typename T>
 SharedFutureBase<T>::SharedFutureBase(Future<T> &&f) : mImpl() {
-    if (!f.isValid())
+    if (!f.is_valid())
         return;
 
     mImpl = std::make_shared<Impl>();

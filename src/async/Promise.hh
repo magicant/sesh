@@ -23,7 +23,7 @@
 #include <exception>
 #include <functional>
 #include <utility>
-#include "async/DelayHolder.hh"
+#include "async/delay_holder.hh"
 #include "common/functional_initialize.hh"
 #include "common/type_tag.hh"
 
@@ -46,11 +46,11 @@ namespace async {
  * std::exception_ptr.
  */
 template<typename T>
-class Promise : public DelayHolder<T> {
+class Promise : public delay_holder<T> {
 
 public:
 
-    using DelayHolder<T>::DelayHolder;
+    using delay_holder<T>::delay_holder;
 
     /**
      * Sets the result of the associated future by constructing T with the

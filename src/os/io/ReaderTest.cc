@@ -130,7 +130,7 @@ public:
         if (mIsReadyToRead)
             return;
         mIsReadyToRead = true;
-        if (mPromise.isValid())
+        if (mPromise.is_valid())
             std::move(mPromise).setResult(ReadableFileDescriptor(FD));
     }
 
