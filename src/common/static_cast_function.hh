@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_StaticCast_hh
-#define INCLUDED_common_StaticCast_hh
+#ifndef INCLUDED_common_static_cast_function_hh
+#define INCLUDED_common_static_cast_function_hh
 
 #include "buildconfig.h"
 
@@ -32,7 +32,7 @@ namespace common {
  * doesn't care the type.
  */
 template<typename To, typename From = void>
-class StaticCast {
+class static_cast_function {
 
 public:
 
@@ -43,14 +43,14 @@ public:
         return static_cast<To>(v);
     }
 
-}; // template<typename To, typename From> class StaticCast
+}; // template<typename To, typename From> class static_cast_function
 
 /**
  * This specialization of the static cast class template tries to static-cast
  * the argument value regardless of its type.
  */
 template<typename To>
-class StaticCast<To, void> {
+class static_cast_function<To, void> {
 
 public:
 
@@ -62,11 +62,11 @@ public:
         return static_cast<To>(std::move(v));
     }
 
-}; // template<typename To> class StaticCast<To, void>
+}; // template<typename To> class static_cast_function<To, void>
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_StaticCast_hh
+#endif // #ifndef INCLUDED_common_static_cast_function_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

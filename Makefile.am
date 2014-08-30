@@ -89,7 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/StaticCast.hh \
 	src/common/StringStream.hh \
 	src/common/Trie.hh \
 	src/common/Try.hh \
@@ -112,6 +111,7 @@ src_sesh_SOURCES = \
 	src/common/nop.hh \
 	src/common/reference.hh \
 	src/common/shared_function.hh \
+	src/common/static_cast_function.hh \
 	src/common/type_tag.hh \
 	src/common/variant.hh \
 	src/common/xchar.hh \

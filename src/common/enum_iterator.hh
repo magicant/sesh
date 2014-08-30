@@ -25,7 +25,7 @@
 #include "boost/iterator/counting_iterator.hpp"
 #include "boost/iterator/transform_iterator.hpp"
 #include "common/enum_traits.hh"
-#include "common/StaticCast.hh"
+#include "common/static_cast_function.hh"
 
 namespace sesh {
 namespace common {
@@ -34,7 +34,7 @@ namespace enum_iterator_impl {
 
 template<typename E>
 using base = boost::transform_iterator<
-        StaticCast<E, typename std::underlying_type<E>::type>,
+        static_cast_function<E, typename std::underlying_type<E>::type>,
         boost::counting_iterator<typename std::underlying_type<E>::type>>;
 
 } // namespace enum_iterator_impl
@@ -53,7 +53,7 @@ public:
     explicit enum_iterator(underlying_type v) :
             enum_iterator_impl::base<E>(
                     boost::make_counting_iterator(v),
-                    StaticCast<E, underlying_type>()) { }
+                    static_cast_function<E, underlying_type>()) { }
 
     enum_iterator(E e) : enum_iterator(static_cast<underlying_type>(e)) { }
 
