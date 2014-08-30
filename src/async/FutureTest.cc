@@ -23,7 +23,7 @@
 #include <exception>
 #include <tuple>
 #include <utility>
-#include "async/Delay.hh"
+#include "async/delay.hh"
 #include "async/Future.hh"
 #include "async/Promise.hh"
 #include "common/nop.hh"
@@ -31,7 +31,6 @@
 
 namespace {
 
-using sesh::async::Delay;
 using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::createFailedFutureOf;
@@ -39,6 +38,7 @@ using sesh::async::createFuture;
 using sesh::async::createFutureFrom;
 using sesh::async::createFutureOf;
 using sesh::async::createPromiseFuturePair;
+using sesh::async::delay;
 using sesh::common::nop;
 using sesh::common::trial;
 
@@ -53,35 +53,35 @@ TEST_CASE("Future, default construction and invalidness") {
 }
 
 TEST_CASE("Future, construction and validness") {
-    auto delay = std::make_shared<Delay<int>>();
-    Future<int> f(delay);
-    delay = nullptr;
+    auto d = std::make_shared<delay<int>>();
+    Future<int> f(d);
+    d = nullptr;
     CHECK(f.isValid());
 }
 
 TEST_CASE("Future, invalidness after setting callback") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f(delay);
+    const auto d = std::make_shared<delay<int>>();
+    Future<int> f(d);
     std::move(f).then(nop());
     CHECK_FALSE(f.isValid());
 }
 
 TEST_CASE("Future, setting callback") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f(delay);
+    const auto d = std::make_shared<delay<int>>();
+    Future<int> f(d);
 
     int i = 0;
     std::move(f).then([&i](trial<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResult(1);
+    d->set_result(1);
     CHECK(i == 1);
 }
 
 TEST_CASE("Future, invalidness in callback") {
-    auto delay = std::make_shared<Delay<int>>();
-    delay->setResult(0);
-    Future<int> f(delay);
+    auto d = std::make_shared<delay<int>>();
+    d->set_result(0);
+    Future<int> f(d);
     std::move(f).then([&f](trial<int> &&) { CHECK_FALSE(f.isValid()); });
 }
 
@@ -95,8 +95,8 @@ TEST_CASE("Create promise/future pair") {
 }
 
 TEST_CASE("Future, then, to promise, success") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    Future<int> f1(dly);
     std::pair<Promise<double>, Future<double>> pf2 =
             createPromiseFuturePair<double>();
 
@@ -109,14 +109,14 @@ TEST_CASE("Future, then, to promise, success") {
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResult(1);
+    dly->set_result(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
 
 TEST_CASE("Future, then, returning future, success") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    Future<int> f1(dly);
 
     int i = 0;
     const auto f = [&i](trial<int> &&v) -> double { i = *v; return 2.0; };
@@ -127,14 +127,14 @@ TEST_CASE("Future, then, returning future, success") {
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResult(1);
+    dly->set_result(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
 
 TEST_CASE("Future, then, returning future, failure") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    Future<int> f1(dly);
 
     const auto f = [](trial<int> &&) -> char { throw 2.0; };
     Future<char> f2 = std::move(f1).then(f);
@@ -149,13 +149,13 @@ TEST_CASE("Future, then, returning future, failure") {
     });
 
     CHECK(d == 0.0);
-    delay->setResult(1);
+    dly->set_result(1);
     CHECK(d == 2.0);
 }
 
 TEST_CASE("Future, map, to promise, success") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    Future<int> f1(dly);
     std::pair<Promise<double>, Future<double>> pf2 =
             createPromiseFuturePair<double>();
 
@@ -168,7 +168,7 @@ TEST_CASE("Future, map, to promise, success") {
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResult(1);
+    dly->set_result(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
@@ -186,8 +186,8 @@ TEST_CASE("Future, map, returning future, success, movable function") {
         }
     };
 
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    Future<int> f1(dly);
 
     int i = 0;
     Future<double> f2 = std::move(f1).map(MovableFunction(i));
@@ -197,15 +197,15 @@ TEST_CASE("Future, map, returning future, success, movable function") {
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResult(1);
+    dly->set_result(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
 
 TEST_CASE(
         "Future, map, returning future, success, copyable constant function") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    Future<int> f1(dly);
 
     int i = 0;
     const auto f = [&i](int &&v) -> double { i = v; return 2.0; };
@@ -216,14 +216,14 @@ TEST_CASE(
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResult(1);
+    dly->set_result(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
 
 TEST_CASE("Future, map, returning future, failure propagation") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    Future<int> f1(dly);
 
     const auto f = [](int &&) -> char { FAIL("unexpected"); return 'a'; };
     Future<char> f2 = std::move(f1).map(f);
@@ -238,13 +238,13 @@ TEST_CASE("Future, map, returning future, failure propagation") {
     });
 
     CHECK(d == 0.0);
-    delay->setResult(std::make_exception_ptr(2.0));
+    dly->set_result(std::make_exception_ptr(2.0));
     CHECK(d == 2.0);
 }
 
 TEST_CASE("Future, map, failure in callback") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    Future<int> f1(dly);
 
     int i = 0;
     const auto f = [&i](int &&v) -> char { i = v; throw 2.0; };
@@ -261,14 +261,14 @@ TEST_CASE("Future, map, failure in callback") {
 
     CHECK(i == 0);
     CHECK(d == 0.0);
-    delay->setResult(1);
+    dly->set_result(1);
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
 
 TEST_CASE("Future, recover, to promise, success") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto d = std::make_shared<delay<int>>();
+    Future<int> f1(d);
     std::pair<Promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
 
     const auto f = [](std::exception_ptr) -> int {
@@ -281,7 +281,7 @@ TEST_CASE("Future, recover, to promise, success") {
     std::move(pf2.second).then([&i](trial<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResult(1);
+    d->set_result(1);
     CHECK(i == 1);
 }
 
@@ -296,23 +296,23 @@ TEST_CASE("Future, recover, returning future, success, movable function") {
         }
     };
 
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto d = std::make_shared<delay<int>>();
+    Future<int> f1(d);
     Future<int> f2 = std::move(f1).recover(MovableFunction());
 
     int i = 0;
     std::move(f2).then([&i](trial<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResult(1);
+    d->set_result(1);
     CHECK(i == 1);
 }
 
 TEST_CASE(
         "Future, recover, returning future, success, "
         "copyable constant function") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto d = std::make_shared<delay<int>>();
+    Future<int> f1(d);
     const auto f = [](std::exception_ptr) -> int {
         FAIL("unexpected exception");
         return 2;
@@ -323,13 +323,13 @@ TEST_CASE(
     std::move(f2).then([&i](trial<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResult(1);
+    d->set_result(1);
     CHECK(i == 1);
 }
 
 TEST_CASE("Future, recover from exception") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto d = std::make_shared<delay<int>>();
+    Future<int> f1(d);
     const auto f = [](std::exception_ptr e) -> int {
         try {
             std::rethrow_exception(e);
@@ -344,13 +344,13 @@ TEST_CASE("Future, recover from exception") {
     std::move(f2).then([&i](trial<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResult(std::make_exception_ptr(1.0));
+    d->set_result(std::make_exception_ptr(1.0));
     CHECK(i == 1);
 }
 
 TEST_CASE("Future, recovery failure") {
-    const auto delay = std::make_shared<Delay<int>>();
-    Future<int> f1(delay);
+    const auto d = std::make_shared<delay<int>>();
+    Future<int> f1(d);
     const auto f = [](std::exception_ptr) -> int { throw 2.0; };
     Future<int> f2 = std::move(f1).recover(f);
 
@@ -365,7 +365,7 @@ TEST_CASE("Future, recovery failure") {
     });
 
     CHECK(i == 0);
-    delay->setResult(std::make_exception_ptr(1.0));
+    d->set_result(std::make_exception_ptr(1.0));
     CHECK(i == 1);
 }
 

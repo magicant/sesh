@@ -25,7 +25,7 @@
 
 namespace {
 
-using sesh::async::Delay;
+using sesh::async::delay;
 using sesh::async::DelayHolder;
 
 TEST_CASE("Delay holder, move") {
@@ -39,14 +39,14 @@ TEST_CASE("Delay holder, default construction and invalidness") {
 }
 
 TEST_CASE("Delay holder, construction with delay and validness") {
-    std::shared_ptr<Delay<int>> d = std::make_shared<Delay<int>>();
+    std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
     DelayHolder<int> dh(d);
     d.reset();
     CHECK(dh.isValid());
 }
 
 TEST_CASE("Delay holder, invalidation") {
-    const std::shared_ptr<Delay<int>> d = std::make_shared<Delay<int>>();
+    const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
     DelayHolder<int> dh(d);
     dh.invalidate();
     CHECK_FALSE(dh.isValid());

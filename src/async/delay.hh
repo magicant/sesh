@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_async_Delay_hh
-#define INCLUDED_async_Delay_hh
+#ifndef INCLUDED_async_delay_hh
+#define INCLUDED_async_delay_hh
 
 #include "buildconfig.h"
 
@@ -50,33 +50,33 @@ namespace async {
  * other than std::exception_ptr.
  */
 template<typename T>
-class Delay {
+class delay {
 
 public:
 
-    using Callback = std::function<void(common::trial<T> &&)>;
+    using callback = std::function<void(common::trial<T> &&)>;
 
 private:
 
-    using Empty = common::empty;
-    using Try = common::trial<T>;
-    using ForwardSource = std::weak_ptr<Delay>;
-    using ForwardTarget = std::shared_ptr<Delay>;
+    using empty = common::empty;
+    using trial = common::trial<T>;
+    using forward_source = std::weak_ptr<delay>;
+    using forward_target = std::shared_ptr<delay>;
 
-    using Input = common::variant<Empty, Try, ForwardSource>;
-    using Output = common::variant<Empty, Callback, ForwardTarget>;
+    using input = common::variant<empty, trial, forward_source>;
+    using output = common::variant<empty, callback, forward_target>;
 
-    Input mInput = Input(common::type_tag<Empty>());
-    Output mOutput = Output(common::type_tag<Empty>());
+    input m_input = input(common::type_tag<empty>());
+    output m_output = output(common::type_tag<empty>());
 
-    void fireIfReady() {
-        if (mInput.tag() != mInput.template tag<Try>())
+    void fire_if_ready() {
+        if (m_input.tag() != m_input.template tag<trial>())
             return;
-        if (mOutput.tag() != mOutput.template tag<Callback>())
+        if (m_output.tag() != m_output.template tag<callback>())
             return;
 
-        auto &f = mOutput.template value<Callback>();
-        f(std::move(mInput.template value<Try>()));
+        auto &f = m_output.template value<callback>();
+        f(std::move(m_input.template value<trial>()));
     }
 
 public:
@@ -92,21 +92,22 @@ public:
      * with the result set.
      */
     template<typename... Arg>
-    void setResult(Arg &&... arg) {
-        assert(mInput.tag() != mInput.template tag<Try>());
+    void set_result(Arg &&... arg) {
+        assert(m_input.tag() != m_input.template tag<trial>());
 
-        if (mOutput.tag() == mOutput.template tag<ForwardTarget>())
-            return mOutput.template value<ForwardTarget>()->setResult(
+        if (m_output.tag() == m_output.template tag<forward_target>())
+            return m_output.template value<forward_target>()->set_result(
                     std::forward<Arg>(arg)...);
 
         try {
-            mInput.template emplace_with_fallback<Empty>(
-                    common::type_tag<Try>(), std::forward<Arg>(arg)...);
+            m_input.template emplace_with_fallback<empty>(
+                    common::type_tag<trial>(), std::forward<Arg>(arg)...);
         } catch (...) {
-            mInput.emplace(common::type_tag<Try>(), std::current_exception());
+            m_input.emplace(
+                    common::type_tag<trial>(), std::current_exception());
         }
 
-        fireIfReady();
+        fire_if_ready();
     }
 
     /**
@@ -118,23 +119,23 @@ public:
      * If a result has already been set, the callback function is called
      * immediately with the result.
      */
-    void setCallback(Callback &&f) {
-        assert(mOutput.tag() != mOutput.template tag<Callback>());
+    void set_callback(callback &&f) {
+        assert(m_output.tag() != m_output.template tag<callback>());
         assert(f != nullptr);
 
-        if (mInput.tag() == mInput.template tag<ForwardSource>()) {
-            if (auto fs = mInput.template value<ForwardSource>().lock())
-                fs->setCallback(std::move(f));
+        if (m_input.tag() == m_input.template tag<forward_source>()) {
+            if (auto fs = m_input.template value<forward_source>().lock())
+                fs->set_callback(std::move(f));
             return;
         }
 
-        mOutput.template emplace_with_fallback<Empty>(std::move(f));
+        m_output.template emplace_with_fallback<empty>(std::move(f));
 
-        fireIfReady();
+        fire_if_ready();
     }
 
     /**
-     * Connects two Delay objects as if a callback is set to the "from" object
+     * Connects two delay objects as if a callback is set to the "from" object
      * so that the result set to the "from" object is simply transferred to the
      * "to" object. If a result and callback both have already been set, the
      * result is immediately passed to the callback.
@@ -149,49 +150,51 @@ public:
      *
      * The argument pointers must be non-null. The "from" and "to" objects must
      * not have a callback and result set, respectively. After calling this
-     * function, {@link #setCallback} and {@link #setResult} must not be called
-     * for the "from" and "to" objects, respectively.
+     * function, {@link #set_callback} and {@link #set_result} must not be
+     * called for the "from" and "to" objects, respectively.
      */
     static void forward(
-            std::shared_ptr<Delay> &&from, std::shared_ptr<Delay> &&to) {
+            std::shared_ptr<delay> &&from, std::shared_ptr<delay> &&to) {
         assert(from != nullptr);
-        assert(from->mOutput.tag() != from->mOutput.template tag<Callback>());
+        assert(from->m_output.tag() !=
+                from->m_output.template tag<callback>());
 
         assert(to != nullptr);
-        assert(to->mInput.tag() != to->mInput.template tag<Try>());
+        assert(to->m_input.tag() != to->m_input.template tag<trial>());
 
         // Normalize "from"
-        if (from->mInput.tag() == from->mInput.template tag<ForwardSource>()) {
-            from = from->mInput.template value<ForwardSource>().lock();
+        if (from->m_input.tag() ==
+                from->m_input.template tag<forward_source>()) {
+            from = from->m_input.template value<forward_source>().lock();
             if (from == nullptr)
                 return;
         }
 
         // Normalize "to"
-        if (to->mOutput.tag() == to->mOutput.template tag<ForwardTarget>())
-            to = std::move(to->mOutput.template value<ForwardTarget>());
+        if (to->m_output.tag() == to->m_output.template tag<forward_target>())
+            to = std::move(to->m_output.template value<forward_target>());
 
         // Transfer result
-        if (from->mInput.tag() == from->mInput.template tag<Try>())
-            return to->setResult(
-                    std::move(from->mInput.template value<Try>()));
+        if (from->m_input.tag() == from->m_input.template tag<trial>())
+            return to->set_result(
+                    std::move(from->m_input.template value<trial>()));
 
         // Transfer callback
-        if (to->mOutput.tag() == to->mOutput.template tag<Callback>())
-            return from->setCallback(
-                    std::move(to->mOutput.template value<Callback>()));
+        if (to->m_output.tag() == to->m_output.template tag<callback>())
+            return from->set_callback(
+                    std::move(to->m_output.template value<callback>()));
 
         // Connect
-        to->mInput.emplace(common::type_tag<ForwardSource>(), from);
-        from->mOutput.emplace(
-                common::type_tag<ForwardTarget>(), std::move(to));
+        to->m_input.emplace(common::type_tag<forward_source>(), from);
+        from->m_output.emplace(
+                common::type_tag<forward_target>(), std::move(to));
     }
 
-}; // template<typename T> class Delay
+}; // template<typename T> class delay
 
 } // namespace async
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_async_Delay_hh
+#endif // #ifndef INCLUDED_async_delay_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -64,7 +64,7 @@ public:
     template<typename... Arg>
     void setResult(Arg &&... arg) && {
         Promise copy = std::move(*this);
-        copy.delay().setResult(
+        copy.delay().set_result(
                 common::type_tag<T>(), std::forward<Arg>(arg)...);
     }
 
@@ -81,7 +81,7 @@ public:
     template<typename F>
     void setResultFrom(F &&f) && {
         Promise copy = std::move(*this);
-        copy.delay().setResult(
+        copy.delay().set_result(
                 common::functional_initialize(), std::forward<F>(f));
     }
 
@@ -95,7 +95,7 @@ public:
      */
     void fail(const std::exception_ptr &e) && {
         Promise copy = std::move(*this);
-        copy.delay().setResult(e);
+        copy.delay().set_result(e);
     }
 
     /**

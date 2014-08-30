@@ -21,13 +21,13 @@
 #include "catch.hpp"
 
 #include <utility>
-#include "async/Delay.hh"
+#include "async/delay.hh"
 #include "async/Promise.hh"
 #include "common/trial.hh"
 
 namespace {
 
-using sesh::async::Delay;
+using sesh::async::delay;
 using sesh::async::Promise;
 using sesh::common::trial;
 
@@ -37,63 +37,63 @@ TEST_CASE("Promise, default construction and invalidness") {
 }
 
 TEST_CASE("Promise, construction and validness") {
-    std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
-    Promise<int> p(delay);
-    delay = nullptr;
+    std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
+    Promise<int> p(d);
+    d = nullptr;
     CHECK(p.isValid());
 }
 
 TEST_CASE("Promise, invalidness after setting result") {
-    const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
-    Promise<int> p(delay);
+    const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
+    Promise<int> p(d);
     std::move(p).setResult(0);
     CHECK_FALSE(p.isValid());
 }
 
 TEST_CASE("Promise, setting result by construction, value") {
     using P = std::pair<int, double>;
-    const std::shared_ptr<Delay<P>> delay = std::make_shared<Delay<P>>();
-    Promise<P> p(delay);
+    const std::shared_ptr<delay<P>> dly = std::make_shared<delay<P>>();
+    Promise<P> p(dly);
     std::move(p).setResult(1, 2.0);
 
     int i = 0;
     double d = 0.0;
-    delay->setCallback([&i, &d](trial<P> &&r) { std::tie(i, d) = *r; });
+    dly->set_callback([&i, &d](trial<P> &&r) { std::tie(i, d) = *r; });
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
 
 TEST_CASE("Promise, setting result by construction, invalidness") {
-    auto delay = std::make_shared<Delay<int>>();
-    Promise<int> p(delay);
-    delay->setCallback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
+    auto d = std::make_shared<delay<int>>();
+    Promise<int> p(d);
+    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
     std::move(p).setResult(0);
 }
 
 TEST_CASE("Promise, setting result by function, value") {
-    const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
-    Promise<int> p(delay);
+    const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
+    Promise<int> p(d);
     std::move(p).setResultFrom([] { return 1; });
 
     int i = 0;
-    delay->setCallback([&i](trial<int> &&r) { i = *r; });
+    d->set_callback([&i](trial<int> &&r) { i = *r; });
     CHECK(i == 1);
 }
 
 TEST_CASE("Promise, setting result by function, invalidness") {
-    auto delay = std::make_shared<Delay<int>>();
-    Promise<int> p(delay);
-    delay->setCallback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
+    auto d = std::make_shared<delay<int>>();
+    Promise<int> p(d);
+    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
     std::move(p).setResultFrom([] { return 0; });
 }
 
 TEST_CASE("Promise, setting result to exception, value") {
-    const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
-    Promise<int> p(delay);
+    const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
+    Promise<int> p(d);
     std::move(p).fail(std::make_exception_ptr('\1'));
 
     char c = '\0';
-    delay->setCallback([&c](trial<int> &&r) {
+    d->set_callback([&c](trial<int> &&r) {
         try {
             *r;
         } catch (char c2) {
@@ -104,15 +104,15 @@ TEST_CASE("Promise, setting result to exception, value") {
 }
 
 TEST_CASE("Promise, setting result to exception, invalidness") {
-    auto delay = std::make_shared<Delay<int>>();
-    Promise<int> p(delay);
-    delay->setCallback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
+    auto d = std::make_shared<delay<int>>();
+    Promise<int> p(d);
+    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
     std::move(p).fail(std::make_exception_ptr(0));
 }
 
 TEST_CASE("Promise, setting result to current exception, value") {
-    const std::shared_ptr<Delay<int>> delay = std::make_shared<Delay<int>>();
-    Promise<int> p(delay);
+    const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
+    Promise<int> p(d);
     try {
         throw '\1';
     } catch (...) {
@@ -120,7 +120,7 @@ TEST_CASE("Promise, setting result to current exception, value") {
     }
 
     char c = '\0';
-    delay->setCallback([&c](trial<int> &&r) {
+    d->set_callback([&c](trial<int> &&r) {
         try {
             *r;
         } catch (char c2) {
@@ -131,9 +131,9 @@ TEST_CASE("Promise, setting result to current exception, value") {
 }
 
 TEST_CASE("Promise, setting result to current exception, invalidness") {
-    auto delay = std::make_shared<Delay<int>>();
-    Promise<int> p(delay);
-    delay->setCallback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
+    auto d = std::make_shared<delay<int>>();
+    Promise<int> p(d);
+    d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.isValid()); });
     try {
         throw 0;
     } catch (...) {

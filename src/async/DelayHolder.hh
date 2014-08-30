@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <utility>
-#include "async/Delay.hh"
+#include "async/delay.hh"
 
 namespace sesh {
 namespace async {
@@ -33,7 +33,7 @@ class DelayHolder {
 
 private:
 
-    std::shared_ptr<Delay<T>> mDelay;
+    std::shared_ptr<async::delay<T>> mDelay;
 
 public:
 
@@ -44,8 +44,8 @@ public:
     DelayHolder() = default;
 
     /** Creates a delay holder that holds the argument delay. */
-    explicit DelayHolder(const std::shared_ptr<Delay<T>> &delay) noexcept :
-            mDelay(delay) { }
+    explicit DelayHolder(const std::shared_ptr<async::delay<T>> &d) noexcept :
+            mDelay(d) { }
 
     DelayHolder(const DelayHolder &) = delete;
     DelayHolder(DelayHolder &&) = default;
@@ -69,14 +69,14 @@ protected:
      * Returns a reference to the associated delay. This function can be called
      * only when this object has an associated delay.
      */
-    Delay<T> &delay() { return *mDelay; }
+    async::delay<T> &delay() { return *mDelay; }
 
     /**
      * Calls the forward function for the delay object contained in the
      * arguments.
      */
     static void forward(DelayHolder &&from, DelayHolder &&to) {
-        Delay<T>::forward(std::move(from.mDelay), std::move(to.mDelay));
+        async::delay<T>::forward(std::move(from.mDelay), std::move(to.mDelay));
     }
 
 }; // template<typename T> class DelayHolder

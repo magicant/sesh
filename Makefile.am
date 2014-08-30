@@ -22,7 +22,7 @@ bin_PROGRAMS = src/sesh
 
 TESTPROGRAMS = \
 	src/async/DelayHolderTest \
-	src/async/DelayTest \
+	src/async/delay_test \
 	src/async/FutureTest \
 	src/async/PromiseTest \
 	src/async/SharedFutureTest \
@@ -81,7 +81,7 @@ src/checkincludebuildconfig.log: src/checkincludebuildconfig.sh $(SOURCES)
 ### Source files
 
 src_sesh_SOURCES = \
-	src/async/Delay.hh \
+	src/async/delay.hh \
 	src/async/DelayHolder.hh \
 	src/async/Future.hh \
 	src/async/Future.tcc \
@@ -202,8 +202,8 @@ src_sesh_SOURCES = \
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_DelayHolderTest_SOURCES = \
 	src/async/DelayHolderTest.cc
-src_async_DelayTest_SOURCES = \
-	src/async/DelayTest.cc
+src_async_delay_test_SOURCES = \
+	src/async/delay_test.cc
 src_async_FutureTest_SOURCES = \
 	src/async/FutureTest.cc
 src_async_PromiseTest_SOURCES = \

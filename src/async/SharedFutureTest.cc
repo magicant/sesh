@@ -22,7 +22,7 @@
 
 #include <exception>
 #include <utility>
-#include "async/Delay.hh"
+#include "async/delay.hh"
 #include "async/Future.hh"
 #include "async/Promise.hh"
 #include "async/SharedFuture.hh"
@@ -31,7 +31,6 @@
 
 namespace {
 
-using sesh::async::Delay;
 using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::SharedFuture;
@@ -39,6 +38,7 @@ using sesh::async::createFailedFutureOf;
 using sesh::async::createFuture;
 using sesh::async::createFutureOf;
 using sesh::async::createPromiseFuturePair;
+using sesh::async::delay;
 using sesh::common::nop;
 using sesh::common::trial;
 
@@ -62,9 +62,9 @@ TEST_CASE("Shared future: construction from future and invalidness") {
 }
 
 TEST_CASE("Shared future: construction from future and validness") {
-    auto delay = std::make_shared<Delay<int>>();
-    const SharedFuture<int> f((Future<int>(delay)));
-    delay = nullptr;
+    auto d = std::make_shared<delay<int>>();
+    const SharedFuture<int> f((Future<int>(d)));
+    d = nullptr;
     CHECK(f.isValid());
     CHECK(f);
 }
@@ -93,10 +93,10 @@ TEST_CASE("Shared future: is mutually comparable") {
     CHECK_FALSE(invalid1 != invalid2);
 
     const SharedFuture<int> valid1 =
-                Future<int>(std::make_shared<Delay<int>>());
+                Future<int>(std::make_shared<delay<int>>());
     const SharedFuture<int> copy1(valid1);
     const SharedFuture<int> valid2 =
-                Future<int>(std::make_shared<Delay<int>>());
+                Future<int>(std::make_shared<delay<int>>());
     CHECK(valid1 == copy1);
     CHECK_FALSE(valid1 != copy1);
     CHECK_FALSE(valid1 == valid2);
@@ -114,7 +114,7 @@ TEST_CASE("Shared future: is comparable with null pointer") {
     CHECK_FALSE(nullptr != invalid);
 
     const SharedFuture<int> valid =
-                Future<int>(std::make_shared<Delay<int>>());
+                Future<int>(std::make_shared<delay<int>>());
     CHECK_FALSE(valid == nullptr);
     CHECK_FALSE(nullptr == valid);
     CHECK(valid != nullptr);
@@ -122,15 +122,15 @@ TEST_CASE("Shared future: is comparable with null pointer") {
 }
 
 TEST_CASE("Shared future: validness after adding callback") {
-    const auto delay = std::make_shared<Delay<int>>();
-    const SharedFuture<int> f = Future<int>(delay);
+    const auto d = std::make_shared<delay<int>>();
+    const SharedFuture<int> f = Future<int>(d);
     f.then(nop());
     CHECK(f.isValid());
 }
 
 TEST_CASE("Shared future: callbacks added before setting result") {
-    const auto delay = std::make_shared<Delay<int>>();
-    const SharedFuture<int> f = Future<int>(delay);
+    const auto d = std::make_shared<delay<int>>();
+    const SharedFuture<int> f = Future<int>(d);
 
     int i = 0, j = 0;
     f.then([&i](const trial<int> &r) { i = *r; });
@@ -140,15 +140,15 @@ TEST_CASE("Shared future: callbacks added before setting result") {
 
     CHECK(i == 0);
     CHECK(j == 0);
-    delay->setResult(1);
+    d->set_result(1);
     CHECK(i == 1);
     CHECK(j == 1);
 }
 
 TEST_CASE("Shared future: callbacks added after setting result") {
-    const auto delay = std::make_shared<Delay<int>>();
-    const SharedFuture<int> f = Future<int>(delay);
-    delay->setResult(1);
+    const auto d = std::make_shared<delay<int>>();
+    const SharedFuture<int> f = Future<int>(d);
+    d->set_result(1);
 
     int i = 0, j = 0;
     CHECK(i == 0);
@@ -162,8 +162,8 @@ TEST_CASE("Shared future: callbacks added after setting result") {
 }
 
 TEST_CASE("Shared future: then") {
-    const auto delay = std::make_shared<Delay<int>>();
-    const SharedFuture<int> f1 = Future<int>(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    const SharedFuture<int> f1 = Future<int>(dly);
     std::pair<Promise<double>, Future<double>> pf2 =
             createPromiseFuturePair<double>();
 
@@ -174,7 +174,7 @@ TEST_CASE("Shared future: then") {
     std::move(pf2.second).then([&d](trial<double> &&t) { d = *t; });
 
     CHECK(d == 0.0);
-    delay->setResult(1);
+    dly->set_result(1);
     CHECK(d == 2.0);
 
     int i = 0;
@@ -191,8 +191,8 @@ TEST_CASE("Shared future: then") {
 }
 
 TEST_CASE("Shared future: map") {
-    const auto delay = std::make_shared<Delay<int>>();
-    const SharedFuture<int> f1 = Future<int>(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    const SharedFuture<int> f1 = Future<int>(dly);
     std::pair<Promise<double>, Future<double>> pf2 =
             createPromiseFuturePair<double>();
 
@@ -201,7 +201,7 @@ TEST_CASE("Shared future: map") {
     std::move(pf2.second).then([&d](trial<double> &&t) { d = *t; });
 
     CHECK(d == 0.0);
-    delay->setResult(1);
+    dly->set_result(1);
     CHECK(d == 2.0);
 
     int i = 0;
@@ -218,8 +218,8 @@ TEST_CASE("Shared future: map") {
 }
 
 TEST_CASE("Shared future: recover, success") {
-    const auto delay = std::make_shared<Delay<int>>();
-    const SharedFuture<int> f1 = Future<int>(delay);
+    const auto d = std::make_shared<delay<int>>();
+    const SharedFuture<int> f1 = Future<int>(d);
     std::pair<Promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
 
     const auto f = [](std::exception_ptr) -> int {
@@ -232,13 +232,13 @@ TEST_CASE("Shared future: recover, success") {
     std::move(pf2.second).then([&i](trial<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResult(1);
+    d->set_result(1);
     CHECK(i == 1);
 }
 
 TEST_CASE("Shared future: recover, failure") {
-    const auto delay = std::make_shared<Delay<int>>();
-    const SharedFuture<int> f1 = Future<int>(delay);
+    const auto dly = std::make_shared<delay<int>>();
+    const SharedFuture<int> f1 = Future<int>(dly);
 
     int i = 0;
     f1.recover([](std::exception_ptr e) -> int {
@@ -253,7 +253,7 @@ TEST_CASE("Shared future: recover, failure") {
     });
 
     CHECK(i == 0);
-    delay->setResult(std::make_exception_ptr(1.0));
+    dly->set_result(std::make_exception_ptr(1.0));
     CHECK(i == 2);
 
     double d = 0.0;
@@ -274,8 +274,8 @@ TEST_CASE("Shared future: recover, failure") {
 }
 
 TEST_CASE("Shared future: forward") {
-    const auto delay = std::make_shared<Delay<int>>();
-    const SharedFuture<int> f1 = Future<int>(delay);
+    const auto d = std::make_shared<delay<int>>();
+    const SharedFuture<int> f1 = Future<int>(d);
     std::pair<Promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
     std::pair<Promise<int>, Future<int>> pf3 = createPromiseFuturePair<int>();
 
@@ -284,7 +284,7 @@ TEST_CASE("Shared future: forward") {
     std::move(pf2.second).then([&i](trial<int> &&r) { i = *r; });
 
     CHECK(i == 0);
-    delay->setResult(1);
+    d->set_result(1);
     CHECK(i == 1);
 
     f1.forward(std::move(pf3.first));

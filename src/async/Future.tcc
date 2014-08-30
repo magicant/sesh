@@ -39,16 +39,16 @@ typename std::enable_if<std::is_void<typename std::result_of<
 >::type>::value>::type
 FutureBase<T>::then(Function &&f) && {
     FutureBase copy = std::move(*this);
-    copy.delay().setCallback(std::forward<Function>(f));
+    copy.delay().set_callback(std::forward<Function>(f));
 }
 
 template<typename T>
 std::pair<Promise<T>, Future<T>> createPromiseFuturePair() {
-    auto delay = std::make_shared<Delay<T>>();
+    auto d = std::make_shared<delay<T>>();
     return std::pair<Promise<T>, Future<T>>(
             std::piecewise_construct,
-            std::forward_as_tuple(delay),
-            std::forward_as_tuple(delay));
+            std::forward_as_tuple(d),
+            std::forward_as_tuple(d));
 }
 
 template<typename To, typename Function>

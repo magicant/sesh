@@ -26,7 +26,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "async/Delay.hh"
 #include "async/DelayHolder.hh"
 #include "async/Promise.hh"
 #include "common/trial.hh"
