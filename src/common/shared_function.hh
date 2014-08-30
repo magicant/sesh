@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_SharedFunction_hh
-#define INCLUDED_common_SharedFunction_hh
+#ifndef INCLUDED_common_shared_function_hh
+#define INCLUDED_common_shared_function_hh
 
 #include "buildconfig.h"
 
@@ -46,11 +46,11 @@ namespace common {
  * @tparam F type of the wrapped function object.
  */
 template<typename F>
-class SharedFunction {
+class shared_function {
 
 private:
 
-    std::shared_ptr<F> mFunction;
+    std::shared_ptr<F> m_function;
 
 public:
 
@@ -62,8 +62,8 @@ public:
      * @param arg arguments that are passed to std::make_shared.
      */
     template<typename... Arg>
-    explicit SharedFunction(direct_initialize, Arg &&... arg) :
-            mFunction(std::make_shared<F>(std::forward<Arg>(arg)...)) { }
+    explicit shared_function(direct_initialize, Arg &&... arg) :
+            m_function(std::make_shared<F>(std::forward<Arg>(arg)...)) { }
 
     /**
      * Constructs a shared function that wraps a new instance of F.
@@ -73,8 +73,8 @@ public:
      * @param arg arguments that are passed to std::make_shared.
      */
     template<typename... Arg>
-    static SharedFunction create(Arg &&... arg) {
-        return SharedFunction(direct_initialize(), std::forward<Arg>(arg)...);
+    static shared_function create(Arg &&... arg) {
+        return shared_function(direct_initialize(), std::forward<Arg>(arg)...);
     }
 
     /**
@@ -85,25 +85,26 @@ public:
      * @param arg arguments that are passed to std::allocate_shared.
      */
     template<typename... Arg>
-    explicit SharedFunction(std::allocator_arg_t, Arg &&... arg) :
-            mFunction(std::allocate_shared<F>(std::forward<Arg>(arg)...)) { }
+    explicit shared_function(std::allocator_arg_t, Arg &&... arg) :
+            m_function(std::allocate_shared<F>(std::forward<Arg>(arg)...)) { }
 
     /**
      * Constructs a shared function from an existing non-null shared pointer.
      */
-    SharedFunction(const std::shared_ptr<F> &f) noexcept : mFunction(f) {
-        assert(mFunction != nullptr);
+    shared_function(const std::shared_ptr<F> &f) noexcept : m_function(f) {
+        assert(m_function != nullptr);
     }
 
     /**
      * Constructs a shared function from an existing non-null shared pointer.
      */
-    SharedFunction(std::shared_ptr<F> &&f) noexcept : mFunction(std::move(f)) {
-        assert(mFunction != nullptr);
+    shared_function(std::shared_ptr<F> &&f) noexcept :
+            m_function(std::move(f)) {
+        assert(m_function != nullptr);
     }
 
     /** Returns a reference to the wrapped function object. */
-    F &get() const { return *mFunction; }
+    F &get() const { return *m_function; }
 
     /**
      * Calls the wrapped object as a function.
@@ -116,7 +117,7 @@ public:
         return get()(std::forward<Arg>(arg)...);
     }
 
-}; // template<typename F> class SharedFunction
+}; // template<typename F> class shared_function
 
 /**
  * Constructs a new shared function from the argument function object.
@@ -125,13 +126,13 @@ public:
  * the argument.
  */
 template<typename F, typename G = const typename std::decay<F>::type>
-SharedFunction<G> makeSharedFunction(F &&f) {
-    return SharedFunction<G>(direct_initialize(), std::forward<F>(f));
+shared_function<G> make_shared_function(F &&f) {
+    return shared_function<G>(direct_initialize(), std::forward<F>(f));
 }
 
 } // namespace common
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_SharedFunction_hh
+#endif // #ifndef INCLUDED_common_shared_function_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

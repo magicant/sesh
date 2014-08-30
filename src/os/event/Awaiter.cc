@@ -29,9 +29,9 @@
 #include <vector>
 #include "async/Future.hh"
 #include "async/Promise.hh"
-#include "common/SharedFunction.hh"
 #include "common/Try.hh"
 #include "common/container_helper.hh"
+#include "common/shared_function.hh"
 #include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/TimeApi.hh"
@@ -46,9 +46,9 @@
 using sesh::async::Future;
 using sesh::async::Promise;
 using sesh::async::createPromiseFuturePair;
-using sesh::common::SharedFunction;
 using sesh::common::Try;
 using sesh::common::find_if;
+using sesh::common::shared_function;
 using sesh::common::variant;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
@@ -325,7 +325,7 @@ AwaiterImpl::AwaiterImpl(
 void registerSignalTrigger(
         Signal s, std::shared_ptr<PendingEvent> &e, HandlerConfiguration &hc) {
     auto result = hc.addHandler(
-            s.number(), SharedFunction<SignalHandler>::create(e));
+            s.number(), shared_function<SignalHandler>::create(e));
     switch (result.tag()) {
     case decltype(result)::tag<HandlerConfiguration::Canceler>():
         return e->addCanceler(

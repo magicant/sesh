@@ -26,7 +26,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "common/SharedFunction.hh"
+#include "common/shared_function.hh"
 
 namespace sesh {
 namespace async {
@@ -79,7 +79,7 @@ template<typename From>
 template<typename Function, typename To>
 void FutureBase<From>::then(Function &&f, Promise<To> &&p) && {
     using C = Composer<To, typename std::decay<Function>::type>;
-    std::move(*this).then(common::SharedFunction<C>::create(
+    std::move(*this).then(common::shared_function<C>::create(
             std::forward<Function>(f), std::move(p)));
 }
 
@@ -262,7 +262,7 @@ public:
 template<typename T>
 void Future<Future<T>>::unwrap(Promise<T> &&p) && {
     std::move(*this).then(
-            common::SharedFunction<Unwrapper<T>>::create(std::move(p)));
+            common::shared_function<Unwrapper<T>>::create(std::move(p)));
 }
 
 template<typename T>

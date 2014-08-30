@@ -123,7 +123,7 @@ template<typename From>
 template<typename Function, typename To>
 void SharedFutureBase<From>::then(Function &&f, Promise<To> &&p) const {
     using C = Composer<To, typename std::decay<Function>::type>;
-    then(common::SharedFunction<C>::create(
+    then(common::shared_function<C>::create(
             std::forward<Function>(f), std::move(p)));
 }
 
@@ -230,7 +230,7 @@ public:
 template<typename T>
 void Future<SharedFuture<T>>::unwrap(Promise<T> &&p) && {
     std::move(*this).then(
-            common::SharedFunction<SharedUnwrapper<T>>::create(std::move(p)));
+            common::shared_function<SharedUnwrapper<T>>::create(std::move(p)));
 }
 
 template<typename T>
@@ -243,7 +243,7 @@ Future<T> Future<SharedFuture<T>>::unwrap() && {
 template<typename T>
 void SharedFuture<SharedFuture<T>>::unwrap(Promise<T> &&p) const {
     this->then(
-            common::SharedFunction<SharedUnwrapper<T>>::create(std::move(p)));
+            common::shared_function<SharedUnwrapper<T>>::create(std::move(p)));
 }
 
 template<typename T>

@@ -23,17 +23,16 @@
 #include <map>
 #include <memory>
 #include <utility>
-#include "common/SharedFunction.hh"
 #include "common/maybe.hh"
+#include "common/shared_function.hh"
 #include "helpermacros.h"
 #include "os/signaling/HandlerConfigurationApi.hh"
 #include "os/signaling/SignalErrorCode.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::common::SharedFunction;
 using sesh::common::make_maybe_of;
-using sesh::common::makeSharedFunction;
 using sesh::common::maybe;
+using sesh::common::shared_function;
 
 namespace sesh {
 namespace os {
@@ -305,7 +304,7 @@ public:
             return e;
         }
         return AddHandlerResult::create<Canceler>(
-                SharedFunction<HandlerCanceler>::create(
+                shared_function<HandlerCanceler>::create(
                         n, *this, std::move(canceler)));
     }
 
