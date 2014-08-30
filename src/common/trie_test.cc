@@ -26,32 +26,32 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include "common/Trie.hh"
+#include "common/trie.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"
 
 namespace {
 
-using sesh::common::Trie;
+using sesh::common::trie;
 using sesh::common::xchar;
 using sesh::common::xstring;
 
 TEST_CASE("Trie, default construction") {
-    Trie<xchar, int> t;
+    trie<xchar, int> t;
 }
 
 TEST_CASE("Trie, construction with comparator and key_comp") {
     auto comp = [](xchar a, xchar b) { return a > b; };
-    Trie<xchar, int, decltype(comp)> t(comp);
+    trie<xchar, int, decltype(comp)> t(comp);
     CHECK_FALSE(t.key_comp()(L('!'), L('!')));
     CHECK(t.key_comp()(L('\1'), L('\0')));
 
-    t['0'].getOrCreateValue() = 10;
-    t['2'].getOrCreateValue() = 12;
-    t['1'].getOrCreateValue() = 11;
+    t['0'].get_or_create_value() = 10;
+    t['2'].get_or_create_value() = 12;
+    t['1'].get_or_create_value() = 11;
 
-    auto i = t.traverserBegin();
-    auto end = t.traverserEnd();
+    auto i = t.traverser_begin();
+    auto end = t.traverser_end();
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t));
     ++i;
@@ -68,142 +68,144 @@ TEST_CASE("Trie, construction with comparator and key_comp") {
 }
 
 TEST_CASE("Trie, move constructor") {
-    Trie<int, int> t1;
-    t1.getOrCreateValue() = 1;
-    t1[1].getOrCreateValue() = 10;
-    t1[1][2].getOrCreateValue() = 20;
+    trie<int, int> t1;
+    t1.get_or_create_value() = 1;
+    t1[1].get_or_create_value() = 10;
+    t1[1][2].get_or_create_value() = 20;
 
-    Trie<int, int> t2 = std::move(t1);
+    trie<int, int> t2 = std::move(t1);
     CHECK(t1.size() == 1);
     CHECK(t2.size() == 3);
     CHECK(t2.value() == 1);
     CHECK(t2[1].value() == 10);
     CHECK(t2[1][2].value() == 20);
 
-    t2[1].eraseDescendants();
+    t2[1].erase_descendants();
     CHECK(t2.size() == 2);
-    t2[1].eraseValue();
+    t2[1].erase_value();
     CHECK(t2.size() == 1);
-    t2.eraseValue();
+    t2.erase_value();
     CHECK(t2.size() == 0);
 }
 
 TEST_CASE("Trie, construction from iterator range") {
     std::pair<std::string, int> values[] = {{"abc", 1}, {"aaa", 2}};
-    Trie<char, int> t(std::begin(values), std::end(values));
+    trie<char, int> t(std::begin(values), std::end(values));
     CHECK(t.size() == 2);
-    REQUIRE(t['a']['a']['a'].hasValue());
-    REQUIRE(t['a']['b']['c'].hasValue());
+    REQUIRE(t['a']['a']['a'].has_value());
+    REQUIRE(t['a']['b']['c'].has_value());
     CHECK(t['a']['a']['a'].value() == 2);
     CHECK(t['a']['b']['c'].value() == 1);
 }
 
 TEST_CASE("Trie, construction from initializer list") {
-    Trie<char, int> t({{"abc", 1}, {"aaa", 2}});
+    trie<char, int> t({{"abc", 1}, {"aaa", 2}});
     CHECK(t.size() == 2);
-    REQUIRE(t['a']['a']['a'].hasValue());
-    REQUIRE(t['a']['b']['c'].hasValue());
+    REQUIRE(t['a']['a']['a'].has_value());
+    REQUIRE(t['a']['b']['c'].has_value());
     CHECK(t['a']['a']['a'].value() == 2);
     CHECK(t['a']['b']['c'].value() == 1);
 }
 
 TEST_CASE("Trie, node value") {
-    Trie<char, std::pair<int, int>> t;
-    CHECK_FALSE(t.maybeValue().has_value());
-    CHECK_FALSE(t.hasValue());
+    trie<char, std::pair<int, int>> t;
+    CHECK_FALSE(t.maybe_value().has_value());
+    CHECK_FALSE(t.has_value());
 
-    auto e1 = t.emplaceValue(1, 2);
+    auto e1 = t.emplace_value(1, 2);
     CHECK(e1.first.first == 1);
     CHECK(e1.first.second == 2);
     CHECK(e1.second);
-    CHECK(t.maybeValue().has_value());
-    CHECK(t.hasValue());
-    CHECK(std::addressof(e1.first) == std::addressof(t.maybeValue().value()));
+    CHECK(t.maybe_value().has_value());
+    CHECK(t.has_value());
+    CHECK(std::addressof(e1.first) == std::addressof(t.maybe_value().value()));
     CHECK(std::addressof(e1.first) == std::addressof(t.value()));
 
-    // emplaceValue has no effect because the value already exists
-    auto e2 = t.emplaceValue(3, 4);
+    // emplace_value has no effect because the value already exists
+    auto e2 = t.emplace_value(3, 4);
     CHECK(e2.first.first == 1);
     CHECK(e2.first.second == 2);
     CHECK_FALSE(e2.second);
-    CHECK(t.maybeValue().has_value());
-    CHECK(t.hasValue());
-    CHECK(std::addressof(e2.first) == std::addressof(t.maybeValue().value()));
+    CHECK(t.maybe_value().has_value());
+    CHECK(t.has_value());
+    CHECK(std::addressof(e2.first) == std::addressof(t.maybe_value().value()));
     CHECK(std::addressof(e2.first) == std::addressof(t.value()));
 
-    auto &intPair1 = t.getOrCreateValue(); // no effect again
-    CHECK(intPair1.first == 1);
-    CHECK(intPair1.second == 2);
-    CHECK(t.hasValue());
-    CHECK(std::addressof(intPair1) == std::addressof(t.maybeValue().value()));
-    CHECK(std::addressof(intPair1) == std::addressof(t.value()));
+    auto &int_pair1 = t.get_or_create_value(); // no effect again
+    CHECK(int_pair1.first == 1);
+    CHECK(int_pair1.second == 2);
+    CHECK(t.has_value());
+    CHECK(std::addressof(int_pair1) ==
+            std::addressof(t.maybe_value().value()));
+    CHECK(std::addressof(int_pair1) == std::addressof(t.value()));
 
-    t.eraseValue();
-    CHECK_FALSE(t.maybeValue().has_value());
-    CHECK_FALSE(t.hasValue());
+    t.erase_value();
+    CHECK_FALSE(t.maybe_value().has_value());
+    CHECK_FALSE(t.has_value());
 
-    t.eraseValue(); // already erased; no effect
-    CHECK_FALSE(t.maybeValue().has_value());
-    CHECK_FALSE(t.hasValue());
+    t.erase_value(); // already erased; no effect
+    CHECK_FALSE(t.maybe_value().has_value());
+    CHECK_FALSE(t.has_value());
 
-    auto &intPair2 = t.getOrCreateValue();
-    CHECK(intPair2.first == 0);
-    CHECK(intPair2.second == 0);
-    CHECK(t.hasValue());
-    CHECK(std::addressof(intPair2) == std::addressof(t.maybeValue().value()));
-    CHECK(std::addressof(intPair2) == std::addressof(t.value()));
+    auto &int_pair2 = t.get_or_create_value();
+    CHECK(int_pair2.first == 0);
+    CHECK(int_pair2.second == 0);
+    CHECK(t.has_value());
+    CHECK(std::addressof(int_pair2) ==
+            std::addressof(t.maybe_value().value()));
+    CHECK(std::addressof(int_pair2) == std::addressof(t.value()));
 }
 
 TEST_CASE("Trie, emplace child") {
-    Trie<xstring, int> t;
+    trie<xstring, int> t;
 
-    auto a1 = t.emplaceChild(3, L('a'));
+    auto a1 = t.emplace_child(3, L('a'));
     CHECK(a1.first.empty());
     CHECK(a1.second);
 
-    auto b1 = t.emplaceChild(L("b"));
+    auto b1 = t.emplace_child(L("b"));
     CHECK(b1.first.empty());
     CHECK(b1.second);
 
-    auto a2 = t.emplaceChild(L("aaa"));
+    auto a2 = t.emplace_child(L("aaa"));
     CHECK(std::addressof(a1.first) == std::addressof(a2.first));
     CHECK_FALSE(a2.second);
 }
 
 TEST_CASE("Trie, emplace descendants") {
-    Trie<char, int> t;
+    trie<char, int> t;
     const std::string s = "aaa";
-    auto &t1 = t.emplaceDescendants(s.begin(), s.end());
-    auto &t2 = t.emplaceDescendants(std::string("abc"));
-    auto &t3 = t2.emplaceDescendants(std::string(""));
+    auto &t1 = t.emplace_descendants(s.begin(), s.end());
+    auto &t2 = t.emplace_descendants(std::string("abc"));
+    auto &t3 = t2.emplace_descendants(std::string(""));
     CHECK(std::addressof(t1) == std::addressof(t['a']['a']['a']));
     CHECK(std::addressof(t2) == std::addressof(t['a']['b']['c']));
     CHECK(std::addressof(t3) == std::addressof(t['a']['b']['c']));
 }
 
 TEST_CASE("Trie, operator[]") {
-    Trie<char, int> t;
+    trie<char, int> t;
     auto &a = t['a'];
     auto &b = t[std::move('b')];
     auto &c = t[std::move('c')];
-    a.getOrCreateValue() = 1;
-    b.getOrCreateValue() = 2;
-    c.getOrCreateValue() = 3;
+    a.get_or_create_value() = 1;
+    b.get_or_create_value() = 2;
+    c.get_or_create_value() = 3;
     CHECK(t['a'].value() == 1);
     CHECK(t['b'].value() == 2);
     CHECK(t[std::move('c')].value() == 3);
 }
 
 TEST_CASE("Trie, at") {
-    Trie<char, int> t;
-    t['a']['b'].getOrCreateValue() = 10;
+    trie<char, int> t;
+    t['a']['b'].get_or_create_value() = 10;
     CHECK(t.at('a').at('b').value() == 10);
     CHECK_THROWS_AS(t.at('b'), std::out_of_range);
     CHECK_THROWS_AS(t.at('a').at('a'), std::out_of_range);
 }
 
 TEST_CASE("Trie, size and empty") {
-    Trie<int, char> t;
+    trie<int, char> t;
     CHECK(t.empty());
     CHECK(t.size() == 0);
 
@@ -211,31 +213,31 @@ TEST_CASE("Trie, size and empty") {
     CHECK(t.empty());
     CHECK(t.size() == 0);
 
-    t[0].getOrCreateValue();
+    t[0].get_or_create_value();
     CHECK_FALSE(t.empty());
     CHECK(t.size() == 1);
 
-    t[1].getOrCreateValue();
+    t[1].get_or_create_value();
     CHECK_FALSE(t.empty());
     CHECK(t.size() == 2);
 
-    t[1][0].getOrCreateValue();
+    t[1][0].get_or_create_value();
     CHECK_FALSE(t.empty());
     CHECK(t.size() == 3);
 
-    t[0].getOrCreateValue();
+    t[0].get_or_create_value();
     CHECK_FALSE(t.empty());
     CHECK(t.size() == 3);
 
-    t[0].eraseValue();
+    t[0].erase_value();
     CHECK_FALSE(t.empty());
     CHECK(t.size() == 2);
 
-    t[1].eraseValue();
+    t[1].erase_value();
     CHECK_FALSE(t.empty());
     CHECK(t.size() == 1);
 
-    t[1][0].eraseValue();
+    t[1][0].erase_value();
     CHECK(t.empty());
     CHECK(t.size() == 0);
 
@@ -243,72 +245,72 @@ TEST_CASE("Trie, size and empty") {
 }
 
 TEST_CASE("Trie, erase children") {
-    Trie<int, int> t;
-    t.emplaceValue(1);
-    t[0].emplaceValue(2);
-    t[0][0].emplaceValue(3);
-    t[0][1][0].emplaceValue(4);
-    t[1][0].emplaceValue(5);
-    t[1][1][0].emplaceValue(6);
+    trie<int, int> t;
+    t.emplace_value(1);
+    t[0].emplace_value(2);
+    t[0][0].emplace_value(3);
+    t[0][1][0].emplace_value(4);
+    t[1][0].emplace_value(5);
+    t[1][1][0].emplace_value(6);
     CHECK(t.size() == 6);
 
-    t[0].eraseDescendants();
+    t[0].erase_descendants();
     CHECK(t.size() == 4);
-    REQUIRE(t.hasValue());
+    REQUIRE(t.has_value());
     CHECK(t.value() == 1);
-    REQUIRE(t[0].hasValue());
+    REQUIRE(t[0].has_value());
     CHECK(t[0].value() == 2);
     CHECK_THROWS_AS(t[0].at(0), std::out_of_range);
     CHECK_THROWS_AS(t[0].at(1), std::out_of_range);
-    REQUIRE(t[1][0].hasValue());
+    REQUIRE(t[1][0].has_value());
     CHECK(t[1][0].value() == 5);
-    REQUIRE(t[1][1][0].hasValue());
+    REQUIRE(t[1][1][0].has_value());
     CHECK(t[1][1][0].value() == 6);
 
-    t.eraseDescendants();
+    t.erase_descendants();
     CHECK(t.size() == 1);
-    REQUIRE(t.hasValue());
+    REQUIRE(t.has_value());
     CHECK(t.value() == 1);
     CHECK_THROWS_AS(t.at(0), std::out_of_range);
     CHECK_THROWS_AS(t.at(1), std::out_of_range);
 }
 
 TEST_CASE("Trie, clear") {
-    Trie<int, int> t;
-    t.emplaceValue(1);
-    t[0].emplaceValue(2);
-    t[0][0].emplaceValue(3);
-    t[0][1][0].emplaceValue(4);
-    t[1][0].emplaceValue(5);
-    t[1][1][0].emplaceValue(6);
+    trie<int, int> t;
+    t.emplace_value(1);
+    t[0].emplace_value(2);
+    t[0][0].emplace_value(3);
+    t[0][1][0].emplace_value(4);
+    t[1][0].emplace_value(5);
+    t[1][1][0].emplace_value(6);
     CHECK(t.size() == 6);
 
     t[0].clear();
     CHECK(t.size() == 3);
-    REQUIRE(t.hasValue());
+    REQUIRE(t.has_value());
     CHECK(t.value() == 1);
-    CHECK_FALSE(t.at(0).hasValue());
+    CHECK_FALSE(t.at(0).has_value());
     CHECK_THROWS_AS(t.at(0).at(0), std::out_of_range);
     CHECK_THROWS_AS(t.at(0).at(1), std::out_of_range);
-    REQUIRE(t[1][0].hasValue());
+    REQUIRE(t[1][0].has_value());
     CHECK(t[1][0].value() == 5);
-    REQUIRE(t[1][1][0].hasValue());
+    REQUIRE(t[1][1][0].has_value());
     CHECK(t[1][1][0].value() == 6);
 
     t.clear();
     CHECK(t.size() == 0);
-    CHECK_FALSE(t.hasValue());
+    CHECK_FALSE(t.has_value());
     CHECK_THROWS_AS(t.at(0), std::out_of_range);
     CHECK_THROWS_AS(t.at(1), std::out_of_range);
 }
 
 TEST_CASE("Trie non-const traverser, basics") {
-    Trie<char, int> t;
-    Trie<char, int>::Traverser<> i = t.traverserBegin();
-    Trie<char, int>::Traverser<> end = t.traverserEnd();
+    trie<char, int> t;
+    trie<char, int>::traverser<> i = t.traverser_begin();
+    trie<char, int>::traverser<> end = t.traverser_end();
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
     CHECK(i->size() == 0);
     i = end;
     CHECK(i == end);
@@ -316,12 +318,12 @@ TEST_CASE("Trie non-const traverser, basics") {
 }
 
 TEST_CASE("Trie const traverser, basics") {
-    const Trie<char, int> t;
-    Trie<char, int>::ConstTraverser<> i = t.traverserBegin();
-    Trie<char, int>::ConstTraverser<> end = t.traverserEnd();
+    const trie<char, int> t;
+    trie<char, int>::const_traverser<> i = t.traverser_begin();
+    trie<char, int>::const_traverser<> end = t.traverser_end();
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
     CHECK(i->size() == 0);
     i = end;
     CHECK(i == end);
@@ -331,416 +333,416 @@ TEST_CASE("Trie const traverser, basics") {
 TEST_CASE("Trie traverser, conversion") {
     using V = std::vector<char>;
 
-    Trie<char, int> t;
-    Trie<char, int>::Traverser<V> ib1 = t.traverserBegin<V>();
-    Trie<char, int>::Traverser<V> ie1 = t.traverserEnd<V>();
-    Trie<char, int>::ConstTraverser<V> ib2 = t.traverserBegin<V>();
-    Trie<char, int>::ConstTraverser<V> ie2 = t.traverserEnd<V>();
-    Trie<char, int>::ConstTraverser<V> ib3 = ib1;
-    Trie<char, int>::ConstTraverser<V> ie3 = ie1;
-    Trie<char, int>::ConstTraverser<V> ib4 = t.constTraverserBegin<V>();
-    Trie<char, int>::ConstTraverser<V> ie4 = t.constTraverserEnd<V>();
+    trie<char, int> t;
+    trie<char, int>::traverser<V> ib1 = t.traverser_begin<V>();
+    trie<char, int>::traverser<V> ie1 = t.traverser_end<V>();
+    trie<char, int>::const_traverser<V> ib2 = t.traverser_begin<V>();
+    trie<char, int>::const_traverser<V> ie2 = t.traverser_end<V>();
+    trie<char, int>::const_traverser<V> ib3 = ib1;
+    trie<char, int>::const_traverser<V> ie3 = ie1;
+    trie<char, int>::const_traverser<V> ib4 = t.const_traverser_begin<V>();
+    trie<char, int>::const_traverser<V> ie4 = t.const_traverser_end<V>();
 
-    const Trie<char, int> ct;
-    Trie<char, int>::ConstTraverser<V> cib1 = t.traverserBegin<V>();
-    Trie<char, int>::ConstTraverser<V> cie1 = t.traverserEnd<V>();
-    Trie<char, int>::ConstTraverser<V> cib2 = t.constTraverserBegin<V>();
-    Trie<char, int>::ConstTraverser<V> cie2 = t.constTraverserEnd<V>();
+    const trie<char, int> ct;
+    trie<char, int>::const_traverser<V> cib1 = t.traverser_begin<V>();
+    trie<char, int>::const_traverser<V> cie1 = t.traverser_end<V>();
+    trie<char, int>::const_traverser<V> cib2 = t.const_traverser_begin<V>();
+    trie<char, int>::const_traverser<V> cie2 = t.const_traverser_end<V>();
 }
 
 TEST_CASE("Trie non-const traverser, forward, whole tree") {
-    Trie<char, int> t;
-    t['a'].emplaceValue(2);
+    trie<char, int> t;
+    t['a'].emplace_value(2);
     t['a']['a'];
-    t['a']['b']['a'].emplaceValue(4);
-    t['b']['a'].emplaceValue(5);
+    t['a']['b']['a'].emplace_value(4);
+    t['b']['a'].emplace_value(5);
     t['b']['b']['a'];
 
-    Trie<char, int>::Traverser<> i = t.traverserBegin();
-    Trie<char, int>::Traverser<> end = t.traverserEnd();
+    trie<char, int>::traverser<> i = t.traverser_begin();
+    trie<char, int>::traverser<> end = t.traverser_end();
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "a");
+    CHECK(i.path_string() == "a");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['a']));
-    CHECK(i.pathString() == "aa");
+    CHECK(i.path_string() == "aa");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['a']));
-    CHECK(i.pathString() == "aba");
+    CHECK(i.path_string() == "aba");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['b']));
-    CHECK(i.pathString() == "b");
+    CHECK(i.path_string() == "b");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['b']['a']));
-    CHECK(i.pathString() == "ba");
+    CHECK(i.path_string() == "ba");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['b']['b']));
-    CHECK(i.pathString() == "bb");
+    CHECK(i.path_string() == "bb");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['b']['b']['a']));
-    CHECK(i.pathString() == "bba");
+    CHECK(i.path_string() == "bba");
     CHECK(std::addressof(i) == std::addressof(++i));
     CHECK(i == end);
 }
 
 TEST_CASE("Trie const traverser, forward, whole tree") {
-    Trie<char, int> t;
-    t['a'].emplaceValue(2);
+    trie<char, int> t;
+    t['a'].emplace_value(2);
     t['a']['a'];
-    t['a']['b']['a'].emplaceValue(4);
-    t['b']['a'].emplaceValue(5);
+    t['a']['b']['a'].emplace_value(4);
+    t['b']['a'].emplace_value(5);
     t['b']['b']['a'];
 
-    Trie<char, int>::ConstTraverser<> i = t.traverserBegin();
-    Trie<char, int>::ConstTraverser<> end = t.traverserEnd();
+    trie<char, int>::const_traverser<> i = t.traverser_begin();
+    trie<char, int>::const_traverser<> end = t.traverser_end();
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "a");
+    CHECK(i.path_string() == "a");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['a']));
-    CHECK(i.pathString() == "aa");
+    CHECK(i.path_string() == "aa");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['a']));
-    CHECK(i.pathString() == "aba");
+    CHECK(i.path_string() == "aba");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['b']));
-    CHECK(i.pathString() == "b");
+    CHECK(i.path_string() == "b");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['b']['a']));
-    CHECK(i.pathString() == "ba");
+    CHECK(i.path_string() == "ba");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['b']['b']));
-    CHECK(i.pathString() == "bb");
+    CHECK(i.path_string() == "bb");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['b']['b']['a']));
-    CHECK(i.pathString() == "bba");
+    CHECK(i.path_string() == "bba");
     CHECK(std::addressof(i) == std::addressof(++i));
     CHECK(i == end);
 }
 
 TEST_CASE("Trie non-const traverser, forward, subtree") {
-    Trie<char, int> t;
-    t['a'].emplaceValue(2);
+    trie<char, int> t;
+    t['a'].emplace_value(2);
     t['a']['a'];
-    t['a']['b']['a'].emplaceValue(4);
-    t['b']['a'].emplaceValue(5);
+    t['a']['b']['a'].emplace_value(4);
+    t['b']['a'].emplace_value(5);
     t['b']['b']['a'];
 
-    Trie<char, int>::Traverser<> i = t['a'].traverserBegin();
-    Trie<char, int>::Traverser<> end = t['a'].traverserEnd();
+    trie<char, int>::traverser<> i = t['a'].traverser_begin();
+    trie<char, int>::traverser<> end = t['a'].traverser_end();
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['a']));
-    CHECK(i.pathString() == "a");
+    CHECK(i.path_string() == "a");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "b");
+    CHECK(i.path_string() == "b");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['a']));
-    CHECK(i.pathString() == "ba");
+    CHECK(i.path_string() == "ba");
     CHECK(std::addressof(i) == std::addressof(++i));
     CHECK(i == end);
 }
 
 TEST_CASE("Trie const traverser, forward, subtree") {
-    Trie<char, int> t;
-    t['a'].emplaceValue(2);
+    trie<char, int> t;
+    t['a'].emplace_value(2);
     t['a']['a'];
-    t['a']['b']['a'].emplaceValue(4);
-    t['b']['a'].emplaceValue(5);
+    t['a']['b']['a'].emplace_value(4);
+    t['b']['a'].emplace_value(5);
     t['b']['b']['a'];
 
-    Trie<char, int>::ConstTraverser<> i = t['a'].traverserBegin();
-    Trie<char, int>::ConstTraverser<> end = t['a'].traverserEnd();
+    trie<char, int>::const_traverser<> i = t['a'].traverser_begin();
+    trie<char, int>::const_traverser<> end = t['a'].traverser_end();
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['a']));
-    CHECK(i.pathString() == "a");
+    CHECK(i.path_string() == "a");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "b");
+    CHECK(i.path_string() == "b");
     CHECK(std::addressof(i) == std::addressof(++i));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['a']));
-    CHECK(i.pathString() == "ba");
+    CHECK(i.path_string() == "ba");
     CHECK(std::addressof(i) == std::addressof(++i));
     CHECK(i == end);
 }
 
 TEST_CASE("Trie non-const traverser, forward, postfix operator") {
-    Trie<char, int> t;
-    t.emplaceValue(0);
-    t['a'].emplaceValue(1);
+    trie<char, int> t;
+    t.emplace_value(0);
+    t['a'].emplace_value(1);
 
-    Trie<char, int>::Traverser<> i1 = t.traverserBegin();
-    Trie<char, int>::Traverser<> end = t.traverserEnd();
+    trie<char, int>::traverser<> i1 = t.traverser_begin();
+    trie<char, int>::traverser<> end = t.traverser_end();
     CHECK(i1 != end);
     CHECK(std::addressof(*i1) == std::addressof(t));
-    CHECK(i1.pathString() == "");
+    CHECK(i1.path_string() == "");
 
-    Trie<char, int>::Traverser<> i2 = i1++;
+    trie<char, int>::traverser<> i2 = i1++;
     CHECK(i1 != end);
     CHECK(std::addressof(*i1) == std::addressof(t['a']));
-    CHECK(i1.pathString() == "a");
+    CHECK(i1.path_string() == "a");
     CHECK(i2 != end);
     CHECK(std::addressof(*i2) == std::addressof(t));
-    CHECK(i2.pathString() == "");
+    CHECK(i2.path_string() == "");
 
-    Trie<char, int>::Traverser<> i3 = i1++;
+    trie<char, int>::traverser<> i3 = i1++;
     CHECK(i1 == end);
     CHECK(i3 != end);
     CHECK(std::addressof(*i3) == std::addressof(t['a']));
-    CHECK(i3.pathString() == "a");
+    CHECK(i3.path_string() == "a");
 }
 
 TEST_CASE("Trie const traverser, forward, postfix operator") {
-    Trie<char, int> t;
-    t.emplaceValue(0);
-    t['a'].emplaceValue(1);
+    trie<char, int> t;
+    t.emplace_value(0);
+    t['a'].emplace_value(1);
 
-    Trie<char, int>::ConstTraverser<> i1 = t.traverserBegin();
-    Trie<char, int>::ConstTraverser<> end = t.traverserEnd();
+    trie<char, int>::const_traverser<> i1 = t.traverser_begin();
+    trie<char, int>::const_traverser<> end = t.traverser_end();
     CHECK(i1 != end);
     CHECK(std::addressof(*i1) == std::addressof(t));
-    CHECK(i1.pathString() == "");
+    CHECK(i1.path_string() == "");
 
-    Trie<char, int>::ConstTraverser<> i2 = i1++;
+    trie<char, int>::const_traverser<> i2 = i1++;
     CHECK(i1 != end);
     CHECK(std::addressof(*i1) == std::addressof(t['a']));
-    CHECK(i1.pathString() == "a");
+    CHECK(i1.path_string() == "a");
     CHECK(i2 != end);
     CHECK(std::addressof(*i2) == std::addressof(t));
-    CHECK(i2.pathString() == "");
+    CHECK(i2.path_string() == "");
 
-    Trie<char, int>::ConstTraverser<> i3 = i1++;
+    trie<char, int>::const_traverser<> i3 = i1++;
     CHECK(i1 == end);
     CHECK(i3 != end);
     CHECK(std::addressof(*i3) == std::addressof(t['a']));
-    CHECK(i3.pathString() == "a");
+    CHECK(i3.path_string() == "a");
 }
 
 TEST_CASE("Trie non-const traverser, down, key digit") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b'];
 
-    Trie<char, int>::Traverser<> i = t.traverserBegin();
-    Trie<char, int>::Traverser<> end = t.traverserEnd();
+    trie<char, int>::traverser<> i = t.traverser_begin();
+    trie<char, int>::traverser<> end = t.traverser_end();
     CHECK_FALSE(i.down('z'));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
     CHECK(i.down('a'));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "a");
+    CHECK(i.path_string() == "a");
     CHECK_FALSE(i.down('y'));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "a");
+    CHECK(i.path_string() == "a");
     CHECK(i.down('b'));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
 }
 
 TEST_CASE("Trie const traverser, down, key digit") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b'];
 
-    Trie<char, int>::ConstTraverser<> i = t.traverserBegin();
-    Trie<char, int>::ConstTraverser<> end = t.traverserEnd();
+    trie<char, int>::const_traverser<> i = t.traverser_begin();
+    trie<char, int>::const_traverser<> end = t.traverser_end();
     CHECK_FALSE(i.down('z'));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
     CHECK(i.down('a'));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "a");
+    CHECK(i.path_string() == "a");
     CHECK_FALSE(i.down('y'));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "a");
+    CHECK(i.path_string() == "a");
     CHECK(i.down('b'));
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
 }
 
 TEST_CASE("Trie non-const traverser, down, key iterator") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b']['c']['d']['e'];
 
     std::string aba = "aba", cde = "cde";
 
-    Trie<char, int>::Traverser<> i = t.traverserBegin();
-    Trie<char, int>::Traverser<> end = t.traverserEnd();
+    trie<char, int>::traverser<> i = t.traverser_begin();
+    trie<char, int>::traverser<> end = t.traverser_end();
     CHECK(i.down(aba.begin(), aba.end()) == 2);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
     CHECK(i.down(cde.begin(), cde.end()) == 3);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['c']['d']['e']));
-    CHECK(i.pathString() == "abcde");
+    CHECK(i.path_string() == "abcde");
 }
 
 TEST_CASE("Trie const traverser, down, key iterator") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b']['c']['d']['e'];
 
     std::string aba = "aba", cde = "cde";
 
-    Trie<char, int>::ConstTraverser<> i = t.traverserBegin();
-    Trie<char, int>::ConstTraverser<> end = t.traverserEnd();
+    trie<char, int>::const_traverser<> i = t.traverser_begin();
+    trie<char, int>::const_traverser<> end = t.traverser_end();
     CHECK(i.down(aba.begin(), aba.end()) == 2);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
     CHECK(i.down(cde.begin(), cde.end()) == 3);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['c']['d']['e']));
-    CHECK(i.pathString() == "abcde");
+    CHECK(i.path_string() == "abcde");
 }
 
 TEST_CASE("Trie non-const traverser, down, key string") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b']['c']['d']['e'];
 
-    Trie<char, int>::Traverser<> i = t.traverserBegin();
-    Trie<char, int>::Traverser<> end = t.traverserEnd();
+    trie<char, int>::traverser<> i = t.traverser_begin();
+    trie<char, int>::traverser<> end = t.traverser_end();
     CHECK(i.down("aba") == 2);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
     CHECK(i.down("cde") == 3);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['c']['d']['e']));
-    CHECK(i.pathString() == "abcde");
+    CHECK(i.path_string() == "abcde");
 }
 
 TEST_CASE("Trie const traverser, down, key string") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b']['c']['d']['e'];
 
-    Trie<char, int>::ConstTraverser<> i = t.traverserBegin();
-    Trie<char, int>::ConstTraverser<> end = t.traverserEnd();
+    trie<char, int>::const_traverser<> i = t.traverser_begin();
+    trie<char, int>::const_traverser<> end = t.traverser_end();
     CHECK(i.down("aba") == 2);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
     CHECK(i.down("cde") == 3);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['c']['d']['e']));
-    CHECK(i.pathString() == "abcde");
+    CHECK(i.path_string() == "abcde");
 }
 
 TEST_CASE("Trie non-const traverser, up, whole tree") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b']['c']['d']['e'];
 
-    Trie<char, int>::Traverser<> i = t.traverserBegin();
-    Trie<char, int>::Traverser<> end = t.traverserEnd();
+    trie<char, int>::traverser<> i = t.traverser_begin();
+    trie<char, int>::traverser<> end = t.traverser_end();
     i.down("abcde");
     CHECK(i.up() == 1);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['c']['d']));
-    CHECK(i.pathString() == "abcd");
+    CHECK(i.path_string() == "abcd");
     CHECK(i.up(2) == 2);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
     CHECK(i.up(3) == 2);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
 }
 
 TEST_CASE("Trie const traverser, up, whole tree") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b']['c']['d']['e'];
 
-    Trie<char, int>::ConstTraverser<> i = t.traverserBegin();
-    Trie<char, int>::ConstTraverser<> end = t.traverserEnd();
+    trie<char, int>::const_traverser<> i = t.traverser_begin();
+    trie<char, int>::const_traverser<> end = t.traverser_end();
     i.down("abcde");
     CHECK(i.up() == 1);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']['c']['d']));
-    CHECK(i.pathString() == "abcd");
+    CHECK(i.path_string() == "abcd");
     CHECK(i.up(2) == 2);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']['b']));
-    CHECK(i.pathString() == "ab");
+    CHECK(i.path_string() == "ab");
     CHECK(i.up(3) == 2);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
 }
 
 TEST_CASE("Trie non-const traverser, up, subtree") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b'];
 
-    Trie<char, int>::Traverser<> i = t['a'].traverserBegin();
-    Trie<char, int>::Traverser<> end = t['a'].traverserEnd();
+    trie<char, int>::traverser<> i = t['a'].traverser_begin();
+    trie<char, int>::traverser<> end = t['a'].traverser_end();
     i.down('b');
     CHECK(i.up(2) == 1);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
 }
 
 TEST_CASE("Trie const traverser, up, subtree") {
-    Trie<char, int> t;
+    trie<char, int> t;
     t['a']['b'];
 
-    Trie<char, int>::ConstTraverser<> i = t['a'].traverserBegin();
-    Trie<char, int>::ConstTraverser<> end = t['a'].traverserEnd();
+    trie<char, int>::const_traverser<> i = t['a'].traverser_begin();
+    trie<char, int>::const_traverser<> end = t['a'].traverser_end();
     i.down('b');
     CHECK(i.up(2) == 1);
     REQUIRE(i != end);
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "");
+    CHECK(i.path_string() == "");
 }
 
 TEST_CASE("Trie non-const iterator, non-constness of value") {
-    Trie<char, int> t;
-    Trie<char, int>::Traverser<> i = t.traverserBegin();
-    i->emplaceChild('a');
+    trie<char, int> t;
+    trie<char, int>::traverser<> i = t.traverser_begin();
+    i->emplace_child('a');
     ++i;
     CHECK(std::addressof(*i) == std::addressof(t['a']));
-    CHECK(i.pathString() == "a");
+    CHECK(i.path_string() == "a");
 }
 
 } // namespace

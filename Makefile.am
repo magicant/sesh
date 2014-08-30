@@ -26,7 +26,6 @@ TESTPROGRAMS = \
 	src/async/FutureTest \
 	src/async/PromiseTest \
 	src/async/SharedFutureTest \
-	src/common/TrieTest \
 	src/common/TryTest \
 	src/common/container_helper_test \
 	src/common/enum_iterator_test \
@@ -35,6 +34,7 @@ TESTPROGRAMS = \
 	src/common/message_test \
 	src/common/reference_test \
 	src/common/shared_function_test \
+	src/common/trie_test \
 	src/common/type_tag_test \
 	src/common/variant_test \
 	src/language/source/BufferTest \
@@ -89,7 +89,6 @@ src_sesh_SOURCES = \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
-	src/common/Trie.hh \
 	src/common/Try.hh \
 	src/common/common_result.hh \
 	src/common/container_helper.hh \
@@ -111,6 +110,7 @@ src_sesh_SOURCES = \
 	src/common/reference.hh \
 	src/common/shared_function.hh \
 	src/common/static_cast_function.hh \
+	src/common/trie.hh \
 	src/common/type_tag.hh \
 	src/common/variant.hh \
 	src/common/xchar.hh \
@@ -210,8 +210,6 @@ src_async_PromiseTest_SOURCES = \
 	src/async/PromiseTest.cc
 src_async_SharedFutureTest_SOURCES = \
 	src/async/SharedFutureTest.cc
-src_common_TrieTest_SOURCES = \
-	src/common/TrieTest.cc
 src_common_TryTest_SOURCES = \
 	src/common/TryTest.cc
 src_common_container_helper_test_SOURCES = \
@@ -229,6 +227,8 @@ src_common_reference_test_SOURCES = \
 	src/common/reference_test.cc
 src_common_shared_function_test_SOURCES = \
 	src/common/shared_function_test.cc
+src_common_trie_test_SOURCES = \
+	src/common/trie_test.cc
 src_common_type_tag_test_SOURCES = \
 	src/common/type_tag.hh \
 	src/common/type_tag_test.cc
