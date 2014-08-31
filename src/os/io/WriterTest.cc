@@ -27,7 +27,7 @@
 #include <vector>
 #include <utility>
 #include "async/Future.hh"
-#include "async/Promise.hh"
+#include "async/promise.hh"
 #include "common/copy.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
@@ -43,10 +43,10 @@
 namespace {
 
 using sesh::async::Future;
-using sesh::async::Promise;
 using sesh::async::createFailedFutureOf;
 using sesh::async::createFuture;
 using sesh::async::createPromiseFuturePair;
+using sesh::async::promise;
 using sesh::common::copy;
 using sesh::common::trial;
 using sesh::os::event::Proactor;
@@ -118,7 +118,7 @@ class WriteTestFixture : public WriterApi, public Proactor {
 private:
 
     mutable bool mIsReadyToWrite = false;
-    Promise<Trigger> mPromise;
+    promise<Trigger> mPromise;
 
 public:
 
@@ -129,7 +129,7 @@ public:
             return;
         mIsReadyToWrite = true;
         if (mPromise.is_valid())
-            std::move(mPromise).setResult(WritableFileDescriptor(FD));
+            std::move(mPromise).set_result(WritableFileDescriptor(FD));
     }
 
 private:

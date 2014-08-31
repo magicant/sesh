@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 #include "async/Future.hh"
-#include "async/Promise.hh"
+#include "async/promise.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "common/variant.hh"
@@ -43,10 +43,10 @@
 namespace {
 
 using sesh::async::Future;
-using sesh::async::Promise;
 using sesh::async::createFailedFutureOf;
 using sesh::async::createFuture;
 using sesh::async::createPromiseFuturePair;
+using sesh::async::promise;
 using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::event::Proactor;
@@ -120,7 +120,7 @@ class ReadTestFixture : public ReaderApi, public Proactor {
 private:
 
     mutable bool mIsReadyToRead = false;
-    Promise<Trigger> mPromise;
+    promise<Trigger> mPromise;
 
 public:
 
@@ -131,7 +131,7 @@ public:
             return;
         mIsReadyToRead = true;
         if (mPromise.is_valid())
-            std::move(mPromise).setResult(ReadableFileDescriptor(FD));
+            std::move(mPromise).set_result(ReadableFileDescriptor(FD));
     }
 
 private:

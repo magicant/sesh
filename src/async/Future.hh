@@ -27,7 +27,7 @@
 #include <type_traits>
 #include <utility>
 #include "async/delay_holder.hh"
-#include "async/Promise.hh"
+#include "async/promise.hh"
 #include "common/trial.hh"
 
 namespace sesh {
@@ -77,7 +77,7 @@ public:
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
-    void then(F &&, Promise<R> &&) &&;
+    void then(F &&, promise<R> &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.
@@ -115,7 +115,7 @@ public:
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
-    void map(F &&, Promise<R> &&) &&;
+    void map(F &&, promise<R> &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.
@@ -160,7 +160,7 @@ public:
     typename std::enable_if<std::is_same<
             T, typename std::result_of<F(std::exception_ptr)>::type
     >::value>::type
-    recover(F &&, Promise<T> &&) &&;
+    recover(F &&, promise<T> &&) &&;
 
     /**
      * Sets a callback function that recovers this future from an exception.
@@ -189,7 +189,7 @@ public:
      * Adds a callback to this future so that its result will be set to the
      * argument promise.
      */
-    void forward(Promise<T> &&) &&;
+    void forward(promise<T> &&) &&;
 
     /**
      * Sets a callback function to this future so that its result is wrapped in
@@ -199,7 +199,7 @@ public:
      * argument promise, not to the inner future. If the move-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    void wrap(Promise<Future<T>> &&) &&;
+    void wrap(promise<Future<T>> &&) &&;
 
     /**
      * Sets a callback function to this future so that its result is wrapped in
@@ -251,7 +251,7 @@ public:
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    void unwrap(Promise<T> &&) &&;
+    void unwrap(promise<T> &&) &&;
 
     /**
      * Unwraps this nested future. The returned future will receive the same
@@ -267,7 +267,7 @@ public:
  * other.
  */
 template<typename T>
-std::pair<Promise<T>, Future<T>> createPromiseFuturePair();
+std::pair<promise<T>, Future<T>> createPromiseFuturePair();
 
 /**
  * Constructs a future that has already received a result from the argument

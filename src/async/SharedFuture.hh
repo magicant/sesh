@@ -106,7 +106,7 @@ public:
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
-    void then(F &&, Promise<R> &&) const;
+    void then(F &&, promise<R> &&) const;
 
     /**
      * Adds a callback function that converts the result to another result.
@@ -144,7 +144,7 @@ public:
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
-    void map(F &&, Promise<R> &&) const;
+    void map(F &&, promise<R> &&) const;
 
     /**
      * Adds a callback function that converts the result to another result.
@@ -189,7 +189,7 @@ public:
     typename std::enable_if<std::is_same<
             T, typename std::result_of<F(std::exception_ptr)>::type
     >::value>::type
-    recover(F &&, Promise<T> &&) const;
+    recover(F &&, promise<T> &&) const;
 
     /**
      * Adds a callback function that recovers this future from an exception.
@@ -218,7 +218,7 @@ public:
      * Adds a callback to this future so that its result will be set to the
      * argument promise.
      */
-    void forward(Promise<T> &&) const;
+    void forward(promise<T> &&) const;
 
     /**
      * Adds a callback function to this future so that its result is wrapped in
@@ -228,7 +228,7 @@ public:
      * argument promise, not to the inner future. If the copy-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    void wrap(Promise<Future<T>> &&) const;
+    void wrap(promise<Future<T>> &&) const;
 
     /**
      * Adds a callback function to this future so that its result is wrapped in
@@ -248,7 +248,7 @@ public:
      * argument promise, not to the inner future. If the copy-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    void wrapShared(Promise<SharedFuture<T>> &&) const;
+    void wrapShared(promise<SharedFuture<T>> &&) const;
 
     /**
      * Adds a callback function to this future so that its result is wrapped in
@@ -289,7 +289,7 @@ public:
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    void unwrap(Promise<T> &&) &&;
+    void unwrap(promise<T> &&) &&;
 
     /**
      * Unwraps this nested future. The returned future will receive the same
@@ -314,7 +314,7 @@ public:
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    void unwrap(Promise<T> &&) const;
+    void unwrap(promise<T> &&) const;
 
     /**
      * Unwraps this nested future. The returned future will receive the same

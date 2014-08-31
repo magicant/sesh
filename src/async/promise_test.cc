@@ -22,39 +22,39 @@
 
 #include <utility>
 #include "async/delay.hh"
-#include "async/Promise.hh"
+#include "async/promise.hh"
 #include "common/trial.hh"
 
 namespace {
 
 using sesh::async::delay;
-using sesh::async::Promise;
+using sesh::async::promise;
 using sesh::common::trial;
 
 TEST_CASE("Promise, default construction and invalidness") {
-    Promise<Promise<int>> p;
+    promise<promise<int>> p;
     CHECK_FALSE(p.is_valid());
 }
 
 TEST_CASE("Promise, construction and validness") {
     std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
-    Promise<int> p(d);
+    promise<int> p(d);
     d = nullptr;
     CHECK(p.is_valid());
 }
 
 TEST_CASE("Promise, invalidness after setting result") {
     const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
-    Promise<int> p(d);
-    std::move(p).setResult(0);
+    promise<int> p(d);
+    std::move(p).set_result(0);
     CHECK_FALSE(p.is_valid());
 }
 
 TEST_CASE("Promise, setting result by construction, value") {
     using P = std::pair<int, double>;
     const std::shared_ptr<delay<P>> dly = std::make_shared<delay<P>>();
-    Promise<P> p(dly);
-    std::move(p).setResult(1, 2.0);
+    promise<P> p(dly);
+    std::move(p).set_result(1, 2.0);
 
     int i = 0;
     double d = 0.0;
@@ -65,15 +65,15 @@ TEST_CASE("Promise, setting result by construction, value") {
 
 TEST_CASE("Promise, setting result by construction, invalidness") {
     auto d = std::make_shared<delay<int>>();
-    Promise<int> p(d);
+    promise<int> p(d);
     d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.is_valid()); });
-    std::move(p).setResult(0);
+    std::move(p).set_result(0);
 }
 
 TEST_CASE("Promise, setting result by function, value") {
     const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
-    Promise<int> p(d);
-    std::move(p).setResultFrom([] { return 1; });
+    promise<int> p(d);
+    std::move(p).set_result_from([] { return 1; });
 
     int i = 0;
     d->set_callback([&i](trial<int> &&r) { i = *r; });
@@ -82,14 +82,14 @@ TEST_CASE("Promise, setting result by function, value") {
 
 TEST_CASE("Promise, setting result by function, invalidness") {
     auto d = std::make_shared<delay<int>>();
-    Promise<int> p(d);
+    promise<int> p(d);
     d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.is_valid()); });
-    std::move(p).setResultFrom([] { return 0; });
+    std::move(p).set_result_from([] { return 0; });
 }
 
 TEST_CASE("Promise, setting result to exception, value") {
     const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
-    Promise<int> p(d);
+    promise<int> p(d);
     std::move(p).fail(std::make_exception_ptr('\1'));
 
     char c = '\0';
@@ -105,18 +105,18 @@ TEST_CASE("Promise, setting result to exception, value") {
 
 TEST_CASE("Promise, setting result to exception, invalidness") {
     auto d = std::make_shared<delay<int>>();
-    Promise<int> p(d);
+    promise<int> p(d);
     d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.is_valid()); });
     std::move(p).fail(std::make_exception_ptr(0));
 }
 
 TEST_CASE("Promise, setting result to current exception, value") {
     const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
-    Promise<int> p(d);
+    promise<int> p(d);
     try {
         throw '\1';
     } catch (...) {
-        std::move(p).failWithCurrentException();
+        std::move(p).fail_with_current_exception();
     }
 
     char c = '\0';
@@ -132,12 +132,12 @@ TEST_CASE("Promise, setting result to current exception, value") {
 
 TEST_CASE("Promise, setting result to current exception, invalidness") {
     auto d = std::make_shared<delay<int>>();
-    Promise<int> p(d);
+    promise<int> p(d);
     d->set_callback([&p](trial<int> &&) { CHECK_FALSE(p.is_valid()); });
     try {
         throw 0;
     } catch (...) {
-        std::move(p).failWithCurrentException();
+        std::move(p).fail_with_current_exception();
     }
 }
 

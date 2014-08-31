@@ -24,7 +24,7 @@ TESTPROGRAMS = \
 	src/async/delay_holder_test \
 	src/async/delay_test \
 	src/async/FutureTest \
-	src/async/PromiseTest \
+	src/async/promise_test \
 	src/async/SharedFutureTest \
 	src/common/container_helper_test \
 	src/common/enum_iterator_test \
@@ -85,7 +85,7 @@ src_sesh_SOURCES = \
 	src/async/delay_holder.hh \
 	src/async/Future.hh \
 	src/async/Future.tcc \
-	src/async/Promise.hh \
+	src/async/promise.hh \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
 	src/buildconfig.h \
@@ -206,8 +206,8 @@ src_async_delay_test_SOURCES = \
 	src/async/delay_test.cc
 src_async_FutureTest_SOURCES = \
 	src/async/FutureTest.cc
-src_async_PromiseTest_SOURCES = \
-	src/async/PromiseTest.cc
+src_async_promise_test_SOURCES = \
+	src/async/promise_test.cc
 src_async_SharedFutureTest_SOURCES = \
 	src/async/SharedFutureTest.cc
 src_common_container_helper_test_SOURCES = \

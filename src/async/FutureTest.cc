@@ -25,14 +25,14 @@
 #include <utility>
 #include "async/delay.hh"
 #include "async/Future.hh"
-#include "async/Promise.hh"
+#include "async/promise.hh"
 #include "common/nop.hh"
 #include "common/trial.hh"
 
 namespace {
 
 using sesh::async::Future;
-using sesh::async::Promise;
+using sesh::async::promise;
 using sesh::async::createFailedFutureOf;
 using sesh::async::createFuture;
 using sesh::async::createFutureFrom;
@@ -86,8 +86,8 @@ TEST_CASE("Future, invalidness in callback") {
 }
 
 TEST_CASE("Create promise/future pair") {
-    std::pair<Promise<int>, Future<int>> &&pf = createPromiseFuturePair<int>();
-    std::move(pf.first).setResult(123);
+    std::pair<promise<int>, Future<int>> &&pf = createPromiseFuturePair<int>();
+    std::move(pf.first).set_result(123);
 
     int i = 0;
     std::move(pf.second).then([&i](trial<int> &&r) { i = *r; });
@@ -97,7 +97,7 @@ TEST_CASE("Create promise/future pair") {
 TEST_CASE("Future, then, to promise, success") {
     const auto dly = std::make_shared<delay<int>>();
     Future<int> f1(dly);
-    std::pair<Promise<double>, Future<double>> pf2 =
+    std::pair<promise<double>, Future<double>> pf2 =
             createPromiseFuturePair<double>();
 
     int i = 0;
@@ -156,7 +156,7 @@ TEST_CASE("Future, then, returning future, failure") {
 TEST_CASE("Future, map, to promise, success") {
     const auto dly = std::make_shared<delay<int>>();
     Future<int> f1(dly);
-    std::pair<Promise<double>, Future<double>> pf2 =
+    std::pair<promise<double>, Future<double>> pf2 =
             createPromiseFuturePair<double>();
 
     int i = 0;
@@ -269,7 +269,7 @@ TEST_CASE("Future, map, failure in callback") {
 TEST_CASE("Future, recover, to promise, success") {
     const auto d = std::make_shared<delay<int>>();
     Future<int> f1(d);
-    std::pair<Promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
+    std::pair<promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
 
     const auto f = [](std::exception_ptr) -> int {
         FAIL("unexpected exception");
@@ -417,9 +417,9 @@ TEST_CASE("Future, create from exception") {
 }
 
 TEST_CASE("Future, forward, success, int") {
-    std::pair<Promise<int>, Future<int>> pf1 = createPromiseFuturePair<int>();
-    std::pair<Promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
-    std::move(pf1.first).setResult(123);
+    std::pair<promise<int>, Future<int>> pf1 = createPromiseFuturePair<int>();
+    std::pair<promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
+    std::move(pf1.first).set_result(123);
     std::move(pf1.second).forward(std::move(pf2.first));
 
     int i = 0;
@@ -430,7 +430,7 @@ TEST_CASE("Future, forward, success, int") {
 TEST_CASE("Future, forward, success, move only object") {
     auto pf1 = createPromiseFuturePair<MoveOnly>();
     auto pf2 = createPromiseFuturePair<MoveOnly>();
-    std::move(pf1.first).setResult(MoveOnly());
+    std::move(pf1.first).set_result(MoveOnly());
     std::move(pf1.second).forward(std::move(pf2.first));
 
     bool called = false;
@@ -441,9 +441,9 @@ TEST_CASE("Future, forward, success, move only object") {
 }
 
 TEST_CASE("Future, forward, failure") {
-    std::pair<Promise<int>, Future<int>> pf1 = createPromiseFuturePair<int>();
-    std::pair<Promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
-    std::move(pf1.first).setResultFrom([]() -> int { throw 1.0; });
+    std::pair<promise<int>, Future<int>> pf1 = createPromiseFuturePair<int>();
+    std::pair<promise<int>, Future<int>> pf2 = createPromiseFuturePair<int>();
+    std::move(pf1.first).set_result_from([]() -> int { throw 1.0; });
     std::move(pf1.second).forward(std::move(pf2.first));
 
     double d = 0.0;
@@ -458,7 +458,7 @@ TEST_CASE("Future, forward, failure") {
 }
 
 TEST_CASE("Future, wrap, to promise, success") {
-    std::pair<Promise<Future<int>>, Future<Future<int>>> pf =
+    std::pair<promise<Future<int>>, Future<Future<int>>> pf =
             createPromiseFuturePair<Future<int>>();
     createFutureOf(123).wrap(std::move(pf.first));
     int i = 0;
@@ -494,7 +494,7 @@ TEST_CASE("Future, wrap, returning value, failure in original future") {
 }
 
 TEST_CASE("Future, unwrap, to promise, success") {
-    std::pair<Promise<int>, Future<int>> pf = createPromiseFuturePair<int>();
+    std::pair<promise<int>, Future<int>> pf = createPromiseFuturePair<int>();
     createFutureOf(createFutureOf(123)).unwrap(std::move(pf.first));
     int i = 0;
     std::move(pf.second).then([&i](trial<int> &&r) { i = *r; });

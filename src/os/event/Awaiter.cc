@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 #include "async/Future.hh"
-#include "async/Promise.hh"
+#include "async/promise.hh"
 #include "common/container_helper.hh"
 #include "common/shared_function.hh"
 #include "common/trial.hh"
@@ -44,7 +44,7 @@
 #include "os/signaling/SignalNumberSet.hh"
 
 using sesh::async::Future;
-using sesh::async::Promise;
+using sesh::async::promise;
 using sesh::async::createPromiseFuturePair;
 using sesh::common::find_if;
 using sesh::common::shared_function;
@@ -74,12 +74,12 @@ private:
 
     Timeout mTimeout;
     std::vector<FileDescriptorTrigger> mTriggers;
-    Promise<Trigger> mPromise;
+    promise<Trigger> mPromise;
     std::vector<HandlerConfiguration::Canceler> mCancelers;
 
 public:
 
-    explicit PendingEvent(Promise<Trigger> p);
+    explicit PendingEvent(promise<Trigger> p);
     PendingEvent(PendingEvent &&) = default;
     PendingEvent &operator=(PendingEvent &&) = default;
     ~PendingEvent();
@@ -193,7 +193,7 @@ public:
 
 }; // class AwaiterImpl
 
-PendingEvent::PendingEvent(Promise<Trigger> p) :
+PendingEvent::PendingEvent(promise<Trigger> p) :
         mTimeout(Timeout::Interval::max()),
         mTriggers(),
         mPromise(std::move(p)),
@@ -210,12 +210,12 @@ void PendingEvent::addTrigger(const FileDescriptorTrigger &t) {
 
 void PendingEvent::fire(Trigger &&t) {
     if (!hasFired())
-        std::move(mPromise).setResult(std::move(t));
+        std::move(mPromise).set_result(std::move(t));
 }
 
 void PendingEvent::failWithCurrentException() {
     if (!hasFired())
-        std::move(mPromise).failWithCurrentException();
+        std::move(mPromise).fail_with_current_exception();
 }
 
 void PendingEvent::addCanceler(HandlerConfiguration::Canceler &&c) {
