@@ -1270,14 +1270,9 @@ public:
      * Throws any exception thrown by the argument function or constructor.
      *
      * @tparam F the type of the function argument.
-     * @tparam U the type of the new contained value to be constructed.
-     *     (inferred from the return type of the argument function.)
      * @param f the function that constructs the new contained value.
      */
-    template<
-            typename F,
-            typename U = typename std::decay<
-                    typename std::result_of<F()>::type>::type>
+    template<typename F>
     static variant result_of(F &&f) {
         return variant(functional_initialize(), std::forward<F>(f));
     }
