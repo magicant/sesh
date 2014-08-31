@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_async_Future_hh
-#define INCLUDED_async_Future_hh
+#ifndef INCLUDED_async_future_hh
+#define INCLUDED_async_future_hh
 
 #include "buildconfig.h"
 
@@ -26,9 +26,8 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "async/Delay.hh"
-#include "async/DelayHolder.hh"
-#include "async/Promise.hh"
+#include "async/delay_holder.hh"
+#include "async/promise.hh"
 #include "common/trial.hh"
 
 namespace sesh {
@@ -37,15 +36,15 @@ namespace async {
 namespace future_impl {
 
 template<typename T>
-class Future;
+class future;
 
 /** A base class that implements most part of the future class. */
 template<typename T>
-class FutureBase : public DelayHolder<T> {
+class future_base : public delay_holder<T> {
 
 public:
 
-    using DelayHolder<T>::DelayHolder;
+    using delay_holder<T>::delay_holder;
 
     /**
      * Sets a callback function to receive the result from the associated
@@ -78,7 +77,7 @@ public:
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
-    void then(F &&, Promise<R> &&) &&;
+    void then(F &&, promise<R> &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.
@@ -97,7 +96,7 @@ public:
             typename F,
             typename R = typename std::result_of<
                     typename std::decay<F>::type(common::trial<T> &&)>::type>
-    typename std::enable_if<!std::is_void<R>::value, Future<R>>::type
+    typename std::enable_if<!std::is_void<R>::value, future<R>>::type
     then(F &&) &&;
 
     /**
@@ -116,7 +115,7 @@ public:
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
-    void map(F &&, Promise<R> &&) &&;
+    void map(F &&, promise<R> &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.
@@ -139,7 +138,7 @@ public:
             typename F,
             typename R = typename std::result_of<
                     typename std::decay<F>::type(T &&)>::type>
-    Future<R> map(F &&) &&;
+    future<R> map(F &&) &&;
 
     /**
      * Sets a callback function that recovers this future from an exception.
@@ -161,7 +160,7 @@ public:
     typename std::enable_if<std::is_same<
             T, typename std::result_of<F(std::exception_ptr)>::type
     >::value>::type
-    recover(F &&, Promise<T> &&) &&;
+    recover(F &&, promise<T> &&) &&;
 
     /**
      * Sets a callback function that recovers this future from an exception.
@@ -183,14 +182,14 @@ public:
     template<typename F>
     typename std::enable_if<std::is_same<
             T, typename std::result_of<F(std::exception_ptr)>::type
-    >::value, Future<T>>::type
+    >::value, future<T>>::type
     recover(F &&) &&;
 
     /**
      * Adds a callback to this future so that its result will be set to the
      * argument promise.
      */
-    void forward(Promise<T> &&) &&;
+    void forward(promise<T> &&) &&;
 
     /**
      * Sets a callback function to this future so that its result is wrapped in
@@ -200,7 +199,7 @@ public:
      * argument promise, not to the inner future. If the move-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    void wrap(Promise<Future<T>> &&) &&;
+    void wrap(promise<future<T>> &&) &&;
 
     /**
      * Sets a callback function to this future so that its result is wrapped in
@@ -210,9 +209,9 @@ public:
      * returned future, not to the inner future. If the move-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    Future<Future<T>> wrap() &&;
+    future<future<T>> wrap() &&;
 
-}; // template<typename T> class FutureBase
+}; // template<typename T> class future_base
 
 /**
  * The output side of a future/promise pair.
@@ -231,44 +230,44 @@ public:
  * std::exception_ptr.
  */
 template<typename T>
-class Future : public FutureBase<T> {
+class future : public future_base<T> {
 
 public:
 
-    using FutureBase<T>::FutureBase;
+    using future_base<T>::future_base;
 
-}; // template<typename T> class Future
+}; // template<typename T> class future
 
 /** A specialization of the future class that has the unwrap method. */
 template<typename T>
-class Future<Future<T>> : public FutureBase<Future<T>> {
+class future<future<T>> : public future_base<future<T>> {
 
 public:
 
-    using FutureBase<Future<T>>::FutureBase;
+    using future_base<future<T>>::future_base;
 
     /**
      * Unwraps this nested future. The argument promise will receive the same
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    void unwrap(Promise<T> &&) &&;
+    void unwrap(promise<T> &&) &&;
 
     /**
      * Unwraps this nested future. The returned future will receive the same
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    Future<T> unwrap() &&;
+    future<T> unwrap() &&;
 
-}; // template<typename T> class Future<Future<T>>
+}; // template<typename T> class future<future<T>>
 
 /**
  * Creates a pair of new promise and future that are associated with each
  * other.
  */
 template<typename T>
-std::pair<Promise<T>, Future<T>> createPromiseFuturePair();
+std::pair<promise<T>, future<T>> make_promise_future_pair();
 
 /**
  * Constructs a future that has already received a result from the argument
@@ -280,7 +279,7 @@ std::pair<Promise<T>, Future<T>> createPromiseFuturePair();
  * exception) that becomes the result of the returned future.
  */
 template<typename F>
-auto createFutureFrom(F &&) -> Future<typename std::result_of<F()>::type>;
+auto make_future_from(F &&) -> future<typename std::result_of<F()>::type>;
 
 /**
  * Constructs a future that has already received a result constructed from
@@ -292,7 +291,7 @@ auto createFutureFrom(F &&) -> Future<typename std::result_of<F()>::type>;
  * @param arg arguments that are passed to the constructor of T.
  */
 template<typename T, typename... Arg>
-Future<T> createFuture(Arg &&... arg);
+future<T> make_future(Arg &&... arg);
 
 /**
  * Constructs a future whose result has been set to a copy of the argument. If
@@ -300,31 +299,31 @@ Future<T> createFuture(Arg &&... arg);
  * to the returned future.
  */
 template<typename T>
-auto createFutureOf(T &&) -> Future<typename std::decay<T>::type>;
+auto make_future_of(T &&) -> future<typename std::decay<T>::type>;
 
 /** Constructs a future whose result has been set to the argument exception. */
 template<typename T>
-Future<T> createFailedFuture(std::exception_ptr);
+future<T> make_failed_future(std::exception_ptr);
 
 /** Constructs a future whose result has been set to the argument exception. */
 template<typename T, typename E>
-Future<T> createFailedFutureOf(E &&e);
+future<T> make_failed_future_of(E &&e);
 
 } // namespace future_impl
 
-using future_impl::Future;
-using future_impl::createFailedFuture;
-using future_impl::createFailedFutureOf;
-using future_impl::createFuture;
-using future_impl::createFutureFrom;
-using future_impl::createFutureOf;
-using future_impl::createPromiseFuturePair;
+using future_impl::future;
+using future_impl::make_failed_future;
+using future_impl::make_failed_future_of;
+using future_impl::make_future;
+using future_impl::make_future_from;
+using future_impl::make_future_of;
+using future_impl::make_promise_future_pair;
 
 } // namespace async
 } // namespace sesh
 
-#include "Future.tcc"
+#include "future.tcc"
 
-#endif // #ifndef INCLUDED_async_Future_hh
+#endif // #ifndef INCLUDED_async_future_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

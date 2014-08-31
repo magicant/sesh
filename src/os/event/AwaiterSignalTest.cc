@@ -24,7 +24,7 @@
 #include <system_error>
 #include <utility>
 #include <vector>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/Awaiter.hh"
@@ -40,7 +40,7 @@
 
 namespace {
 
-using sesh::async::Future;
+using sesh::async::future;
 using sesh::common::trial;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::Signal;
@@ -58,7 +58,7 @@ TEST_CASE_METHOD(
         "Awaiter: one signal in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(Signal(3));
+    future<Trigger> f = a.expect(Signal(3));
     std::move(f).then([this](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<Signal>());
@@ -129,7 +129,7 @@ TEST_CASE_METHOD(
         "Awaiter: two signals in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(100));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(Signal(2), Signal(6));
+    future<Trigger> f = a.expect(Signal(2), Signal(6));
     std::move(f).then([this](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<Signal>());

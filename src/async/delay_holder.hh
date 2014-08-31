@@ -15,25 +15,25 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_async_DelayHolder_hh
-#define INCLUDED_async_DelayHolder_hh
+#ifndef INCLUDED_async_delay_holder_hh
+#define INCLUDED_async_delay_holder_hh
 
 #include "buildconfig.h"
 
 #include <memory>
 #include <utility>
-#include "async/Delay.hh"
+#include "async/delay.hh"
 
 namespace sesh {
 namespace async {
 
 /** A non-copyable base class that has a shared pointer to a delay object. */
 template<typename T>
-class DelayHolder {
+class delay_holder {
 
 private:
 
-    std::shared_ptr<Delay<T>> mDelay;
+    std::shared_ptr<async::delay<T>> m_delay;
 
 public:
 
@@ -41,26 +41,26 @@ public:
      * The default constructor creates a delay holder without an associated
      * delay.
      */
-    DelayHolder() = default;
+    delay_holder() = default;
 
     /** Creates a delay holder that holds the argument delay. */
-    explicit DelayHolder(const std::shared_ptr<Delay<T>> &delay) noexcept :
-            mDelay(delay) { }
+    explicit delay_holder(const std::shared_ptr<async::delay<T>> &d) noexcept :
+            m_delay(d) { }
 
-    DelayHolder(const DelayHolder &) = delete;
-    DelayHolder(DelayHolder &&) = default;
-    DelayHolder &operator=(const DelayHolder &) = delete;
-    DelayHolder &operator=(DelayHolder &&) = default;
-    ~DelayHolder() = default;
+    delay_holder(const delay_holder &) = delete;
+    delay_holder(delay_holder &&) = default;
+    delay_holder &operator=(const delay_holder &) = delete;
+    delay_holder &operator=(delay_holder &&) = default;
+    ~delay_holder() = default;
 
     /** Checks if this delay holder has an associated delay object. */
-    bool isValid() const noexcept {
-        return mDelay != nullptr;
+    bool is_valid() const noexcept {
+        return m_delay != nullptr;
     }
 
     /** Disconnects this delay holder from the associated delay object. */
     void invalidate() noexcept {
-        mDelay.reset();
+        m_delay.reset();
     }
 
 protected:
@@ -69,21 +69,22 @@ protected:
      * Returns a reference to the associated delay. This function can be called
      * only when this object has an associated delay.
      */
-    Delay<T> &delay() { return *mDelay; }
+    async::delay<T> &delay() { return *m_delay; }
 
     /**
      * Calls the forward function for the delay object contained in the
      * arguments.
      */
-    static void forward(DelayHolder &&from, DelayHolder &&to) {
-        Delay<T>::forward(std::move(from.mDelay), std::move(to.mDelay));
+    static void forward(delay_holder &&from, delay_holder &&to) {
+        async::delay<T>::forward(
+                std::move(from.m_delay), std::move(to.m_delay));
     }
 
-}; // template<typename T> class DelayHolder
+}; // template<typename T> class delay_holder
 
 } // namespace async
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_async_DelayHolder_hh
+#endif // #ifndef INCLUDED_async_delay_holder_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

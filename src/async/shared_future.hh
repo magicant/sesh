@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_async_SharedFuture_hh
-#define INCLUDED_async_SharedFuture_hh
+#ifndef INCLUDED_async_shared_future_hh
+#define INCLUDED_async_shared_future_hh
 
 #include "buildconfig.h"
 
 #include <cstddef>
 #include <memory>
-#include "async/Future.hh"
+#include "async/future.hh"
 
 namespace sesh {
 namespace async {
@@ -30,22 +30,22 @@ namespace async {
 namespace future_impl {
 
 template<typename T>
-class SharedFuture;
+class shared_future;
 
 template<typename T>
-class SharedFutureBase {
+class shared_future_base {
 
 private:
 
-    class Impl;
+    class impl;
 
     /** May be null. */
-    std::shared_ptr<Impl> mImpl;
+    std::shared_ptr<impl> m_impl;
 
 public:
 
     /** Creates a new invalid shared future. */
-    SharedFutureBase() = default;
+    shared_future_base() = default;
 
     /**
      * Creates a shared future from a future.
@@ -53,26 +53,26 @@ public:
      * If the argument future is not valid, the resulting shared future is not
      * valid, either.
      */
-    SharedFutureBase(Future<T> &&);
+    shared_future_base(future<T> &&);
 
     /**
      * Compares two shared futures. The two are compared equal if and only if
      * they share the same associated promise.
      */
-    bool operator==(const SharedFutureBase<T> &) const noexcept;
+    bool operator==(const shared_future_base<T> &) const noexcept;
 
     /**
      * Compares two shared futures. The two are compared equal if and only if
      * they share the same associated promise.
      */
-    bool operator!=(const SharedFutureBase<T> &) const noexcept;
+    bool operator!=(const shared_future_base<T> &) const noexcept;
 
     /**
      * Returns true if and only if this shared future is valid, that is,
      * associated with a promise. Callback functions can be added to valid
      * shared futures only.
      */
-    bool isValid() const noexcept;
+    bool is_valid() const noexcept;
 
     /** True if this future is valid. */
     explicit operator bool() const noexcept;
@@ -106,7 +106,7 @@ public:
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
-    void then(F &&, Promise<R> &&) const;
+    void then(F &&, promise<R> &&) const;
 
     /**
      * Adds a callback function that converts the result to another result.
@@ -125,7 +125,7 @@ public:
             typename F,
             typename R = typename std::result_of<
                 typename std::decay<F>::type(const common::trial<T> &)>::type>
-    typename std::enable_if<!std::is_void<R>::value, Future<R>>::type
+    typename std::enable_if<!std::is_void<R>::value, future<R>>::type
     then(F &&) const;
 
     /**
@@ -144,7 +144,7 @@ public:
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
-    void map(F &&, Promise<R> &&) const;
+    void map(F &&, promise<R> &&) const;
 
     /**
      * Adds a callback function that converts the result to another result.
@@ -167,7 +167,7 @@ public:
             typename F,
             typename R = typename std::result_of<
                     typename std::decay<F>::type(const T &)>::type>
-    Future<R> map(F &&) const;
+    future<R> map(F &&) const;
 
     /**
      * Adds a callback function that recovers this future from an exception.
@@ -189,7 +189,7 @@ public:
     typename std::enable_if<std::is_same<
             T, typename std::result_of<F(std::exception_ptr)>::type
     >::value>::type
-    recover(F &&, Promise<T> &&) const;
+    recover(F &&, promise<T> &&) const;
 
     /**
      * Adds a callback function that recovers this future from an exception.
@@ -211,14 +211,14 @@ public:
     template<typename F>
     typename std::enable_if<std::is_same<
             T, typename std::result_of<F(std::exception_ptr)>::type
-    >::value, Future<T>>::type
+    >::value, future<T>>::type
     recover(F &&) const;
 
     /**
      * Adds a callback to this future so that its result will be set to the
      * argument promise.
      */
-    void forward(Promise<T> &&) const;
+    void forward(promise<T> &&) const;
 
     /**
      * Adds a callback function to this future so that its result is wrapped in
@@ -228,7 +228,7 @@ public:
      * argument promise, not to the inner future. If the copy-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    void wrap(Promise<Future<T>> &&) const;
+    void wrap(promise<future<T>> &&) const;
 
     /**
      * Adds a callback function to this future so that its result is wrapped in
@@ -238,7 +238,7 @@ public:
      * returned future, not to the inner future. If the copy-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    Future<Future<T>> wrap() const;
+    future<future<T>> wrap() const;
 
     /**
      * Adds a callback function to this future so that its result is wrapped in
@@ -248,7 +248,7 @@ public:
      * argument promise, not to the inner future. If the copy-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    void wrapShared(Promise<SharedFuture<T>> &&) const;
+    void wrap_shared(promise<shared_future<T>> &&) const;
 
     /**
      * Adds a callback function to this future so that its result is wrapped in
@@ -258,9 +258,9 @@ public:
      * returned future, not to the inner future. If the copy-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    Future<SharedFuture<T>> wrapShared() const;
+    future<shared_future<T>> wrap_shared() const;
 
-}; // template<typename> SharedFutureBase
+}; // template<typename> shared_future_base
 
 /**
  * A shared future is a future that accepts multiple callback functions.
@@ -268,84 +268,84 @@ public:
  * All callbacks receives const references to the same result object.
  */
 template<typename T>
-class SharedFuture : public SharedFutureBase<T> {
+class shared_future : public shared_future_base<T> {
 
 public:
 
-    using SharedFutureBase<T>::SharedFutureBase;
+    using shared_future_base<T>::shared_future_base;
 
-}; // template<typename> class SharedFuture
+}; // template<typename> class shared_future
 
 /** A specialization of the future class that has the unwrap method. */
 template<typename T>
-class Future<SharedFuture<T>> : public FutureBase<SharedFuture<T>> {
+class future<shared_future<T>> : public future_base<shared_future<T>> {
 
 public:
 
-    using FutureBase<SharedFuture<T>>::FutureBase;
+    using future_base<shared_future<T>>::future_base;
 
     /**
      * Unwraps this nested future. The argument promise will receive the same
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    void unwrap(Promise<T> &&) &&;
+    void unwrap(promise<T> &&) &&;
 
     /**
      * Unwraps this nested future. The returned future will receive the same
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    Future<T> unwrap() &&;
+    future<T> unwrap() &&;
 
-}; // template<typename T> class SharedFuture<Future<T>>
+}; // template<typename T> class shared_future<future<T>>
 
 /** A specialization of the future class that has the unwrap method. */
 template<typename T>
-class SharedFuture<SharedFuture<T>> :
-        public SharedFutureBase<SharedFuture<T>> {
+class shared_future<shared_future<T>> :
+        public shared_future_base<shared_future<T>> {
 
 public:
 
-    using SharedFutureBase<SharedFuture<T>>::SharedFutureBase;
+    using shared_future_base<shared_future<T>>::shared_future_base;
 
     /**
      * Unwraps this nested future. The argument promise will receive the same
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    void unwrap(Promise<T> &&) const;
+    void unwrap(promise<T> &&) const;
 
     /**
      * Unwraps this nested future. The returned future will receive the same
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    Future<T> unwrap() const;
+    future<T> unwrap() const;
 
-}; // template<typename T> class SharedFuture<Future<T>>
-
-template<typename T>
-bool operator==(const SharedFutureBase<T> &, std::nullptr_t);
+}; // template<typename T> class shared_future<future<T>>
 
 template<typename T>
-bool operator!=(const SharedFutureBase<T> &, std::nullptr_t);
+bool operator==(const shared_future_base<T> &, std::nullptr_t);
 
 template<typename T>
-bool operator==(std::nullptr_t, const SharedFutureBase<T> &);
+bool operator!=(const shared_future_base<T> &, std::nullptr_t);
 
 template<typename T>
-bool operator!=(std::nullptr_t, const SharedFutureBase<T> &);
+bool operator==(std::nullptr_t, const shared_future_base<T> &);
+
+template<typename T>
+bool operator!=(std::nullptr_t, const shared_future_base<T> &);
 
 } // namespace future_impl
 
-using future_impl::SharedFuture;
+using future_impl::shared_future;
 
 } // namespace async
 } // namespace sesh
 
-#include "SharedFuture.tcc"
+#include "shared_future.tcc"
 
-#endif // #ifndef INCLUDED_async_SharedFuture_hh
+#endif // #ifndef INCLUDED_async_shared_future_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

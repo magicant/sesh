@@ -24,7 +24,7 @@
 #include <exception>
 #include <system_error>
 #include <utility>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/AwaiterTestHelper.hh"
@@ -61,7 +61,7 @@ std::ostream &operator<<(
 namespace {
 
 using sesh::common::trial;
-using sesh::async::Future;
+using sesh::async::future;
 using sesh::os::event::AwaiterTestFixture;
 using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Signal;
@@ -84,7 +84,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: does nothing for empty trigger set") {
-    Future<Trigger> f = a.expect();
+    future<Trigger> f = a.expect();
     std::move(f).then([](trial<Trigger> &&) { FAIL("callback called"); });
     a.awaitEvents();
 }
@@ -94,7 +94,7 @@ TEST_CASE_METHOD(
         "Awaiter: timeout with FD trigger in same set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(
+    future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(5)), ReadableFileDescriptor(3));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
@@ -131,7 +131,7 @@ TEST_CASE_METHOD(
         "Awaiter: FD trigger with timeout in same set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(
+    future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(10)), ReadableFileDescriptor(3));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());

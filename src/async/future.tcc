@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_async_Future_tcc
-#define INCLUDED_async_Future_tcc
+#ifndef INCLUDED_async_future_tcc
+#define INCLUDED_async_future_tcc
 
 #include "buildconfig.h"
-#include "Future.hh"
+#include "future.hh"
 
 #include <cstddef>
 #include <functional>
@@ -37,124 +37,124 @@ template<typename Function>
 typename std::enable_if<std::is_void<typename std::result_of<
         typename std::decay<Function>::type(common::trial<T> &&)
 >::type>::value>::type
-FutureBase<T>::then(Function &&f) && {
-    FutureBase copy = std::move(*this);
-    copy.delay().setCallback(std::forward<Function>(f));
+future_base<T>::then(Function &&f) && {
+    future_base copy = std::move(*this);
+    copy.delay().set_callback(std::forward<Function>(f));
 }
 
 template<typename T>
-std::pair<Promise<T>, Future<T>> createPromiseFuturePair() {
-    auto delay = std::make_shared<Delay<T>>();
-    return std::pair<Promise<T>, Future<T>>(
+std::pair<promise<T>, future<T>> make_promise_future_pair() {
+    auto d = std::make_shared<delay<T>>();
+    return std::pair<promise<T>, future<T>>(
             std::piecewise_construct,
-            std::forward_as_tuple(delay),
-            std::forward_as_tuple(delay));
+            std::forward_as_tuple(d),
+            std::forward_as_tuple(d));
 }
 
 template<typename To, typename Function>
-class Composer {
+class composer {
 
 private:
 
-    Function mFunction;
-    Promise<To> mReceiver;
+    Function m_function;
+    promise<To> m_receiver;
 
 public:
 
     template<typename F>
-    Composer(F &&function, Promise<To> &&receiver) :
-            mFunction(std::forward<F>(function)),
-            mReceiver(std::move(receiver)) { }
+    composer(F &&function, promise<To> &&receiver) :
+            m_function(std::forward<F>(function)),
+            m_receiver(std::move(receiver)) { }
 
     template<typename From>
     void operator()(From &&r) {
-        std::move(mReceiver).setResultFrom(
-                [this, &r] { return mFunction(std::forward<From>(r)); });
+        std::move(m_receiver).set_result_from(
+                [this, &r] { return m_function(std::forward<From>(r)); });
     }
 
 };
 
 template<typename From>
 template<typename Function, typename To>
-void FutureBase<From>::then(Function &&f, Promise<To> &&p) && {
-    using C = Composer<To, typename std::decay<Function>::type>;
+void future_base<From>::then(Function &&f, promise<To> &&p) && {
+    using C = composer<To, typename std::decay<Function>::type>;
     std::move(*this).then(common::shared_function<C>::create(
             std::forward<Function>(f), std::move(p)));
 }
 
 template<typename From>
 template<typename Function, typename To>
-typename std::enable_if<!std::is_void<To>::value, Future<To>>::type
-FutureBase<From>::then(Function &&f) && {
-    std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
+typename std::enable_if<!std::is_void<To>::value, future<To>>::type
+future_base<From>::then(Function &&f) && {
+    std::pair<promise<To>, future<To>> pf = make_promise_future_pair<To>();
     std::move(*this).then(std::forward<Function>(f), std::move(pf.first));
     return std::move(pf.second);
 }
 
 template<typename Function>
-class Mapper {
+class mapper {
 
 private:
 
-    Function mFunction;
+    Function m_function;
 
 public:
 
     template<typename F>
-    Mapper(F &&function) : mFunction(std::forward<F>(function)) { }
+    mapper(F &&function) : m_function(std::forward<F>(function)) { }
 
     template<typename From>
-    auto operator()(const common::trial<From> &r) -> decltype(mFunction(*r)) {
-        return mFunction(*r);
+    auto operator()(const common::trial<From> &r) -> decltype(m_function(*r)) {
+        return m_function(*r);
     }
 
     template<typename From>
     auto operator()(common::trial<From> &&r)
-            -> decltype(mFunction(std::move(*r))) {
-        return mFunction(std::move(*r));
+            -> decltype(m_function(std::move(*r))) {
+        return m_function(std::move(*r));
     }
 
 };
 
 template<typename From>
 template<typename Function, typename To>
-void FutureBase<From>::map(Function &&f, Promise<To> &&p) && {
-    using M = Mapper<typename std::decay<Function>::type>;
+void future_base<From>::map(Function &&f, promise<To> &&p) && {
+    using M = mapper<typename std::decay<Function>::type>;
     std::move(*this).then(M(std::forward<Function>(f)), std::move(p));
 }
 
 template<typename From>
 template<typename Function, typename To>
-Future<To> FutureBase<From>::map(Function &&f) && {
-    std::pair<Promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
+future<To> future_base<From>::map(Function &&f) && {
+    std::pair<promise<To>, future<To>> pf = make_promise_future_pair<To>();
     std::move(*this).map(std::forward<Function>(f), std::move(pf.first));
     return std::move(pf.second);
 }
 
 template<typename Function>
-class Recoverer {
+class recoverer {
 
 private:
 
-    Function mFunction;
+    Function m_function;
 
 public:
 
     template<typename F>
-    Recoverer(F &&function) : mFunction(std::forward<F>(function)) { }
+    recoverer(F &&function) : m_function(std::forward<F>(function)) { }
 
     template<typename T>
     T operator()(const common::trial<T> &r) {
         if (r.has_value())
             return *r;
-        return mFunction(r.template value<std::exception_ptr>());
+        return m_function(r.template value<std::exception_ptr>());
     }
 
     template<typename T>
     T operator()(common::trial<T> &&r) {
         if (r.has_value())
             return std::move(*r);
-        return mFunction(r.template value<std::exception_ptr>());
+        return m_function(r.template value<std::exception_ptr>());
     }
 
 };
@@ -164,8 +164,8 @@ template<typename F>
 typename std::enable_if<std::is_same<
         T, typename std::result_of<F(std::exception_ptr)>::type
 >::value>::type
-FutureBase<T>::recover(F &&function, Promise<T> &&p) && {
-    using R = Recoverer<typename std::decay<F>::type>;
+future_base<T>::recover(F &&function, promise<T> &&p) && {
+    using R = recoverer<typename std::decay<F>::type>;
     std::move(*this).then(R(std::forward<F>(function)), std::move(p));
 }
 
@@ -173,15 +173,15 @@ template<typename T>
 template<typename F>
 typename std::enable_if<std::is_same<
         T, typename std::result_of<F(std::exception_ptr)>::type
->::value, Future<T>>::type
-FutureBase<T>::recover(F &&function) && {
-    std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
+>::value, future<T>>::type
+future_base<T>::recover(F &&function) && {
+    std::pair<promise<T>, future<T>> pf = make_promise_future_pair<T>();
     std::move(*this).recover(std::forward<F>(function), std::move(pf.first));
     return std::move(pf.second);
 }
 
 template<typename T>
-void FutureBase<T>::forward(Promise<T> &&receiver) && {
+void future_base<T>::forward(promise<T> &&receiver) && {
     // std::move(*this).map(common::identity(), std::move(receiver));
     /*
      * Mapping would leave intermediate delay objects that will not be
@@ -189,84 +189,84 @@ void FutureBase<T>::forward(Promise<T> &&receiver) && {
      * infinitely recursive algorithm to grow the delay object chain until it
      * eats up the heap.
      */
-    DelayHolder<T>::forward(std::move(*this), std::move(receiver));
+    delay_holder<T>::forward(std::move(*this), std::move(receiver));
 }
 
 template<typename F>
-auto createFutureFrom(F &&f) -> Future<typename std::result_of<F()>::type> {
+auto make_future_from(F &&f) -> future<typename std::result_of<F()>::type> {
     using T = typename std::result_of<F()>::type;
-    std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
-    std::move(pf.first).setResultFrom(std::forward<F>(f));
+    std::pair<promise<T>, future<T>> pf = make_promise_future_pair<T>();
+    std::move(pf.first).set_result_from(std::forward<F>(f));
     return std::move(pf.second);
 }
 
 template<typename T, typename... Arg>
-Future<T> createFuture(Arg &&... arg) {
-    std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
-    std::move(pf.first).setResult(std::forward<Arg>(arg)...);
+future<T> make_future(Arg &&... arg) {
+    std::pair<promise<T>, future<T>> pf = make_promise_future_pair<T>();
+    std::move(pf.first).set_result(std::forward<Arg>(arg)...);
     return std::move(pf.second);
 }
 
 template<typename T>
-auto createFutureOf(T &&t) -> Future<typename std::decay<T>::type> {
-    return createFuture<typename std::decay<T>::type>(std::forward<T>(t));
+auto make_future_of(T &&t) -> future<typename std::decay<T>::type> {
+    return make_future<typename std::decay<T>::type>(std::forward<T>(t));
 }
 
 template<typename T>
-Future<T> createFailedFuture(std::exception_ptr e) {
-    std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
+future<T> make_failed_future(std::exception_ptr e) {
+    std::pair<promise<T>, future<T>> pf = make_promise_future_pair<T>();
     std::move(pf.first).fail(e);
     return std::move(pf.second);
 }
 
 template<typename T, typename E>
-Future<T> createFailedFutureOf(E &&e) {
-    return createFailedFuture<T>(std::make_exception_ptr(std::forward<E>(e)));
+future<T> make_failed_future_of(E &&e) {
+    return make_failed_future<T>(std::make_exception_ptr(std::forward<E>(e)));
 }
 
 template<typename T>
-void FutureBase<T>::wrap(Promise<Future<T>> &&p) && {
-    std::move(*this).map(createFutureOf<T>, std::move(p));
+void future_base<T>::wrap(promise<future<T>> &&p) && {
+    std::move(*this).map(make_future_of<T>, std::move(p));
 }
 
 template<typename T>
-Future<Future<T>> FutureBase<T>::wrap() && {
-    std::pair<Promise<Future<T>>, Future<Future<T>>> pf =
-            createPromiseFuturePair<Future<T>>();
+future<future<T>> future_base<T>::wrap() && {
+    std::pair<promise<future<T>>, future<future<T>>> pf =
+            make_promise_future_pair<future<T>>();
     std::move(*this).wrap(std::move(pf.first));
     return std::move(pf.second);
 }
 
 template<typename T>
-class Unwrapper {
+class unwrapper {
 
 private:
 
-    Promise<T> mReceiver;
+    promise<T> m_receiver;
 
 public:
 
-    explicit Unwrapper(Promise<T> &&receiver) noexcept :
-            mReceiver(std::move(receiver)) { }
+    explicit unwrapper(promise<T> &&receiver) noexcept :
+            m_receiver(std::move(receiver)) { }
 
-    void operator()(common::trial<Future<T>> &&r) {
+    void operator()(common::trial<future<T>> &&r) {
         if (r.has_value())
-            return std::move(*r).forward(std::move(mReceiver));
+            return std::move(*r).forward(std::move(m_receiver));
 
-        std::move(mReceiver).fail(r.template value<std::exception_ptr>());
+        std::move(m_receiver).fail(r.template value<std::exception_ptr>());
     }
 
 };
 
 template<typename T>
-void Future<Future<T>>::unwrap(Promise<T> &&p) && {
+void future<future<T>>::unwrap(promise<T> &&p) && {
     std::move(*this).then(
-            common::shared_function<Unwrapper<T>>::create(std::move(p)));
+            common::shared_function<unwrapper<T>>::create(std::move(p)));
 }
 
 template<typename T>
-Future<T> Future<Future<T>>::unwrap() && {
-    std::pair<Promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
+future<T> future<future<T>>::unwrap() && {
+    std::pair<promise<T>, future<T>> pf = make_promise_future_pair<T>();
     std::move(*this).unwrap(std::move(pf.first));
     return std::move(pf.second);
 }
@@ -275,6 +275,6 @@ Future<T> Future<Future<T>>::unwrap() && {
 } // namespace async
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_async_Future_tcc
+#endif // #ifndef INCLUDED_async_future_tcc
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

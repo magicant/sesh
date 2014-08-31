@@ -21,35 +21,35 @@
 #include "catch.hpp"
 
 #include <utility>
-#include "async/DelayHolder.hh"
+#include "async/delay_holder.hh"
 
 namespace {
 
-using sesh::async::Delay;
-using sesh::async::DelayHolder;
+using sesh::async::delay;
+using sesh::async::delay_holder;
 
 TEST_CASE("Delay holder, move") {
-    DelayHolder<int> d;
-    d = DelayHolder<int>(std::move(d));
+    delay_holder<int> d;
+    d = delay_holder<int>(std::move(d));
 }
 
 TEST_CASE("Delay holder, default construction and invalidness") {
-    DelayHolder<int> dh;
-    CHECK_FALSE(dh.isValid());
+    delay_holder<int> dh;
+    CHECK_FALSE(dh.is_valid());
 }
 
 TEST_CASE("Delay holder, construction with delay and validness") {
-    std::shared_ptr<Delay<int>> d = std::make_shared<Delay<int>>();
-    DelayHolder<int> dh(d);
+    std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
+    delay_holder<int> dh(d);
     d.reset();
-    CHECK(dh.isValid());
+    CHECK(dh.is_valid());
 }
 
 TEST_CASE("Delay holder, invalidation") {
-    const std::shared_ptr<Delay<int>> d = std::make_shared<Delay<int>>();
-    DelayHolder<int> dh(d);
+    const std::shared_ptr<delay<int>> d = std::make_shared<delay<int>>();
+    delay_holder<int> dh(d);
     dh.invalidate();
-    CHECK_FALSE(dh.isValid());
+    CHECK_FALSE(dh.is_valid());
 }
 
 } // namespace

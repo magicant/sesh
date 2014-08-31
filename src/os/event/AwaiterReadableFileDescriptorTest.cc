@@ -25,7 +25,7 @@
 #include <set>
 #include <system_error>
 #include <utility>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/Awaiter.hh"
@@ -40,7 +40,7 @@
 
 namespace {
 
-using sesh::async::Future;
+using sesh::async::future;
 using sesh::common::trial;
 using sesh::os::event::Awaiter;
 using sesh::os::event::AwaiterTestFixture;
@@ -58,7 +58,7 @@ TEST_CASE_METHOD(
         "Awaiter: awaiting single readable FD") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(ReadableFileDescriptor(4));
+    future<Trigger> f = a.expect(ReadableFileDescriptor(4));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
@@ -95,7 +95,7 @@ TEST_CASE_METHOD(
         "pselect returning single FD") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(
+    future<Trigger> f = a.expect(
             ReadableFileDescriptor(2), ReadableFileDescriptor(0));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
@@ -134,7 +134,7 @@ TEST_CASE_METHOD(
         "pselect returning all FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(
+    future<Trigger> f = a.expect(
             ReadableFileDescriptor(2), ReadableFileDescriptor(0));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());

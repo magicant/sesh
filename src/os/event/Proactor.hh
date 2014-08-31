@@ -22,7 +22,7 @@
 
 #include <utility>
 #include <vector>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/container_helper.hh"
 #include "os/event/Trigger.hh"
 
@@ -38,7 +38,7 @@ class Proactor {
 
 protected:
 
-    virtual async::Future<Trigger> expectImpl(std::vector<Trigger> &&) = 0;
+    virtual async::future<Trigger> expectImpl(std::vector<Trigger> &&) = 0;
 
 public:
 
@@ -69,7 +69,7 @@ public:
      * is not supported by the underlying OS API, the returned future fails
      * with std::domain_error.
      */
-    async::Future<Trigger> expect(std::vector<Trigger> &&triggers) {
+    async::future<Trigger> expect(std::vector<Trigger> &&triggers) {
         return expectImpl(std::move(triggers));
     }
 
@@ -81,7 +81,7 @@ public:
      * which you can directly pass triggers as arguments.
      */
     template<typename... TriggerArg>
-    async::Future<Trigger> expect(TriggerArg &&... t) {
+    async::future<Trigger> expect(TriggerArg &&... t) {
         return expectImpl(common::make_vector_of<Trigger>(
                 std::forward<TriggerArg>(t)...));
     }

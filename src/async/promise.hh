@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_async_Promise_hh
-#define INCLUDED_async_Promise_hh
+#ifndef INCLUDED_async_promise_hh
+#define INCLUDED_async_promise_hh
 
 #include "buildconfig.h"
 
 #include <exception>
 #include <functional>
 #include <utility>
-#include "async/DelayHolder.hh"
+#include "async/delay_holder.hh"
 #include "common/functional_initialize.hh"
 #include "common/type_tag.hh"
 
@@ -46,11 +46,11 @@ namespace async {
  * std::exception_ptr.
  */
 template<typename T>
-class Promise : public DelayHolder<T> {
+class promise : public delay_holder<T> {
 
 public:
 
-    using DelayHolder<T>::DelayHolder;
+    using delay_holder<T>::delay_holder;
 
     /**
      * Sets the result of the associated future by constructing T with the
@@ -62,9 +62,9 @@ public:
      * The behavior is undefined if this promise has no associated future.
      */
     template<typename... Arg>
-    void setResult(Arg &&... arg) && {
-        Promise copy = std::move(*this);
-        copy.delay().setResult(
+    void set_result(Arg &&... arg) && {
+        promise copy = std::move(*this);
+        copy.delay().set_result(
                 common::type_tag<T>(), std::forward<Arg>(arg)...);
     }
 
@@ -79,9 +79,9 @@ public:
      * The behavior is undefined if this promise has no associated future.
      */
     template<typename F>
-    void setResultFrom(F &&f) && {
-        Promise copy = std::move(*this);
-        copy.delay().setResult(
+    void set_result_from(F &&f) && {
+        promise copy = std::move(*this);
+        copy.delay().set_result(
                 common::functional_initialize(), std::forward<F>(f));
     }
 
@@ -94,8 +94,8 @@ public:
      * the exception pointer is null.
      */
     void fail(const std::exception_ptr &e) && {
-        Promise copy = std::move(*this);
-        copy.delay().setResult(e);
+        promise copy = std::move(*this);
+        copy.delay().set_result(e);
     }
 
     /**
@@ -106,15 +106,15 @@ public:
      * This function can be used in a catch clause only. The behavior is
      * undefined if this promise has no associated future.
      */
-    void failWithCurrentException() && {
+    void fail_with_current_exception() && {
         std::move(*this).fail(std::current_exception());
     }
 
-}; // template<typename T> class Promise
+}; // template<typename T> class promise
 
 } // namespace async
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_async_Promise_hh
+#endif // #ifndef INCLUDED_async_promise_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

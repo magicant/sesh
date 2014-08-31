@@ -21,11 +21,11 @@ bin_PROGRAMS = src/sesh
 ### Tests
 
 TESTPROGRAMS = \
-	src/async/DelayHolderTest \
-	src/async/DelayTest \
-	src/async/FutureTest \
-	src/async/PromiseTest \
-	src/async/SharedFutureTest \
+	src/async/delay_holder_test \
+	src/async/delay_test \
+	src/async/future_test \
+	src/async/promise_test \
+	src/async/shared_future_test \
 	src/common/container_helper_test \
 	src/common/enum_iterator_test \
 	src/common/enum_set_test \
@@ -81,13 +81,13 @@ src/checkincludebuildconfig.log: src/checkincludebuildconfig.sh $(SOURCES)
 ### Source files
 
 src_sesh_SOURCES = \
-	src/async/Delay.hh \
-	src/async/DelayHolder.hh \
-	src/async/Future.hh \
-	src/async/Future.tcc \
-	src/async/Promise.hh \
-	src/async/SharedFuture.hh \
-	src/async/SharedFuture.tcc \
+	src/async/delay.hh \
+	src/async/delay_holder.hh \
+	src/async/future.hh \
+	src/async/future.tcc \
+	src/async/promise.hh \
+	src/async/shared_future.hh \
+	src/async/shared_future.tcc \
 	src/buildconfig.h \
 	src/common/common_result.hh \
 	src/common/container_helper.hh \
@@ -200,16 +200,16 @@ src_sesh_SOURCES = \
 	src/os/signaling/SignalNumberSet.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
-src_async_DelayHolderTest_SOURCES = \
-	src/async/DelayHolderTest.cc
-src_async_DelayTest_SOURCES = \
-	src/async/DelayTest.cc
-src_async_FutureTest_SOURCES = \
-	src/async/FutureTest.cc
-src_async_PromiseTest_SOURCES = \
-	src/async/PromiseTest.cc
-src_async_SharedFutureTest_SOURCES = \
-	src/async/SharedFutureTest.cc
+src_async_delay_holder_test_SOURCES = \
+	src/async/delay_holder_test.cc
+src_async_delay_test_SOURCES = \
+	src/async/delay_test.cc
+src_async_future_test_SOURCES = \
+	src/async/future_test.cc
+src_async_promise_test_SOURCES = \
+	src/async/promise_test.cc
+src_async_shared_future_test_SOURCES = \
+	src/async/shared_future_test.cc
 src_common_container_helper_test_SOURCES = \
 	src/common/container_helper_test.cc
 src_common_enum_iterator_test_SOURCES = \

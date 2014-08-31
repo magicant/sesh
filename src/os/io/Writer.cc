@@ -22,14 +22,14 @@
 #include <stdexcept>
 #include <system_error>
 #include <utility>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/trial.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
 
-using sesh::async::Future;
-using sesh::async::createFuture;
+using sesh::async::future;
+using sesh::async::make_future;
 using sesh::common::trial;
 using sesh::os::event::Proactor;
 using sesh::os::event::Trigger;
@@ -50,17 +50,17 @@ struct Writer {
     NonBlockingFileDescriptor fd;
     std::vector<char> bytes;
 
-    Future<ResultPair> operator()(std::size_t bytesWritten) {
+    future<ResultPair> operator()(std::size_t bytesWritten) {
         auto i = bytes.begin();
         bytes.erase(i, i + bytesWritten);
         return write(api, proactor, std::move(fd), std::move(bytes));
     }
 
-    Future<ResultPair> operator()(std::error_code e) {
-        return createFuture<ResultPair>(std::move(fd), e);
+    future<ResultPair> operator()(std::error_code e) {
+        return make_future<ResultPair>(std::move(fd), e);
     }
 
-    Future<ResultPair> operator()(trial<Trigger> &&t) {
+    future<ResultPair> operator()(trial<Trigger> &&t) {
         try {
             *t;
         } catch (std::domain_error &e) {
@@ -81,13 +81,13 @@ struct Writer {
 
 } // namespace
 
-Future<ResultPair> write(
+future<ResultPair> write(
         const WriterApi &api,
         Proactor &p,
         NonBlockingFileDescriptor &&fd,
         std::vector<char> &&bytes) {
     if (bytes.empty())
-        return createFuture<ResultPair>(std::move(fd), std::error_code());
+        return make_future<ResultPair>(std::move(fd), std::error_code());
 
     auto trigger = WritableFileDescriptor(fd.value());
     auto writer = Writer{api, p, std::move(fd), std::move(bytes)};

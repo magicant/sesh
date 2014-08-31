@@ -21,15 +21,15 @@
 #include <cassert>
 #include <cstdint>
 #include <utility>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/trial.hh"
 #include "common/variant.hh"
 #include "os/event/Proactor.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Trigger.hh"
 
-using sesh::async::Future;
-using sesh::async::createFuture;
+using sesh::async::future;
+using sesh::async::make_future;
 using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::event::Proactor;
@@ -80,13 +80,13 @@ struct Reader {
 
 } // namespace
 
-Future<ResultPair> read(
+future<ResultPair> read(
         const ReaderApi &api,
         Proactor &p,
         NonBlockingFileDescriptor &&fd,
         std::vector<char>::size_type maxBytesToRead) {
     if (maxBytesToRead == 0)
-        return createFuture<ResultPair>(std::move(fd), std::vector<char>());
+        return make_future<ResultPair>(std::move(fd), std::vector<char>());
 
     if (maxBytesToRead > SIZE_MAX)
         maxBytesToRead = SIZE_MAX;

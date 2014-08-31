@@ -27,8 +27,8 @@
 #include <tuple>
 #include <utility>
 #include <vector>
-#include "async/Future.hh"
-#include "async/Promise.hh"
+#include "async/future.hh"
+#include "async/promise.hh"
 #include "common/container_helper.hh"
 #include "common/shared_function.hh"
 #include "common/trial.hh"
@@ -43,9 +43,9 @@
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::async::Future;
-using sesh::async::Promise;
-using sesh::async::createPromiseFuturePair;
+using sesh::async::future;
+using sesh::async::make_promise_future_pair;
+using sesh::async::promise;
 using sesh::common::find_if;
 using sesh::common::shared_function;
 using sesh::common::trial;
@@ -74,12 +74,12 @@ private:
 
     Timeout mTimeout;
     std::vector<FileDescriptorTrigger> mTriggers;
-    Promise<Trigger> mPromise;
+    promise<Trigger> mPromise;
     std::vector<HandlerConfiguration::Canceler> mCancelers;
 
 public:
 
-    explicit PendingEvent(Promise<Trigger> p);
+    explicit PendingEvent(promise<Trigger> p);
     PendingEvent(PendingEvent &&) = default;
     PendingEvent &operator=(PendingEvent &&) = default;
     ~PendingEvent();
@@ -92,7 +92,7 @@ public:
 
     void addTrigger(const FileDescriptorTrigger &t);
 
-    bool hasFired() const noexcept { return !mPromise.isValid(); }
+    bool hasFired() const noexcept { return !mPromise.is_valid(); }
 
     void fire(Trigger &&);
     void failWithCurrentException();
@@ -171,7 +171,7 @@ private:
     std::shared_ptr<HandlerConfiguration> mHandlerConfiguration;
     std::multimap<TimeLimit, std::shared_ptr<PendingEvent>> mPendingEvents;
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
+    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
 
     bool removeFiredEvents();
 
@@ -193,7 +193,7 @@ public:
 
 }; // class AwaiterImpl
 
-PendingEvent::PendingEvent(Promise<Trigger> p) :
+PendingEvent::PendingEvent(promise<Trigger> p) :
         mTimeout(Timeout::Interval::max()),
         mTriggers(),
         mPromise(std::move(p)),
@@ -210,12 +210,12 @@ void PendingEvent::addTrigger(const FileDescriptorTrigger &t) {
 
 void PendingEvent::fire(Trigger &&t) {
     if (!hasFired())
-        std::move(mPromise).setResult(std::move(t));
+        std::move(mPromise).set_result(std::move(t));
 }
 
 void PendingEvent::failWithCurrentException() {
     if (!hasFired())
-        std::move(mPromise).failWithCurrentException();
+        std::move(mPromise).fail_with_current_exception();
 }
 
 void PendingEvent::addCanceler(HandlerConfiguration::Canceler &&c) {
@@ -390,9 +390,9 @@ TimePoint computeTimeLimit(Timeout timeout, const TimeApi &api) {
     return now + timeout.interval();
 }
 
-Future<Trigger> AwaiterImpl::expectImpl(
+future<Trigger> AwaiterImpl::expectImpl(
         std::vector<Trigger> &&triggers) {
-    auto promiseAndFuture = createPromiseFuturePair<Trigger>();
+    auto promiseAndFuture = make_promise_future_pair<Trigger>();
     if (triggers.empty())
         return std::move(promiseAndFuture.second);
 
