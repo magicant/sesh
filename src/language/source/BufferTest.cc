@@ -32,7 +32,7 @@ using sesh::language::source::Location;
 using sesh::language::source::Source;
 using sesh::language::source::checkSourceString;
 
-using BufferPointer = sesh::language::source::Buffer::Pointer;
+using BufferPointer = std::shared_ptr<Buffer>;
 using SBCI = sesh::language::source::Buffer::ConstIterator;
 using SourcePointer = sesh::language::source::Source::Pointer;
 using String = sesh::language::source::Buffer::String;

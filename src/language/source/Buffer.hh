@@ -50,9 +50,6 @@ public:
     using Difference = Source::Difference;
     using ConstReference = Source::ConstReference;
 
-    using Pointer = std::shared_ptr<Buffer>;
-    using ConstPointer = std::shared_ptr<const Buffer>;
-
     /**
      * Random access iterator for the buffer contents. This iterator remembers
      * the character position, so it is not invalidated by substitution of the
@@ -64,13 +61,13 @@ public:
 
     private:
 
-        ConstPointer mBuffer;
+        std::shared_ptr<const Buffer> mBuffer;
         Size mPosition;
 
     public:
 
-        ConstIterator(const ConstPointer &, Size) noexcept;
-        ConstIterator(ConstPointer &&, Size) noexcept;
+        ConstIterator(const std::shared_ptr<const Buffer> &, Size) noexcept;
+        ConstIterator(std::shared_ptr<const Buffer> &&, Size) noexcept;
 
         ConstIterator() = default;
         ConstIterator(const ConstIterator &) = default;
@@ -79,8 +76,12 @@ public:
         ConstIterator &operator=(ConstIterator &&) = default;
         ~ConstIterator() = default;
 
-        ConstPointer &bufferPointer() noexcept { return mBuffer; }
-        const ConstPointer &bufferPointer() const noexcept { return mBuffer; }
+        std::shared_ptr<const Buffer> &bufferPointer() noexcept {
+            return mBuffer;
+        }
+        const std::shared_ptr<const Buffer> &bufferPointer() const noexcept {
+            return mBuffer;
+        }
         Size &position() noexcept { return mPosition; }
         Size position() const noexcept { return mPosition; }
 
@@ -110,7 +111,7 @@ public:
     Buffer &operator=(Buffer &&) = delete;
     ~Buffer() = default;
 
-    static Pointer create();
+    static std::shared_ptr<Buffer> create();
 
     Size length() const noexcept;
 

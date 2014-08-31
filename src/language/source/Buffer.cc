@@ -27,14 +27,14 @@ namespace language {
 namespace source {
 
 Buffer::ConstIterator::ConstIterator(
-        const ConstPointer &buffer, Size position) noexcept :
+        const std::shared_ptr<const Buffer> &buffer, Size position) noexcept :
         mBuffer(buffer), mPosition(position) { }
 
 Buffer::ConstIterator::ConstIterator(
-        ConstPointer &&buffer, Size position) noexcept :
+        std::shared_ptr<const Buffer> &&buffer, Size position) noexcept :
         mBuffer(std::move(buffer)), mPosition(position) { }
 
-auto Buffer::create() -> Pointer {
+auto Buffer::create() -> std::shared_ptr<Buffer> {
     return std::make_shared<Buffer>();
 }
 
