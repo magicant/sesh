@@ -20,6 +20,7 @@
 
 #include "buildconfig.h"
 
+#include <type_traits>
 #include <utility>
 
 namespace sesh {
@@ -37,7 +38,9 @@ class static_cast_function {
 public:
 
     constexpr To operator()(From v) const
-            noexcept(noexcept(static_cast<To>(v))) {
+            noexcept(
+                    noexcept(static_cast<To>(v)) &&
+                    std::is_nothrow_move_constructible<To>::value) {
         return static_cast<To>(v);
     }
 
@@ -54,7 +57,9 @@ public:
 
     template<typename From>
     constexpr To operator()(From &&v) const
-            noexcept(noexcept(static_cast<To>(std::forward<From>(v)))) {
+            noexcept(
+                    noexcept(static_cast<To>(std::forward<From>(v))) &&
+                    std::is_nothrow_move_constructible<To>::value) {
         return static_cast<To>(std::forward<From>(v));
     }
 
