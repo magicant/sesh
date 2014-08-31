@@ -54,8 +54,8 @@ public:
 
     template<typename From>
     constexpr To operator()(From &&v) const
-            noexcept(noexcept(static_cast<To>(std::move(v)))) {
-        return static_cast<To>(std::move(v));
+            noexcept(noexcept(static_cast<To>(std::forward<From>(v)))) {
+        return static_cast<To>(std::forward<From>(v));
     }
 
 }; // template<typename To> class static_cast_function<To, void>
