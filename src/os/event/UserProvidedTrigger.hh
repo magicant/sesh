@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <utility>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/variant.hh"
 
 namespace sesh {
@@ -45,14 +45,14 @@ public:
 
 private:
 
-    using Value = common::variant<async::Future<Result>, Result>;
+    using Value = common::variant<async::future<Result>, Result>;
 
     Value mValue;
 
 public:
 
     /** Constructs a new user-provided trigger from the given future. */
-    explicit UserProvidedTrigger(async::Future<Result> &&f) noexcept :
+    explicit UserProvidedTrigger(async::future<Result> &&f) noexcept :
             mValue(std::move(f)) { }
 
     /**
@@ -69,8 +69,8 @@ public:
      * can be called only for objects that were constructed by the constructor
      * that takes a future argument.
      */
-    async::Future<Result> &future() noexcept {
-        return mValue.value<async::Future<Result>>();
+    async::future<Result> &future() noexcept {
+        return mValue.value<async::future<Result>>();
     }
 
     /**

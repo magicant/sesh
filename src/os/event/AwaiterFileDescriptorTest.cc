@@ -21,7 +21,7 @@
 #include "catch.hpp"
 
 #include <stdexcept>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "common/variant.hh"
@@ -41,7 +41,7 @@
 
 namespace {
 
-using sesh::async::Future;
+using sesh::async::future;
 using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::event::AwaiterTestFixture;
@@ -66,7 +66,7 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing readable and writable FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(
+    future<Trigger> f = a.expect(
             ReadableFileDescriptor(3), WritableFileDescriptor(3));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
@@ -115,7 +115,7 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing readable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(
+    future<Trigger> f = a.expect(
             ReadableFileDescriptor(3), ErrorFileDescriptor(3));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
@@ -164,7 +164,7 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing writable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(
+    future<Trigger> f = a.expect(
             WritableFileDescriptor(3), ErrorFileDescriptor(3));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());

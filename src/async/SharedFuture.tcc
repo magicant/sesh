@@ -23,7 +23,7 @@
 
 #include <exception>
 #include <utility>
-#include "async/Future.tcc"
+#include "async/future.tcc"
 #include "common/identity.hh"
 #include "common/maybe.hh"
 #include "common/trial.hh"
@@ -75,7 +75,7 @@ void SharedFutureBase<T>::Impl::addCallback(Callback &&c) {
 }
 
 template<typename T>
-SharedFutureBase<T>::SharedFutureBase(Future<T> &&f) : mImpl() {
+SharedFutureBase<T>::SharedFutureBase(future<T> &&f) : mImpl() {
     if (!f.is_valid())
         return;
 
@@ -121,16 +121,16 @@ SharedFutureBase<T>::then(Function &&f) const {
 template<typename From>
 template<typename Function, typename To>
 void SharedFutureBase<From>::then(Function &&f, promise<To> &&p) const {
-    using C = Composer<To, typename std::decay<Function>::type>;
+    using C = composer<To, typename std::decay<Function>::type>;
     then(common::shared_function<C>::create(
             std::forward<Function>(f), std::move(p)));
 }
 
 template<typename From>
 template<typename Function, typename To>
-typename std::enable_if<!std::is_void<To>::value, Future<To>>::type
+typename std::enable_if<!std::is_void<To>::value, future<To>>::type
 SharedFutureBase<From>::then(Function &&f) const {
-    std::pair<promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
+    std::pair<promise<To>, future<To>> pf = make_promise_future_pair<To>();
     then(std::forward<Function>(f), std::move(pf.first));
     return std::move(pf.second);
 }
@@ -138,14 +138,14 @@ SharedFutureBase<From>::then(Function &&f) const {
 template<typename From>
 template<typename Function, typename To>
 void SharedFutureBase<From>::map(Function &&f, promise<To> &&p) const {
-    using M = Mapper<typename std::decay<Function>::type>;
+    using M = mapper<typename std::decay<Function>::type>;
     then(M(std::forward<Function>(f)), std::move(p));
 }
 
 template<typename From>
 template<typename Function, typename To>
-Future<To> SharedFutureBase<From>::map(Function &&f) const {
-    std::pair<promise<To>, Future<To>> pf = createPromiseFuturePair<To>();
+future<To> SharedFutureBase<From>::map(Function &&f) const {
+    std::pair<promise<To>, future<To>> pf = make_promise_future_pair<To>();
     map(std::forward<Function>(f), std::move(pf.first));
     return std::move(pf.second);
 }
@@ -156,7 +156,7 @@ typename std::enable_if<std::is_same<
         T, typename std::result_of<F(std::exception_ptr)>::type
 >::value>::type
 SharedFutureBase<T>::recover(F &&function, promise<T> &&p) const {
-    using R = Recoverer<typename std::decay<F>::type>;
+    using R = recoverer<typename std::decay<F>::type>;
     then(R(std::forward<F>(function)), std::move(p));
 }
 
@@ -164,9 +164,9 @@ template<typename T>
 template<typename F>
 typename std::enable_if<std::is_same<
         T, typename std::result_of<F(std::exception_ptr)>::type
->::value, Future<T>>::type
+>::value, future<T>>::type
 SharedFutureBase<T>::recover(F &&function) const {
-    std::pair<promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
+    std::pair<promise<T>, future<T>> pf = make_promise_future_pair<T>();
     recover(std::forward<F>(function), std::move(pf.first));
     return std::move(pf.second);
 }
@@ -177,14 +177,14 @@ void SharedFutureBase<T>::forward(promise<T> &&receiver) const {
 }
 
 template<typename T>
-void SharedFutureBase<T>::wrap(promise<Future<T>> &&p) const {
-    map(createFutureOf<const T &>, std::move(p));
+void SharedFutureBase<T>::wrap(promise<future<T>> &&p) const {
+    map(make_future_of<const T &>, std::move(p));
 }
 
 template<typename T>
-Future<Future<T>> SharedFutureBase<T>::wrap() const {
-    using F = Future<T>;
-    std::pair<promise<F>, Future<F>> pf = createPromiseFuturePair<F>();
+future<future<T>> SharedFutureBase<T>::wrap() const {
+    using F = future<T>;
+    std::pair<promise<F>, future<F>> pf = make_promise_future_pair<F>();
     wrap(std::move(pf.first));
     return std::move(pf.second);
 }
@@ -192,15 +192,15 @@ Future<Future<T>> SharedFutureBase<T>::wrap() const {
 template<typename T>
 void SharedFutureBase<T>::wrapShared(promise<SharedFuture<T>> &&p) const {
     auto wrapper = [](const T &v) -> SharedFuture<T> {
-        return createFutureOf<const T &>(v);
+        return make_future_of<const T &>(v);
     };
     map(wrapper, std::move(p));
 }
 
 template<typename T>
-Future<SharedFuture<T>> SharedFutureBase<T>::wrapShared() const {
+future<SharedFuture<T>> SharedFutureBase<T>::wrapShared() const {
     using F = SharedFuture<T>;
-    std::pair<promise<F>, Future<F>> pf = createPromiseFuturePair<F>();
+    std::pair<promise<F>, future<F>> pf = make_promise_future_pair<F>();
     wrapShared(std::move(pf.first));
     return std::move(pf.second);
 }
@@ -227,14 +227,14 @@ public:
 };
 
 template<typename T>
-void Future<SharedFuture<T>>::unwrap(promise<T> &&p) && {
+void future<SharedFuture<T>>::unwrap(promise<T> &&p) && {
     std::move(*this).then(
             common::shared_function<SharedUnwrapper<T>>::create(std::move(p)));
 }
 
 template<typename T>
-Future<T> Future<SharedFuture<T>>::unwrap() && {
-    std::pair<promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
+future<T> future<SharedFuture<T>>::unwrap() && {
+    std::pair<promise<T>, future<T>> pf = make_promise_future_pair<T>();
     std::move(*this).unwrap(std::move(pf.first));
     return std::move(pf.second);
 }
@@ -246,8 +246,8 @@ void SharedFuture<SharedFuture<T>>::unwrap(promise<T> &&p) const {
 }
 
 template<typename T>
-Future<T> SharedFuture<SharedFuture<T>>::unwrap() const {
-    std::pair<promise<T>, Future<T>> pf = createPromiseFuturePair<T>();
+future<T> SharedFuture<SharedFuture<T>>::unwrap() const {
+    std::pair<promise<T>, future<T>> pf = make_promise_future_pair<T>();
     unwrap(std::move(pf.first));
     return std::move(pf.second);
 }

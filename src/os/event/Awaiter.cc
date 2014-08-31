@@ -27,7 +27,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "async/promise.hh"
 #include "common/container_helper.hh"
 #include "common/shared_function.hh"
@@ -43,9 +43,9 @@
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
-using sesh::async::Future;
+using sesh::async::future;
+using sesh::async::make_promise_future_pair;
 using sesh::async::promise;
-using sesh::async::createPromiseFuturePair;
 using sesh::common::find_if;
 using sesh::common::shared_function;
 using sesh::common::trial;
@@ -171,7 +171,7 @@ private:
     std::shared_ptr<HandlerConfiguration> mHandlerConfiguration;
     std::multimap<TimeLimit, std::shared_ptr<PendingEvent>> mPendingEvents;
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
+    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
 
     bool removeFiredEvents();
 
@@ -390,9 +390,9 @@ TimePoint computeTimeLimit(Timeout timeout, const TimeApi &api) {
     return now + timeout.interval();
 }
 
-Future<Trigger> AwaiterImpl::expectImpl(
+future<Trigger> AwaiterImpl::expectImpl(
         std::vector<Trigger> &&triggers) {
-    auto promiseAndFuture = createPromiseFuturePair<Trigger>();
+    auto promiseAndFuture = make_promise_future_pair<Trigger>();
     if (triggers.empty())
         return std::move(promiseAndFuture.second);
 

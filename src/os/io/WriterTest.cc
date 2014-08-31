@@ -26,7 +26,7 @@
 #include <system_error>
 #include <vector>
 #include <utility>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "async/promise.hh"
 #include "common/copy.hh"
 #include "common/trial.hh"
@@ -42,10 +42,10 @@
 
 namespace {
 
-using sesh::async::Future;
-using sesh::async::createFailedFutureOf;
-using sesh::async::createFuture;
-using sesh::async::createPromiseFuturePair;
+using sesh::async::future;
+using sesh::async::make_failed_future_of;
+using sesh::async::make_future;
+using sesh::async::make_promise_future_pair;
 using sesh::async::promise;
 using sesh::common::copy;
 using sesh::common::trial;
@@ -71,7 +71,7 @@ class UncallableWriterApi : public WriterApi {
 
 class UncallableProactor : public Proactor {
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&) override {
+    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
         throw "unexpected expect";
     }
 
@@ -79,9 +79,9 @@ class UncallableProactor : public Proactor {
 
 class EchoingProactor : public Proactor {
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
-        return createFuture<Trigger>(std::move(triggers.front()));
+        return make_future<Trigger>(std::move(triggers.front()));
     }
 
 }; // class EchoingProactor
@@ -92,7 +92,7 @@ TEST_CASE("Write: empty") {
     const FileDescriptor::Value FD = 2;
     UncallableWriterApi api;
     UncallableProactor p;
-    Future<ResultPair> f = write(
+    future<ResultPair> f = write(
             api, p, dummyNonBlockingFileDescriptor(FD), std::vector<char>());
 
     bool called = false;
@@ -153,13 +153,13 @@ private:
         return count;
     }
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
         Trigger &t = triggers.front();
         CHECK(t.tag() == t.tag<WritableFileDescriptor>());
         CHECK(t.value<WritableFileDescriptor>().value() == FD);
 
-        auto pf = createPromiseFuturePair<Trigger>();
+        auto pf = make_promise_future_pair<Trigger>();
         mPromise = std::move(pf.first);
         return std::move(pf.second);
     }
@@ -168,7 +168,7 @@ private:
 
 TEST_CASE_METHOD(WriteTestFixture, "Write: one byte") {
     const char C = '!';
-    Future<ResultPair> f = sesh::os::io::write(
+    future<ResultPair> f = sesh::os::io::write(
             *this,
             *this,
             dummyNonBlockingFileDescriptor(FD),
@@ -196,7 +196,7 @@ TEST_CASE_METHOD(WriteTestFixture, "Write: one byte") {
 TEST_CASE_METHOD(WriteTestFixture, "Write: 25 bytes in three writes") {
     std::string chars = "0123456789abcdefghijklmno";
     std::vector<char> bytes(chars.begin(), chars.end());
-    Future<ResultPair> f = sesh::os::io::write(
+    future<ResultPair> f = sesh::os::io::write(
             *this, *this, dummyNonBlockingFileDescriptor(FD), copy(bytes));
 
     bool called = false;
@@ -233,8 +233,8 @@ namespace domain_error {
 
 class DomainErrorProactor : public Proactor {
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&) override {
-        return createFailedFutureOf<Trigger>(
+    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
+        return make_failed_future_of<Trigger>(
                 std::domain_error("expected error"));
     }
 
@@ -244,7 +244,7 @@ TEST_CASE("Write: domain error in proactor") {
     const FileDescriptor::Value FD = 2;
     UncallableWriterApi api;
     DomainErrorProactor p;
-    Future<ResultPair> f = write(
+    future<ResultPair> f = write(
             api, p, dummyNonBlockingFileDescriptor(FD), {'C'});
 
     bool called = false;
@@ -277,7 +277,7 @@ TEST_CASE("Write: write error") {
     const FileDescriptor::Value FD = 4;
     WriteErrorApi api;
     EchoingProactor proactor;
-    Future<ResultPair> f = sesh::os::io::write(
+    future<ResultPair> f = sesh::os::io::write(
             api, proactor, dummyNonBlockingFileDescriptor(FD), {'A'});
 
     bool called = false;

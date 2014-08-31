@@ -22,7 +22,7 @@
 
 #include <system_error>
 #include <utility>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "os/event/Proactor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 #include "os/io/WriterApi.hh"
@@ -47,7 +47,7 @@ namespace io {
  * success, the error code is zero. A non-zero error code indicates an error,
  * but some bytes have been written before the error occurred.
  */
-async::Future<std::pair<NonBlockingFileDescriptor, std::error_code>> write(
+async::future<std::pair<NonBlockingFileDescriptor, std::error_code>> write(
         const WriterApi &,
         event::Proactor &,
         NonBlockingFileDescriptor &&,

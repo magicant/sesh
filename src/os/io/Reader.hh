@@ -23,7 +23,7 @@
 #include <system_error>
 #include <utility>
 #include <vector>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/variant.hh"
 #include "os/event/Proactor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
@@ -58,7 +58,7 @@ auto read(
         event::Proactor &,
         NonBlockingFileDescriptor &&,
         std::vector<char>::size_type maxBytesToRead)
-        -> async::Future<std::pair<
+        -> async::future<std::pair<
                 NonBlockingFileDescriptor,
                 common::variant<std::vector<char>, std::error_code>>>;
 

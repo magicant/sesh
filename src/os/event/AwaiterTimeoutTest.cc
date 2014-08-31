@@ -24,7 +24,7 @@
 #include <set>
 #include <system_error>
 #include <utility>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/Awaiter.hh"
@@ -59,7 +59,7 @@ std::ostream &operator<<(
 
 namespace {
 
-using sesh::async::Future;
+using sesh::async::future;
 using sesh::common::trial;
 using sesh::os::event::Awaiter;
 using sesh::os::event::AwaiterTestFixture;
@@ -93,7 +93,7 @@ TEST_CASE_METHOD(
         "Awaiter: timeout 0") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(0)));
+    future<Trigger> f = a.expect(Timeout(std::chrono::seconds(0)));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
@@ -131,7 +131,7 @@ template<int durationInSecondsInt>
 TimeoutTest<durationInSecondsInt>::TimeoutTest() {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(Timeout(duration()));
+    future<Trigger> f = a.expect(Timeout(duration()));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
@@ -174,7 +174,7 @@ TEST_CASE_METHOD(
         "Awaiter: negative timeout") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(-10)));
+    future<Trigger> f = a.expect(Timeout(std::chrono::seconds(-10)));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
@@ -212,7 +212,7 @@ TEST_CASE_METHOD(
         "Awaiter: duplicate timeouts in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(-100));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(
+    future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(10)),
             Timeout(std::chrono::seconds(5)),
             Timeout(std::chrono::seconds(20)));
@@ -253,7 +253,7 @@ TEST_CASE_METHOD(
         "Awaiter: two simultaneous timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(1000));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f1 = a.expect(Timeout(std::chrono::seconds(10)));
+    future<Trigger> f1 = a.expect(Timeout(std::chrono::seconds(10)));
     bool callback1Called = false;
     std::move(f1).then(
             [this, startTime, &callback1Called](trial<Trigger> &&t) {
@@ -266,7 +266,7 @@ TEST_CASE_METHOD(
     CHECK_FALSE(callback1Called);
 
     mutableSteadyClockNow() = startTime + std::chrono::seconds(1);
-    Future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(29)));
+    future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(29)));
     bool callback2Called = false;
     std::move(f2).then(
             [this, startTime, &callback2Called](trial<Trigger> &&t) {
@@ -323,14 +323,14 @@ TEST_CASE_METHOD(
         "Awaiter: two successive timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutableSteadyClockNow() = startTime;
-    Future<Trigger> f = a.expect(Timeout(std::chrono::seconds(100)));
+    future<Trigger> f = a.expect(Timeout(std::chrono::seconds(100)));
     bool callbackCalled = false;
-    std::move(f).map([this, startTime](Trigger &&t) -> Future<Trigger> {
+    std::move(f).map([this, startTime](Trigger &&t) -> future<Trigger> {
         CHECK(t.tag() == Trigger::tag<Timeout>());
         CHECK(t.value<Timeout>().interval() == std::chrono::seconds(100));
         CHECK(steadyClockNow() == startTime + std::chrono::seconds(102));
 
-        Future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(8)));
+        future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(8)));
         mutableSteadyClockNow() += std::chrono::seconds(1);
         return f2;
     }).unwrap().then([this, startTime, &callbackCalled](trial<Trigger> &&t) {

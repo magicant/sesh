@@ -23,7 +23,7 @@ bin_PROGRAMS = src/sesh
 TESTPROGRAMS = \
 	src/async/delay_holder_test \
 	src/async/delay_test \
-	src/async/FutureTest \
+	src/async/future_test \
 	src/async/promise_test \
 	src/async/SharedFutureTest \
 	src/common/container_helper_test \
@@ -83,8 +83,8 @@ src/checkincludebuildconfig.log: src/checkincludebuildconfig.sh $(SOURCES)
 src_sesh_SOURCES = \
 	src/async/delay.hh \
 	src/async/delay_holder.hh \
-	src/async/Future.hh \
-	src/async/Future.tcc \
+	src/async/future.hh \
+	src/async/future.tcc \
 	src/async/promise.hh \
 	src/async/SharedFuture.hh \
 	src/async/SharedFuture.tcc \
@@ -204,8 +204,8 @@ src_async_delay_holder_test_SOURCES = \
 	src/async/delay_holder_test.cc
 src_async_delay_test_SOURCES = \
 	src/async/delay_test.cc
-src_async_FutureTest_SOURCES = \
-	src/async/FutureTest.cc
+src_async_future_test_SOURCES = \
+	src/async/future_test.cc
 src_async_promise_test_SOURCES = \
 	src/async/promise_test.cc
 src_async_SharedFutureTest_SOURCES = \

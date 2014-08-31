@@ -22,7 +22,7 @@
 
 #include <cstddef>
 #include <memory>
-#include "async/Future.hh"
+#include "async/future.hh"
 
 namespace sesh {
 namespace async {
@@ -53,7 +53,7 @@ public:
      * If the argument future is not valid, the resulting shared future is not
      * valid, either.
      */
-    SharedFutureBase(Future<T> &&);
+    SharedFutureBase(future<T> &&);
 
     /**
      * Compares two shared futures. The two are compared equal if and only if
@@ -125,7 +125,7 @@ public:
             typename F,
             typename R = typename std::result_of<
                 typename std::decay<F>::type(const common::trial<T> &)>::type>
-    typename std::enable_if<!std::is_void<R>::value, Future<R>>::type
+    typename std::enable_if<!std::is_void<R>::value, future<R>>::type
     then(F &&) const;
 
     /**
@@ -167,7 +167,7 @@ public:
             typename F,
             typename R = typename std::result_of<
                     typename std::decay<F>::type(const T &)>::type>
-    Future<R> map(F &&) const;
+    future<R> map(F &&) const;
 
     /**
      * Adds a callback function that recovers this future from an exception.
@@ -211,7 +211,7 @@ public:
     template<typename F>
     typename std::enable_if<std::is_same<
             T, typename std::result_of<F(std::exception_ptr)>::type
-    >::value, Future<T>>::type
+    >::value, future<T>>::type
     recover(F &&) const;
 
     /**
@@ -228,7 +228,7 @@ public:
      * argument promise, not to the inner future. If the copy-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    void wrap(promise<Future<T>> &&) const;
+    void wrap(promise<future<T>> &&) const;
 
     /**
      * Adds a callback function to this future so that its result is wrapped in
@@ -238,7 +238,7 @@ public:
      * returned future, not to the inner future. If the copy-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    Future<Future<T>> wrap() const;
+    future<future<T>> wrap() const;
 
     /**
      * Adds a callback function to this future so that its result is wrapped in
@@ -258,7 +258,7 @@ public:
      * returned future, not to the inner future. If the copy-constructor of
      * the result throws an exception, it is set to the inner future.
      */
-    Future<SharedFuture<T>> wrapShared() const;
+    future<SharedFuture<T>> wrapShared() const;
 
 }; // template<typename> SharedFutureBase
 
@@ -278,11 +278,11 @@ public:
 
 /** A specialization of the future class that has the unwrap method. */
 template<typename T>
-class Future<SharedFuture<T>> : public FutureBase<SharedFuture<T>> {
+class future<SharedFuture<T>> : public future_base<SharedFuture<T>> {
 
 public:
 
-    using FutureBase<SharedFuture<T>>::FutureBase;
+    using future_base<SharedFuture<T>>::future_base;
 
     /**
      * Unwraps this nested future. The argument promise will receive the same
@@ -296,9 +296,9 @@ public:
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    Future<T> unwrap() &&;
+    future<T> unwrap() &&;
 
-}; // template<typename T> class SharedFuture<Future<T>>
+}; // template<typename T> class SharedFuture<future<T>>
 
 /** A specialization of the future class that has the unwrap method. */
 template<typename T>
@@ -321,9 +321,9 @@ public:
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
      */
-    Future<T> unwrap() const;
+    future<T> unwrap() const;
 
-}; // template<typename T> class SharedFuture<Future<T>>
+}; // template<typename T> class SharedFuture<future<T>>
 
 template<typename T>
 bool operator==(const SharedFutureBase<T> &, std::nullptr_t);

@@ -26,7 +26,7 @@
 #include <system_error>
 #include <utility>
 #include <vector>
-#include "async/Future.hh"
+#include "async/future.hh"
 #include "async/promise.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
@@ -42,10 +42,10 @@
 
 namespace {
 
-using sesh::async::Future;
-using sesh::async::createFailedFutureOf;
-using sesh::async::createFuture;
-using sesh::async::createPromiseFuturePair;
+using sesh::async::future;
+using sesh::async::make_failed_future_of;
+using sesh::async::make_future;
+using sesh::async::make_promise_future_pair;
 using sesh::async::promise;
 using sesh::common::trial;
 using sesh::common::variant;
@@ -73,7 +73,7 @@ class UncallableReaderApi : public ReaderApi {
 
 class UncallableProactor : public Proactor {
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&) override {
+    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
         throw "unexpected expect";
     }
 
@@ -81,9 +81,9 @@ class UncallableProactor : public Proactor {
 
 class EchoingProactor : public Proactor {
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
         REQUIRE_FALSE(triggers.empty());
-        return createFuture<Trigger>(std::move(triggers.front()));
+        return make_future<Trigger>(std::move(triggers.front()));
     }
 
 }; // class EchoingProactor
@@ -94,7 +94,7 @@ TEST_CASE("Read: empty") {
     const FileDescriptor::Value FD = 2;
     UncallableReaderApi api;
     UncallableProactor p;
-    Future<ResultPair> f = read(api, p, dummyNonBlockingFileDescriptor(FD), 0);
+    future<ResultPair> f = read(api, p, dummyNonBlockingFileDescriptor(FD), 0);
 
     bool called = false;
     std::move(f).then([FD, &called](trial<ResultPair> &&r) {
@@ -157,13 +157,13 @@ private:
         return count;
     }
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
         Trigger &t = triggers.front();
         CHECK(t.tag() == t.tag<ReadableFileDescriptor>());
         CHECK(t.value<ReadableFileDescriptor>().value() == FD);
 
-        auto pf = createPromiseFuturePair<Trigger>();
+        auto pf = make_promise_future_pair<Trigger>();
         mPromise = std::move(pf.first);
         return std::move(pf.second);
     }
@@ -174,7 +174,7 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than available") {
     const char C = '&';
     readableBytes.assign(2, C);
 
-    Future<ResultPair> f = sesh::os::io::read(
+    future<ResultPair> f = sesh::os::io::read(
             *this, *this, dummyNonBlockingFileDescriptor(FD), 1);
 
     bool called = false;
@@ -203,7 +203,7 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than buffer size") {
 
     readableBytes = bytes;
 
-    Future<ResultPair> f = sesh::os::io::read(
+    future<ResultPair> f = sesh::os::io::read(
             *this, *this, dummyNonBlockingFileDescriptor(FD), 11);
 
     bool called = false;
@@ -231,8 +231,8 @@ namespace domain_error {
 
 class DomainErrorProactor : public Proactor {
 
-    Future<Trigger> expectImpl(std::vector<Trigger> &&) override {
-        return createFailedFutureOf<Trigger>(
+    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
+        return make_failed_future_of<Trigger>(
                 std::domain_error("expected error"));
     }
 
@@ -242,7 +242,7 @@ TEST_CASE("Read: domain error in proactor") {
     const FileDescriptor::Value FD = 2;
     UncallableReaderApi api;
     DomainErrorProactor p;
-    Future<ResultPair> f = read(
+    future<ResultPair> f = read(
             api, p, dummyNonBlockingFileDescriptor(FD), {'C'});
 
     bool called = false;
@@ -276,7 +276,7 @@ TEST_CASE("Read: read error") {
     const FileDescriptor::Value FD = 4;
     ReadErrorApiStub api;
     EchoingProactor proactor;
-    Future<ResultPair> f = sesh::os::io::read(
+    future<ResultPair> f = sesh::os::io::read(
             api, proactor, dummyNonBlockingFileDescriptor(FD), {'A'});
 
     bool called = false;
