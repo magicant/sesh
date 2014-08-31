@@ -36,8 +36,6 @@ class static_cast_function {
 
 public:
 
-    using Result = To;
-
     constexpr To operator()(From v) const
             noexcept(noexcept(static_cast<To>(v))) {
         return static_cast<To>(v);
@@ -53,8 +51,6 @@ template<typename To>
 class static_cast_function<To, void> {
 
 public:
-
-    using Result = To;
 
     template<typename From>
     constexpr To operator()(From &&v) const
