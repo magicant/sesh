@@ -37,7 +37,7 @@ TESTPROGRAMS = \
 	src/common/trie_test \
 	src/common/type_tag_test \
 	src/common/variant_test \
-	src/language/source/BufferTest \
+	src/language/source/buffer_test \
 	src/language/source/LineAppendedSourceTest \
 	src/language/source/LineContinuedSourceTest \
 	src/language/source/LocationTest \
@@ -119,8 +119,8 @@ src_sesh_SOURCES = \
 	src/common/xstring.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
-	src/language/source/Buffer.cc \
-	src/language/source/Buffer.hh \
+	src/language/source/buffer.cc \
+	src/language/source/buffer.hh \
 	src/language/source/DiagnosticMessage.cc \
 	src/language/source/DiagnosticMessage.hh \
 	src/language/source/LineAppendedSource.cc \
@@ -234,10 +234,10 @@ src_common_type_tag_test_SOURCES = \
 	src/common/type_tag_test.cc
 src_common_variant_test_SOURCES = \
 	src/common/variant_test.cc
-src_language_source_BufferTest_SOURCES = \
+src_language_source_buffer_test_SOURCES = \
 	src/common/message.cc \
-	src/language/source/Buffer.cc \
-	src/language/source/BufferTest.cc \
+	src/language/source/buffer.cc \
+	src/language/source/buffer_test.cc \
 	src/language/source/Source.cc
 src_language_source_LineAppendedSourceTest_SOURCES = \
 	src/common/message.cc \

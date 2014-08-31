@@ -21,7 +21,7 @@
 #include "catch.hpp"
 
 #include <utility>
-#include "language/source/Buffer.hh"
+#include "language/source/buffer.hh"
 #include "language/source/Source.hh"
 #include "language/source/SourceTestHelper.hh"
 

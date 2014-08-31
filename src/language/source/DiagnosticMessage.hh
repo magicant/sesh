@@ -22,7 +22,7 @@
 
 #include "common/error_level.hh"
 #include "common/message.hh"
-#include "language/source/Buffer.hh"
+#include "language/source/buffer.hh"
 
 namespace sesh {
 namespace language {

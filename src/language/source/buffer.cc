@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Buffer.hh"
+#include "buffer.hh"
 
 #include <memory>
 #include <stdexcept>

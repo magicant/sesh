@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_Buffer_hh
-#define INCLUDED_language_source_Buffer_hh
+#ifndef INCLUDED_language_source_buffer_hh
+#define INCLUDED_language_source_buffer_hh
 
 #include "buildconfig.h"
 
@@ -291,6 +291,6 @@ std::basic_ostream<Char, Traits> &operator<<(
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_Buffer_hh
+#endif // #ifndef INCLUDED_language_source_buffer_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
