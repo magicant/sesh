@@ -324,6 +324,16 @@ assigner<Union> make_assigner(Union &target) noexcept {
     return assigner<Union>(target);
 }
 
+/**
+ * Re-constructs the pointed-to object by forwarding the argument to the
+ * constructor. This function assumes the constructor never throws. If the
+ * constructor did throw something at runtime, std::terminate is called.
+ */
+template<typename T, typename... Arg>
+void reconstruct_or_terminate(T *t, Arg &&... arg) noexcept {
+    new (t) T(std::forward<Arg>(arg)...);
+}
+
 } // namespace
 
 namespace swap_impl {
@@ -742,20 +752,6 @@ public:
         v.apply(make_move_if_noexcept_constructor(value()));
     }
 
-private:
-
-    /**
-     * Re-constructs this variant by forwarding the argument to the
-     * constructor. This function assumes the constructor never throws. If the
-     * constructor did throw something at runtime, std::terminate is called.
-     */
-    template<typename... Arg>
-    void reconstruct_or_terminate(Arg &&... arg) noexcept {
-        new (this) variant_base(std::forward<Arg>(arg)...);
-    }
-
-public:
-
     /**
      * Destructs the currently contained value and creates a new contained
      * value by calling the constructor of this variant again with the given
@@ -795,7 +791,7 @@ public:
             this->~variant_base();
             new (this) variant_base(std::forward<Arg>(arg)...);
         } catch (...) {
-            reconstruct_or_terminate(type_tag<Fallback>());
+            reconstruct_or_terminate(this, type_tag<Fallback>());
             throw;
         }
     }
@@ -844,7 +840,7 @@ public:
             this->~variant_base();
             new (this) variant_base(std::forward<Arg>(arg)...);
         } catch (...) {
-            reconstruct_or_terminate(std::move(backup));
+            reconstruct_or_terminate(this, std::move(backup));
             throw;
         }
     }
