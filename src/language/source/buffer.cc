@@ -26,51 +26,54 @@ namespace sesh {
 namespace language {
 namespace source {
 
-Buffer::ConstIterator::ConstIterator(
-        const std::shared_ptr<const Buffer> &buffer, Size position) noexcept :
-        mBuffer(buffer), mPosition(position) { }
+buffer::const_iterator::const_iterator(
+        const std::shared_ptr<const class buffer> &buffer, size_type position)
+        noexcept :
+        m_buffer(buffer), m_position(position) { }
 
-Buffer::ConstIterator::ConstIterator(
-        std::shared_ptr<const Buffer> &&buffer, Size position) noexcept :
-        mBuffer(std::move(buffer)), mPosition(position) { }
+buffer::const_iterator::const_iterator(
+        std::shared_ptr<const class buffer> &&buffer, size_type position)
+        noexcept :
+        m_buffer(std::move(buffer)), m_position(position) { }
 
-auto Buffer::create() -> std::shared_ptr<Buffer> {
-    return std::make_shared<Buffer>();
+auto buffer::create() -> std::shared_ptr<buffer> {
+    return std::make_shared<buffer>();
 }
 
-auto Buffer::length() const noexcept -> Size {
-    if (mSource == nullptr)
+auto buffer::length() const noexcept -> size_type {
+    if (m_source == nullptr)
         return 0;
-    return mSource->length();
+    return m_source->length();
 }
 
-auto Buffer::at(Size position) const -> ConstReference {
-    if (mSource == nullptr)
+auto buffer::at(size_type position) const -> const_reference {
+    if (m_source == nullptr)
         throw std::out_of_range("empty source");
-    return mSource->at(position);
+    return m_source->at(position);
 }
 
-auto Buffer::operator[](Size position) const -> ConstReference {
-    if (mSource == nullptr)
+auto buffer::operator[](size_type position) const -> const_reference {
+    if (m_source == nullptr)
         return L("")[0];
-    return (*mSource)[position];
+    return (*m_source)[position];
 }
 
-auto Buffer::cbegin() const noexcept -> ConstIterator {
-    return ConstIterator(shared_from_this(), 0);
+auto buffer::cbegin() const noexcept -> const_iterator {
+    return const_iterator(shared_from_this(), 0);
 }
 
-auto Buffer::cend() const noexcept -> ConstIterator {
-    return ConstIterator(shared_from_this(), length());
+auto buffer::cend() const noexcept -> const_iterator {
+    return const_iterator(shared_from_this(), length());
 }
 
-Location Buffer::location(Size position) const {
-    return mSource->location(position);
+Location buffer::location(size_type position) const {
+    return m_source->location(position);
 }
 
-Buffer::String toString(
-        const Buffer::ConstIterator &begin, const Buffer::ConstIterator &end) {
-    Buffer::String s;
+buffer::string_type to_string(
+        const buffer::const_iterator &begin,
+        const buffer::const_iterator &end) {
+    buffer::string_type s;
     s.insert(s.end(), begin, end);
     return s;
 }

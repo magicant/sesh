@@ -36,7 +36,7 @@ class DiagnosticMessage {
 
 public:
 
-    using Position = source::Buffer::ConstIterator;
+    using Position = source::buffer::const_iterator;
 
 private:
 

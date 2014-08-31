@@ -40,15 +40,15 @@ namespace source {
  * contents (unlike normal string iterators). This class enforces use of
  * shared_ptr because iterators need safe pointers.
  */
-class Buffer : public std::enable_shared_from_this<Buffer> {
+class buffer : public std::enable_shared_from_this<buffer> {
 
 public:
 
-    using String = Source::String;
-    using Char = Source::Char;
-    using Size = Source::Size;
-    using Difference = Source::Difference;
-    using ConstReference = Source::ConstReference;
+    using string_type = Source::String;
+    using value_type = Source::Char;
+    using size_type = Source::Size;
+    using difference_type = Source::Difference;
+    using const_reference = Source::ConstReference;
 
     /**
      * Random access iterator for the buffer contents. This iterator remembers
@@ -56,37 +56,46 @@ public:
      * contents unless the contents are shortened and the position exceeds the
      * new contents length.
      */
-    class ConstIterator :
-            public std::iterator<std::random_access_iterator_tag, const Char> {
+    class const_iterator :
+            public std::iterator<
+                    std::random_access_iterator_tag, const value_type> {
 
     private:
 
-        std::shared_ptr<const Buffer> mBuffer;
-        Size mPosition;
+        std::shared_ptr<const class buffer> m_buffer;
+        size_type m_position;
 
     public:
 
-        ConstIterator(const std::shared_ptr<const Buffer> &, Size) noexcept;
-        ConstIterator(std::shared_ptr<const Buffer> &&, Size) noexcept;
+        const_iterator(const std::shared_ptr<const class buffer> &, size_type)
+                noexcept;
+        const_iterator(std::shared_ptr<const class buffer> &&, size_type)
+                noexcept;
 
-        ConstIterator() = default;
-        ConstIterator(const ConstIterator &) = default;
-        ConstIterator(ConstIterator &&) = default;
-        ConstIterator &operator=(const ConstIterator &) = default;
-        ConstIterator &operator=(ConstIterator &&) = default;
-        ~ConstIterator() = default;
+        const_iterator() = default;
+        const_iterator(const const_iterator &) = default;
+        const_iterator(const_iterator &&) = default;
+        const_iterator &operator=(const const_iterator &) = default;
+        const_iterator &operator=(const_iterator &&) = default;
+        ~const_iterator() = default;
 
-        std::shared_ptr<const Buffer> &bufferPointer() noexcept {
-            return mBuffer;
+        std::shared_ptr<const class buffer> &buffer_pointer() noexcept {
+            return m_buffer;
         }
-        const std::shared_ptr<const Buffer> &bufferPointer() const noexcept {
-            return mBuffer;
+        const std::shared_ptr<const class buffer> &buffer_pointer() const
+                noexcept {
+            return m_buffer;
         }
-        Size &position() noexcept { return mPosition; }
-        Size position() const noexcept { return mPosition; }
+        size_type &position() noexcept { return m_position; }
+        size_type position() const noexcept { return m_position; }
 
         /** Precondition: the buffer pointer must not be null. */
-        const Buffer &buffer() const { return *bufferPointer(); }
+        const class buffer &buffer() const { return *buffer_pointer(); }
+        /*
+         * XXX This declaration of the buffer method hides the buffer outer
+         * class, so the class must be referred to as "class buffer" within the
+         * const_iterator class.
+         */
 
         /** Not very useful... */
         inline pointer operator->() const;
@@ -99,24 +108,24 @@ public:
 
 private:
 
-    std::unique_ptr<const Source> mSource;
+    std::unique_ptr<const Source> m_source;
 
 public:
 
     /** Don't call the default constructor directly. Use {@link #create()}. */
-    Buffer() = default;
-    Buffer(const Buffer &) = delete;
-    Buffer(Buffer &&) = delete;
-    Buffer &operator=(const Buffer &) = delete;
-    Buffer &operator=(Buffer &&) = delete;
-    ~Buffer() = default;
+    buffer() = default;
+    buffer(const buffer &) = delete;
+    buffer(buffer &&) = delete;
+    buffer &operator=(const buffer &) = delete;
+    buffer &operator=(buffer &&) = delete;
+    ~buffer() = default;
 
-    static std::shared_ptr<Buffer> create();
+    static std::shared_ptr<buffer> create();
 
-    Size length() const noexcept;
+    size_type length() const noexcept;
 
-    ConstReference at(Size) const;
-    ConstReference operator[](Size) const;
+    const_reference at(size_type) const;
+    const_reference operator[](size_type) const;
 
     /**
      * Substitutes the contents of this source buffer with the return value of
@@ -124,111 +133,111 @@ public:
      */
     void substitute(
             const std::function<Source::Pointer(Source::Pointer &&)> &f) {
-        mSource = f(std::move(mSource));
+        m_source = f(std::move(m_source));
     }
 
-    ConstIterator cbegin() const noexcept;
-    ConstIterator cend() const noexcept;
-    ConstIterator begin() const noexcept { return cbegin(); }
-    ConstIterator end() const noexcept { return cend(); }
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
+    const_iterator begin() const noexcept { return cbegin(); }
+    const_iterator end() const noexcept { return cend(); }
 
-    Location location(Size position) const;
+    Location location(size_type position) const;
 
 };
 
-inline Buffer::ConstIterator::reference operator*(
-        const Buffer::ConstIterator &i) {
+inline buffer::const_iterator::reference operator*(
+        const buffer::const_iterator &i) {
     return i.buffer()[i.position()];
 }
 
-inline auto Buffer::ConstIterator::operator->() const -> pointer {
+inline auto buffer::const_iterator::operator->() const -> pointer {
     return &**this;
 }
 
-inline Buffer::ConstIterator &operator++(Buffer::ConstIterator &i) noexcept {
+inline buffer::const_iterator &operator++(buffer::const_iterator &i) noexcept {
     ++i.position();
     return i;
 }
 
-inline Buffer::ConstIterator operator++(Buffer::ConstIterator &i, int)
+inline buffer::const_iterator operator++(buffer::const_iterator &i, int)
         noexcept {
     auto orig = i;
     ++i;
     return orig;
 }
 
-inline Buffer::ConstIterator &operator--(Buffer::ConstIterator &i) noexcept {
+inline buffer::const_iterator &operator--(buffer::const_iterator &i) noexcept {
     --i.position();
     return i;
 }
 
-inline Buffer::ConstIterator operator--(Buffer::ConstIterator &i, int)
+inline buffer::const_iterator operator--(buffer::const_iterator &i, int)
         noexcept {
     auto orig = i;
     --i;
     return orig;
 }
 
-inline Buffer::ConstIterator &operator+=(
-        Buffer::ConstIterator &i, Buffer::ConstIterator::difference_type d)
+inline buffer::const_iterator &operator+=(
+        buffer::const_iterator &i, buffer::const_iterator::difference_type d)
         noexcept {
     i.position() += d;
     return i;
 }
 
-inline Buffer::ConstIterator &operator-=(
-        Buffer::ConstIterator &i, Buffer::ConstIterator::difference_type d)
+inline buffer::const_iterator &operator-=(
+        buffer::const_iterator &i, buffer::const_iterator::difference_type d)
         noexcept {
     i.position() -= d;
     return i;
 }
 
-inline Buffer::ConstIterator operator+(
-        const Buffer::ConstIterator &i,
-        Buffer::ConstIterator::difference_type d) noexcept {
-    return Buffer::ConstIterator(i.bufferPointer(), i.position() + d);
+inline buffer::const_iterator operator+(
+        const buffer::const_iterator &i,
+        buffer::const_iterator::difference_type d) noexcept {
+    return buffer::const_iterator(i.buffer_pointer(), i.position() + d);
 }
 
-inline Buffer::ConstIterator operator+(
-        Buffer::ConstIterator &&i, Buffer::ConstIterator::difference_type d)
+inline buffer::const_iterator operator+(
+        buffer::const_iterator &&i, buffer::const_iterator::difference_type d)
         noexcept {
-    return Buffer::ConstIterator(
-            std::move(i.bufferPointer()), i.position() + d);
+    return buffer::const_iterator(
+            std::move(i.buffer_pointer()), i.position() + d);
 }
 
-inline Buffer::ConstIterator operator+(
-        Buffer::ConstIterator::difference_type d,
-        const Buffer::ConstIterator &i) noexcept {
+inline buffer::const_iterator operator+(
+        buffer::const_iterator::difference_type d,
+        const buffer::const_iterator &i) noexcept {
     return i + d;
 }
 
-inline Buffer::ConstIterator operator+(
-        Buffer::ConstIterator::difference_type d,
-        Buffer::ConstIterator &&i) noexcept {
+inline buffer::const_iterator operator+(
+        buffer::const_iterator::difference_type d,
+        buffer::const_iterator &&i) noexcept {
     return std::move(i) + d;
 }
 
-inline Buffer::ConstIterator operator-(
-        const Buffer::ConstIterator &i,
-        Buffer::ConstIterator::difference_type d) noexcept {
-    return Buffer::ConstIterator(i.bufferPointer(), i.position() - d);
+inline buffer::const_iterator operator-(
+        const buffer::const_iterator &i,
+        buffer::const_iterator::difference_type d) noexcept {
+    return buffer::const_iterator(i.buffer_pointer(), i.position() - d);
 }
 
-inline Buffer::ConstIterator operator-(
-        Buffer::ConstIterator &&i, Buffer::ConstIterator::difference_type d)
+inline buffer::const_iterator operator-(
+        buffer::const_iterator &&i, buffer::const_iterator::difference_type d)
         noexcept {
-    return Buffer::ConstIterator(
-            std::move(i.bufferPointer()), i.position() - d);
+    return buffer::const_iterator(
+            std::move(i.buffer_pointer()), i.position() - d);
 }
 
-inline Buffer::ConstIterator::difference_type operator-(
-        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+inline buffer::const_iterator::difference_type operator-(
+        const buffer::const_iterator &i1, const buffer::const_iterator &i2)
         noexcept {
     return i1.position() - i2.position();
 }
 
 inline bool operator==(
-        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        const buffer::const_iterator &i1, const buffer::const_iterator &i2)
         noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
@@ -236,13 +245,13 @@ inline bool operator==(
 }
 
 inline bool operator!=(
-        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        const buffer::const_iterator &i1, const buffer::const_iterator &i2)
         noexcept {
     return !(i1 == i2);
 }
 
 inline bool operator<(
-        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        const buffer::const_iterator &i1, const buffer::const_iterator &i2)
         noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
@@ -250,7 +259,7 @@ inline bool operator<(
 }
 
 inline bool operator<=(
-        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        const buffer::const_iterator &i1, const buffer::const_iterator &i2)
         noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
@@ -258,7 +267,7 @@ inline bool operator<=(
 }
 
 inline bool operator>(
-        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2)
+        const buffer::const_iterator &i1, const buffer::const_iterator &i2)
         noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
@@ -266,16 +275,18 @@ inline bool operator>(
 }
 
 inline bool operator>=(
-        const Buffer::ConstIterator &i1, const Buffer::ConstIterator &i2) noexcept {
+        const buffer::const_iterator &i1, const buffer::const_iterator &i2)
+        noexcept {
     // Comparison of iterators on different buffers is undefined, so only the
     // positions are compared.
     return i1.position() >= i2.position();
 }
 
-Buffer::String toString(
-        const Buffer::ConstIterator &begin, const Buffer::ConstIterator &end);
+buffer::string_type to_string(
+        const buffer::const_iterator &begin,
+        const buffer::const_iterator &end);
 
-inline Location toLocation(const Buffer::ConstIterator &i) {
+inline Location to_location(const buffer::const_iterator &i) {
     return i.buffer().location(i.position());
 }
 
@@ -283,8 +294,8 @@ inline Location toLocation(const Buffer::ConstIterator &i) {
 template<typename Char, typename Traits>
 std::basic_ostream<Char, Traits> &operator<<(
         std::basic_ostream<Char, Traits> &os,
-        const Buffer::ConstIterator &i) {
-    return os << i.bufferPointer() << '@' << i.position();
+        const buffer::const_iterator &i) {
+    return os << i.buffer_pointer() << '@' << i.position();
 }
 
 } // namespace source
