@@ -30,6 +30,7 @@
 #include <utility>
 #include "common/common_result.hh"
 #include "common/functional_initialize.hh"
+#include "common/logic_helper.hh"
 #include "common/type_tag.hh"
 
 namespace sesh {
@@ -40,38 +41,10 @@ namespace variant_impl {
 /**
  * Defined to be (a subclass of) std::true_type or std::false_type depending on
  * the template parameter types. The Boolean will be true if and only if
- * <code>Predicate&lt;T>::value</code> is true for all <code>T</code>s.
- */
-template<template<typename> class Predicate, typename... T>
-class for_all;
-
-template<template<typename> class Predicate>
-class for_all<Predicate> : public std::true_type { };
-
-template<template<typename> class Predicate, typename Head, typename... Tail>
-class for_all<Predicate, Head, Tail...> :
-        public std::conditional<
-                Predicate<Head>::value,
-                for_all<Predicate, Tail...>,
-                std::false_type>::type { };
-
-/**
- * Defined to be (a subclass of) std::true_type or std::false_type depending on
- * the template parameter types. The Boolean will be true if and only if
  * {@code T} is the same type as one (or more) of {@code U}s.
  */
 template<typename T, typename... U>
-class is_any_of;
-
-template<typename T>
-class is_any_of<T> : public std::false_type { };
-
-template<typename T, typename Head, typename... Tail>
-class is_any_of<T, Head, Tail...> :
-        public std::conditional<
-                std::is_same<T, Head>::value,
-                std::true_type,
-                is_any_of<T, Tail...>>::type { };
+class is_any_of : public for_any<std::is_same<T, U>::value...> { };
 
 template<typename T>
 class is_type_tag : public std::false_type { };
@@ -444,21 +417,21 @@ public:
     using nth_type = typename std::tuple_element<n, std::tuple<T...>>::type;
 
     constexpr static bool is_nothrow_copy_constructible =
-            for_all<std::is_nothrow_copy_constructible, T...>::value;
+            for_all<std::is_nothrow_copy_constructible<T>::value...>::value;
     constexpr static bool is_nothrow_move_constructible =
-            for_all<std::is_nothrow_move_constructible, T...>::value;
+            for_all<std::is_nothrow_move_constructible<T>::value...>::value;
     constexpr static bool is_nothrow_destructible =
-            for_all<std::is_nothrow_destructible, T...>::value;
+            for_all<std::is_nothrow_destructible<T>::value...>::value;
     constexpr static bool is_nothrow_copy_assignable =
-            for_all<std::is_nothrow_copy_assignable, T...>::value &&
+            for_all<std::is_nothrow_copy_assignable<T>::value...>::value &&
             is_nothrow_copy_constructible &&
             is_nothrow_destructible;
     constexpr static bool is_nothrow_move_assignable =
-            for_all<std::is_nothrow_move_assignable, T...>::value &&
+            for_all<std::is_nothrow_move_assignable<T>::value...>::value &&
             is_nothrow_move_constructible &&
             is_nothrow_destructible;
     constexpr static bool is_nothrow_swappable =
-            for_all<swap_impl::is_nothrow_swappable, T...>::value &&
+            for_all<swap_impl::is_nothrow_swappable<T>::value...>::value &&
             is_nothrow_move_constructible &&
             is_nothrow_destructible;
 
@@ -990,7 +963,7 @@ public:
 template<typename... T>
 using conditionally_move_constructible_variant =
         typename std::conditional<
-                for_all<std::is_move_constructible, T...>::value,
+                for_all<std::is_move_constructible<T>::value...>::value,
                 move_constructible_variant<T...>,
                 unmovable_variant<T...>
         >::type;
@@ -1002,7 +975,7 @@ using conditionally_move_constructible_variant =
 template<typename... T>
 using conditionally_copy_constructible_variant =
         typename std::conditional<
-                for_all<std::is_copy_constructible, T...>::value,
+                for_all<std::is_copy_constructible<T>::value...>::value,
                 copy_constructible_variant<T...>,
                 conditionally_move_constructible_variant<T...>
         >::type;
@@ -1065,8 +1038,8 @@ public:
 template<typename... T>
 using conditionally_move_assignable_variant =
         typename std::conditional<
-                for_all<std::is_move_constructible, T...>::value &&
-                for_all<std::is_move_assignable, T...>::value,
+                for_all<std::is_move_constructible<T>::value...>::value &&
+                for_all<std::is_move_assignable<T>::value...>::value,
                 move_assignable_variant<T...>,
                 conditionally_copy_constructible_variant<T...>
         >::type;
@@ -1126,8 +1099,8 @@ public:
 template<typename... T>
 using conditionally_copy_assignable_variant =
         typename std::conditional<
-                for_all<std::is_copy_constructible, T...>::value &&
-                for_all<std::is_copy_assignable, T...>::value,
+                for_all<std::is_copy_constructible<T>::value...>::value &&
+                for_all<std::is_copy_assignable<T>::value...>::value,
                 copy_assignable_variant<T...>,
                 conditionally_move_assignable_variant<T...>
         >::type;

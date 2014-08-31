@@ -102,6 +102,7 @@ src_sesh_SOURCES = \
 	src/common/functional_initialize.hh \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
+	src/common/logic_helper.hh \
 	src/common/maybe.hh \
 	src/common/message.cc \
 	src/common/message.hh \
