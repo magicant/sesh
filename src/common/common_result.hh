@@ -22,6 +22,7 @@
 
 #include <type_traits>
 #include <utility>
+#include "common/logic_helper.hh"
 
 namespace sesh {
 namespace common {
@@ -38,36 +39,16 @@ inline auto is_callable(Function &&f, Argument &&... a)
 
 inline std::false_type is_callable(...);
 
-template<typename, typename>
-class same_type { };
-
-template<typename T>
-class same_type<T, T> {
-public:
-    using type = T;
-};
-
 template<bool IsCallable, typename Function, typename... Argument>
 class common_result_impl;
 
 template<typename Function, typename... Argument>
 class common_result_impl<false, Function, Argument...> { };
 
-template<typename Function>
-class common_result_impl<true, Function> { };
-
-template<typename Function, typename Argument>
-class common_result_impl<true, Function, Argument> {
-public:
-    using type = decltype(std::declval<Function>()(std::declval<Argument>()));
-};
-
-template<typename Function, typename A1, typename A2, typename... AN>
-class common_result_impl<true, Function, A1, A2, AN...> :
+template<typename Function, typename... Argument>
+class common_result_impl<true, Function, Argument...> :
         public same_type<
-                typename common_result_impl<true, Function, A1>::type,
-                typename common_result_impl<true, Function, A2, AN...>::type> {
-};
+        decltype(std::declval<Function>()(std::declval<Argument>()))...> { };
 
 } // namespace common_result_impl
 

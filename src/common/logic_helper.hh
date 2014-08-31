@@ -58,6 +58,23 @@ class for_any<true, b...> : public std::true_type { };
 template<bool... b>
 class for_any<false, b...> : public for_any<b...> { };
 
+/**
+ * This class template will have the "type" member type alias iff all the
+ * template parameters are the same type. The alias is not declared if no
+ * template parameter is given.
+ */
+template<typename...>
+class same_type { };
+
+template<typename T>
+class same_type<T> {
+public:
+    using type = T;
+};
+
+template<typename Head, typename... Tail>
+class same_type<Head, Head, Tail...> : public same_type<Head, Tail...> { };
+
 } // namespace common
 } // namespace sesh
 
