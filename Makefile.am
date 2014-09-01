@@ -121,8 +121,8 @@ src_sesh_SOURCES = \
 	src/i18n/M.h \
 	src/language/source/buffer.cc \
 	src/language/source/buffer.hh \
-	src/language/source/DiagnosticMessage.cc \
-	src/language/source/DiagnosticMessage.hh \
+	src/language/source/diagnostic_message.cc \
+	src/language/source/diagnostic_message.hh \
 	src/language/source/LineAppendedSource.cc \
 	src/language/source/LineAppendedSource.hh \
 	src/language/source/LineContinuedSource.cc \
@@ -383,7 +383,7 @@ src_os_signaling_HandlerConfigurationTest_SOURCES = \
 
 TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \
-	src/language/source/DiagnosticMessageTestHelper.hh \
+	src/language/source/diagnostic_message_test_helper.hh \
 	src/language/source/LocationTestHelper.hh \
 	src/language/source/OriginTestHelper.hh \
 	src/language/source/SourceTestHelper.hh \

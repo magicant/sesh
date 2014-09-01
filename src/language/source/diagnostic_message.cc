@@ -15,50 +15,27 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_DiagnosticMessage_hh
-#define INCLUDED_language_source_DiagnosticMessage_hh
-
 #include "buildconfig.h"
+#include "diagnostic_message.hh"
 
+#include <utility>
 #include "common/error_level.hh"
 #include "common/message.hh"
-#include "language/source/buffer.hh"
+
+using sesh::common::error_level;
 
 namespace sesh {
 namespace language {
 namespace source {
 
-/**
- * A diagnostic message is a message associated with a position in a source
- * buffer and an error level.
- */
-class DiagnosticMessage {
-
-public:
-
-    using Position = source::buffer::const_iterator;
-
-private:
-
-    Position mPosition;
-    common::error_level mErrorLevel;
-    common::message<> mMessage;
-
-public:
-
-    DiagnosticMessage(Position, common::message<> &&, common::error_level);
-
-    const Position &position() const noexcept { return mPosition; }
-    common::error_level errorLevel() const noexcept { return mErrorLevel; }
-    const common::message<> &message() const noexcept { return mMessage; }
-    common::message<> &message() noexcept { return mMessage; }
-
-}; // class DiagnosticMessage
+diagnostic_message::diagnostic_message(
+        position_type p, common::message<> &&m, common::error_level el) :
+        m_position(std::move(p)),
+        m_error_level(el),
+        m_message(std::move(m)) { }
 
 } // namespace source
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_source_DiagnosticMessage_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
