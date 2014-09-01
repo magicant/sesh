@@ -36,7 +36,7 @@ class diagnostic_message {
 
 public:
 
-    using position_type = source::buffer::const_iterator;
+    using position_type = buffer::const_iterator;
 
 private:
 

@@ -33,7 +33,7 @@ namespace source {
  * to be taken from an actual source code. A line-appended source instance
  * contains information about the source code name and line number.
  */
-class LineAppendedSource : public Source {
+class LineAppendedSource : public source {
 
 private:
 

@@ -28,19 +28,19 @@
 namespace {
 
 using sesh::language::source::Location;
-using sesh::language::source::Source;
 using sesh::language::source::buffer;
 using sesh::language::source::checkSourceString;
+using sesh::language::source::source;
 
 using buffer_pointer = std::shared_ptr<buffer>;
 using SBCI = sesh::language::source::buffer::const_iterator;
-using source_pointer = sesh::language::source::Source::Pointer;
+using source_pointer = sesh::language::source::source::Pointer;
 using string = sesh::language::source::buffer::string_type;
 
-class string_prepended_source : public Source {
+class string_prepended_source : public source {
 public:
     string_prepended_source(Pointer &&p, string &&s) :
-            Source(std::move(p), 0, 0, std::move(s)) { }
+            source(std::move(p), 0, 0, std::move(s)) { }
     Location locationInAlternate(Size) const override {
         throw "unexpected";
     }

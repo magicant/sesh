@@ -25,16 +25,16 @@ namespace sesh {
 namespace language {
 namespace source {
 
-auto Source::positionAfterAlternate() const noexcept -> Size {
+auto source::positionAfterAlternate() const noexcept -> Size {
     return begin() + alternate().length();
 }
 
-auto Source::lengthDifference() const noexcept -> Difference {
+auto source::lengthDifference() const noexcept -> Difference {
     return static_cast<Difference>(alternate().length()) -
             static_cast<Difference>(end() - begin());
 }
 
-Source::Source(Pointer &&original, Size begin, Size end, String &&alternate) :
+source::source(Pointer &&original, Size begin, Size end, String &&alternate) :
         mOriginal(std::move(original)),
         mBegin(begin),
         mEnd(end),
@@ -49,14 +49,14 @@ Source::Source(Pointer &&original, Size begin, Size end, String &&alternate) :
         throw std::overflow_error("too long source");
 }
 
-auto Source::length() const noexcept -> Size {
+auto source::length() const noexcept -> Size {
     if (original() == nullptr)
         return alternate().length();
 
     return original()->length() + lengthDifference();
 }
 
-auto Source::at(Size position) const -> ConstReference {
+auto source::at(Size position) const -> ConstReference {
     if (original() == nullptr)
         return alternate().at(position);
 
@@ -73,7 +73,7 @@ auto Source::at(Size position) const -> ConstReference {
     return original()->at(positionFromEnd);
 }
 
-auto Source::operator[](Size position) const -> ConstReference {
+auto source::operator[](Size position) const -> ConstReference {
     if (original() == nullptr)
         return alternate()[position];
 
@@ -87,7 +87,7 @@ auto Source::operator[](Size position) const -> ConstReference {
     return (*original())[positionFromBegin - alternate().length() + end()];
 }
 
-auto Source::lineBeginInAlternate(Size position) const noexcept -> Size {
+auto source::lineBeginInAlternate(Size position) const noexcept -> Size {
     if (position == 0)
         return 0;
 
@@ -97,14 +97,14 @@ auto Source::lineBeginInAlternate(Size position) const noexcept -> Size {
     return newlinePosition + 1;
 }
 
-auto Source::lineEndInAlternate(Size position) const noexcept -> Size {
+auto source::lineEndInAlternate(Size position) const noexcept -> Size {
     Size newlinePosition = alternate().find(NEWLINE, position);
     if (newlinePosition == String::npos)
         return String::npos;
     return newlinePosition + 1;
 }
 
-auto Source::lineBegin(Size position) const noexcept -> Size {
+auto source::lineBegin(Size position) const noexcept -> Size {
     if (original() != nullptr && position > positionAfterAlternate()) {
         Difference ld = lengthDifference();
         Size lineBeginAfterAlternate = original()->lineBegin(position - ld);
@@ -126,7 +126,7 @@ auto Source::lineBegin(Size position) const noexcept -> Size {
     return original()->lineBegin(position);
 }
 
-auto Source::lineEnd(Size position) const noexcept -> Size {
+auto source::lineEnd(Size position) const noexcept -> Size {
     if (position < begin()) {
         Size lineEndBeforeBegin = original()->lineEnd(position);
         if (lineEndBeforeBegin < begin())
@@ -152,7 +152,7 @@ auto Source::lineEnd(Size position) const noexcept -> Size {
     return original()->lineEnd(position - ld) + ld;
 }
 
-Location Source::location(Size position) const {
+Location source::location(Size position) const {
     if (position < begin())
         return original()->location(position);
     if (position < positionAfterAlternate())

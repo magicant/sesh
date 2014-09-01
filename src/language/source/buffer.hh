@@ -33,7 +33,7 @@ namespace language {
 namespace source {
 
 /**
- * A buffer wraps a Source object to provide extended functionality.
+ * A buffer wraps a source object to provide extended functionality.
  *
  * Because the buffer contents may be dynamically modified during parsing, the
  * buffer provides iterators that are not invalidated by modification of buffer
@@ -44,11 +44,11 @@ class buffer : public std::enable_shared_from_this<buffer> {
 
 public:
 
-    using string_type = Source::String;
-    using value_type = Source::Char;
-    using size_type = Source::Size;
-    using difference_type = Source::Difference;
-    using const_reference = Source::ConstReference;
+    using string_type = source::String;
+    using value_type = source::Char;
+    using size_type = source::Size;
+    using difference_type = source::Difference;
+    using const_reference = source::ConstReference;
 
     /**
      * Random access iterator for the buffer contents. This iterator remembers
@@ -108,7 +108,7 @@ public:
 
 private:
 
-    std::unique_ptr<const Source> m_source;
+    std::unique_ptr<const source> m_source;
 
 public:
 
@@ -132,7 +132,7 @@ public:
      * the argument function. The function is called with the current source.
      */
     void substitute(
-            const std::function<Source::Pointer(Source::Pointer &&)> &f) {
+            const std::function<source::Pointer(source::Pointer &&)> &f) {
         m_source = f(std::move(m_source));
     }
 

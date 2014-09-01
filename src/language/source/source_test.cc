@@ -29,14 +29,14 @@
 namespace {
 
 using sesh::language::source::Location;
-using sesh::language::source::Source;
 using sesh::language::source::SourceStub;
 using sesh::language::source::checkSourceLineBegin;
 using sesh::language::source::checkSourceLineEnd;
 using sesh::language::source::checkSourceString;
+using sesh::language::source::source;
 
 TEST_CASE("Source construction") {
-    Source::Pointer s;
+    source::Pointer s;
 
     CHECK_NOTHROW(s.reset(new SourceStub(nullptr, 0, 0, L(""))));
     CHECK_NOTHROW(s.reset(new SourceStub(std::move(s), 0, 0, L("test"))));
@@ -45,13 +45,13 @@ TEST_CASE("Source construction") {
 }
 
 TEST_CASE("Source assignment") {
-    Source::Pointer s(new SourceStub(nullptr, 0, 0, L("")));
+    source::Pointer s(new SourceStub(nullptr, 0, 0, L("")));
     SourceStub ss(std::move(s), 0, 0, L(""));
     CHECK_NOTHROW(ss = SourceStub(nullptr, 0, 0, L("")));
 }
 
 TEST_CASE("Source construction exception") {
-    Source::Pointer s;
+    source::Pointer s;
 
     CHECK_THROWS_AS(SourceStub(nullptr, 1, 0, L("test")), std::out_of_range);
     CHECK_THROWS_AS(SourceStub(nullptr, 0, 1, L("test")), std::out_of_range);
@@ -67,7 +67,7 @@ TEST_CASE("Source construction exception") {
 }
 
 TEST_CASE("Source length") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(new SourceStub(nullptr, 0, 0, L("")));
     CHECK(s->length() == 0);
@@ -83,7 +83,7 @@ TEST_CASE("Source length") {
 }
 
 TEST_CASE("Source at and operator[]") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(new SourceStub(nullptr, 0, 0, L("")));
     INFO("source=''");
@@ -111,7 +111,7 @@ TEST_CASE("Source at and operator[]") {
 }
 
 TEST_CASE("Source line begin") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(new SourceStub(nullptr, 0, 0, L("abc\nxyz\n")));
     INFO("source='abc\\nxyz\\n'");
@@ -140,7 +140,7 @@ TEST_CASE("Source line begin") {
 }
 
 TEST_CASE("Source line end") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(new SourceStub(nullptr, 0, 0, L("abc\nxyz\n")));
     INFO("source='abc\\nxyz\\n'");

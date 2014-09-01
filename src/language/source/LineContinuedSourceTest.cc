@@ -28,11 +28,11 @@
 namespace {
 
 using sesh::language::source::LineContinuedSource;
-using sesh::language::source::Source;
+using sesh::language::source::source;
 using sesh::language::source::SourceStub;
 
 TEST_CASE("Line-continued source construction") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(new SourceStub(nullptr, 0, 0, L("\\\n")));
     CHECK_NOTHROW(s.reset(new LineContinuedSource(std::move(s), 0)));
@@ -45,7 +45,7 @@ TEST_CASE("Line-continued source construction") {
 }
 
 TEST_CASE("Line-continued source construction exception") {
-    Source::Pointer s;
+    source::Pointer s;
 
     CHECK_THROWS_AS(LineContinuedSource(nullptr, 0), std::out_of_range);
 
@@ -101,15 +101,15 @@ TEST_CASE("Line-continued source construction exception") {
 
 TEST_CASE("Line-continued source assignment") {
     LineContinuedSource lcs(
-            Source::Pointer(new SourceStub(nullptr, 0, 0, L("\\\n"))),
+            source::Pointer(new SourceStub(nullptr, 0, 0, L("\\\n"))),
             0);
     CHECK_NOTHROW(lcs = LineContinuedSource(
-            Source::Pointer(new SourceStub(nullptr, 0, 0, L("\\\n"))),
+            source::Pointer(new SourceStub(nullptr, 0, 0, L("\\\n"))),
             0));
 }
 
 TEST_CASE("Line-continued source value") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(new SourceStub(nullptr, 0, 0, L("\\\n")));
     s.reset(new LineContinuedSource(std::move(s), 0));

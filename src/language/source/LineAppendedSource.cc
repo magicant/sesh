@@ -32,7 +32,7 @@ LineAppendedSource::LineAppendedSource(
         Size end,
         String &&alternate,
         LineLocation &&lineLocation) :
-        Source(std::move(original), begin, end, std::move(alternate)),
+        source(std::move(original), begin, end, std::move(alternate)),
         mLineLocation(std::move(lineLocation)) { }
 
 LineAppendedSource LineAppendedSource::create(

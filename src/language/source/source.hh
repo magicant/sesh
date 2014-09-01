@@ -34,7 +34,7 @@ namespace source {
  * this class represents a string that is created by altering part of another
  * source string.
  */
-class Source {
+class source {
 
 public:
 
@@ -45,7 +45,7 @@ public:
     using ConstReference = String::const_reference;
     constexpr static Char NEWLINE = L('\n');
 
-    using Pointer = std::unique_ptr<const Source>;
+    using Pointer = std::unique_ptr<const source>;
 
 private:
 
@@ -83,13 +83,13 @@ public:
      * @throws std::out_of_range begin > end || end > length of original
      * @throws std::overflow_error The resultant source is too long.
      */
-    Source(Pointer &&original, Size begin, Size end, String &&alternate);
+    source(Pointer &&original, Size begin, Size end, String &&alternate);
 
-    Source(const Source &) = delete;
-    Source(Source &&) = default;
-    Source &operator=(const Source &) = delete;
-    Source &operator=(Source &&) = default;
-    virtual ~Source() = default;
+    source(const source &) = delete;
+    source(source &&) = default;
+    source &operator=(const source &) = delete;
+    source &operator=(source &&) = default;
+    virtual ~source() = default;
 
     Size length() const noexcept;
 

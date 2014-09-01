@@ -30,7 +30,7 @@ namespace source {
  * Line-continued source is a source wrapper that removes a line continuation
  * from the original source.
  */
-class LineContinuedSource : public Source {
+class LineContinuedSource : public source {
 
 public:
 

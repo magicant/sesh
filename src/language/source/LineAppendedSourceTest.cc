@@ -31,13 +31,13 @@ namespace {
 using sesh::language::source::LineAppendedSource;
 using sesh::language::source::LineLocation;
 using sesh::language::source::Location;
-using sesh::language::source::Source;
 using sesh::language::source::SourceStub;
 using sesh::language::source::checkSourceLineBegin;
 using sesh::language::source::checkSourceLineEnd;
 using sesh::language::source::checkSourceLocation;
 using sesh::language::source::checkSourceString;
 using sesh::language::source::dummyLineLocation;
+using sesh::language::source::source;
 
 using Pointer = sesh::language::source::LineAppendedSource::Pointer;
 using String = sesh::language::source::LineAppendedSource::String;
@@ -49,7 +49,7 @@ LineAppendedSource *create(
 }
 
 TEST_CASE("Line-appended source construction no throw") {
-    Source::Pointer s;
+    source::Pointer s;
 
     CHECK_NOTHROW(s.reset(create(
             nullptr, L(""), dummyLineLocation())));
@@ -72,7 +72,7 @@ TEST_CASE("Line-appended source construction no throw") {
 }
 
 TEST_CASE("Line-appended source construction throw") {
-    Source::Pointer s;
+    source::Pointer s;
 
     CHECK_THROWS_AS(
             s.reset(create(nullptr, L("t\next"), dummyLineLocation())),
@@ -91,7 +91,7 @@ TEST_CASE("Line-appended source assignment") {
 }
 
 TEST_CASE("Line-appended source value") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(create(nullptr, L(""), dummyLineLocation()));
     INFO("source=''");
@@ -112,7 +112,7 @@ TEST_CASE("Line-appended source value") {
 }
 
 TEST_CASE("Line-appended source line begin") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(create(nullptr, L(""), dummyLineLocation()));
     INFO("source=''");
@@ -141,7 +141,7 @@ TEST_CASE("Line-appended source line begin") {
 }
 
 TEST_CASE("Line-appended source line end") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(create(nullptr, L("ab"), dummyLineLocation()));
     INFO("source=''");
@@ -163,7 +163,7 @@ TEST_CASE("Line-appended source line end") {
 }
 
 TEST_CASE("Line-appended source location") {
-    Source::Pointer s;
+    source::Pointer s;
 
     s.reset(create(nullptr, L("ab"), dummyLineLocation(3)));
     checkSourceLocation(*s, 0, 3, 0);

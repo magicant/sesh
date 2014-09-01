@@ -29,29 +29,29 @@ namespace sesh {
 namespace language {
 namespace source {
 
-class SourceStub : public Source {
-    using Source::Source;
+class SourceStub : public source {
+    using source::source;
     Location locationInAlternate(Size) const override {
         throw "unexpected location";
     }
 };
 
-void checkSourceString(const Source &source, const Source::String &string) {
-    for (Source::Size i = 0; i < string.length(); ++i) {
-        CHECK(source.at(i) == string.at(i));
-        CHECK(source[i] == string[i]);
+void checkSourceString(const source &src, const source::String &string) {
+    for (source::Size i = 0; i < string.length(); ++i) {
+        CHECK(src.at(i) == string.at(i));
+        CHECK(src[i] == string[i]);
     }
-    CHECK_THROWS_AS(source.at(string.length()), std::out_of_range);
-    CHECK(source[string.length()] == Source::Char());
+    CHECK_THROWS_AS(src.at(string.length()), std::out_of_range);
+    CHECK(src[string.length()] == source::Char());
 }
 
 void checkSourceLineBegin(
-        const Source &source, const std::vector<Source::Size> &linePositions) {
-    Source::Size position = 0;
-    Source::Size lineBeginPosition = 0;
+        const source &source, const std::vector<source::Size> &linePositions) {
+    source::Size position = 0;
+    source::Size lineBeginPosition = 0;
 
     for (auto i = linePositions.cbegin(); i != linePositions.cend(); ++i) {
-        Source::Size lineEndPosition = *i;
+        source::Size lineEndPosition = *i;
         for (; position < lineEndPosition; ++position) {
             INFO("position=" << position);
             CHECK(source.lineBegin(position) == lineBeginPosition);
@@ -59,7 +59,7 @@ void checkSourceLineBegin(
         lineBeginPosition = lineEndPosition;
     }
 
-    Source::Size length = source.length();
+    source::Size length = source.length();
     for (; position <= length; ++position) {
         INFO("position=" << position);
         CHECK(source.lineBegin(position) == lineBeginPosition);
@@ -67,11 +67,11 @@ void checkSourceLineBegin(
 }
 
 void checkSourceLineEnd(
-        const Source &source, const std::vector<Source::Size> &linePositions) {
-    Source::Size position = 0;
+        const source &source, const std::vector<source::Size> &linePositions) {
+    source::Size position = 0;
 
     for (auto i = linePositions.cbegin(); i != linePositions.cend(); ++i) {
-        Source::Size lineEndPosition = *i;
+        source::Size lineEndPosition = *i;
         for (; position < lineEndPosition; ++position) {
             INFO("position=" << position);
             CHECK(source.lineEnd(position) == lineEndPosition);
@@ -80,10 +80,10 @@ void checkSourceLineEnd(
 }
 
 void checkSourceLocation(
-        const Source &source,
-        Source::Size position,
-        Source::Size line,
-        Source::Size column) {
+        const source &source,
+        source::Size position,
+        source::Size line,
+        source::Size column) {
     Location l = source.location(position);
     CHECK_NOTHROW((void) dynamic_cast<const OriginStub &>(l.origin()));
     CHECK(l.line() == line);
