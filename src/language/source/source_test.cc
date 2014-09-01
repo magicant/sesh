@@ -23,8 +23,8 @@
 #include <memory>
 #include <stdexcept>
 #include "common/xchar.hh"
-#include "language/source/Source.hh"
-#include "language/source/SourceTestHelper.hh"
+#include "language/source/source.hh"
+#include "language/source/source_test_helper.hh"
 
 namespace {
 

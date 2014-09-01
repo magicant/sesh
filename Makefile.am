@@ -41,7 +41,7 @@ TESTPROGRAMS = \
 	src/language/source/LineAppendedSourceTest \
 	src/language/source/LineContinuedSourceTest \
 	src/language/source/LocationTest \
-	src/language/source/SourceTest \
+	src/language/source/source_test \
 	src/language/syntax/AndOrListTest \
 	src/language/syntax/AssignmentTest \
 	src/language/syntax/CommandTest \
@@ -130,8 +130,8 @@ src_sesh_SOURCES = \
 	src/language/source/Location.cc \
 	src/language/source/Location.hh \
 	src/language/source/Origin.hh \
-	src/language/source/Source.cc \
-	src/language/source/Source.hh \
+	src/language/source/source.cc \
+	src/language/source/source.hh \
 	src/language/syntax/AndOrList.cc \
 	src/language/syntax/AndOrList.hh \
 	src/language/syntax/Assignment.cc \
@@ -238,27 +238,27 @@ src_language_source_buffer_test_SOURCES = \
 	src/common/message.cc \
 	src/language/source/buffer.cc \
 	src/language/source/buffer_test.cc \
-	src/language/source/Source.cc
+	src/language/source/source.cc
 src_language_source_LineAppendedSourceTest_SOURCES = \
 	src/common/message.cc \
 	src/language/source/LineAppendedSource.cc \
 	src/language/source/LineAppendedSourceTest.cc \
 	src/language/source/Location.cc \
-	src/language/source/Source.cc
+	src/language/source/source.cc
 src_language_source_LineContinuedSourceTest_SOURCES = \
 	src/common/message.cc \
 	src/language/source/LineContinuedSource.cc \
 	src/language/source/LineContinuedSourceTest.cc \
 	src/language/source/Location.cc \
-	src/language/source/Source.cc
+	src/language/source/source.cc
 src_language_source_LocationTest_SOURCES = \
 	src/common/message.cc \
 	src/language/source/Location.cc \
 	src/language/source/LocationTest.cc
-src_language_source_SourceTest_SOURCES = \
+src_language_source_source_test_SOURCES = \
 	src/common/message.cc \
-	src/language/source/Source.cc \
-	src/language/source/SourceTest.cc
+	src/language/source/source.cc \
+	src/language/source/source_test.cc
 src_language_syntax_AndOrListTest_SOURCES = \
 	src/language/source/Location.cc \
 	src/language/syntax/AndOrList.cc \
@@ -386,7 +386,7 @@ TESTHEADERS = \
 	src/language/source/diagnostic_message_test_helper.hh \
 	src/language/source/LocationTestHelper.hh \
 	src/language/source/OriginTestHelper.hh \
-	src/language/source/SourceTestHelper.hh \
+	src/language/source/source_test_helper.hh \
 	src/language/syntax/PrinterTestHelper.hh \
 	src/os/TimeApiTestHelper.hh \
 	src/os/event/AwaiterTestHelper.hh \

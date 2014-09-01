@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "language/source/Source.hh"
+#include "language/source/source.hh"
 
 namespace sesh {
 namespace language {

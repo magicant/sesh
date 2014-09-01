@@ -22,8 +22,8 @@
 
 #include <utility>
 #include "language/source/buffer.hh"
-#include "language/source/Source.hh"
-#include "language/source/SourceTestHelper.hh"
+#include "language/source/source.hh"
+#include "language/source/source_test_helper.hh"
 
 namespace {
 

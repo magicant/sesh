@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include "language/source/Location.hh"
-#include "language/source/Source.hh"
+#include "language/source/source.hh"
 
 namespace sesh {
 namespace language {

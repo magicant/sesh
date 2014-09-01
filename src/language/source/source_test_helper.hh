@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_SourceTestHelper_hh
-#define INCLUDED_language_source_SourceTestHelper_hh
+#ifndef INCLUDED_language_source_source_test_helper_hh
+#define INCLUDED_language_source_source_test_helper_hh
 
 #include "buildconfig.h"
 
 #include <vector>
 #include "catch.hpp"
 #include "language/source/OriginTestHelper.hh"
-#include "language/source/Source.hh"
+#include "language/source/source.hh"
 
 namespace sesh {
 namespace language {
@@ -94,6 +94,6 @@ void checkSourceLocation(
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_SourceTestHelper_hh
+#endif // #ifndef INCLUDED_language_source_source_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

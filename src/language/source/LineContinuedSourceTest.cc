@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include "common/xchar.hh"
 #include "language/source/LineContinuedSource.hh"
-#include "language/source/SourceTestHelper.hh"
+#include "language/source/source_test_helper.hh"
 
 namespace {
 

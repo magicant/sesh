@@ -24,7 +24,7 @@
 #include "common/xchar.hh"
 #include "language/source/LineAppendedSource.hh"
 #include "language/source/LocationTestHelper.hh"
-#include "language/source/SourceTestHelper.hh"
+#include "language/source/source_test_helper.hh"
 
 namespace {
 
