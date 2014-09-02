@@ -43,14 +43,14 @@ source::source(
         m_begin(begin),
         m_end(end),
         m_alternate(std::move(alternate)) {
-    size_type originalLength =
+    size_type original_length =
             (m_original == nullptr) ? 0 : m_original->length();
     difference_type ld = length_difference();
-    size_type thisLength = originalLength + ld;
+    size_type this_length = original_length + ld;
 
-    if (m_begin > m_end || m_end > originalLength)
+    if (m_begin > m_end || m_end > original_length)
         throw std::out_of_range("invalid alteration range");
-    if (ld > 0 && thisLength < originalLength)
+    if (ld > 0 && this_length < original_length)
         throw std::overflow_error("too long source");
 }
 
@@ -68,15 +68,15 @@ auto source::at(size_type position) const -> const_reference {
     if (position < begin())
         return original()->at(position);
 
-    size_type positionFromBegin = position - begin();
-    if (positionFromBegin < alternate().length())
-        return alternate().at(positionFromBegin);
+    size_type position_from_begin = position - begin();
+    if (position_from_begin < alternate().length())
+        return alternate().at(position_from_begin);
 
-    size_type positionFromEnd =
-            positionFromBegin - alternate().length() + end();
-    if (positionFromEnd < end())
-        positionFromEnd = string_type::npos; // recover overflow
-    return original()->at(positionFromEnd);
+    size_type position_from_end =
+            position_from_begin - alternate().length() + end();
+    if (position_from_end < end())
+        position_from_end = string_type::npos; // recover overflow
+    return original()->at(position_from_end);
 }
 
 auto source::operator[](size_type position) const -> const_reference {
@@ -86,11 +86,11 @@ auto source::operator[](size_type position) const -> const_reference {
     if (position < begin())
         return (*original())[position];
 
-    size_type positionFromBegin = position - begin();
-    if (positionFromBegin < alternate().length())
-        return alternate()[positionFromBegin];
+    size_type position_from_begin = position - begin();
+    if (position_from_begin < alternate().length())
+        return alternate()[position_from_begin];
 
-    return (*original())[positionFromBegin - alternate().length() + end()];
+    return (*original())[position_from_begin - alternate().length() + end()];
 }
 
 auto source::line_begin_in_alternate(size_type position) const noexcept
@@ -98,35 +98,36 @@ auto source::line_begin_in_alternate(size_type position) const noexcept
     if (position == 0)
         return 0;
 
-    size_type newlinePosition = alternate().rfind(newline, position - 1);
-    if (newlinePosition == string_type::npos)
+    size_type newline_position = alternate().rfind(newline, position - 1);
+    if (newline_position == string_type::npos)
         return 0;
-    return newlinePosition + 1;
+    return newline_position + 1;
 }
 
 auto source::line_end_in_alternate(size_type position) const noexcept
         -> size_type {
-    size_type newlinePosition = alternate().find(newline, position);
-    if (newlinePosition == string_type::npos)
+    size_type newline_position = alternate().find(newline, position);
+    if (newline_position == string_type::npos)
         return string_type::npos;
-    return newlinePosition + 1;
+    return newline_position + 1;
 }
 
 auto source::line_begin(size_type position) const noexcept -> size_type {
     if (original() != nullptr && position > position_after_alternate()) {
         difference_type ld = length_difference();
-        size_type lineBeginAfterAlternate =
+        size_type line_begin_after_alternate =
                 original()->line_begin(position - ld);
-        if (lineBeginAfterAlternate > end())
-            return lineBeginAfterAlternate + ld;
+        if (line_begin_after_alternate > end())
+            return line_begin_after_alternate + ld;
         position = position_after_alternate();
     }
 
     if (position > begin()) {
-        size_type positionInAlternate = position - begin();
-        size_type altLineBegin = line_begin_in_alternate(positionInAlternate);
-        if (altLineBegin > 0)
-            return altLineBegin + begin();
+        size_type position_in_alternate = position - begin();
+        size_type alt_line_begin =
+                line_begin_in_alternate(position_in_alternate);
+        if (alt_line_begin > 0)
+            return alt_line_begin + begin();
         position = begin();
     }
 
@@ -137,20 +138,20 @@ auto source::line_begin(size_type position) const noexcept -> size_type {
 
 auto source::line_end(size_type position) const noexcept -> size_type {
     if (position < begin()) {
-        size_type lineEndBeforeBegin = original()->line_end(position);
-        if (lineEndBeforeBegin < begin())
-            return lineEndBeforeBegin;
-        if (lineEndBeforeBegin == begin())
-            if ((*original())[lineEndBeforeBegin - 1] == newline)
-                return lineEndBeforeBegin;
+        size_type line_end_before_begin = original()->line_end(position);
+        if (line_end_before_begin < begin())
+            return line_end_before_begin;
+        if (line_end_before_begin == begin())
+            if ((*original())[line_end_before_begin - 1] == newline)
+                return line_end_before_begin;
         position = begin();
     }
 
     if (position < position_after_alternate()) {
-        size_type positionInAlternate = position - begin();
-        size_type altLineEnd = line_end_in_alternate(positionInAlternate);
-        if (altLineEnd != string_type::npos)
-            return altLineEnd + begin();
+        size_type position_in_alternate = position - begin();
+        size_type alt_line_end = line_end_in_alternate(position_in_alternate);
+        if (alt_line_end != string_type::npos)
+            return alt_line_end + begin();
         position = position_after_alternate();
     }
 
