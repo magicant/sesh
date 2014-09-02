@@ -29,7 +29,6 @@ namespace {
 
 using sesh::language::source::Location;
 using sesh::language::source::buffer;
-using sesh::language::source::checkSourceString;
 using sesh::language::source::source;
 
 using buffer_pointer = std::shared_ptr<buffer>;
@@ -97,7 +96,7 @@ TEST_CASE("Buffer, substitution, at and operator[]") {
         REQUIRE(p != nullptr);
         CHECK(dynamic_cast<const string_prepended_source *>(p.get()) !=
                 nullptr);
-        checkSourceString(*p, L("Test"));
+        check_source_string(*p, L("Test"));
         return std::move(p);
     });
     check_buffer_string(sb, L("Test"));

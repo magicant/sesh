@@ -29,14 +29,15 @@ namespace sesh {
 namespace language {
 namespace source {
 
-class SourceStub : public source {
+class source_stub : public source {
     using source::source;
     Location location_in_alternate(size_type) const override {
         throw "unexpected location";
     }
 };
 
-void checkSourceString(const source &src, const source::string_type &string) {
+void check_source_string(
+        const source &src, const source::string_type &string) {
     for (source::size_type i = 0; i < string.length(); ++i) {
         CHECK(src.at(i) == string.at(i));
         CHECK(src[i] == string[i]);
@@ -45,43 +46,43 @@ void checkSourceString(const source &src, const source::string_type &string) {
     CHECK(src[string.length()] == source::value_type());
 }
 
-void checkSourceLineBegin(
+void check_source_line_begin(
         const source &source,
-        const std::vector<source::size_type> &linePositions) {
+        const std::vector<source::size_type> &line_positions) {
     source::size_type position = 0;
-    source::size_type lineBeginPosition = 0;
+    source::size_type line_begin_position = 0;
 
-    for (auto i = linePositions.cbegin(); i != linePositions.cend(); ++i) {
-        source::size_type lineEndPosition = *i;
-        for (; position < lineEndPosition; ++position) {
+    for (auto i = line_positions.cbegin(); i != line_positions.cend(); ++i) {
+        source::size_type line_end_position = *i;
+        for (; position < line_end_position; ++position) {
             INFO("position=" << position);
-            CHECK(source.line_begin(position) == lineBeginPosition);
+            CHECK(source.line_begin(position) == line_begin_position);
         }
-        lineBeginPosition = lineEndPosition;
+        line_begin_position = line_end_position;
     }
 
     source::size_type length = source.length();
     for (; position <= length; ++position) {
         INFO("position=" << position);
-        CHECK(source.line_begin(position) == lineBeginPosition);
+        CHECK(source.line_begin(position) == line_begin_position);
     }
 }
 
-void checkSourceLineEnd(
+void check_source_line_end(
         const source &source,
-        const std::vector<source::size_type> &linePositions) {
+        const std::vector<source::size_type> &line_positions) {
     source::size_type position = 0;
 
-    for (auto i = linePositions.cbegin(); i != linePositions.cend(); ++i) {
-        source::size_type lineEndPosition = *i;
-        for (; position < lineEndPosition; ++position) {
+    for (auto i = line_positions.cbegin(); i != line_positions.cend(); ++i) {
+        source::size_type line_end_position = *i;
+        for (; position < line_end_position; ++position) {
             INFO("position=" << position);
-            CHECK(source.line_end(position) == lineEndPosition);
+            CHECK(source.line_end(position) == line_end_position);
         }
     }
 }
 
-void checkSourceLocation(
+void check_source_location(
         const source &source,
         source::size_type position,
         source::size_type line,

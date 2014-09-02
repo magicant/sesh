@@ -29,148 +29,144 @@
 namespace {
 
 using sesh::language::source::Location;
-using sesh::language::source::SourceStub;
-using sesh::language::source::checkSourceLineBegin;
-using sesh::language::source::checkSourceLineEnd;
-using sesh::language::source::checkSourceString;
 using sesh::language::source::source;
+using sesh::language::source::source_stub;
 
 TEST_CASE("Source construction") {
     source::source_pointer s;
 
-    CHECK_NOTHROW(s.reset(new SourceStub(nullptr, 0, 0, L(""))));
-    CHECK_NOTHROW(s.reset(new SourceStub(std::move(s), 0, 0, L("test"))));
-    CHECK_NOTHROW(s.reset(new SourceStub(std::move(s), 0, 4, L("more test"))));
-    CHECK_NOTHROW(s.reset(new SourceStub(std::move(s), 0, 9, L(""))));
+    CHECK_NOTHROW(s.reset(new source_stub(nullptr, 0, 0, L(""))));
+    CHECK_NOTHROW(s.reset(new source_stub(std::move(s), 0, 0, L("test"))));
+    CHECK_NOTHROW(s.reset(new source_stub(std::move(s), 0, 4, L(""))));
 }
 
 TEST_CASE("Source assignment") {
-    source::source_pointer s(new SourceStub(nullptr, 0, 0, L("")));
-    SourceStub ss(std::move(s), 0, 0, L(""));
-    CHECK_NOTHROW(ss = SourceStub(nullptr, 0, 0, L("")));
+    source::source_pointer s(new source_stub(nullptr, 0, 0, L("")));
+    source_stub ss(std::move(s), 0, 0, L(""));
+    CHECK_NOTHROW(ss = source_stub(nullptr, 0, 0, L("")));
 }
 
 TEST_CASE("Source construction exception") {
     source::source_pointer s;
 
-    CHECK_THROWS_AS(SourceStub(nullptr, 1, 0, L("test")), std::out_of_range);
-    CHECK_THROWS_AS(SourceStub(nullptr, 0, 1, L("test")), std::out_of_range);
+    CHECK_THROWS_AS(source_stub(nullptr, 1, 0, L("test")), std::out_of_range);
+    CHECK_THROWS_AS(source_stub(nullptr, 0, 1, L("test")), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("test")));
-    CHECK_THROWS_AS(SourceStub(std::move(s), 3, 2, L("")), std::out_of_range);
+    s.reset(new source_stub(nullptr, 0, 0, L("test")));
+    CHECK_THROWS_AS(source_stub(std::move(s), 3, 2, L("")), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("test")));
-    CHECK_THROWS_AS(SourceStub(std::move(s), 0, 5, L("")), std::out_of_range);
+    s.reset(new source_stub(nullptr, 0, 0, L("test")));
+    CHECK_THROWS_AS(source_stub(std::move(s), 0, 5, L("")), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("test")));
-    CHECK_THROWS_AS(SourceStub(std::move(s), 5, 0, L("")), std::out_of_range);
+    s.reset(new source_stub(nullptr, 0, 0, L("test")));
+    CHECK_THROWS_AS(source_stub(std::move(s), 5, 0, L("")), std::out_of_range);
 }
 
 TEST_CASE("Source length") {
     source::source_pointer s;
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("")));
+    s.reset(new source_stub(nullptr, 0, 0, L("")));
     CHECK(s->length() == 0);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("test")));
+    s.reset(new source_stub(nullptr, 0, 0, L("test")));
     CHECK(s->length() == 4);
 
-    s.reset(new SourceStub(std::move(s), 1, 3, L("test")));
+    s.reset(new source_stub(std::move(s), 1, 3, L("test")));
     CHECK(s->length() == 6);
 
-    s.reset(new SourceStub(std::move(s), 0, 6, L("")));
+    s.reset(new source_stub(std::move(s), 0, 6, L("")));
     CHECK(s->length() == 0);
 }
 
 TEST_CASE("Source at and operator[]") {
     source::source_pointer s;
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("")));
+    s.reset(new source_stub(nullptr, 0, 0, L("")));
     INFO("source=''");
-    checkSourceString(*s, L(""));
+    check_source_string(*s, L(""));
 
-    s.reset(new SourceStub(std::move(s), 0, 0, L("x")));
+    s.reset(new source_stub(std::move(s), 0, 0, L("x")));
     INFO("source='x'");
-    checkSourceString(*s, L("x"));
+    check_source_string(*s, L("x"));
 
-    s.reset(new SourceStub(std::move(s), 0, 0, L("t")));
+    s.reset(new source_stub(std::move(s), 0, 0, L("t")));
     INFO("source='tx'");
-    checkSourceString(*s, L("tx"));
+    check_source_string(*s, L("tx"));
 
-    s.reset(new SourceStub(std::move(s), 2, 2, L("t")));
+    s.reset(new source_stub(std::move(s), 2, 2, L("t")));
     INFO("source='txt'");
-    checkSourceString(*s, L("txt"));
+    check_source_string(*s, L("txt"));
 
-    s.reset(new SourceStub(std::move(s), 1, 2, L("es")));
+    s.reset(new source_stub(std::move(s), 1, 2, L("es")));
     INFO("source='test'");
-    checkSourceString(*s, L("test"));
+    check_source_string(*s, L("test"));
 
-    s.reset(new SourceStub(std::move(s), 1, 3, L("")));
+    s.reset(new source_stub(std::move(s), 1, 3, L("")));
     INFO("source='tt'");
-    checkSourceString(*s, L("tt"));
+    check_source_string(*s, L("tt"));
 }
 
 TEST_CASE("Source line begin") {
     source::source_pointer s;
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("abc\nxyz\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("abc\nxyz\n")));
     INFO("source='abc\\nxyz\\n'");
-    checkSourceLineBegin(*s, {4, 8});
+    check_source_line_begin(*s, {4, 8});
 
-    s.reset(new SourceStub(std::move(s), 3, 4, L("d\n\nw")));
+    s.reset(new source_stub(std::move(s), 3, 4, L("d\n\nw")));
     INFO("source='abcd\\n\\nwxyz\\n'");
-    checkSourceLineBegin(*s, {5, 6, 11});
+    check_source_line_begin(*s, {5, 6, 11});
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\n\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\n\n")));
     INFO("source='\\n\\n'");
-    checkSourceLineBegin(*s, {1, 2});
+    check_source_line_begin(*s, {1, 2});
 
-    s.reset(new SourceStub(std::move(s), 1, 1, L("\n\n")));
+    s.reset(new source_stub(std::move(s), 1, 1, L("\n\n")));
     INFO("source='\\n\\n\\n\\n'");
-    checkSourceLineBegin(*s, {1, 2, 3, 4});
+    check_source_line_begin(*s, {1, 2, 3, 4});
 
-    s.reset(new SourceStub(std::move(s), 1, 3, L("")));
+    s.reset(new source_stub(std::move(s), 1, 3, L("")));
     INFO("source='\\n\\n'");
-    checkSourceLineBegin(*s, {1, 2});
+    check_source_line_begin(*s, {1, 2});
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("abc\nxyz")));
-    s.reset(new SourceStub(std::move(s), 2, 5, L("p")));
+    s.reset(new source_stub(nullptr, 0, 0, L("abc\nxyz")));
+    s.reset(new source_stub(std::move(s), 2, 5, L("p")));
     INFO("source='abpyz'");
-    checkSourceLineBegin(*s, {});
+    check_source_line_begin(*s, {});
 }
 
 TEST_CASE("Source line end") {
     source::source_pointer s;
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("abc\nxyz\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("abc\nxyz\n")));
     INFO("source='abc\\nxyz\\n'");
-    checkSourceLineEnd(*s, {4, 8});
+    check_source_line_end(*s, {4, 8});
 
     // L("abcd\n\nwxyz\n")
-    s.reset(new SourceStub(std::move(s), 3, 4, L("d\n\nw")));
+    s.reset(new source_stub(std::move(s), 3, 4, L("d\n\nw")));
     INFO("source='abcd\\n\\nwxyz\\n'");
-    checkSourceLineEnd(*s, {5, 6, 11});
+    check_source_line_end(*s, {5, 6, 11});
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\n\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\n\n")));
     INFO("source='\\n\\n'");
-    checkSourceLineEnd(*s, {1, 2});
+    check_source_line_end(*s, {1, 2});
 
-    s.reset(new SourceStub(std::move(s), 1, 1, L("\n\n")));
+    s.reset(new source_stub(std::move(s), 1, 1, L("\n\n")));
     INFO("source='\\n\\n\\n\\n'");
-    checkSourceLineEnd(*s, {1, 2, 3, 4});
+    check_source_line_end(*s, {1, 2, 3, 4});
 
-    s.reset(new SourceStub(std::move(s), 1, 3, L("")));
+    s.reset(new source_stub(std::move(s), 1, 3, L("")));
     INFO("source='\\n\\n'");
-    checkSourceLineEnd(*s, {1, 2});
+    check_source_line_end(*s, {1, 2});
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("abc\nxyz")));
-    s.reset(new SourceStub(std::move(s), 2, 5, L("p")));
+    s.reset(new source_stub(nullptr, 0, 0, L("abc\nxyz")));
+    s.reset(new source_stub(std::move(s), 2, 5, L("p")));
     INFO("source='abpyz'");
-    checkSourceLineEnd(*s, {5});
+    check_source_line_end(*s, {5});
 
-    s.reset(new SourceStub(std::move(s), 5, 5, L("\n")));
+    s.reset(new source_stub(std::move(s), 5, 5, L("\n")));
     INFO("source='abpyz\\n'");
-    checkSourceLineEnd(*s, {6});
+    check_source_line_end(*s, {6});
 }
 
 } // namespace

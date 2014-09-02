@@ -29,18 +29,18 @@ namespace {
 
 using sesh::language::source::LineContinuedSource;
 using sesh::language::source::source;
-using sesh::language::source::SourceStub;
+using sesh::language::source::source_stub;
 
 TEST_CASE("Line-continued source construction") {
     source::source_pointer s;
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\\n")));
     CHECK_NOTHROW(s.reset(new LineContinuedSource(std::move(s), 0)));
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("abc\\\ndef")));
+    s.reset(new source_stub(nullptr, 0, 0, L("abc\\\ndef")));
     CHECK_NOTHROW(s.reset(new LineContinuedSource(std::move(s), 3)));
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\\\\n\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\\\\n\n")));
     CHECK_NOTHROW(s.reset(new LineContinuedSource(std::move(s), 1)));
 }
 
@@ -49,51 +49,51 @@ TEST_CASE("Line-continued source construction exception") {
 
     CHECK_THROWS_AS(LineContinuedSource(nullptr, 0), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\")));
     CHECK_THROWS_AS(LineContinuedSource(std::move(s), 0), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\")));
     CHECK_THROWS_AS(LineContinuedSource(std::move(s), 1), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\n")));
     CHECK_THROWS_AS(LineContinuedSource(std::move(s), 0), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\n")));
     CHECK_THROWS_AS(LineContinuedSource(std::move(s), 1), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\\\")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\\\")));
     CHECK_THROWS_AS(
             LineContinuedSource(std::move(s), 0),
             std::invalid_argument);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\\\")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\\\")));
     CHECK_THROWS_AS(LineContinuedSource(std::move(s), 1), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\\\")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\\\")));
     CHECK_THROWS_AS(LineContinuedSource(std::move(s), 2), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\n\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\n\n")));
     CHECK_THROWS_AS(
             LineContinuedSource(std::move(s), 0),
             std::invalid_argument);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\n\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\n\n")));
     CHECK_THROWS_AS(LineContinuedSource(std::move(s), 1), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\n\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\n\n")));
     CHECK_THROWS_AS(LineContinuedSource(std::move(s), 2), std::out_of_range);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\a")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\a")));
     CHECK_THROWS_AS(
             LineContinuedSource(std::move(s), 0),
             std::invalid_argument);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("a\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("a\n")));
     CHECK_THROWS_AS(
             LineContinuedSource(std::move(s), 0),
             std::invalid_argument);
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("ab")));
+    s.reset(new source_stub(nullptr, 0, 0, L("ab")));
     CHECK_THROWS_AS(
             LineContinuedSource(std::move(s), 0),
             std::invalid_argument);
@@ -101,34 +101,34 @@ TEST_CASE("Line-continued source construction exception") {
 
 TEST_CASE("Line-continued source assignment") {
     LineContinuedSource lcs(
-            source::source_pointer(new SourceStub(nullptr, 0, 0, L("\\\n"))),
+            source::source_pointer(new source_stub(nullptr, 0, 0, L("\\\n"))),
             0);
     CHECK_NOTHROW(lcs = LineContinuedSource(
-            source::source_pointer(new SourceStub(nullptr, 0, 0, L("\\\n"))),
+            source::source_pointer(new source_stub(nullptr, 0, 0, L("\\\n"))),
             0));
 }
 
 TEST_CASE("Line-continued source value") {
     source::source_pointer s;
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\\n")));
     s.reset(new LineContinuedSource(std::move(s), 0));
     INFO("source='' (1)");
-    checkSourceString(*s, L(""));
+    check_source_string(*s, L(""));
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("abc\\\ndef")));
+    s.reset(new source_stub(nullptr, 0, 0, L("abc\\\ndef")));
     s.reset(new LineContinuedSource(std::move(s), 3));
     INFO("source='abcdef'");
-    checkSourceString(*s, L("abcdef"));
+    check_source_string(*s, L("abcdef"));
 
-    s.reset(new SourceStub(nullptr, 0, 0, L("\\\\\n\n")));
+    s.reset(new source_stub(nullptr, 0, 0, L("\\\\\n\n")));
     s.reset(new LineContinuedSource(std::move(s), 1));
     INFO("source='\\\\\\n'");
-    checkSourceString(*s, L("\\\n"));
+    check_source_string(*s, L("\\\n"));
 
     s.reset(new LineContinuedSource(std::move(s), 0));
     INFO("source='' (2)");
-    checkSourceString(*s, L(""));
+    check_source_string(*s, L(""));
 }
 
 } // namespace
