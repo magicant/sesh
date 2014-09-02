@@ -39,8 +39,8 @@ using sesh::language::source::checkSourceString;
 using sesh::language::source::dummyLineLocation;
 using sesh::language::source::source;
 
-using Pointer = sesh::language::source::LineAppendedSource::Pointer;
-using String = sesh::language::source::LineAppendedSource::String;
+using Pointer = sesh::language::source::LineAppendedSource::source_pointer;
+using String = sesh::language::source::LineAppendedSource::string_type;
 
 LineAppendedSource *create(
         Pointer &&original, String &&line, LineLocation &&location) {
@@ -49,7 +49,7 @@ LineAppendedSource *create(
 }
 
 TEST_CASE("Line-appended source construction no throw") {
-    source::Pointer s;
+    source::source_pointer s;
 
     CHECK_NOTHROW(s.reset(create(
             nullptr, L(""), dummyLineLocation())));
@@ -72,7 +72,7 @@ TEST_CASE("Line-appended source construction no throw") {
 }
 
 TEST_CASE("Line-appended source construction throw") {
-    source::Pointer s;
+    source::source_pointer s;
 
     CHECK_THROWS_AS(
             s.reset(create(nullptr, L("t\next"), dummyLineLocation())),
@@ -91,7 +91,7 @@ TEST_CASE("Line-appended source assignment") {
 }
 
 TEST_CASE("Line-appended source value") {
-    source::Pointer s;
+    source::source_pointer s;
 
     s.reset(create(nullptr, L(""), dummyLineLocation()));
     INFO("source=''");
@@ -112,7 +112,7 @@ TEST_CASE("Line-appended source value") {
 }
 
 TEST_CASE("Line-appended source line begin") {
-    source::Pointer s;
+    source::source_pointer s;
 
     s.reset(create(nullptr, L(""), dummyLineLocation()));
     INFO("source=''");
@@ -141,7 +141,7 @@ TEST_CASE("Line-appended source line begin") {
 }
 
 TEST_CASE("Line-appended source line end") {
-    source::Pointer s;
+    source::source_pointer s;
 
     s.reset(create(nullptr, L("ab"), dummyLineLocation()));
     INFO("source=''");
@@ -163,7 +163,7 @@ TEST_CASE("Line-appended source line end") {
 }
 
 TEST_CASE("Line-appended source location") {
-    source::Pointer s;
+    source::source_pointer s;
 
     s.reset(create(nullptr, L("ab"), dummyLineLocation(3)));
     checkSourceLocation(*s, 0, 3, 0);

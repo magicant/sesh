@@ -27,22 +27,24 @@ namespace language {
 namespace source {
 
 LineAppendedSource::LineAppendedSource(
-        Pointer &&original,
-        Size begin,
-        Size end,
-        String &&alternate,
+        source_pointer &&original,
+        size_type begin,
+        size_type end,
+        string_type &&alternate,
         LineLocation &&lineLocation) :
         source(std::move(original), begin, end, std::move(alternate)),
         mLineLocation(std::move(lineLocation)) { }
 
 LineAppendedSource LineAppendedSource::create(
-        Pointer &&original, String &&line, LineLocation &&location) {
-    Size newlinePosition = line.find(NEWLINE);
-    if (newlinePosition != String::npos)
+        source_pointer &&original,
+        string_type &&line,
+        LineLocation &&location) {
+    size_type newlinePosition = line.find(newline);
+    if (newlinePosition != string_type::npos)
         if (newlinePosition != line.length() - 1)
             throw std::invalid_argument("newline at illegal position");
 
-    Size length = (original == nullptr) ? 0 : original->length();
+    size_type length = (original == nullptr) ? 0 : original->length();
     return LineAppendedSource(
             std::move(original),
             length,
@@ -51,22 +53,23 @@ LineAppendedSource LineAppendedSource::create(
             std::move(location));
 }
 
-auto LineAppendedSource::lineBeginInAlternate(Size position)
-        const noexcept -> Size {
+auto LineAppendedSource::line_begin_in_alternate(size_type position)
+        const noexcept -> size_type {
     if (position == alternate().length())
-        if (position > 0 && alternate()[position - 1] == NEWLINE)
+        if (position > 0 && alternate()[position - 1] == newline)
             return position;
     return 0;
 }
 
-auto LineAppendedSource::lineEndInAlternate(Size) const noexcept -> Size {
-    Size altLength = alternate().length();
-    if (altLength == 0 || alternate()[altLength - 1] != NEWLINE)
-        return String::npos;
+auto LineAppendedSource::line_end_in_alternate(size_type)
+        const noexcept -> size_type {
+    size_type altLength = alternate().length();
+    if (altLength == 0 || alternate()[altLength - 1] != newline)
+        return string_type::npos;
     return altLength;
 }
 
-Location LineAppendedSource::locationInAlternate(Size position) const {
+Location LineAppendedSource::location_in_alternate(size_type position) const {
     return Location(mLineLocation, position);
 }
 

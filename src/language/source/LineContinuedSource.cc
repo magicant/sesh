@@ -28,14 +28,14 @@ namespace language {
 namespace source {
 
 LineContinuedSource::LineContinuedSource(
-        Pointer &&original, Size position) :
-        source(std::move(original), position, position + 2, String()) {
+        source_pointer &&original, size_type position) :
+        source(std::move(original), position, position + 2, string_type()) {
     const source &o = *this->original();
-    if (o[position] != L('\\') || o[position + 1] != NEWLINE)
+    if (o[position] != L('\\') || o[position + 1] != newline)
         throw std::invalid_argument("no line continuation");
 }
 
-Location LineContinuedSource::locationInAlternate(Size) const {
+Location LineContinuedSource::location_in_alternate(size_type) const {
     // The length of the alternate is always zero in this class, so this
     // function is never called.
     std::terminate();

@@ -40,7 +40,7 @@ public:
      * @throws std::invalid_argument no line continuation at the position.
      * @throws std::out_of_range too large position.
      */
-    LineContinuedSource(Pointer &&original, Size position);
+    LineContinuedSource(source_pointer &&original, size_type position);
 
     LineContinuedSource(const LineContinuedSource &) = delete;
     LineContinuedSource(LineContinuedSource &&) = default;
@@ -50,7 +50,7 @@ public:
 
 private:
 
-    Location locationInAlternate(Size) const override;
+    Location location_in_alternate(size_type) const override;
 
 };
 

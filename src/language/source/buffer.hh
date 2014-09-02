@@ -44,11 +44,11 @@ class buffer : public std::enable_shared_from_this<buffer> {
 
 public:
 
-    using string_type = source::String;
-    using value_type = source::Char;
-    using size_type = source::Size;
-    using difference_type = source::Difference;
-    using const_reference = source::ConstReference;
+    using string_type = source::string_type;
+    using value_type = source::value_type;
+    using size_type = source::size_type;
+    using difference_type = source::difference_type;
+    using const_reference = source::const_reference;
 
     /**
      * Random access iterator for the buffer contents. This iterator remembers
@@ -132,7 +132,8 @@ public:
      * the argument function. The function is called with the current source.
      */
     void substitute(
-            const std::function<source::Pointer(source::Pointer &&)> &f) {
+            const std::function<
+                    source::source_pointer(source::source_pointer &&)> &f) {
         m_source = f(std::move(m_source));
     }
 

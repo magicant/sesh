@@ -39,7 +39,12 @@ private:
 
     LineLocation mLineLocation;
 
-    LineAppendedSource(Pointer &&, Size, Size, String &&, LineLocation &&);
+    LineAppendedSource(
+            source_pointer &&,
+            size_type,
+            size_type,
+            string_type &&,
+            LineLocation &&);
 
 public:
 
@@ -49,7 +54,7 @@ public:
      * the line.
      */
     static LineAppendedSource create(
-            Pointer &&original, String &&line, LineLocation &&);
+            source_pointer &&original, string_type &&line, LineLocation &&);
 
     LineAppendedSource(const LineAppendedSource &) = delete;
     LineAppendedSource(LineAppendedSource &&) = default;
@@ -59,9 +64,9 @@ public:
 
 private:
 
-    Size lineBeginInAlternate(Size) const noexcept override;
-    Size lineEndInAlternate(Size) const noexcept override;
-    Location locationInAlternate(Size) const override;
+    size_type line_begin_in_alternate(size_type) const noexcept override;
+    size_type line_end_in_alternate(size_type) const noexcept override;
+    Location location_in_alternate(size_type) const override;
 
 };
 

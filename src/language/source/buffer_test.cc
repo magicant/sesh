@@ -34,14 +34,14 @@ using sesh::language::source::source;
 
 using buffer_pointer = std::shared_ptr<buffer>;
 using SBCI = sesh::language::source::buffer::const_iterator;
-using source_pointer = sesh::language::source::source::Pointer;
+using source_pointer = sesh::language::source::source::source_pointer;
 using string = sesh::language::source::buffer::string_type;
 
 class string_prepended_source : public source {
 public:
-    string_prepended_source(Pointer &&p, string &&s) :
+    string_prepended_source(source_pointer &&p, string &&s) :
             source(std::move(p), 0, 0, std::move(s)) { }
-    Location locationInAlternate(Size) const override {
+    Location location_in_alternate(size_type) const override {
         throw "unexpected";
     }
 };
