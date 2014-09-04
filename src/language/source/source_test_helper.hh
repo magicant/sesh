@@ -31,7 +31,7 @@ namespace source {
 
 class source_stub : public source {
     using source::source;
-    Location location_in_alternate(size_type) const override {
+    class location location_in_alternate(size_type) const override {
         throw "unexpected location";
     }
 };
@@ -87,7 +87,7 @@ void check_source_location(
         source::size_type position,
         source::size_type line,
         source::size_type column) {
-    Location l = source.location(position);
+    location l = source.location(position);
     CHECK_NOTHROW((void) dynamic_cast<const OriginStub &>(l.origin()));
     CHECK(l.line() == line);
     CHECK(l.column() == column);

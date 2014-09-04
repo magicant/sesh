@@ -123,7 +123,7 @@ private:
      * @param position < length of alternate
      * @return source location for the argument position in the alternate
      */
-    virtual Location location_in_alternate(size_type position) const = 0;
+    virtual class location location_in_alternate(size_type position) const = 0;
 
 public:
 
@@ -147,7 +147,7 @@ public:
      * @param position < length of this source
      * @return source location for the argument position
      */
-    Location location(size_type position) const;
+    class location location(size_type position) const;
 
 };
 

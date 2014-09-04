@@ -27,7 +27,7 @@ namespace source {
 
 namespace {
 
-bool equal(const Location *l, const Location *r) noexcept {
+bool equal(const location *l, const location *r) noexcept {
     if (l == nullptr)
         return r == nullptr;
     return r != nullptr && *l == *r;
@@ -36,7 +36,7 @@ bool equal(const Location *l, const Location *r) noexcept {
 } // namespace
 
 LineLocation::LineLocation(
-        std::shared_ptr<const Location> &&parent, // may be null
+        std::shared_ptr<const location> &&parent, // may be null
         std::shared_ptr<const Origin> &&origin, // must never be null
         std::size_t line) :
         mParent(std::move(parent)),
@@ -52,15 +52,15 @@ bool operator==(const LineLocation &l, const LineLocation &r) noexcept {
             equal(l.parent(), r.parent());
 }
 
-Location::Location(
-        std::shared_ptr<const Location> &&parent, // may be null
+location::location(
+        std::shared_ptr<const location> &&parent, // may be null
         std::shared_ptr<const Origin> &&origin, // must never be null
         std::size_t line,
         std::size_t column) :
         LineLocation(std::move(parent), std::move(origin), line),
         mColumn(column) { }
 
-bool operator==(const Location &l, const Location &r) noexcept {
+bool operator==(const location &l, const location &r) noexcept {
     return l.column() == r.column() &&
             static_cast<const LineLocation &>(l) ==
             static_cast<const LineLocation &>(r);

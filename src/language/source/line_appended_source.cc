@@ -69,9 +69,10 @@ auto line_appended_source::line_end_in_alternate(size_type)
     return alt_length;
 }
 
-Location line_appended_source::location_in_alternate(size_type position) const
-{
-    return Location(m_line_location, position);
+class location line_appended_source::location_in_alternate(size_type position)
+        const {
+    class location l(m_line_location, position);
+    return l;
 }
 
 } // namespace source

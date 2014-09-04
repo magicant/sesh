@@ -35,7 +35,7 @@ line_continued_source::line_continued_source(
         throw std::invalid_argument("no line continuation");
 }
 
-Location line_continued_source::location_in_alternate(size_type) const {
+location line_continued_source::location_in_alternate(size_type) const {
     // The length of the alternate is always zero in this class, so this
     // function is never called.
     std::terminate();

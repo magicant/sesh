@@ -27,8 +27,8 @@
 
 namespace {
 
-using sesh::language::source::Location;
 using sesh::language::source::buffer;
+using sesh::language::source::location;
 using sesh::language::source::source;
 
 using buffer_pointer = std::shared_ptr<buffer>;
@@ -40,7 +40,7 @@ class string_prepended_source : public source {
 public:
     string_prepended_source(source_pointer &&p, string &&s) :
             source(std::move(p), 0, 0, std::move(s)) { }
-    Location location_in_alternate(size_type) const override {
+    class location location_in_alternate(size_type) const override {
         throw "unexpected";
     }
 };

@@ -66,7 +66,7 @@ private:
 
     size_type line_begin_in_alternate(size_type) const noexcept override;
     size_type line_end_in_alternate(size_type) const noexcept override;
-    Location location_in_alternate(size_type) const override;
+    class location location_in_alternate(size_type) const override;
 
 };
 

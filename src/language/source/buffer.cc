@@ -66,7 +66,7 @@ auto buffer::cend() const noexcept -> const_iterator {
     return const_iterator(shared_from_this(), length());
 }
 
-Location buffer::location(size_type position) const {
+class location buffer::location(size_type position) const {
     return m_source->location(position);
 }
 

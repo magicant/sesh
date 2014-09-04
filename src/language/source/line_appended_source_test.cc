@@ -29,7 +29,6 @@
 namespace {
 
 using sesh::language::source::LineLocation;
-using sesh::language::source::Location;
 using sesh::language::source::check_source_line_end;
 using sesh::language::source::dummyLineLocation;
 using sesh::language::source::line_appended_source;

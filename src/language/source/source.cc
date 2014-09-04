@@ -162,7 +162,7 @@ auto source::line_end(size_type position) const noexcept -> size_type {
     return original()->line_end(position - ld) + ld;
 }
 
-Location source::location(size_type position) const {
+class location source::location(size_type position) const {
     if (position < begin())
         return original()->location(position);
     if (position < position_after_alternate())

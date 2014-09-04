@@ -142,7 +142,7 @@ public:
     const_iterator begin() const noexcept { return cbegin(); }
     const_iterator end() const noexcept { return cend(); }
 
-    Location location(size_type position) const;
+    class location location(size_type position) const;
 
 };
 
@@ -287,7 +287,7 @@ buffer::string_type to_string(
         const buffer::const_iterator &begin,
         const buffer::const_iterator &end);
 
-inline Location to_location(const buffer::const_iterator &i) {
+inline location to_location(const buffer::const_iterator &i) {
     return i.buffer().location(i.position());
 }
 

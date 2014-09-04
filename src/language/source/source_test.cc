@@ -28,7 +28,6 @@
 
 namespace {
 
-using sesh::language::source::Location;
 using sesh::language::source::source;
 using sesh::language::source::source_stub;
 

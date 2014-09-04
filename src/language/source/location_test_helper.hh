@@ -35,8 +35,8 @@ inline LineLocation dummyLineLocation(std::size_t line = 1) {
 }
 
 /** For testing only. */
-inline Location dummyLocation(std::size_t line = 1, std::size_t column = 1) {
-    return Location(dummyLineLocation(line), column);
+inline location dummyLocation(std::size_t line = 1, std::size_t column = 1) {
+    return location(dummyLineLocation(line), column);
 }
 
 } // namespace source

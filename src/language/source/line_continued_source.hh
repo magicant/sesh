@@ -50,7 +50,7 @@ public:
 
 private:
 
-    Location location_in_alternate(size_type) const override;
+    class location location_in_alternate(size_type) const override;
 
 };
 
