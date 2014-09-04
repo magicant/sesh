@@ -22,6 +22,8 @@
 
 #include <type_traits>
 #include <utility>
+#include "common/empty.hh"
+#include "common/function_helper.hh"
 #include "common/logic_helper.hh"
 
 namespace sesh {
@@ -29,26 +31,9 @@ namespace common {
 
 namespace common_result_impl {
 
-inline void ignore(...);
-
 template<typename Function, typename... Argument>
-inline auto is_callable(Function &&f, Argument &&... a)
-    -> decltype(
-        ignore((std::forward<Function>(f)(std::forward<Argument>(a)), 0)...),
-        std::true_type());
-
-inline std::false_type is_callable(...);
-
-template<bool IsCallable, typename Function, typename... Argument>
-class common_result_impl;
-
-template<typename Function, typename... Argument>
-class common_result_impl<false, Function, Argument...> { };
-
-template<typename Function, typename... Argument>
-class common_result_impl<true, Function, Argument...> :
-        public same_type<
-        decltype(std::declval<Function>()(std::declval<Argument>()))...> { };
+class common_result_impl :
+        public same_type<result_of_t<Function(Argument)>...> { };
 
 } // namespace common_result_impl
 
@@ -68,12 +53,11 @@ class common_result_impl<true, Function, Argument...> :
  */
 template<typename Function, typename... Argument>
 class common_result :
-        public common_result_impl::common_result_impl<
-                decltype(common_result_impl::is_callable(
-                        std::declval<Function>(),
-                        std::declval<Argument>()...))::value,
-                Function,
-                Argument...> { };
+        public std::conditional<
+                for_all<is_callable<Function(Argument)>::value...>::value,
+                common_result_impl::common_result_impl<Function, Argument...>,
+                empty
+        >::type { };
 
 } // namespace common
 } // namespace sesh
