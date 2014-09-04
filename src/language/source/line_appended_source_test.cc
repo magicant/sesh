@@ -28,10 +28,10 @@
 
 namespace {
 
-using sesh::language::source::LineLocation;
 using sesh::language::source::check_source_line_end;
 using sesh::language::source::dummyLineLocation;
 using sesh::language::source::line_appended_source;
+using sesh::language::source::line_location;
 using sesh::language::source::source;
 using sesh::language::source::source_stub;
 
@@ -39,7 +39,7 @@ using pointer = sesh::language::source::line_appended_source::source_pointer;
 using string = sesh::language::source::line_appended_source::string_type;
 
 line_appended_source *create(
-        pointer &&original, string &&line, LineLocation &&location) {
+        pointer &&original, string &&line, line_location &&location) {
     return new line_appended_source(line_appended_source::create(
                 std::move(original), std::move(line), std::move(location)));
 }

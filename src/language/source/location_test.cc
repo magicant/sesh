@@ -29,11 +29,11 @@
 
 namespace {
 
-using sesh::language::source::LineLocation;
 using sesh::language::source::Origin;
 using sesh::language::source::dummyLineLocation;
 using sesh::language::source::dummyLocation;
 using sesh::language::source::dummyOrigin;
+using sesh::language::source::line_location;
 using sesh::language::source::location;
 
 template<typename T>
@@ -42,13 +42,13 @@ T copy(const T &v) {
 }
 
 TEST_CASE("Line location, construction, no parent") {
-    LineLocation ll1(nullptr, dummyOrigin(), 0);
-    LineLocation ll2 = ll1;
+    line_location ll1(nullptr, dummyOrigin(), 0);
+    line_location ll2 = ll1;
 }
 
 TEST_CASE("Line location, assignment") {
-    LineLocation ll1 = dummyLineLocation();
-    LineLocation ll2 = dummyLineLocation();
+    line_location ll1 = dummyLineLocation();
+    line_location ll2 = dummyLineLocation();
     ll1 = ll2;
 }
 
@@ -61,30 +61,30 @@ TEST_CASE("Location, construction and assignment") {
 TEST_CASE("Line location, construction, with parent") {
     std::shared_ptr<const location> parent =
             std::make_shared<location>(dummyLocation());
-    LineLocation ll1(copy(parent), dummyOrigin(), 0);
+    line_location ll1(copy(parent), dummyOrigin(), 0);
     (void) ll1;
 }
 
 TEST_CASE("Line location, parent") {
-    LineLocation ll1(nullptr, dummyOrigin(), 0);
+    line_location ll1(nullptr, dummyOrigin(), 0);
     CHECK(ll1.parent() == nullptr);
 
     std::shared_ptr<const location> parent =
             std::make_shared<location>(dummyLocation());
-    LineLocation ll2(copy(parent), dummyOrigin(), 0);
+    line_location ll2(copy(parent), dummyOrigin(), 0);
     CHECK(ll2.parent() == parent.get());
 }
 
 TEST_CASE("Line location, origin") {
     std::shared_ptr<const Origin> origin = dummyOrigin();
-    LineLocation ll1(nullptr, copy(origin), 0);
+    line_location ll1(nullptr, copy(origin), 0);
     CHECK(&ll1.origin() == origin.get());
 }
 
 TEST_CASE("Line location, line") {
-    LineLocation ll1(nullptr, dummyOrigin(), 0);
-    LineLocation ll2(nullptr, dummyOrigin(), 1);
-    LineLocation ll3(nullptr, dummyOrigin(), 2);
+    line_location ll1(nullptr, dummyOrigin(), 0);
+    line_location ll2(nullptr, dummyOrigin(), 1);
+    line_location ll3(nullptr, dummyOrigin(), 2);
     CHECK(ll1.line() == 0);
     CHECK(ll2.line() == 1);
     CHECK(ll3.line() == 2);
@@ -95,13 +95,13 @@ TEST_CASE("Line location, comparison, no parent") {
             std::make_shared<location>(dummyLocation());
     std::shared_ptr<const Origin> origin = dummyOrigin();
 
-    LineLocation ll1(nullptr, copy(origin), 0);
-    LineLocation ll2(copy(parent), copy(origin), 0);
-    LineLocation ll3(nullptr, dummyOrigin(), 0);
-    LineLocation ll4(nullptr, copy(origin), 1);
+    line_location ll1(nullptr, copy(origin), 0);
+    line_location ll2(copy(parent), copy(origin), 0);
+    line_location ll3(nullptr, dummyOrigin(), 0);
+    line_location ll4(nullptr, copy(origin), 1);
 
     CHECK(ll1 == ll1);
-    CHECK(ll1 == LineLocation(ll1));
+    CHECK(ll1 == line_location(ll1));
     CHECK(ll2 == ll2);
     CHECK(ll3 == ll3);
     CHECK(ll4 == ll4);
@@ -149,22 +149,22 @@ TEST_CASE("Location, comparison") {
 TEST_CASE("Line location, comparison, with parent") {
     std::shared_ptr<const Origin> origin = dummyOrigin();
 
-    LineLocation ll1(nullptr, copy(origin), 0);
+    line_location ll1(nullptr, copy(origin), 0);
     std::shared_ptr<const location> parent1 =
             std::make_shared<location>(ll1, 0);
-    LineLocation ll2(copy(parent1), copy(origin), 0);
+    line_location ll2(copy(parent1), copy(origin), 0);
 
     CHECK(ll2 == ll2);
-    CHECK(ll2 == LineLocation(ll2));
+    CHECK(ll2 == line_location(ll2));
     CHECK_FALSE(ll2 != ll2);
 
     std::shared_ptr<const location> parent2 =
             std::make_shared<location>(ll2, 0);
     std::shared_ptr<const location> parent3 =
             std::make_shared<location>(ll2, 0);
-    LineLocation ll3(copy(parent2), copy(origin), 0);
-    LineLocation ll4(copy(parent3), copy(origin), 0);
-    LineLocation ll5(copy(parent3), copy(origin), 0);
+    line_location ll3(copy(parent2), copy(origin), 0);
+    line_location ll4(copy(parent3), copy(origin), 0);
+    line_location ll5(copy(parent3), copy(origin), 0);
 
     CHECK(ll2 != ll3);
     CHECK_FALSE(ll2 == ll3);

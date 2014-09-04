@@ -31,14 +31,14 @@ line_appended_source::line_appended_source(
         size_type begin,
         size_type end,
         string_type &&alternate,
-        LineLocation &&line_location) :
+        line_location &&line_location) :
         source(std::move(original), begin, end, std::move(alternate)),
         m_line_location(std::move(line_location)) { }
 
 line_appended_source line_appended_source::create(
         source_pointer &&original,
         string_type &&line,
-        LineLocation &&location) {
+        line_location &&location) {
     size_type newline_position = line.find(newline);
     if (newline_position != string_type::npos)
         if (newline_position != line.length() - 1)

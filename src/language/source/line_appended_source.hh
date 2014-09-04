@@ -37,14 +37,14 @@ class line_appended_source : public source {
 
 private:
 
-    LineLocation m_line_location;
+    line_location m_line_location;
 
     line_appended_source(
             source_pointer &&,
             size_type,
             size_type,
             string_type &&,
-            LineLocation &&);
+            line_location &&);
 
 public:
 
@@ -54,7 +54,7 @@ public:
      * the line.
      */
     static line_appended_source create(
-            source_pointer &&original, string_type &&line, LineLocation &&);
+            source_pointer &&original, string_type &&line, line_location &&);
 
     line_appended_source(const line_appended_source &) = delete;
     line_appended_source(line_appended_source &&) = default;

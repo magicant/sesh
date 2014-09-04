@@ -30,8 +30,8 @@ namespace language {
 namespace source {
 
 /** For testing only. */
-inline LineLocation dummyLineLocation(std::size_t line = 1) {
-    return LineLocation(nullptr, dummyOrigin(), line);
+inline line_location dummyLineLocation(std::size_t line = 1) {
+    return line_location(nullptr, dummyOrigin(), line);
 }
 
 /** For testing only. */

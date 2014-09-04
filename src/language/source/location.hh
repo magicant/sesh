@@ -33,7 +33,7 @@ namespace source {
 class location;
 
 /** A line location is a pair of a source origin and a line number. */
-class LineLocation {
+class line_location {
 
 private:
 
@@ -46,35 +46,36 @@ private:
 
 public:
 
-    LineLocation(
+    line_location(
             std::shared_ptr<const location> &&parent, // may be null
             std::shared_ptr<const Origin> &&origin, // must never be null
             std::size_t line);
 
-    LineLocation(const LineLocation &) = default;
-    LineLocation(LineLocation &&) = default;
-    LineLocation &operator=(const LineLocation &) = default;
-    LineLocation &operator=(LineLocation &&) = default;
-    ~LineLocation() = default;
+    line_location(const line_location &) = default;
+    line_location(line_location &&) = default;
+    line_location &operator=(const line_location &) = default;
+    line_location &operator=(line_location &&) = default;
+    ~line_location() = default;
 
     const location *parent() const noexcept { return mParent.get(); }
     const Origin &origin() const noexcept { return *mOrigin; }
     const std::size_t &line() const noexcept { return mLine; }
 
-};
+}; // class line_location
 
 /**
  * Compares two line locations. The parents and origins are compared by their
  * addresses.
  */
-bool operator==(const LineLocation &l, const LineLocation &r) noexcept;
+bool operator==(const line_location &l, const line_location &r) noexcept;
 
-inline bool operator!=(const LineLocation &l, const LineLocation &r) noexcept {
+inline bool operator!=(const line_location &l, const line_location &r)
+        noexcept {
     return !(l == r);
 }
 
 /** A location points to a character position in a shell script source file. */
-class location : public LineLocation {
+class location : public line_location {
 
 private:
 
@@ -83,11 +84,11 @@ private:
 
 public:
 
-    location(const LineLocation &lineLocation, std::size_t column) noexcept :
-            LineLocation(lineLocation), mColumn(column) { }
+    location(const line_location &lineLocation, std::size_t column) noexcept :
+            line_location(lineLocation), mColumn(column) { }
 
-    location(LineLocation &&lineLocation, std::size_t column) noexcept :
-            LineLocation(std::move(lineLocation)), mColumn(column) { }
+    location(line_location &&lineLocation, std::size_t column) noexcept :
+            line_location(std::move(lineLocation)), mColumn(column) { }
 
     location(
             std::shared_ptr<const location> &&parent, // may be null
@@ -111,10 +112,10 @@ inline bool operator!=(const location &l, const location &r) noexcept {
     return !(l == r);
 }
 
-bool operator==(const LineLocation &, const location &) = delete;
-bool operator!=(const LineLocation &, const location &) = delete;
-bool operator==(const location &, const LineLocation &) = delete;
-bool operator!=(const location &, const LineLocation &) = delete;
+bool operator==(const line_location &, const location &) = delete;
+bool operator!=(const line_location &, const location &) = delete;
+bool operator==(const location &, const line_location &) = delete;
+bool operator!=(const location &, const line_location &) = delete;
 
 } // namespace source
 } // namespace language
