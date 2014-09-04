@@ -22,26 +22,26 @@
 
 #include <utility>
 #include "common/xchar.hh"
-#include "language/source/LineAppendedSource.hh"
+#include "language/source/line_appended_source.hh"
 #include "language/source/LocationTestHelper.hh"
 #include "language/source/source_test_helper.hh"
 
 namespace {
 
-using sesh::language::source::LineAppendedSource;
 using sesh::language::source::LineLocation;
 using sesh::language::source::Location;
 using sesh::language::source::check_source_line_end;
 using sesh::language::source::dummyLineLocation;
+using sesh::language::source::line_appended_source;
 using sesh::language::source::source;
 using sesh::language::source::source_stub;
 
-using Pointer = sesh::language::source::LineAppendedSource::source_pointer;
-using String = sesh::language::source::LineAppendedSource::string_type;
+using pointer = sesh::language::source::line_appended_source::source_pointer;
+using string = sesh::language::source::line_appended_source::string_type;
 
-LineAppendedSource *create(
-        Pointer &&original, String &&line, LineLocation &&location) {
-    return new LineAppendedSource(LineAppendedSource::create(
+line_appended_source *create(
+        pointer &&original, string &&line, LineLocation &&location) {
+    return new line_appended_source(line_appended_source::create(
                 std::move(original), std::move(line), std::move(location)));
 }
 
@@ -81,9 +81,9 @@ TEST_CASE("Line-appended source construction throw") {
 }
 
 TEST_CASE("Line-appended source assignment") {
-    LineAppendedSource las = LineAppendedSource::create(
+    line_appended_source las = line_appended_source::create(
             nullptr, L(""), dummyLineLocation());
-    las = LineAppendedSource::create(
+    las = line_appended_source::create(
             nullptr, L(""), dummyLineLocation());
 }
 

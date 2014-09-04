@@ -38,7 +38,7 @@ TESTPROGRAMS = \
 	src/common/type_tag_test \
 	src/common/variant_test \
 	src/language/source/buffer_test \
-	src/language/source/LineAppendedSourceTest \
+	src/language/source/line_appended_source_test \
 	src/language/source/LineContinuedSourceTest \
 	src/language/source/LocationTest \
 	src/language/source/source_test \
@@ -123,8 +123,8 @@ src_sesh_SOURCES = \
 	src/language/source/buffer.hh \
 	src/language/source/diagnostic_message.cc \
 	src/language/source/diagnostic_message.hh \
-	src/language/source/LineAppendedSource.cc \
-	src/language/source/LineAppendedSource.hh \
+	src/language/source/line_appended_source.cc \
+	src/language/source/line_appended_source.hh \
 	src/language/source/LineContinuedSource.cc \
 	src/language/source/LineContinuedSource.hh \
 	src/language/source/Location.cc \
@@ -239,10 +239,10 @@ src_language_source_buffer_test_SOURCES = \
 	src/language/source/buffer.cc \
 	src/language/source/buffer_test.cc \
 	src/language/source/source.cc
-src_language_source_LineAppendedSourceTest_SOURCES = \
+src_language_source_line_appended_source_test_SOURCES = \
 	src/common/message.cc \
-	src/language/source/LineAppendedSource.cc \
-	src/language/source/LineAppendedSourceTest.cc \
+	src/language/source/line_appended_source.cc \
+	src/language/source/line_appended_source_test.cc \
 	src/language/source/Location.cc \
 	src/language/source/source.cc
 src_language_source_LineContinuedSourceTest_SOURCES = \

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_LineAppendedSource_hh
-#define INCLUDED_language_source_LineAppendedSource_hh
+#ifndef INCLUDED_language_source_line_appended_source_hh
+#define INCLUDED_language_source_line_appended_source_hh
 
 #include "buildconfig.h"
 
@@ -33,13 +33,13 @@ namespace source {
  * to be taken from an actual source code. A line-appended source instance
  * contains information about the source code name and line number.
  */
-class LineAppendedSource : public source {
+class line_appended_source : public source {
 
 private:
 
-    LineLocation mLineLocation;
+    LineLocation m_line_location;
 
-    LineAppendedSource(
+    line_appended_source(
             source_pointer &&,
             size_type,
             size_type,
@@ -53,14 +53,14 @@ public:
      * the appended line contains a newline character, it must be at the end of
      * the line.
      */
-    static LineAppendedSource create(
+    static line_appended_source create(
             source_pointer &&original, string_type &&line, LineLocation &&);
 
-    LineAppendedSource(const LineAppendedSource &) = delete;
-    LineAppendedSource(LineAppendedSource &&) = default;
-    LineAppendedSource &operator=(const LineAppendedSource &) = delete;
-    LineAppendedSource &operator=(LineAppendedSource &&) = default;
-    ~LineAppendedSource() override = default;
+    line_appended_source(const line_appended_source &) = delete;
+    line_appended_source(line_appended_source &&) = default;
+    line_appended_source &operator=(const line_appended_source &) = delete;
+    line_appended_source &operator=(line_appended_source &&) = default;
+    ~line_appended_source() override = default;
 
 private:
 
@@ -74,6 +74,6 @@ private:
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_LineAppendedSource_hh
+#endif // #ifndef INCLUDED_language_source_line_appended_source_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "LineAppendedSource.hh"
+#include "line_appended_source.hh"
 
 #include <algorithm>
 #include <stdexcept>
@@ -26,26 +26,26 @@ namespace sesh {
 namespace language {
 namespace source {
 
-LineAppendedSource::LineAppendedSource(
+line_appended_source::line_appended_source(
         source_pointer &&original,
         size_type begin,
         size_type end,
         string_type &&alternate,
-        LineLocation &&lineLocation) :
+        LineLocation &&line_location) :
         source(std::move(original), begin, end, std::move(alternate)),
-        mLineLocation(std::move(lineLocation)) { }
+        m_line_location(std::move(line_location)) { }
 
-LineAppendedSource LineAppendedSource::create(
+line_appended_source line_appended_source::create(
         source_pointer &&original,
         string_type &&line,
         LineLocation &&location) {
-    size_type newlinePosition = line.find(newline);
-    if (newlinePosition != string_type::npos)
-        if (newlinePosition != line.length() - 1)
+    size_type newline_position = line.find(newline);
+    if (newline_position != string_type::npos)
+        if (newline_position != line.length() - 1)
             throw std::invalid_argument("newline at illegal position");
 
     size_type length = (original == nullptr) ? 0 : original->length();
-    return LineAppendedSource(
+    return line_appended_source(
             std::move(original),
             length,
             length,
@@ -53,7 +53,7 @@ LineAppendedSource LineAppendedSource::create(
             std::move(location));
 }
 
-auto LineAppendedSource::line_begin_in_alternate(size_type position)
+auto line_appended_source::line_begin_in_alternate(size_type position)
         const noexcept -> size_type {
     if (position == alternate().length())
         if (position > 0 && alternate()[position - 1] == newline)
@@ -61,16 +61,17 @@ auto LineAppendedSource::line_begin_in_alternate(size_type position)
     return 0;
 }
 
-auto LineAppendedSource::line_end_in_alternate(size_type)
+auto line_appended_source::line_end_in_alternate(size_type)
         const noexcept -> size_type {
-    size_type altLength = alternate().length();
-    if (altLength == 0 || alternate()[altLength - 1] != newline)
+    size_type alt_length = alternate().length();
+    if (alt_length == 0 || alternate()[alt_length - 1] != newline)
         return string_type::npos;
-    return altLength;
+    return alt_length;
 }
 
-Location LineAppendedSource::location_in_alternate(size_type position) const {
-    return Location(mLineLocation, position);
+Location line_appended_source::location_in_alternate(size_type position) const
+{
+    return Location(m_line_location, position);
 }
 
 } // namespace source
