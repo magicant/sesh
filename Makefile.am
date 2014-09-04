@@ -39,7 +39,7 @@ TESTPROGRAMS = \
 	src/common/variant_test \
 	src/language/source/buffer_test \
 	src/language/source/line_appended_source_test \
-	src/language/source/LineContinuedSourceTest \
+	src/language/source/line_continued_source_test \
 	src/language/source/LocationTest \
 	src/language/source/source_test \
 	src/language/syntax/AndOrListTest \
@@ -125,8 +125,8 @@ src_sesh_SOURCES = \
 	src/language/source/diagnostic_message.hh \
 	src/language/source/line_appended_source.cc \
 	src/language/source/line_appended_source.hh \
-	src/language/source/LineContinuedSource.cc \
-	src/language/source/LineContinuedSource.hh \
+	src/language/source/line_continued_source.cc \
+	src/language/source/line_continued_source.hh \
 	src/language/source/Location.cc \
 	src/language/source/Location.hh \
 	src/language/source/Origin.hh \
@@ -245,10 +245,10 @@ src_language_source_line_appended_source_test_SOURCES = \
 	src/language/source/line_appended_source_test.cc \
 	src/language/source/Location.cc \
 	src/language/source/source.cc
-src_language_source_LineContinuedSourceTest_SOURCES = \
+src_language_source_line_continued_source_test_SOURCES = \
 	src/common/message.cc \
-	src/language/source/LineContinuedSource.cc \
-	src/language/source/LineContinuedSourceTest.cc \
+	src/language/source/line_continued_source.cc \
+	src/language/source/line_continued_source_test.cc \
 	src/language/source/Location.cc \
 	src/language/source/source.cc
 src_language_source_LocationTest_SOURCES = \

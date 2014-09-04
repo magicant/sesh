@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "LineContinuedSource.hh"
+#include "line_continued_source.hh"
 
 #include <exception>
 #include <stdexcept>
@@ -27,7 +27,7 @@ namespace sesh {
 namespace language {
 namespace source {
 
-LineContinuedSource::LineContinuedSource(
+line_continued_source::line_continued_source(
         source_pointer &&original, size_type position) :
         source(std::move(original), position, position + 2, string_type()) {
     const source &o = *this->original();
@@ -35,7 +35,7 @@ LineContinuedSource::LineContinuedSource(
         throw std::invalid_argument("no line continuation");
 }
 
-Location LineContinuedSource::location_in_alternate(size_type) const {
+Location line_continued_source::location_in_alternate(size_type) const {
     // The length of the alternate is always zero in this class, so this
     // function is never called.
     std::terminate();
