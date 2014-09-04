@@ -40,7 +40,7 @@ TESTPROGRAMS = \
 	src/language/source/buffer_test \
 	src/language/source/line_appended_source_test \
 	src/language/source/line_continued_source_test \
-	src/language/source/LocationTest \
+	src/language/source/location_test \
 	src/language/source/source_test \
 	src/language/syntax/AndOrListTest \
 	src/language/syntax/AssignmentTest \
@@ -127,8 +127,8 @@ src_sesh_SOURCES = \
 	src/language/source/line_appended_source.hh \
 	src/language/source/line_continued_source.cc \
 	src/language/source/line_continued_source.hh \
-	src/language/source/Location.cc \
-	src/language/source/Location.hh \
+	src/language/source/location.cc \
+	src/language/source/location.hh \
 	src/language/source/Origin.hh \
 	src/language/source/source.cc \
 	src/language/source/source.hh \
@@ -243,24 +243,24 @@ src_language_source_line_appended_source_test_SOURCES = \
 	src/common/message.cc \
 	src/language/source/line_appended_source.cc \
 	src/language/source/line_appended_source_test.cc \
-	src/language/source/Location.cc \
+	src/language/source/location.cc \
 	src/language/source/source.cc
 src_language_source_line_continued_source_test_SOURCES = \
 	src/common/message.cc \
 	src/language/source/line_continued_source.cc \
 	src/language/source/line_continued_source_test.cc \
-	src/language/source/Location.cc \
+	src/language/source/location.cc \
 	src/language/source/source.cc
-src_language_source_LocationTest_SOURCES = \
+src_language_source_location_test_SOURCES = \
 	src/common/message.cc \
-	src/language/source/Location.cc \
-	src/language/source/LocationTest.cc
+	src/language/source/location.cc \
+	src/language/source/location_test.cc
 src_language_source_source_test_SOURCES = \
 	src/common/message.cc \
 	src/language/source/source.cc \
 	src/language/source/source_test.cc
 src_language_syntax_AndOrListTest_SOURCES = \
-	src/language/source/Location.cc \
+	src/language/source/location.cc \
 	src/language/syntax/AndOrList.cc \
 	src/language/syntax/AndOrListTest.cc \
 	src/language/syntax/ConditionalPipeline.cc \
@@ -273,16 +273,16 @@ src_language_syntax_AssignmentTest_SOURCES = \
 	src/language/syntax/RawString.cc \
 	src/language/syntax/Word.cc
 src_language_syntax_CommandTest_SOURCES = \
-	src/language/source/Location.cc \
+	src/language/source/location.cc \
 	src/language/syntax/CommandTest.cc
 src_language_syntax_ConditionalPipelineTest_SOURCES = \
-	src/language/source/Location.cc \
+	src/language/source/location.cc \
 	src/language/syntax/ConditionalPipeline.cc \
 	src/language/syntax/ConditionalPipelineTest.cc \
 	src/language/syntax/Pipeline.cc \
 	src/language/syntax/Printer.cc
 src_language_syntax_PipelineTest_SOURCES = \
-	src/language/source/Location.cc \
+	src/language/source/location.cc \
 	src/language/syntax/Pipeline.cc \
 	src/language/syntax/PipelineTest.cc \
 	src/language/syntax/Printer.cc
@@ -294,7 +294,7 @@ src_language_syntax_RawStringTest_SOURCES = \
 	src/language/syntax/RawString.cc \
 	src/language/syntax/RawStringTest.cc
 src_language_syntax_SequenceTest_SOURCES = \
-	src/language/source/Location.cc \
+	src/language/source/location.cc \
 	src/language/syntax/AndOrList.cc \
 	src/language/syntax/ConditionalPipeline.cc \
 	src/language/syntax/Pipeline.cc \
@@ -302,7 +302,7 @@ src_language_syntax_SequenceTest_SOURCES = \
 	src/language/syntax/Sequence.cc \
 	src/language/syntax/SequenceTest.cc
 src_language_syntax_SimpleCommandTest_SOURCES = \
-	src/language/source/Location.cc \
+	src/language/source/location.cc \
 	src/language/syntax/Assignment.cc \
 	src/language/syntax/Printer.cc \
 	src/language/syntax/RawString.cc \
@@ -384,7 +384,7 @@ src_os_signaling_HandlerConfigurationTest_SOURCES = \
 TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \
 	src/language/source/diagnostic_message_test_helper.hh \
-	src/language/source/LocationTestHelper.hh \
+	src/language/source/location_test_helper.hh \
 	src/language/source/OriginTestHelper.hh \
 	src/language/source/source_test_helper.hh \
 	src/language/syntax/PrinterTestHelper.hh \

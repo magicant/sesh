@@ -25,7 +25,7 @@
 #include <memory>
 #include <ostream>
 #include <utility>
-#include "language/source/Location.hh"
+#include "language/source/location.hh"
 #include "language/source/source.hh"
 
 namespace sesh {

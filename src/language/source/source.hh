@@ -23,7 +23,7 @@
 #include <memory>
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/source/Location.hh"
+#include "language/source/location.hh"
 
 namespace sesh {
 namespace language {

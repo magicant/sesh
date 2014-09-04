@@ -23,8 +23,8 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include "language/source/Location.hh"
-#include "language/source/LocationTestHelper.hh"
+#include "language/source/location.hh"
+#include "language/source/location_test_helper.hh"
 #include "language/source/OriginTestHelper.hh"
 
 namespace {

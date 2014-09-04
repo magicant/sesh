@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Location.hh"
+#include "location.hh"
 
 #include <stdexcept>
 #include <utility>

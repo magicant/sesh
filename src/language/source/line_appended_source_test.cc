@@ -23,7 +23,7 @@
 #include <utility>
 #include "common/xchar.hh"
 #include "language/source/line_appended_source.hh"
-#include "language/source/LocationTestHelper.hh"
+#include "language/source/location_test_helper.hh"
 #include "language/source/source_test_helper.hh"
 
 namespace {
