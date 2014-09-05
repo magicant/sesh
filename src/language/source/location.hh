@@ -24,7 +24,7 @@
 #include <memory>
 #include <utility>
 #include "common/message.hh"
-#include "language/source/Origin.hh"
+#include "language/source/origin.hh"
 
 namespace sesh {
 namespace language {
@@ -40,7 +40,7 @@ private:
     /** May be null. */
     std::shared_ptr<const location> m_parent;
     /** Non-null. */
-    std::shared_ptr<const Origin> m_origin;
+    std::shared_ptr<const class origin> m_origin;
     /** Counted from 0. */
     std::size_t m_line;
 
@@ -48,7 +48,7 @@ public:
 
     line_location(
             std::shared_ptr<const location> &&parent, // may be null
-            std::shared_ptr<const Origin> &&origin, // must never be null
+            std::shared_ptr<const class origin> &&origin, // must never be null
             std::size_t line);
 
     line_location(const line_location &) = default;
@@ -58,7 +58,7 @@ public:
     ~line_location() = default;
 
     const location *parent() const noexcept { return m_parent.get(); }
-    const Origin &origin() const noexcept { return *m_origin; }
+    const class origin &origin() const noexcept { return *m_origin; }
     const std::size_t &line() const noexcept { return m_line; }
 
 }; // class line_location
@@ -92,7 +92,7 @@ public:
 
     location(
             std::shared_ptr<const location> &&parent, // may be null
-            std::shared_ptr<const Origin> &&origin, // must never be null
+            std::shared_ptr<const class origin> &&origin, // must never be null
             std::size_t line,
             std::size_t column);
 

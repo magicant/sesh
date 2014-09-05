@@ -23,7 +23,7 @@
 #include <cstddef>
 #include <memory>
 #include "language/source/location.hh"
-#include "language/source/OriginTestHelper.hh"
+#include "language/source/origin_test_helper.hh"
 
 namespace sesh {
 namespace language {
@@ -31,7 +31,7 @@ namespace source {
 
 /** For testing only. */
 inline line_location dummy_line_location(std::size_t line = 1) {
-    return line_location(nullptr, dummyOrigin(), line);
+    return line_location(nullptr, dummy_origin(), line);
 }
 
 /** For testing only. */

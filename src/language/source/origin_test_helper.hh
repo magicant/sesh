@@ -15,20 +15,20 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_OriginTestHelper_hh
-#define INCLUDED_language_source_OriginTestHelper_hh
+#ifndef INCLUDED_language_source_origin_test_helper_hh
+#define INCLUDED_language_source_origin_test_helper_hh
 
 #include "buildconfig.h"
 
 #include <memory>
 #include "common/xchar.hh"
-#include "language/source/Origin.hh"
+#include "language/source/origin.hh"
 
 namespace sesh {
 namespace language {
 namespace source {
 
-class OriginStub : public Origin {
+class origin_stub : public origin {
 
 public:
 
@@ -37,7 +37,7 @@ public:
             *DUMMY_DESCRIPTION = L("dummy description");
 
     // XXX LLVM 3.4 libc++ seems to require a user-provided default constructor
-    OriginStub() noexcept : Origin() { }
+    origin_stub() noexcept : origin() { }
 
     common::message<> name() const override {
         return common::message<>(DUMMY_NAME);
@@ -47,16 +47,16 @@ public:
         return common::message<>(DUMMY_DESCRIPTION);
     }
 
-}; // class OriginStub
+}; // class origin_stub
 
-std::shared_ptr<const Origin> dummyOrigin() {
-    return std::make_shared<const OriginStub>();
+std::shared_ptr<const origin> dummy_origin() {
+    return std::make_shared<const origin_stub>();
 }
 
 } // namespace source
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_OriginTestHelper_hh
+#endif // #ifndef INCLUDED_language_source_origin_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

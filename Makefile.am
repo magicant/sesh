@@ -129,7 +129,7 @@ src_sesh_SOURCES = \
 	src/language/source/line_continued_source.hh \
 	src/language/source/location.cc \
 	src/language/source/location.hh \
-	src/language/source/Origin.hh \
+	src/language/source/origin.hh \
 	src/language/source/source.cc \
 	src/language/source/source.hh \
 	src/language/syntax/AndOrList.cc \
@@ -385,7 +385,7 @@ TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \
 	src/language/source/diagnostic_message_test_helper.hh \
 	src/language/source/location_test_helper.hh \
-	src/language/source/OriginTestHelper.hh \
+	src/language/source/origin_test_helper.hh \
 	src/language/source/source_test_helper.hh \
 	src/language/syntax/PrinterTestHelper.hh \
 	src/os/TimeApiTestHelper.hh \

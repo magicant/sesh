@@ -37,7 +37,7 @@ bool equal(const location *l, const location *r) noexcept {
 
 line_location::line_location(
         std::shared_ptr<const location> &&parent, // may be null
-        std::shared_ptr<const Origin> &&origin, // must never be null
+        std::shared_ptr<const class origin> &&origin, // must never be null
         std::size_t line) :
         m_parent(std::move(parent)),
         m_origin(std::move(origin)),
@@ -54,7 +54,7 @@ bool operator==(const line_location &l, const line_location &r) noexcept {
 
 location::location(
         std::shared_ptr<const location> &&parent, // may be null
-        std::shared_ptr<const Origin> &&origin, // must never be null
+        std::shared_ptr<const class origin> &&origin, // must never be null
         std::size_t line,
         std::size_t column) :
         line_location(std::move(parent), std::move(origin), line),
