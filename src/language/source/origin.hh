@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_Origin_hh
-#define INCLUDED_language_source_Origin_hh
+#ifndef INCLUDED_language_source_origin_hh
+#define INCLUDED_language_source_origin_hh
 
 #include "buildconfig.h"
 
@@ -29,16 +29,16 @@ namespace language {
 namespace source {
 
 /** This abstract class identifies the origin of a source. */
-class Origin {
+class origin {
 
 public:
 
-    Origin() = default;
-    Origin(const Origin &) = default;
-    Origin(Origin &&) = default;
-    Origin &operator=(const Origin &) = default;
-    Origin &operator=(Origin &&) = default;
-    virtual ~Origin() = default;
+    origin() = default;
+    origin(const origin &) = default;
+    origin(origin &&) = default;
+    origin &operator=(const origin &) = default;
+    origin &operator=(origin &&) = default;
+    virtual ~origin() = default;
 
     /**
      * Returns the name of this origin. It should be a pathname or a
@@ -56,12 +56,12 @@ public:
      */
     virtual common::message<> description() const = 0;
 
-}; // class Origin
+}; // class origin
 
 } // namespace source
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_Origin_hh
+#endif // #ifndef INCLUDED_language_source_origin_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

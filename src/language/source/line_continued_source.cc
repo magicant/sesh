@@ -16,23 +16,30 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "DiagnosticMessage.hh"
+#include "line_continued_source.hh"
 
+#include <exception>
+#include <stdexcept>
 #include <utility>
-#include "common/error_level.hh"
-#include "common/message.hh"
-
-using sesh::common::error_level;
+#include "common/xchar.hh"
 
 namespace sesh {
 namespace language {
 namespace source {
 
-DiagnosticMessage::DiagnosticMessage(
-        Position p, common::message<> &&m, error_level el) :
-        mPosition(std::move(p)),
-        mErrorLevel(el),
-        mMessage(std::move(m)) { }
+line_continued_source::line_continued_source(
+        source_pointer &&original, size_type position) :
+        source(std::move(original), position, position + 2, string_type()) {
+    const source &o = *this->original();
+    if (o[position] != L('\\') || o[position + 1] != newline)
+        throw std::invalid_argument("no line continuation");
+}
+
+location line_continued_source::location_in_alternate(size_type) const {
+    // The length of the alternate is always zero in this class, so this
+    // function is never called.
+    std::terminate();
+}
 
 } // namespace source
 } // namespace language

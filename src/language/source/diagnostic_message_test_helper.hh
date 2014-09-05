@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_DiagnosticMessageTestHelper_hh
-#define INCLUDED_language_source_DiagnosticMessageTestHelper_hh
+#ifndef INCLUDED_language_source_diagnostic_message_test_helper_hh
+#define INCLUDED_language_source_diagnostic_message_test_helper_hh
 
 #include "buildconfig.h"
 
 #include "common/message.hh"
-#include "language/source/DiagnosticMessage.hh"
+#include "language/source/diagnostic_message.hh"
 
 namespace sesh {
 namespace language {
 namespace source {
 
-void checkEqual(const DiagnosticMessage &a, const DiagnosticMessage &b) {
+void checkEqual(const diagnostic_message &a, const diagnostic_message &b) {
     CHECK(a.position() == b.position());
-    CHECK(a.errorLevel() == b.errorLevel());
+    CHECK(a.error_level() == b.error_level());
     CHECK(a.message().toString() == b.message().toString());
 }
 
@@ -37,6 +37,6 @@ void checkEqual(const DiagnosticMessage &a, const DiagnosticMessage &b) {
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_DiagnosticMessageTestHelper_hh
+#endif // #ifndef INCLUDED_language_source_diagnostic_message_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_Source_hh
-#define INCLUDED_language_source_Source_hh
+#ifndef INCLUDED_language_source_source_hh
+#define INCLUDED_language_source_source_hh
 
 #include "buildconfig.h"
 
 #include <memory>
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/source/Location.hh"
+#include "language/source/location.hh"
 
 namespace sesh {
 namespace language {
@@ -34,24 +34,24 @@ namespace source {
  * this class represents a string that is created by altering part of another
  * source string.
  */
-class Source {
+class source {
 
 public:
 
-    using String = common::xstring;
-    using Char = String::value_type;
-    using Size = String::size_type;
-    using Difference = String::difference_type;
-    using ConstReference = String::const_reference;
-    constexpr static Char NEWLINE = L('\n');
+    using string_type = common::xstring;
+    using value_type = string_type::value_type;
+    using size_type = string_type::size_type;
+    using difference_type = string_type::difference_type;
+    using const_reference = string_type::const_reference;
+    constexpr static value_type newline = L('\n');
 
-    using Pointer = std::unique_ptr<const Source>;
+    using source_pointer = std::unique_ptr<const source>;
 
 private:
 
-    Pointer mOriginal;
-    Size mBegin, mEnd;
-    String mAlternate;
+    source_pointer m_original;
+    size_type m_begin, m_end;
+    string_type m_alternate;
 
 protected:
 
@@ -60,22 +60,22 @@ protected:
      * instance. The original may be null, in which case it is treated as an
      * empty string.
      */
-    const Pointer &original() const noexcept { return mOriginal; }
+    const source_pointer &original() const noexcept { return m_original; }
     /**
      * Beginning position of the range in the original to be replaced.
      * Inclusive. The position cannot exceed the length of the original.
      */
-    Size begin() const noexcept { return mBegin; }
+    size_type begin() const noexcept { return m_begin; }
     /**
      * Ending position of the range in the original to be replaced. Exclusive.
      * The position cannot exceed the length of the original.
      */
-    Size end() const noexcept { return mEnd; }
+    size_type end() const noexcept { return m_end; }
     /** String that alternates part of the original. */
-    const String &alternate() const noexcept { return mAlternate; }
+    const string_type &alternate() const noexcept { return m_alternate; }
 
-    Size positionAfterAlternate() const noexcept;
-    Difference lengthDifference() const noexcept;
+    size_type position_after_alternate() const noexcept;
+    difference_type length_difference() const noexcept;
 
 public:
 
@@ -83,18 +83,22 @@ public:
      * @throws std::out_of_range begin > end || end > length of original
      * @throws std::overflow_error The resultant source is too long.
      */
-    Source(Pointer &&original, Size begin, Size end, String &&alternate);
+    source(
+            source_pointer &&original,
+            size_type begin,
+            size_type end,
+            string_type &&alternate);
 
-    Source(const Source &) = delete;
-    Source(Source &&) = default;
-    Source &operator=(const Source &) = delete;
-    Source &operator=(Source &&) = default;
-    virtual ~Source() = default;
+    source(const source &) = delete;
+    source(source &&) = default;
+    source &operator=(const source &) = delete;
+    source &operator=(source &&) = default;
+    virtual ~source() = default;
 
-    Size length() const noexcept;
+    size_type length() const noexcept;
 
-    ConstReference at(Size) const;
-    ConstReference operator[](Size) const;
+    const_reference at(size_type) const;
+    const_reference operator[](size_type) const;
 
 private:
 
@@ -104,21 +108,22 @@ private:
      * @param position <= length of alternate
      * @return position in the alternate (<= length)
      */
-    virtual Size lineBeginInAlternate(Size position) const noexcept;
+    virtual size_type line_begin_in_alternate(size_type position) const
+            noexcept;
     /**
      * Computes the character position just past the line at the argument
      * position in the alternate. If the line does not have a trailing newline
-     * in the alternate, String::npos is returned.
+     * in the alternate, string_type::npos is returned.
      * @param position < length of alternate
-     * @return position in the alternate (<= length) or String::npos
+     * @return position in the alternate (<= length) or string_type::npos
      */
-    virtual Size lineEndInAlternate(Size position) const noexcept;
+    virtual size_type line_end_in_alternate(size_type position) const noexcept;
 
     /**
      * @param position < length of alternate
      * @return source location for the argument position in the alternate
      */
-    virtual Location locationInAlternate(Size position) const = 0;
+    virtual class location location_in_alternate(size_type position) const = 0;
 
 public:
 
@@ -128,7 +133,7 @@ public:
      * @param position <= length of this source
      * @return position in this source (<= length)
      */
-    Size lineBegin(Size position) const noexcept;
+    size_type line_begin(size_type position) const noexcept;
     /**
      * Computes the character position just past the line at the argument
      * position in this source. If the line does not have a trailing newline,
@@ -136,13 +141,13 @@ public:
      * @param position < length of this source
      * @return position in this source (<= length)
      */
-    Size lineEnd(Size position) const noexcept;
+    size_type line_end(size_type position) const noexcept;
 
     /**
      * @param position < length of this source
      * @return source location for the argument position
      */
-    Location location(Size position) const;
+    class location location(size_type position) const;
 
 };
 
@@ -150,6 +155,6 @@ public:
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_Source_hh
+#endif // #ifndef INCLUDED_language_source_source_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

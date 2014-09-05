@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_LineAppendedSource_hh
-#define INCLUDED_language_source_LineAppendedSource_hh
+#ifndef INCLUDED_language_source_line_appended_source_hh
+#define INCLUDED_language_source_line_appended_source_hh
 
 #include "buildconfig.h"
 
-#include "language/source/Location.hh"
-#include "language/source/Source.hh"
+#include "language/source/location.hh"
+#include "language/source/source.hh"
 
 namespace sesh {
 namespace language {
@@ -33,13 +33,18 @@ namespace source {
  * to be taken from an actual source code. A line-appended source instance
  * contains information about the source code name and line number.
  */
-class LineAppendedSource : public Source {
+class line_appended_source : public source {
 
 private:
 
-    LineLocation mLineLocation;
+    line_location m_line_location;
 
-    LineAppendedSource(Pointer &&, Size, Size, String &&, LineLocation &&);
+    line_appended_source(
+            source_pointer &&,
+            size_type,
+            size_type,
+            string_type &&,
+            line_location &&);
 
 public:
 
@@ -48,20 +53,20 @@ public:
      * the appended line contains a newline character, it must be at the end of
      * the line.
      */
-    static LineAppendedSource create(
-            Pointer &&original, String &&line, LineLocation &&);
+    static line_appended_source create(
+            source_pointer &&original, string_type &&line, line_location &&);
 
-    LineAppendedSource(const LineAppendedSource &) = delete;
-    LineAppendedSource(LineAppendedSource &&) = default;
-    LineAppendedSource &operator=(const LineAppendedSource &) = delete;
-    LineAppendedSource &operator=(LineAppendedSource &&) = default;
-    ~LineAppendedSource() override = default;
+    line_appended_source(const line_appended_source &) = delete;
+    line_appended_source(line_appended_source &&) = default;
+    line_appended_source &operator=(const line_appended_source &) = delete;
+    line_appended_source &operator=(line_appended_source &&) = default;
+    ~line_appended_source() override = default;
 
 private:
 
-    Size lineBeginInAlternate(Size) const noexcept override;
-    Size lineEndInAlternate(Size) const noexcept override;
-    Location locationInAlternate(Size) const override;
+    size_type line_begin_in_alternate(size_type) const noexcept override;
+    size_type line_end_in_alternate(size_type) const noexcept override;
+    class location location_in_alternate(size_type) const override;
 
 };
 
@@ -69,6 +74,6 @@ private:
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_LineAppendedSource_hh
+#endif // #ifndef INCLUDED_language_source_line_appended_source_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

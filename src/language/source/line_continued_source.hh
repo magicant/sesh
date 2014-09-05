@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_LineContinuedSource_hh
-#define INCLUDED_language_source_LineContinuedSource_hh
+#ifndef INCLUDED_language_source_line_continued_source_hh
+#define INCLUDED_language_source_line_continued_source_hh
 
 #include "buildconfig.h"
 
-#include "language/source/Source.hh"
+#include "language/source/source.hh"
 
 namespace sesh {
 namespace language {
@@ -30,7 +30,7 @@ namespace source {
  * Line-continued source is a source wrapper that removes a line continuation
  * from the original source.
  */
-class LineContinuedSource : public Source {
+class line_continued_source : public source {
 
 public:
 
@@ -40,17 +40,17 @@ public:
      * @throws std::invalid_argument no line continuation at the position.
      * @throws std::out_of_range too large position.
      */
-    LineContinuedSource(Pointer &&original, Size position);
+    line_continued_source(source_pointer &&original, size_type position);
 
-    LineContinuedSource(const LineContinuedSource &) = delete;
-    LineContinuedSource(LineContinuedSource &&) = default;
-    LineContinuedSource &operator=(const LineContinuedSource &) = delete;
-    LineContinuedSource &operator=(LineContinuedSource &&) = default;
-    ~LineContinuedSource() override = default;
+    line_continued_source(const line_continued_source &) = delete;
+    line_continued_source(line_continued_source &&) = default;
+    line_continued_source &operator=(const line_continued_source &) = delete;
+    line_continued_source &operator=(line_continued_source &&) = default;
+    ~line_continued_source() override = default;
 
 private:
 
-    Location locationInAlternate(Size) const override;
+    class location location_in_alternate(size_type) const override;
 
 };
 
@@ -58,6 +58,6 @@ private:
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_LineContinuedSource_hh
+#endif // #ifndef INCLUDED_language_source_line_continued_source_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

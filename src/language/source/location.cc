@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Location.hh"
+#include "location.hh"
 
 #include <stdexcept>
 #include <utility>
@@ -27,7 +27,7 @@ namespace source {
 
 namespace {
 
-bool equal(const Location *l, const Location *r) noexcept {
+bool equal(const location *l, const location *r) noexcept {
     if (l == nullptr)
         return r == nullptr;
     return r != nullptr && *l == *r;
@@ -35,35 +35,35 @@ bool equal(const Location *l, const Location *r) noexcept {
 
 } // namespace
 
-LineLocation::LineLocation(
-        std::shared_ptr<const Location> &&parent, // may be null
-        std::shared_ptr<const Origin> &&origin, // must never be null
+line_location::line_location(
+        std::shared_ptr<const location> &&parent, // may be null
+        std::shared_ptr<const class origin> &&origin, // must never be null
         std::size_t line) :
-        mParent(std::move(parent)),
-        mOrigin(std::move(origin)),
-        mLine(line) {
-    if (mOrigin == nullptr)
+        m_parent(std::move(parent)),
+        m_origin(std::move(origin)),
+        m_line(line) {
+    if (m_origin == nullptr)
         throw std::invalid_argument("null origin");
 }
 
-bool operator==(const LineLocation &l, const LineLocation &r) noexcept {
+bool operator==(const line_location &l, const line_location &r) noexcept {
     return l.line() == r.line() &&
             &l.origin() == &r.origin() &&
             equal(l.parent(), r.parent());
 }
 
-Location::Location(
-        std::shared_ptr<const Location> &&parent, // may be null
-        std::shared_ptr<const Origin> &&origin, // must never be null
+location::location(
+        std::shared_ptr<const location> &&parent, // may be null
+        std::shared_ptr<const class origin> &&origin, // must never be null
         std::size_t line,
         std::size_t column) :
-        LineLocation(std::move(parent), std::move(origin), line),
-        mColumn(column) { }
+        line_location(std::move(parent), std::move(origin), line),
+        m_column(column) { }
 
-bool operator==(const Location &l, const Location &r) noexcept {
+bool operator==(const location &l, const location &r) noexcept {
     return l.column() == r.column() &&
-            static_cast<const LineLocation &>(l) ==
-            static_cast<const LineLocation &>(r);
+            static_cast<const line_location &>(l) ==
+            static_cast<const line_location &>(r);
 }
 
 } // namespace source

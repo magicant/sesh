@@ -21,95 +21,95 @@
 #include "catch.hpp"
 
 #include <utility>
-#include "language/source/Buffer.hh"
-#include "language/source/Source.hh"
-#include "language/source/SourceTestHelper.hh"
+#include "language/source/buffer.hh"
+#include "language/source/source.hh"
+#include "language/source/source_test_helper.hh"
 
 namespace {
 
-using sesh::language::source::Buffer;
-using sesh::language::source::Location;
-using sesh::language::source::Source;
-using sesh::language::source::checkSourceString;
+using sesh::language::source::buffer;
+using sesh::language::source::location;
+using sesh::language::source::source;
 
-using BufferPointer = sesh::language::source::Buffer::Pointer;
-using SBCI = sesh::language::source::Buffer::ConstIterator;
-using SourcePointer = sesh::language::source::Source::Pointer;
-using String = sesh::language::source::Buffer::String;
+using buffer_pointer = std::shared_ptr<buffer>;
+using SBCI = sesh::language::source::buffer::const_iterator;
+using source_pointer = sesh::language::source::source::source_pointer;
+using string = sesh::language::source::buffer::string_type;
 
-class StringPrependedSource : public Source {
+class string_prepended_source : public source {
 public:
-    StringPrependedSource(Pointer &&p, String &&s) :
-            Source(std::move(p), 0, 0, std::move(s)) { }
-    Location locationInAlternate(Size) const override {
+    string_prepended_source(source_pointer &&p, string &&s) :
+            source(std::move(p), 0, 0, std::move(s)) { }
+    class location location_in_alternate(size_type) const override {
         throw "unexpected";
     }
 };
 
-SourcePointer prepend(SourcePointer &&p, String &&s) {
-    return SourcePointer(
-            new StringPrependedSource(std::move(p), std::move(s)));
+source_pointer prepend(source_pointer &&p, string &&s) {
+    return source_pointer(
+            new string_prepended_source(std::move(p), std::move(s)));
 }
 
-BufferPointer createBuffer(Buffer::String &&string) {
-    BufferPointer b = Buffer::create();
+buffer_pointer create_buffer(string &&s) {
+    buffer_pointer b = buffer::create();
 
-    b->substitute([&string](SourcePointer &&p) -> SourcePointer {
-        return prepend(std::move(p), std::move(string));
+    b->substitute([&s](source_pointer &&p) -> source_pointer {
+        return prepend(std::move(p), std::move(s));
     });
     return b;
 }
 
-void checkBufferString(const Buffer &sb, const Buffer::String &string) {
-    for (Buffer::Size i = 0; i < string.length(); ++i) {
-        CHECK(sb.at(i) == string.at(i));
-        CHECK(sb[i] == string[i]);
+void check_buffer_string(const buffer &sb, const string &s) {
+    for (buffer::size_type i = 0; i < s.length(); ++i) {
+        CHECK(sb.at(i) == s.at(i));
+        CHECK(sb[i] == s[i]);
     }
-    CHECK_THROWS_AS(sb.at(string.length()), std::out_of_range);
-    CHECK(sb[string.length()] == Buffer::Char());
+    CHECK_THROWS_AS(sb.at(s.length()), std::out_of_range);
+    CHECK(sb[s.length()] == buffer::value_type());
 }
 
 } // namespace
 
 TEST_CASE("Buffer, construction and creation") {
-    CHECK_NOTHROW(Buffer());
-    CHECK_NOTHROW(Buffer::create());
+    CHECK_NOTHROW(buffer());
+    CHECK_NOTHROW(buffer::create());
 }
 
 TEST_CASE("Buffer, length") {
-    CHECK(Buffer().length() == 0);
+    CHECK(buffer().length() == 0);
 }
 
 TEST_CASE("Buffer, substitution, at and operator[]") {
-    Buffer sb;
+    buffer sb;
 
-    checkBufferString(sb, L(""));
-    sb.substitute([](SourcePointer &&p) -> SourcePointer {
+    check_buffer_string(sb, L(""));
+    sb.substitute([](source_pointer &&p) -> source_pointer {
         CHECK(p == nullptr);
         return prepend(std::move(p), L("Test"));
     });
-    checkBufferString(sb, L("Test"));
-    sb.substitute([](SourcePointer &&p) -> SourcePointer {
+    check_buffer_string(sb, L("Test"));
+    sb.substitute([](source_pointer &&p) -> source_pointer {
         return std::move(p);
     });
-    checkBufferString(sb, L("Test"));
-    sb.substitute([](SourcePointer &&p) -> SourcePointer {
+    check_buffer_string(sb, L("Test"));
+    sb.substitute([](source_pointer &&p) -> source_pointer {
         REQUIRE(p != nullptr);
-        CHECK(dynamic_cast<const StringPrependedSource *>(p.get()) != nullptr);
-        checkSourceString(*p, L("Test"));
+        CHECK(dynamic_cast<const string_prepended_source *>(p.get()) !=
+                nullptr);
+        check_source_string(*p, L("Test"));
         return std::move(p);
     });
-    checkBufferString(sb, L("Test"));
+    check_buffer_string(sb, L("Test"));
 }
 
 TEST_CASE("Buffer, begin and end") {
-    BufferPointer b = Buffer::create();
+    buffer_pointer b = buffer::create();
     CHECK_NOTHROW(b->cbegin());
     CHECK_NOTHROW(b->cend());
     CHECK_NOTHROW(b->begin());
     CHECK_NOTHROW(b->end());
 
-    b->substitute([](SourcePointer &&p) -> SourcePointer {
+    b->substitute([](source_pointer &&p) -> source_pointer {
         return prepend(std::move(p), L("Test"));
     });
     CHECK_NOTHROW(b->cbegin());
@@ -119,7 +119,7 @@ TEST_CASE("Buffer, begin and end") {
 }
 
 TEST_CASE("Buffer iterator, normal construction") {
-    BufferPointer b = createBuffer(L("X"));
+    buffer_pointer b = create_buffer(L("X"));
     CHECK_NOTHROW(SBCI(b, 0));
     CHECK_NOTHROW(SBCI(b, 1));
 }
@@ -142,7 +142,7 @@ TEST_CASE("Buffer iterator, assignment") {
 }
 
 TEST_CASE("Buffer iterator, dereferencing") {
-    BufferPointer b = createBuffer(L("ABC"));
+    buffer_pointer b = create_buffer(L("ABC"));
     CHECK(*b->cbegin() == L('A'));
 
     SBCI ci = b->cbegin(), i = b->begin();
@@ -155,7 +155,7 @@ TEST_CASE("Buffer iterator, dereferencing") {
 }
 
 TEST_CASE("Buffer iterator, incrementation") {
-    BufferPointer b = createBuffer(L("Test"));
+    buffer_pointer b = create_buffer(L("Test"));
     SBCI i = b->cbegin();
     CHECK_NOTHROW(++i);
     CHECK(*i == L('e'));
@@ -168,7 +168,7 @@ TEST_CASE("Buffer iterator, incrementation") {
 }
 
 TEST_CASE("Buffer iterator, decrementation") {
-    BufferPointer b = createBuffer(L("Test"));
+    buffer_pointer b = create_buffer(L("Test"));
     SBCI i1 = b->cend();
     CHECK(*--i1 == L('t'));
 
@@ -184,7 +184,7 @@ TEST_CASE("Buffer iterator, decrementation") {
 }
 
 TEST_CASE("Buffer iterator, equality") {
-    BufferPointer b = createBuffer(L("ABC"));
+    buffer_pointer b = create_buffer(L("ABC"));
     SBCI ci = b->cbegin(), i = b->begin();
     SBCI cend = b->cend(), end = b->end();
 
@@ -245,7 +245,7 @@ TEST_CASE("Buffer iterator, equality") {
 }
 
 TEST_CASE("Buffer iterator, multi-pass guarantee 1") {
-    BufferPointer b = createBuffer(L("ABC"));
+    buffer_pointer b = create_buffer(L("ABC"));
     SBCI ci = b->cbegin(), i = b->begin();
     // ci == i
     CHECK(++ci == ++i);
@@ -254,14 +254,14 @@ TEST_CASE("Buffer iterator, multi-pass guarantee 1") {
 }
 
 TEST_CASE("Buffer iterator, multi-pass guarantee 2") {
-    BufferPointer b = createBuffer(L("ABC"));
+    buffer_pointer b = create_buffer(L("ABC"));
     SBCI i1 = b->begin();
     SBCI i2 = i1;
     CHECK(((void) ++i2, *i1) == *i1);
 }
 
 TEST_CASE("Buffer iterator, random access") {
-    BufferPointer b = createBuffer(L("Test"));
+    buffer_pointer b = create_buffer(L("Test"));
     SBCI begin = b->cbegin();
     SBCI end = b->cend();
     SBCI i = begin;
@@ -338,7 +338,7 @@ TEST_CASE("Buffer iterator, random access") {
 }
 
 TEST_CASE("Buffer iterator, inequality") {
-    BufferPointer b = createBuffer(L("ABC"));
+    buffer_pointer b = create_buffer(L("ABC"));
     SBCI begin = b->cbegin();
     SBCI end = b->cend();
     SBCI i = begin + 1;
@@ -380,7 +380,7 @@ TEST_CASE("Buffer iterator, inequality") {
 }
 
 TEST_CASE("Buffer iterator, index") {
-    BufferPointer b = createBuffer(L("Test"));
+    buffer_pointer b = create_buffer(L("Test"));
 
     SBCI i = b->cbegin() + 1;
     CHECK(i[-1] == L('T'));
@@ -396,13 +396,13 @@ TEST_CASE("Buffer iterator, index") {
 }
 
 TEST_CASE("Buffer iterator, range to string") {
-    BufferPointer b = createBuffer(L("string"));
+    buffer_pointer b = create_buffer(L("string"));
 
-    b->substitute([](SourcePointer &&p) -> SourcePointer {
+    b->substitute([](source_pointer &&p) -> source_pointer {
         return prepend(std::move(p), L("Test "));
     });
 
-    String s = toString(b->begin() + 2, b->end() - 2);
+    string s = to_string(b->begin() + 2, b->end() - 2);
     CHECK(s == L("st stri"));
 }
 
