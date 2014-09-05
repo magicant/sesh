@@ -29,7 +29,7 @@
 namespace {
 
 using sesh::language::source::check_source_line_end;
-using sesh::language::source::dummyLineLocation;
+using sesh::language::source::dummy_line_location;
 using sesh::language::source::line_appended_source;
 using sesh::language::source::line_location;
 using sesh::language::source::source;
@@ -48,61 +48,61 @@ TEST_CASE("Line-appended source construction no throw") {
     source::source_pointer s;
 
     CHECK_NOTHROW(s.reset(create(
-            nullptr, L(""), dummyLineLocation())));
+            nullptr, L(""), dummy_line_location())));
     CHECK_NOTHROW(s.reset(create(
-            std::move(s), L("\n"), dummyLineLocation())));
+            std::move(s), L("\n"), dummy_line_location())));
     CHECK_NOTHROW(s.reset(create(
-            std::move(s), L("test\n"), dummyLineLocation())));
+            std::move(s), L("test\n"), dummy_line_location())));
     CHECK_NOTHROW(s.reset(create(
-            std::move(s), L("more"), dummyLineLocation())));
+            std::move(s), L("more"), dummy_line_location())));
     CHECK_NOTHROW(s.reset(create(
-            std::move(s), L("line"), dummyLineLocation())));
+            std::move(s), L("line"), dummy_line_location())));
     CHECK_NOTHROW(s.reset(create(
-            std::move(s), L("last\n"), dummyLineLocation())));
+            std::move(s), L("last\n"), dummy_line_location())));
 
     CHECK_NOTHROW(s.reset(create(
-            nullptr, L("txt\n"), dummyLineLocation())));
+            nullptr, L("txt\n"), dummy_line_location())));
     CHECK_NOTHROW(s.reset(new source_stub(std::move(s), 1, 2, L("es"))));
     CHECK_NOTHROW(s.reset(create(
-            std::move(s), L("next\n"), dummyLineLocation())));
+            std::move(s), L("next\n"), dummy_line_location())));
 }
 
 TEST_CASE("Line-appended source construction throw") {
     source::source_pointer s;
 
     CHECK_THROWS_AS(
-            s.reset(create(nullptr, L("t\next"), dummyLineLocation())),
+            s.reset(create(nullptr, L("t\next"), dummy_line_location())),
             std::invalid_argument);
 
     CHECK_THROWS_AS(
-            s.reset(create(nullptr, L("\n\n"), dummyLineLocation())),
+            s.reset(create(nullptr, L("\n\n"), dummy_line_location())),
             std::invalid_argument);
 }
 
 TEST_CASE("Line-appended source assignment") {
     line_appended_source las = line_appended_source::create(
-            nullptr, L(""), dummyLineLocation());
+            nullptr, L(""), dummy_line_location());
     las = line_appended_source::create(
-            nullptr, L(""), dummyLineLocation());
+            nullptr, L(""), dummy_line_location());
 }
 
 TEST_CASE("Line-appended source value") {
     source::source_pointer s;
 
-    s.reset(create(nullptr, L(""), dummyLineLocation()));
+    s.reset(create(nullptr, L(""), dummy_line_location()));
     INFO("source=''");
     check_source_string(*s, L(""));
 
-    s.reset(create(std::move(s), L("abc"), dummyLineLocation()));
+    s.reset(create(std::move(s), L("abc"), dummy_line_location()));
     INFO("source='abc'");
     check_source_string(*s, L("abc"));
 
-    s.reset(create(std::move(s), L("def\\\n"), dummyLineLocation()));
+    s.reset(create(std::move(s), L("def\\\n"), dummy_line_location()));
     INFO("source='abcdef\\\\\\n'");
     check_source_string(*s, L("abcdef\\\n"));
 
     s.reset(new source_stub(std::move(s), 6, 8, L("")));
-    s.reset(create(std::move(s), L("ghi\n"), dummyLineLocation()));
+    s.reset(create(std::move(s), L("ghi\n"), dummy_line_location()));
     INFO("source='abcdefghi\\n'");
     check_source_string(*s, L("abcdefghi\n"));
 }
@@ -110,28 +110,28 @@ TEST_CASE("Line-appended source value") {
 TEST_CASE("Line-appended source line begin") {
     source::source_pointer s;
 
-    s.reset(create(nullptr, L(""), dummyLineLocation()));
+    s.reset(create(nullptr, L(""), dummy_line_location()));
     INFO("source=''");
     check_source_line_begin(*s, {});
 
-    s.reset(create(std::move(s), L("ab"), dummyLineLocation()));
+    s.reset(create(std::move(s), L("ab"), dummy_line_location()));
     INFO("source='ab'");
     check_source_line_begin(*s, {});
 
-    s.reset(create(std::move(s), L("cd\n"), dummyLineLocation()));
+    s.reset(create(std::move(s), L("cd\n"), dummy_line_location()));
     INFO("source='abcd\\n'");
     check_source_line_begin(*s, {5});
 
-    s.reset(create(std::move(s), L("e\\\n"), dummyLineLocation()));
+    s.reset(create(std::move(s), L("e\\\n"), dummy_line_location()));
     INFO("source='abcd\\ne\\\\\\n'");
     check_source_line_begin(*s, {5, 8});
 
     s.reset(new source_stub(std::move(s), 6, 8, L("")));
-    s.reset(create(std::move(s), L(""), dummyLineLocation()));
+    s.reset(create(std::move(s), L(""), dummy_line_location()));
     INFO("source='abcd\\ne'");
     check_source_line_begin(*s, {5});
 
-    s.reset(create(std::move(s), L("\n"), dummyLineLocation()));
+    s.reset(create(std::move(s), L("\n"), dummy_line_location()));
     INFO("source='abcd\\ne\\n'");
     check_source_line_begin(*s, {5, 7});
 }
@@ -139,39 +139,39 @@ TEST_CASE("Line-appended source line begin") {
 TEST_CASE("Line-appended source line end") {
     source::source_pointer s;
 
-    s.reset(create(nullptr, L("ab"), dummyLineLocation()));
+    s.reset(create(nullptr, L("ab"), dummy_line_location()));
     INFO("source=''");
     check_source_line_end(*s, {2});
 
-    s.reset(create(std::move(s), L("cd\n"), dummyLineLocation()));
+    s.reset(create(std::move(s), L("cd\n"), dummy_line_location()));
     INFO("source='abcd\\n'");
     check_source_line_end(*s, {5});
 
-    s.reset(create(std::move(s), L(""), dummyLineLocation()));
+    s.reset(create(std::move(s), L(""), dummy_line_location()));
     check_source_line_end(*s, {5});
 
-    s.reset(create(std::move(s), L("ef"), dummyLineLocation()));
+    s.reset(create(std::move(s), L("ef"), dummy_line_location()));
     INFO("source='abcd\\nef'");
     check_source_line_end(*s, {5, 7});
 
-    s.reset(create(std::move(s), L(""), dummyLineLocation()));
+    s.reset(create(std::move(s), L(""), dummy_line_location()));
     check_source_line_end(*s, {5, 7});
 }
 
 TEST_CASE("Line-appended source location") {
     source::source_pointer s;
 
-    s.reset(create(nullptr, L("ab"), dummyLineLocation(3)));
+    s.reset(create(nullptr, L("ab"), dummy_line_location(3)));
     check_source_location(*s, 0, 3, 0);
     check_source_location(*s, 1, 3, 1);
 
-    s.reset(create(std::move(s), L("c\n"), dummyLineLocation(0)));
+    s.reset(create(std::move(s), L("c\n"), dummy_line_location(0)));
     check_source_location(*s, 0, 3, 0);
     check_source_location(*s, 1, 3, 1);
     check_source_location(*s, 2, 0, 0);
     check_source_location(*s, 3, 0, 1);
 
-    s.reset(create(std::move(s), L("def"), dummyLineLocation(5)));
+    s.reset(create(std::move(s), L("def"), dummy_line_location(5)));
     check_source_location(*s, 0, 3, 0);
     check_source_location(*s, 1, 3, 1);
     check_source_location(*s, 2, 0, 0);

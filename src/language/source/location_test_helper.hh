@@ -30,13 +30,13 @@ namespace language {
 namespace source {
 
 /** For testing only. */
-inline line_location dummyLineLocation(std::size_t line = 1) {
+inline line_location dummy_line_location(std::size_t line = 1) {
     return line_location(nullptr, dummyOrigin(), line);
 }
 
 /** For testing only. */
-inline location dummyLocation(std::size_t line = 1, std::size_t column = 1) {
-    return location(dummyLineLocation(line), column);
+inline location dummy_location(std::size_t line = 1, std::size_t column = 1) {
+    return location(dummy_line_location(line), column);
 }
 
 } // namespace source

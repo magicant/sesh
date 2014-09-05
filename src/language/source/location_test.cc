@@ -30,8 +30,8 @@
 namespace {
 
 using sesh::language::source::Origin;
-using sesh::language::source::dummyLineLocation;
-using sesh::language::source::dummyLocation;
+using sesh::language::source::dummy_line_location;
+using sesh::language::source::dummy_location;
 using sesh::language::source::dummyOrigin;
 using sesh::language::source::line_location;
 using sesh::language::source::location;
@@ -47,20 +47,20 @@ TEST_CASE("Line location, construction, no parent") {
 }
 
 TEST_CASE("Line location, assignment") {
-    line_location ll1 = dummyLineLocation();
-    line_location ll2 = dummyLineLocation();
+    line_location ll1 = dummy_line_location();
+    line_location ll2 = dummy_line_location();
     ll1 = ll2;
 }
 
 TEST_CASE("Location, construction and assignment") {
-    location l1(dummyLineLocation(), 0);
+    location l1(dummy_line_location(), 0);
     location l2 = l1;
     l1 = l2;
 }
 
 TEST_CASE("Line location, construction, with parent") {
     std::shared_ptr<const location> parent =
-            std::make_shared<location>(dummyLocation());
+            std::make_shared<location>(dummy_location());
     line_location ll1(copy(parent), dummyOrigin(), 0);
     (void) ll1;
 }
@@ -70,7 +70,7 @@ TEST_CASE("Line location, parent") {
     CHECK(ll1.parent() == nullptr);
 
     std::shared_ptr<const location> parent =
-            std::make_shared<location>(dummyLocation());
+            std::make_shared<location>(dummy_location());
     line_location ll2(copy(parent), dummyOrigin(), 0);
     CHECK(ll2.parent() == parent.get());
 }
@@ -92,7 +92,7 @@ TEST_CASE("Line location, line") {
 
 TEST_CASE("Line location, comparison, no parent") {
     std::shared_ptr<const location> parent =
-            std::make_shared<location>(dummyLocation());
+            std::make_shared<location>(dummy_location());
     std::shared_ptr<const Origin> origin = dummyOrigin();
 
     line_location ll1(nullptr, copy(origin), 0);
@@ -119,18 +119,18 @@ TEST_CASE("Line location, comparison, no parent") {
 }
 
 TEST_CASE("Location, column") {
-    location l1(dummyLineLocation(), 0);
-    location l2(dummyLineLocation(), 1);
-    location l3(dummyLineLocation(), 2);
+    location l1(dummy_line_location(), 0);
+    location l2(dummy_line_location(), 1);
+    location l3(dummy_line_location(), 2);
     CHECK(l1.column() == 0);
     CHECK(l2.column() == 1);
     CHECK(l3.column() == 2);
 }
 
 TEST_CASE("Location, comparison") {
-    location l1(dummyLineLocation(0), 0);
-    location l2(dummyLineLocation(1), 0);
-    location l3(dummyLineLocation(0), 1);
+    location l1(dummy_line_location(0), 0);
+    location l2(dummy_line_location(1), 0);
+    location l3(dummy_line_location(0), 1);
 
     CHECK(l1 == l1);
     CHECK(l1 == location(l1));

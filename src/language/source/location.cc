@@ -39,10 +39,10 @@ line_location::line_location(
         std::shared_ptr<const location> &&parent, // may be null
         std::shared_ptr<const Origin> &&origin, // must never be null
         std::size_t line) :
-        mParent(std::move(parent)),
-        mOrigin(std::move(origin)),
-        mLine(line) {
-    if (mOrigin == nullptr)
+        m_parent(std::move(parent)),
+        m_origin(std::move(origin)),
+        m_line(line) {
+    if (m_origin == nullptr)
         throw std::invalid_argument("null origin");
 }
 
@@ -58,7 +58,7 @@ location::location(
         std::size_t line,
         std::size_t column) :
         line_location(std::move(parent), std::move(origin), line),
-        mColumn(column) { }
+        m_column(column) { }
 
 bool operator==(const location &l, const location &r) noexcept {
     return l.column() == r.column() &&

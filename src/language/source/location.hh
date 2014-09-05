@@ -38,11 +38,11 @@ class line_location {
 private:
 
     /** May be null. */
-    std::shared_ptr<const location> mParent;
+    std::shared_ptr<const location> m_parent;
     /** Non-null. */
-    std::shared_ptr<const Origin> mOrigin;
+    std::shared_ptr<const Origin> m_origin;
     /** Counted from 0. */
-    std::size_t mLine;
+    std::size_t m_line;
 
 public:
 
@@ -57,9 +57,9 @@ public:
     line_location &operator=(line_location &&) = default;
     ~line_location() = default;
 
-    const location *parent() const noexcept { return mParent.get(); }
-    const Origin &origin() const noexcept { return *mOrigin; }
-    const std::size_t &line() const noexcept { return mLine; }
+    const location *parent() const noexcept { return m_parent.get(); }
+    const Origin &origin() const noexcept { return *m_origin; }
+    const std::size_t &line() const noexcept { return m_line; }
 
 }; // class line_location
 
@@ -80,15 +80,15 @@ class location : public line_location {
 private:
 
     /** Counted from 0. */
-    std::size_t mColumn;
+    std::size_t m_column;
 
 public:
 
-    location(const line_location &lineLocation, std::size_t column) noexcept :
-            line_location(lineLocation), mColumn(column) { }
+    location(const line_location &ll, std::size_t column) noexcept :
+            line_location(ll), m_column(column) { }
 
-    location(line_location &&lineLocation, std::size_t column) noexcept :
-            line_location(std::move(lineLocation)), mColumn(column) { }
+    location(line_location &&ll, std::size_t column) noexcept :
+            line_location(std::move(ll)), m_column(column) { }
 
     location(
             std::shared_ptr<const location> &&parent, // may be null
@@ -102,7 +102,7 @@ public:
     location &operator=(location &&) = default;
     ~location() = default;
 
-    std::size_t column() const noexcept { return mColumn; }
+    std::size_t column() const noexcept { return m_column; }
 
 }; // class location
 
