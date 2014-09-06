@@ -27,7 +27,7 @@
 #include "language/syntax/conditional_pipeline.hh"
 #include "language/syntax/pipeline.hh"
 #include "language/syntax/printer.hh"
-#include "language/syntax/Sequence.hh"
+#include "language/syntax/sequence.hh"
 
 namespace {
 
@@ -37,49 +37,49 @@ using sesh::language::syntax::command;
 using sesh::language::syntax::conditional_pipeline;
 using sesh::language::syntax::pipeline;
 using sesh::language::syntax::printer;
-using sesh::language::syntax::Sequence;
+using sesh::language::syntax::sequence;
 
-struct CommandStub : public command {
+struct command_stub : public command {
     xstring s;
-    CommandStub(xstring s) : command(), s(s) { }
+    command_stub(xstring s) : command(), s(s) { }
     void print(printer &p) const override {
         p << s;
         p.delayed_characters() << L(' ');
     }
 };
 
-struct PrintFixture {
+struct print_fixture {
     // C1 && C2; ! C3 | C4& C5
-    Sequence s;
-    PrintFixture() : s() {
-        s.andOrLists().emplace_back(
-                Sequence::AndOrListPointer(new and_or_list(pipeline())));
-        s.andOrLists()[0]->first().commands().emplace_back(
-                pipeline::command_pointer(new CommandStub(L("C1"))));
-        s.andOrLists()[0]->rest().emplace_back(
+    sequence s;
+    print_fixture() : s() {
+        s.and_or_lists().emplace_back(
+                sequence::and_or_list_pointer(new and_or_list(pipeline())));
+        s.and_or_lists()[0]->first().commands().emplace_back(
+                pipeline::command_pointer(new command_stub(L("C1"))));
+        s.and_or_lists()[0]->rest().emplace_back(
                 conditional_pipeline::condition_type::and_then);
-        s.andOrLists()[0]->rest()[0].pipeline().commands().emplace_back(
-                pipeline::command_pointer(new CommandStub(L("C2"))));
+        s.and_or_lists()[0]->rest()[0].pipeline().commands().emplace_back(
+                pipeline::command_pointer(new command_stub(L("C2"))));
 
-        s.andOrLists().emplace_back(
-                Sequence::AndOrListPointer(new and_or_list(pipeline())));
-        s.andOrLists()[1]->synchronicity() =
+        s.and_or_lists().emplace_back(
+                sequence::and_or_list_pointer(new and_or_list(pipeline())));
+        s.and_or_lists()[1]->synchronicity() =
                 and_or_list::synchronicity_type::asynchronous;
-        s.andOrLists()[1]->first().exit_status_mode() =
+        s.and_or_lists()[1]->first().exit_status_mode() =
                 pipeline::exit_status_mode_type::negated;
-        s.andOrLists()[1]->first().commands().emplace_back(
-                pipeline::command_pointer(new CommandStub(L("C3"))));
-        s.andOrLists()[1]->first().commands().emplace_back(
-                pipeline::command_pointer(new CommandStub(L("C4"))));
+        s.and_or_lists()[1]->first().commands().emplace_back(
+                pipeline::command_pointer(new command_stub(L("C3"))));
+        s.and_or_lists()[1]->first().commands().emplace_back(
+                pipeline::command_pointer(new command_stub(L("C4"))));
 
-        s.andOrLists().emplace_back(
-                Sequence::AndOrListPointer(new and_or_list(pipeline())));
-        s.andOrLists()[2]->first().commands().emplace_back(
-                pipeline::command_pointer(new CommandStub(L("C5"))));
+        s.and_or_lists().emplace_back(
+                sequence::and_or_list_pointer(new and_or_list(pipeline())));
+        s.and_or_lists()[2]->first().commands().emplace_back(
+                pipeline::command_pointer(new command_stub(L("C5"))));
     }
 };
 
-TEST_CASE_METHOD(PrintFixture, "Sequence print single-line") {
+TEST_CASE_METHOD(print_fixture, "Sequence print single-line") {
     printer p(printer::line_mode_type::single_line);
     p.delayed_characters() << L('X');
     p.delayed_lines() << L("Y\n");
@@ -90,7 +90,7 @@ TEST_CASE_METHOD(PrintFixture, "Sequence print single-line") {
     CHECK(p.to_string() == L("XC1 && C2; ! C3 | C4& C5; "));
 }
 
-TEST_CASE_METHOD(PrintFixture, "Sequence print multi-line") {
+TEST_CASE_METHOD(print_fixture, "Sequence print multi-line") {
     printer p(printer::line_mode_type::multi_line);
     p.delayed_characters() << L('X');
     p.delayed_lines() << L("Y\n");

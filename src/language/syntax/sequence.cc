@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Sequence.hh"
+#include "sequence.hh"
 
 #include "language/syntax/and_or_list.hh"
 #include "language/syntax/printer.hh"
@@ -27,7 +27,7 @@ namespace syntax {
 
 namespace {
 
-inline void printSeparator(printer &p) {
+inline void print_separator(printer &p) {
     switch (p.line_mode()) {
     case printer::line_mode_type::single_line:
         break;
@@ -40,13 +40,13 @@ inline void printSeparator(printer &p) {
 
 } // namespace
 
-void Sequence::print(printer &p) const {
-    bool isFirst = true;
-    for (const AndOrListPointer &aol : andOrLists()) {
-        if (!isFirst)
-            printSeparator(p);
+void sequence::print(printer &p) const {
+    bool is_first = true;
+    for (const and_or_list_pointer &aol : and_or_lists()) {
+        if (!is_first)
+            print_separator(p);
         p << *aol;
-        isFirst = false;
+        is_first = false;
     }
 }
 

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_Sequence_hh
-#define INCLUDED_language_syntax_Sequence_hh
+#ifndef INCLUDED_language_syntax_sequence_hh
+#define INCLUDED_language_syntax_sequence_hh
 
 #include "buildconfig.h"
 
@@ -35,40 +35,40 @@ namespace syntax {
  * may contain no and-or lists. Users of this class must validate the number of
  * contained and-or lists.
  */
-class Sequence : public printable {
+class sequence : public printable {
 
 public:
 
-    using AndOrListPointer = std::unique_ptr<and_or_list>;
+    using and_or_list_pointer = std::unique_ptr<and_or_list>;
 
 private:
 
-    std::vector<AndOrListPointer> mAndOrLists;
+    std::vector<and_or_list_pointer> m_and_or_lists;
 
 public:
 
-    Sequence() = default;
-    Sequence(const Sequence &) = delete;
-    Sequence(Sequence &&) = default;
-    Sequence &operator=(const Sequence &) = delete;
-    Sequence &operator=(Sequence &&) = default;
-    ~Sequence() override = default;
+    sequence() = default;
+    sequence(const sequence &) = delete;
+    sequence(sequence &&) = default;
+    sequence &operator=(const sequence &) = delete;
+    sequence &operator=(sequence &&) = default;
+    ~sequence() override = default;
 
-    std::vector<AndOrListPointer> &andOrLists() noexcept {
-        return mAndOrLists;
+    std::vector<and_or_list_pointer> &and_or_lists() noexcept {
+        return m_and_or_lists;
     }
-    const std::vector<AndOrListPointer> &andOrLists() const noexcept {
-        return mAndOrLists;
+    const std::vector<and_or_list_pointer> &and_or_lists() const noexcept {
+        return m_and_or_lists;
     }
 
     void print(printer &) const override;
 
-}; // class Sequence
+}; // class sequence
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_Sequence_hh
+#endif // #ifndef INCLUDED_language_syntax_sequence_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -49,7 +49,7 @@ TESTPROGRAMS = \
 	src/language/syntax/pipeline_test \
 	src/language/syntax/printer_test \
 	src/language/syntax/raw_string_test \
-	src/language/syntax/SequenceTest \
+	src/language/syntax/sequence_test \
 	src/language/syntax/SimpleCommandTest \
 	src/language/syntax/WordTest \
 	src/os/event/AwaiterErrorFileDescriptorTest \
@@ -148,8 +148,8 @@ src_sesh_SOURCES = \
 	src/language/syntax/printer.hh \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/raw_string.hh \
-	src/language/syntax/Sequence.cc \
-	src/language/syntax/Sequence.hh \
+	src/language/syntax/sequence.cc \
+	src/language/syntax/sequence.hh \
 	src/language/syntax/SimpleCommand.cc \
 	src/language/syntax/SimpleCommand.hh \
 	src/language/syntax/Word.cc \
@@ -295,14 +295,14 @@ src_language_syntax_raw_string_test_SOURCES = \
 	src/language/syntax/printer.cc \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/raw_string_test.cc
-src_language_syntax_SequenceTest_SOURCES = \
+src_language_syntax_sequence_test_SOURCES = \
 	src/language/source/location.cc \
 	src/language/syntax/and_or_list.cc \
 	src/language/syntax/conditional_pipeline.cc \
 	src/language/syntax/pipeline.cc \
 	src/language/syntax/printer.cc \
-	src/language/syntax/Sequence.cc \
-	src/language/syntax/SequenceTest.cc
+	src/language/syntax/sequence.cc \
+	src/language/syntax/sequence_test.cc
 src_language_syntax_SimpleCommandTest_SOURCES = \
 	src/language/source/location.cc \
 	src/language/syntax/assignment.cc \
