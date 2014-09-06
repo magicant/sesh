@@ -27,7 +27,7 @@
 #include "language/syntax/and_or_list.hh"
 #include "language/syntax/command.hh"
 #include "language/syntax/conditional_pipeline.hh"
-#include "language/syntax/Pipeline.hh"
+#include "language/syntax/pipeline.hh"
 #include "language/syntax/Printer.hh"
 
 namespace {

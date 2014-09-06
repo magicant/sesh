@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Pipeline.hh"
+#include "pipeline.hh"
 
 #include <utility>
 #include <vector>

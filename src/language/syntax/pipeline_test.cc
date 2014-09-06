@@ -24,7 +24,7 @@
 #include "common/xchar.hh"
 #include "common/xstring.hh"
 #include "language/syntax/command.hh"
-#include "language/syntax/Pipeline.hh"
+#include "language/syntax/pipeline.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 

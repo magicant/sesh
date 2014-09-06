@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include <utility>
 #include "common/xchar.hh"
-#include "language/syntax/Pipeline.hh"
+#include "language/syntax/pipeline.hh"
 #include "language/syntax/Printer.hh"
 
 namespace sesh {

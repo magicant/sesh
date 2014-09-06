@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include "language/syntax/Pipeline.hh"
+#include "language/syntax/pipeline.hh"
 #include "language/syntax/Printable.hh"
 
 namespace sesh {

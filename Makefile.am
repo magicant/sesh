@@ -46,7 +46,7 @@ TESTPROGRAMS = \
 	src/language/syntax/assignment_test \
 	src/language/syntax/command_test \
 	src/language/syntax/conditional_pipeline_test \
-	src/language/syntax/PipelineTest \
+	src/language/syntax/pipeline_test \
 	src/language/syntax/PrinterTest \
 	src/language/syntax/RawStringTest \
 	src/language/syntax/SequenceTest \
@@ -141,8 +141,8 @@ src_sesh_SOURCES = \
 	src/language/syntax/command.hh \
 	src/language/syntax/conditional_pipeline.cc \
 	src/language/syntax/conditional_pipeline.hh \
-	src/language/syntax/Pipeline.cc \
-	src/language/syntax/Pipeline.hh \
+	src/language/syntax/pipeline.cc \
+	src/language/syntax/pipeline.hh \
 	src/language/syntax/Printable.hh \
 	src/language/syntax/Printer.cc \
 	src/language/syntax/Printer.hh \
@@ -266,7 +266,7 @@ src_language_syntax_and_or_list_test_SOURCES = \
 	src/language/syntax/and_or_list.cc \
 	src/language/syntax/and_or_list_test.cc \
 	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/Pipeline.cc \
+	src/language/syntax/pipeline.cc \
 	src/language/syntax/Printer.cc
 src_language_syntax_assignment_test_SOURCES = \
 	src/language/syntax/assignment.cc \
@@ -281,12 +281,12 @@ src_language_syntax_conditional_pipeline_test_SOURCES = \
 	src/language/source/location.cc \
 	src/language/syntax/conditional_pipeline.cc \
 	src/language/syntax/conditional_pipeline_test.cc \
-	src/language/syntax/Pipeline.cc \
+	src/language/syntax/pipeline.cc \
 	src/language/syntax/Printer.cc
-src_language_syntax_PipelineTest_SOURCES = \
+src_language_syntax_pipeline_test_SOURCES = \
 	src/language/source/location.cc \
-	src/language/syntax/Pipeline.cc \
-	src/language/syntax/PipelineTest.cc \
+	src/language/syntax/pipeline.cc \
+	src/language/syntax/pipeline_test.cc \
 	src/language/syntax/Printer.cc
 src_language_syntax_PrinterTest_SOURCES = \
 	src/language/syntax/Printer.cc \
@@ -299,7 +299,7 @@ src_language_syntax_SequenceTest_SOURCES = \
 	src/language/source/location.cc \
 	src/language/syntax/and_or_list.cc \
 	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/Pipeline.cc \
+	src/language/syntax/pipeline.cc \
 	src/language/syntax/Printer.cc \
 	src/language/syntax/Sequence.cc \
 	src/language/syntax/SequenceTest.cc
