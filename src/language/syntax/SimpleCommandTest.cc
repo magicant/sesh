@@ -26,7 +26,7 @@
 #include "language/syntax/assignment.hh"
 #include "language/syntax/printer.hh"
 #include "language/syntax/printer_test_helper.hh"
-#include "language/syntax/RawString.hh"
+#include "language/syntax/raw_string.hh"
 #include "language/syntax/SimpleCommand.hh"
 #include "language/syntax/Word.hh"
 
@@ -36,13 +36,13 @@ using sesh::common::xstring;
 using sesh::language::syntax::assignment;
 using sesh::language::syntax::for_each_line_mode;
 using sesh::language::syntax::printer;
-using sesh::language::syntax::RawString;
+using sesh::language::syntax::raw_string;
 using sesh::language::syntax::SimpleCommand;
 using sesh::language::syntax::Word;
 
 assignment::word_pointer newWord(xstring s) {
     assignment::word_pointer w(new Word);
-    w->addComponent(Word::ComponentPointer(new RawString(s)));
+    w->addComponent(Word::ComponentPointer(new raw_string(s)));
     return w;
 }
 

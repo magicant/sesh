@@ -24,25 +24,25 @@
 #include "common/xstring.hh"
 #include "language/syntax/printer.hh"
 #include "language/syntax/printer_test_helper.hh"
-#include "language/syntax/RawString.hh"
+#include "language/syntax/raw_string.hh"
 
 namespace {
 
 using sesh::common::xstring;
-using sesh::language::syntax::RawString;
 using sesh::language::syntax::for_each_line_mode;
 using sesh::language::syntax::printer;
+using sesh::language::syntax::raw_string;
 
 TEST_CASE("Raw string constructors and value") {
-    RawString rs1;
+    raw_string rs1;
     CHECK(rs1.value() == L(""));
     rs1.value() = L("test");
     CHECK(rs1.value() == L("test"));
 
-    const RawString rs2(rs1.value());
+    const raw_string rs2(rs1.value());
     CHECK(rs2.value() == L("test"));
 
-    RawString rs3(rs2.value());
+    raw_string rs3(rs2.value());
     CHECK(rs3.value() == L("test"));
     rs3.value() += L(" string");
     CHECK(rs3.value() == L("test string"));
@@ -50,16 +50,16 @@ TEST_CASE("Raw string constructors and value") {
 
 TEST_CASE("Raw string, append constant value") {
     xstring s;
-    CHECK(RawString(L("1")).appendConstantValue(s));
+    CHECK(raw_string(L("1")).appendConstantValue(s));
     CHECK(s == L("1"));
-    CHECK(RawString(L("ABC")).appendConstantValue(s));
+    CHECK(raw_string(L("ABC")).appendConstantValue(s));
     CHECK(s == L("1ABC"));
 }
 
 TEST_CASE("Raw string print") {
     for_each_line_mode([](printer &p) {
-        p << RawString(L("1")) << RawString(L(""));
-        p << RawString(L("23"));
+        p << raw_string(L("1")) << raw_string(L(""));
+        p << raw_string(L("23"));
         CHECK(p.to_string() == L("123"));
     });
 }

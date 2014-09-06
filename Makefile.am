@@ -48,7 +48,7 @@ TESTPROGRAMS = \
 	src/language/syntax/conditional_pipeline_test \
 	src/language/syntax/pipeline_test \
 	src/language/syntax/printer_test \
-	src/language/syntax/RawStringTest \
+	src/language/syntax/raw_string_test \
 	src/language/syntax/SequenceTest \
 	src/language/syntax/SimpleCommandTest \
 	src/language/syntax/WordTest \
@@ -146,8 +146,8 @@ src_sesh_SOURCES = \
 	src/language/syntax/printable.hh \
 	src/language/syntax/printer.cc \
 	src/language/syntax/printer.hh \
-	src/language/syntax/RawString.cc \
-	src/language/syntax/RawString.hh \
+	src/language/syntax/raw_string.cc \
+	src/language/syntax/raw_string.hh \
 	src/language/syntax/Sequence.cc \
 	src/language/syntax/Sequence.hh \
 	src/language/syntax/SimpleCommand.cc \
@@ -272,7 +272,7 @@ src_language_syntax_assignment_test_SOURCES = \
 	src/language/syntax/assignment.cc \
 	src/language/syntax/assignment_test.cc \
 	src/language/syntax/printer.cc \
-	src/language/syntax/RawString.cc \
+	src/language/syntax/raw_string.cc \
 	src/language/syntax/Word.cc
 src_language_syntax_command_test_SOURCES = \
 	src/language/source/location.cc \
@@ -291,10 +291,10 @@ src_language_syntax_pipeline_test_SOURCES = \
 src_language_syntax_printer_test_SOURCES = \
 	src/language/syntax/printer.cc \
 	src/language/syntax/printer_test.cc
-src_language_syntax_RawStringTest_SOURCES = \
+src_language_syntax_raw_string_test_SOURCES = \
 	src/language/syntax/printer.cc \
-	src/language/syntax/RawString.cc \
-	src/language/syntax/RawStringTest.cc
+	src/language/syntax/raw_string.cc \
+	src/language/syntax/raw_string_test.cc
 src_language_syntax_SequenceTest_SOURCES = \
 	src/language/source/location.cc \
 	src/language/syntax/and_or_list.cc \
@@ -307,13 +307,13 @@ src_language_syntax_SimpleCommandTest_SOURCES = \
 	src/language/source/location.cc \
 	src/language/syntax/assignment.cc \
 	src/language/syntax/printer.cc \
-	src/language/syntax/RawString.cc \
+	src/language/syntax/raw_string.cc \
 	src/language/syntax/SimpleCommand.cc \
 	src/language/syntax/SimpleCommandTest.cc \
 	src/language/syntax/Word.cc
 src_language_syntax_WordTest_SOURCES = \
 	src/language/syntax/printer.cc \
-	src/language/syntax/RawString.cc \
+	src/language/syntax/raw_string.cc \
 	src/language/syntax/Word.cc \
 	src/language/syntax/WordTest.cc
 src_os_event_AwaiterErrorFileDescriptorTest_SOURCES = \

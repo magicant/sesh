@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "RawString.hh"
+#include "raw_string.hh"
 
 #include "common/xstring.hh"
 #include "language/syntax/printer.hh"
@@ -27,12 +27,12 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-bool RawString::appendConstantValue(xstring &s) const {
+bool raw_string::appendConstantValue(xstring &s) const {
     s += value();
     return true;
 }
 
-void RawString::print(printer &p) const {
+void raw_string::print(printer &p) const {
     p << value();
 }
 

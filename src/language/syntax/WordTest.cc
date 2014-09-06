@@ -26,7 +26,7 @@
 #include "common/xstring.hh"
 #include "language/syntax/printer.hh"
 #include "language/syntax/printer_test_helper.hh"
-#include "language/syntax/RawString.hh"
+#include "language/syntax/raw_string.hh"
 #include "language/syntax/Word.hh"
 #include "language/syntax/WordComponent.hh"
 
@@ -35,7 +35,7 @@ namespace {
 using sesh::common::xstring;
 using sesh::language::syntax::for_each_line_mode;
 using sesh::language::syntax::printer;
-using sesh::language::syntax::RawString;
+using sesh::language::syntax::raw_string;
 using sesh::language::syntax::Word;
 using sesh::language::syntax::WordComponent;
 
@@ -49,11 +49,11 @@ TEST_CASE("Word, constant value") {
     REQUIRE(w1.maybeConstantValue().has_value());
     CHECK(w1.maybeConstantValue().value() == xstring());
 
-    w1.addComponent(Word::ComponentPointer(new RawString(L("ABC"))));
+    w1.addComponent(Word::ComponentPointer(new raw_string(L("ABC"))));
     REQUIRE(w1.maybeConstantValue().has_value());
     CHECK(w1.maybeConstantValue().value() == L("ABC"));
 
-    w1.addComponent(Word::ComponentPointer(new RawString(L("123"))));
+    w1.addComponent(Word::ComponentPointer(new raw_string(L("123"))));
     REQUIRE(w1.maybeConstantValue().has_value());
     CHECK(w1.maybeConstantValue().value() == L("ABC123"));
 
@@ -71,10 +71,10 @@ TEST_CASE("Word, is raw string") {
     Word w;
     CHECK(w.isRawString());
 
-    w.addComponent(Word::ComponentPointer(new RawString));
+    w.addComponent(Word::ComponentPointer(new raw_string));
     CHECK(w.isRawString());
 
-    w.addComponent(Word::ComponentPointer(new RawString(L("Test"))));
+    w.addComponent(Word::ComponentPointer(new raw_string(L("Test"))));
     CHECK(w.isRawString());
 
     w.addComponent(Word::ComponentPointer(new NonConstant));
@@ -88,9 +88,9 @@ TEST_CASE("Word print") {
         p << w;
         CHECK(p.to_string() == L(""));
 
-        w.addComponent(Word::ComponentPointer(new RawString(L("1"))));
-        w.addComponent(Word::ComponentPointer(new RawString(L("2"))));
-        w.addComponent(Word::ComponentPointer(new RawString(L("3"))));
+        w.addComponent(Word::ComponentPointer(new raw_string(L("1"))));
+        w.addComponent(Word::ComponentPointer(new raw_string(L("2"))));
+        w.addComponent(Word::ComponentPointer(new raw_string(L("3"))));
         p << w;
         CHECK(p.to_string() == L("123"));
 

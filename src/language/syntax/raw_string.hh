@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_RawString_hh
-#define INCLUDED_language_syntax_RawString_hh
+#ifndef INCLUDED_language_syntax_raw_string_hh
+#define INCLUDED_language_syntax_raw_string_hh
 
 #include "buildconfig.h"
 
@@ -36,39 +36,40 @@ namespace syntax {
  * implementation of this class does not itself check the validity of the
  * string value.
  */
-class RawString : public WordComponent {
+class raw_string : public WordComponent {
 
 private:
 
-    common::xstring mValue;
+    common::xstring m_value;
 
 public:
 
-    RawString() : mValue() { }
-    explicit RawString(const common::xstring &s) : mValue(s) { }
-    explicit RawString(common::xstring &&s) noexcept : mValue(std::move(s)) { }
+    raw_string() : m_value() { }
+    explicit raw_string(const common::xstring &s) : m_value(s) { }
+    explicit raw_string(common::xstring &&s) noexcept :
+            m_value(std::move(s)) { }
 
-    RawString(const RawString &) = default;
-    RawString(RawString &&) = default;
-    RawString &operator=(const RawString &) = default;
-    RawString &operator=(RawString &&) = default;
-    ~RawString() override = default;
+    raw_string(const raw_string &) = default;
+    raw_string(raw_string &&) = default;
+    raw_string &operator=(const raw_string &) = default;
+    raw_string &operator=(raw_string &&) = default;
+    ~raw_string() override = default;
 
     bool isRawString() const noexcept override { return true; }
 
-    common::xstring &value() { return mValue; }
-    const common::xstring &value() const { return mValue; }
+    common::xstring &value() { return m_value; }
+    const common::xstring &value() const { return m_value; }
 
     bool appendConstantValue(common::xstring &) const override;
 
     void print(printer &) const override;
 
-}; // class RawString
+}; // class raw_string
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_RawString_hh
+#endif // #ifndef INCLUDED_language_syntax_raw_string_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

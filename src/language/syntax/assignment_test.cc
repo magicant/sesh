@@ -27,7 +27,7 @@
 #include "language/syntax/assignment.hh"
 #include "language/syntax/printer.hh"
 #include "language/syntax/printer_test_helper.hh"
-#include "language/syntax/RawString.hh"
+#include "language/syntax/raw_string.hh"
 #include "language/syntax/Word.hh"
 
 namespace {
@@ -36,7 +36,7 @@ using sesh::common::xstring;
 using sesh::language::syntax::assignment;
 using sesh::language::syntax::for_each_line_mode;
 using sesh::language::syntax::printer;
-using sesh::language::syntax::RawString;
+using sesh::language::syntax::raw_string;
 using sesh::language::syntax::Word;
 
 struct fixture {
@@ -44,9 +44,9 @@ struct fixture {
     fixture() : a() {
         a.variable_name() = L("varName");
         a.value().addComponent(Word::ComponentPointer(
-                new RawString(L("assigned"))));
+                new raw_string(L("assigned"))));
         a.value().addComponent(Word::ComponentPointer(
-                new RawString(L("Value"))));
+                new raw_string(L("Value"))));
     }
 };
 
@@ -81,11 +81,11 @@ TEST_CASE("Assignment data 2") {
     xstring name(L("name"));
     assignment a1(name, assignment::word_pointer(new Word));
     a1.value().addComponent(
-            Word::ComponentPointer(new RawString(L("value"))));
+            Word::ComponentPointer(new raw_string(L("value"))));
     a1.value().addComponent(
-            Word::ComponentPointer(new RawString(L(" "))));
+            Word::ComponentPointer(new raw_string(L(" "))));
     a1.value().addComponent(
-            Word::ComponentPointer(new RawString(L("string"))));
+            Word::ComponentPointer(new raw_string(L("string"))));
     CHECK(a1.variable_name() == name);
     CHECK(a1.value().components().size() == 3);
 
