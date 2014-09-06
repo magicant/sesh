@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 #include "language/syntax/command.hh"
-#include "language/syntax/Printable.hh"
+#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -33,7 +33,7 @@ namespace syntax {
  * A pipeline is a list of one or more commands that are executed at a time
  * with the standard input/output connected with each other.
  */
-class pipeline : public Printable {
+class pipeline : public printable {
 
 public:
 

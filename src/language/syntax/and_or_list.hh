@@ -24,7 +24,7 @@
 #include <vector>
 #include "language/syntax/conditional_pipeline.hh"
 #include "language/syntax/pipeline.hh"
-#include "language/syntax/Printable.hh"
+#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -34,7 +34,7 @@ namespace syntax {
  * An and-or list is a pipeline possibly followed by any number of conditional
  * pipelines.
  */
-class and_or_list : public Printable {
+class and_or_list : public printable {
 
 public:
 

@@ -21,13 +21,13 @@
 #include "buildconfig.h"
 
 #include "common/xstring.hh"
-#include "language/syntax/Printable.hh"
+#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
-class WordComponent : public Printable {
+class WordComponent : public printable {
 
 public:
 

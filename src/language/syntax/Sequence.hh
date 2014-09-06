@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 #include "language/syntax/and_or_list.hh"
-#include "language/syntax/Printable.hh"
+#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -35,7 +35,7 @@ namespace syntax {
  * may contain no and-or lists. Users of this class must validate the number of
  * contained and-or lists.
  */
-class Sequence : public Printable {
+class Sequence : public printable {
 
 public:
 

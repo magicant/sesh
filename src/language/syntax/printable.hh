@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_Printable_hh
-#define INCLUDED_language_syntax_Printable_hh
+#ifndef INCLUDED_language_syntax_printable_hh
+#define INCLUDED_language_syntax_printable_hh
 
 #include "buildconfig.h"
 
@@ -35,22 +35,22 @@ namespace syntax {
  * command string is parsed to the invalid object), then the object is not
  * required to print a syntactically correct string.
  */
-class Printable {
+class printable {
 
 public:
 
-    Printable() = default;
-    Printable(const Printable &) = default;
-    Printable(Printable &&) = default;
-    Printable &operator=(const Printable &) = default;
-    Printable &operator=(Printable &&) = default;
-    virtual ~Printable() = default;
+    printable() = default;
+    printable(const printable &) = default;
+    printable(printable &&) = default;
+    printable &operator=(const printable &) = default;
+    printable &operator=(printable &&) = default;
+    virtual ~printable() = default;
 
     virtual void print(Printer &) const = 0;
 
-}; // class Printable
+}; // class printable
 
-inline Printer &operator<<(Printer &printer, const Printable &printable) {
+inline Printer &operator<<(Printer &printer, const printable &printable) {
     printable.print(printer);
     return printer;
 }
@@ -59,6 +59,6 @@ inline Printer &operator<<(Printer &printer, const Printable &printable) {
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_Printable_hh
+#endif // #ifndef INCLUDED_language_syntax_printable_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

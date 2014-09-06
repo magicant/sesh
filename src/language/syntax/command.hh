@@ -21,14 +21,14 @@
 #include "buildconfig.h"
 
 #include <utility>
-#include "language/syntax/Printable.hh"
+#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
 /** A command is either a simple or compound command. */
-class command : public Printable {
+class command : public printable {
 
 private:
 

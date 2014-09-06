@@ -143,7 +143,7 @@ src_sesh_SOURCES = \
 	src/language/syntax/conditional_pipeline.hh \
 	src/language/syntax/pipeline.cc \
 	src/language/syntax/pipeline.hh \
-	src/language/syntax/Printable.hh \
+	src/language/syntax/printable.hh \
 	src/language/syntax/Printer.cc \
 	src/language/syntax/Printer.hh \
 	src/language/syntax/RawString.cc \

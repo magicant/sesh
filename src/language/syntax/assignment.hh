@@ -22,7 +22,7 @@
 
 #include <memory>
 #include "common/xstring.hh"
-#include "language/syntax/Printable.hh"
+#include "language/syntax/printable.hh"
 #include "language/syntax/Word.hh"
 
 namespace sesh {
@@ -30,7 +30,7 @@ namespace language {
 namespace syntax {
 
 /** An assignment is part of a simple command. */
-class assignment : public Printable {
+class assignment : public printable {
 
 public:
 

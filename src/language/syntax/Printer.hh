@@ -31,7 +31,7 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class Printable;
+class printable;
 
 /**
  * Printer is an intermediate object that is used while converting a command
@@ -102,12 +102,12 @@ public:
     void clearDelayedCharacters();
     void commitDelayedCharacters();
 
-    /* If T is Printable, another operator overload defined in "Printable.hh"
+    /* If T is printable, another operator overload defined in "printable.hh"
      * is used. */
     template<
             typename T,
             typename = typename std::enable_if<!std::is_base_of<
-                    Printable,
+                    printable,
                     typename std::decay<T>::type
                     >::value>::type>
     Printer &operator<<(T &&v) {

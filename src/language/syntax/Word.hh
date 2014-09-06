@@ -25,7 +25,7 @@
 #include <vector>
 #include "common/maybe.hh"
 #include "common/xstring.hh"
-#include "language/syntax/Printable.hh"
+#include "language/syntax/printable.hh"
 #include "language/syntax/WordComponent.hh"
 
 namespace sesh {
@@ -36,7 +36,7 @@ namespace syntax {
  * A word is a token that may contain expansions. A word is composed of any
  * number of word components.
  */
-class Word : public Printable {
+class Word : public printable {
 
 public:
 

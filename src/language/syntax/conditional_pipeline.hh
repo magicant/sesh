@@ -22,7 +22,7 @@
 
 #include <memory>
 #include "language/syntax/pipeline.hh"
-#include "language/syntax/Printable.hh"
+#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -32,7 +32,7 @@ namespace syntax {
  * A conditional pipeline is a pipeline that is executed conditionally
  * depending on the exit status of the previous pipeline.
  */
-class conditional_pipeline : public Printable {
+class conditional_pipeline : public printable {
 
 public:
 
