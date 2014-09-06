@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "ConditionalPipeline.hh"
+#include "conditional_pipeline.hh"
 
 #include <stdexcept>
 #include <utility>

@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <vector>
-#include "language/syntax/ConditionalPipeline.hh"
+#include "language/syntax/conditional_pipeline.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printable.hh"
 
