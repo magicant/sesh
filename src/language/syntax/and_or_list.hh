@@ -46,7 +46,7 @@ public:
 private:
 
     Pipeline m_first;
-    std::vector<ConditionalPipeline> m_rest;
+    std::vector<conditional_pipeline> m_rest;
     synchronicity_type m_synchronicity;
 
 public:
@@ -64,10 +64,10 @@ public:
     Pipeline &first() noexcept { return m_first; }
     const Pipeline &first() const noexcept { return m_first; }
 
-    std::vector<ConditionalPipeline> &rest() noexcept {
+    std::vector<conditional_pipeline> &rest() noexcept {
         return m_rest;
     }
-    const std::vector<ConditionalPipeline> &rest() const noexcept {
+    const std::vector<conditional_pipeline> &rest() const noexcept {
         return m_rest;
     }
 

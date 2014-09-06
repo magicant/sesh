@@ -34,7 +34,7 @@ namespace {
 using sesh::common::xstring;
 using sesh::language::syntax::and_or_list;
 using sesh::language::syntax::command;
-using sesh::language::syntax::ConditionalPipeline;
+using sesh::language::syntax::conditional_pipeline;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::Sequence;
@@ -57,7 +57,7 @@ struct PrintFixture {
         s.andOrLists()[0]->first().commands().emplace_back(
                 Pipeline::CommandPointer(new CommandStub(L("C1"))));
         s.andOrLists()[0]->rest().emplace_back(
-                ConditionalPipeline::Condition::AND_THEN);
+                conditional_pipeline::condition_type::and_then);
         s.andOrLists()[0]->rest()[0].pipeline().commands().emplace_back(
                 Pipeline::CommandPointer(new CommandStub(L("C2"))));
 

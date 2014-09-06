@@ -34,60 +34,60 @@ namespace {
 using sesh::common::xchar;
 using sesh::common::xstring;
 using sesh::language::syntax::command;
-using sesh::language::syntax::ConditionalPipeline;
+using sesh::language::syntax::conditional_pipeline;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
 
-class CommandStub : public command {
+class command_stub : public command {
 private:
     xstring mString;
 public:
-    explicit CommandStub(const xchar *s) : command(), mString(s) { }
+    explicit command_stub(const xchar *s) : command(), mString(s) { }
     void print(Printer &) const override;
 };
 
-void CommandStub::print(Printer &p) const {
+void command_stub::print(Printer &p) const {
     p << mString;
     p.delayedCharacters() << L(' ');
 }
 
-void addCommand(Pipeline &p, const xchar *s) {
-    p.commands().push_back(Pipeline::CommandPointer(new CommandStub(s)));
+void add_command(Pipeline &p, const xchar *s) {
+    p.commands().push_back(Pipeline::CommandPointer(new command_stub(s)));
 }
 
-std::unique_ptr<Pipeline> newPipeline(const xchar *s) {
+std::unique_ptr<Pipeline> new_pipeline(const xchar *s) {
     std::unique_ptr<Pipeline> p(
             new Pipeline(Pipeline::ExitStatusType::NEGATED));
-    addCommand(*p, s);
+    add_command(*p, s);
     return p;
 }
 
 TEST_CASE("Conditional pipeline constructors") {
-    ConditionalPipeline cp1(ConditionalPipeline::Condition::AND_THEN);
-    addCommand(cp1.pipeline(), L("pipeline 1"));
-    CHECK(cp1.condition() == ConditionalPipeline::Condition::AND_THEN);
+    conditional_pipeline cp1(conditional_pipeline::condition_type::and_then);
+    add_command(cp1.pipeline(), L("pipeline 1"));
+    CHECK(cp1.condition() == conditional_pipeline::condition_type::and_then);
     CHECK(cp1.pipeline().commands().size() == 1);
 
-    ConditionalPipeline cp2(ConditionalPipeline::Condition::OR_ELSE);
-    addCommand(cp2.pipeline(), L("pipeline 2"));
-    addCommand(cp2.pipeline(), L("pipeline 3"));
-    addCommand(cp2.pipeline(), L("pipeline 4"));
-    CHECK(cp2.condition() == ConditionalPipeline::Condition::OR_ELSE);
+    conditional_pipeline cp2(conditional_pipeline::condition_type::or_else);
+    add_command(cp2.pipeline(), L("pipeline 2"));
+    add_command(cp2.pipeline(), L("pipeline 3"));
+    add_command(cp2.pipeline(), L("pipeline 4"));
+    CHECK(cp2.condition() == conditional_pipeline::condition_type::or_else);
     CHECK(cp2.pipeline().commands().size() == 3);
 
-    ConditionalPipeline cp3(
-            ConditionalPipeline::Condition::AND_THEN,
+    conditional_pipeline cp3(
+            conditional_pipeline::condition_type::and_then,
             nullptr);
-    addCommand(cp3.pipeline(), L("pipeline 5"));
-    CHECK(cp3.condition() == ConditionalPipeline::Condition::AND_THEN);
+    add_command(cp3.pipeline(), L("pipeline 5"));
+    CHECK(cp3.condition() == conditional_pipeline::condition_type::and_then);
     CHECK(cp3.pipeline().commands().size() == 1);
 
-    ConditionalPipeline cp4(
-            ConditionalPipeline::Condition::OR_ELSE,
+    conditional_pipeline cp4(
+            conditional_pipeline::condition_type::or_else,
             nullptr);
-    addCommand(cp4.pipeline(), L("pipeline 6"));
-    addCommand(cp4.pipeline(), L("pipeline 7"));
-    CHECK(cp4.condition() == ConditionalPipeline::Condition::OR_ELSE);
+    add_command(cp4.pipeline(), L("pipeline 6"));
+    add_command(cp4.pipeline(), L("pipeline 7"));
+    CHECK(cp4.condition() == conditional_pipeline::condition_type::or_else);
     CHECK(cp4.pipeline().commands().size() == 2);
 }
 
@@ -95,9 +95,9 @@ TEST_CASE("Conditional pipeline print") {
     Printer ps(Printer::LineMode::SINGLE_LINE);
     Printer pm(Printer::LineMode::MULTI_LINE);
 
-    ConditionalPipeline cp1(
-            ConditionalPipeline::Condition::AND_THEN,
-            newPipeline(L("pipeline 1")));
+    conditional_pipeline cp1(
+            conditional_pipeline::condition_type::and_then,
+            new_pipeline(L("pipeline 1")));
 
     ps.indentLevel() = 1;
     pm.indentLevel() = 1;
@@ -106,9 +106,9 @@ TEST_CASE("Conditional pipeline print") {
     CHECK(ps.toString() == L("&& ! pipeline 1"));
     CHECK(pm.toString() == L("&&\n    ! pipeline 1"));
 
-    ConditionalPipeline cp2(
-            ConditionalPipeline::Condition::OR_ELSE,
-            newPipeline(L("pipeline 2")));
+    conditional_pipeline cp2(
+            conditional_pipeline::condition_type::or_else,
+            new_pipeline(L("pipeline 2")));
 
     ps.indentLevel() = 2;
     pm.indentLevel() = 2;

@@ -32,50 +32,50 @@ namespace syntax {
  * A conditional pipeline is a pipeline that is executed conditionally
  * depending on the exit status of the previous pipeline.
  */
-class ConditionalPipeline : public Printable {
+class conditional_pipeline : public Printable {
 
 public:
 
-    using PipelinePointer = std::unique_ptr<Pipeline>;
+    using pipeline_pointer = std::unique_ptr<Pipeline>;
 
-    enum class Condition {
+    enum class condition_type {
         /**
          * A conditional pipeline that has the and-then condition is executed
          * if the exit status of the previous pipeline is zero.
          */
-        AND_THEN,
+        and_then,
         /**
          * A conditional pipeline that has the or-else condition is executed
          * if the exit status of the previous pipeline is non-zero.
          */
-        OR_ELSE,
+        or_else,
     };
 
 private:
 
-    Condition mCondition;
-    PipelinePointer mPipeline;
+    condition_type m_condition;
+    pipeline_pointer m_pipeline;
 
 public:
 
-    explicit ConditionalPipeline(Condition c);
-    ConditionalPipeline(Condition c, PipelinePointer &&p);
+    explicit conditional_pipeline(condition_type c);
+    conditional_pipeline(condition_type c, pipeline_pointer &&p);
 
-    ConditionalPipeline(const ConditionalPipeline &) = delete;
-    ConditionalPipeline(ConditionalPipeline &&) = default;
-    ConditionalPipeline &operator=(const ConditionalPipeline &) = delete;
-    ConditionalPipeline &operator=(ConditionalPipeline &&) = default;
-    ~ConditionalPipeline() override = default;
+    conditional_pipeline(const conditional_pipeline &) = delete;
+    conditional_pipeline(conditional_pipeline &&) = default;
+    conditional_pipeline &operator=(const conditional_pipeline &) = delete;
+    conditional_pipeline &operator=(conditional_pipeline &&) = default;
+    ~conditional_pipeline() override = default;
 
-    Condition &condition() noexcept { return mCondition; }
-    Condition condition() const noexcept { return mCondition; }
+    condition_type &condition() noexcept { return m_condition; }
+    condition_type condition() const noexcept { return m_condition; }
 
-    Pipeline &pipeline() { return *mPipeline; }
-    const Pipeline &pipeline() const { return *mPipeline; }
+    Pipeline &pipeline() { return *m_pipeline; }
+    const Pipeline &pipeline() const { return *m_pipeline; }
 
     void print(Printer &) const override;
 
-}; // class ConditionalPipeline
+}; // class conditional_pipeline
 
 } // namespace syntax
 } // namespace language

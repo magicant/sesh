@@ -35,7 +35,7 @@ namespace {
 using sesh::common::xstring;
 using sesh::language::syntax::and_or_list;
 using sesh::language::syntax::command;
-using sesh::language::syntax::ConditionalPipeline;
+using sesh::language::syntax::conditional_pipeline;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
 
@@ -79,12 +79,12 @@ void test_and_or_list_with_rest(
         const xstring with_delayed) {
     and_or_list aol(pipeline_stub(), synchronicity);
     aol.rest().emplace_back(
-            ConditionalPipeline::Condition::AND_THEN,
-            ConditionalPipeline::PipelinePointer(
+            conditional_pipeline::condition_type::and_then,
+            conditional_pipeline::pipeline_pointer(
                     new Pipeline(pipeline_stub())));
     aol.rest().emplace_back(
-            ConditionalPipeline::Condition::OR_ELSE,
-            ConditionalPipeline::PipelinePointer(
+            conditional_pipeline::condition_type::or_else,
+            conditional_pipeline::pipeline_pointer(
                     new Pipeline(pipeline_stub())));
 
     Printer p(line_mode);
@@ -101,7 +101,7 @@ void test_and_or_list_with_rest(
 
 TEST_CASE("And-or list constructor 1") {
     and_or_list aol(pipeline_stub());
-    aol.rest().emplace_back(ConditionalPipeline::Condition::AND_THEN);
+    aol.rest().emplace_back(conditional_pipeline::condition_type::and_then);
     aol.rest()[0].pipeline().commands().push_back(
             Pipeline::CommandPointer(new command_stub));
     aol.rest()[0].pipeline().commands().push_back(

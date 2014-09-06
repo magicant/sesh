@@ -48,7 +48,7 @@ inline void print_separator(and_or_list::synchronicity_type s, Printer &p) {
 
 void and_or_list::print(Printer &p) const {
     p << first();
-    for (const ConditionalPipeline &cp : rest())
+    for (const conditional_pipeline &cp : rest())
         p << cp;
     print_separator(synchronicity(), p);
 }

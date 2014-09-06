@@ -28,23 +28,24 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-ConditionalPipeline::ConditionalPipeline(Condition c) :
-        mCondition(c), mPipeline(new Pipeline) { }
+conditional_pipeline::conditional_pipeline(condition_type c) :
+        m_condition(c), m_pipeline(new Pipeline) { }
 
-ConditionalPipeline::ConditionalPipeline(Condition c, PipelinePointer &&p) :
-        mCondition(c), mPipeline(std::move(p)) {
-    if (mPipeline == nullptr)
-        mPipeline.reset(new Pipeline);
+conditional_pipeline::conditional_pipeline(
+        condition_type c, pipeline_pointer &&p) :
+        m_condition(c), m_pipeline(std::move(p)) {
+    if (m_pipeline == nullptr)
+        m_pipeline.reset(new Pipeline);
 }
 
-void ConditionalPipeline::print(Printer &p) const {
+void conditional_pipeline::print(Printer &p) const {
     switch (condition()) {
-    case Condition::AND_THEN:  p << L("&&");  break;
-    case Condition::OR_ELSE:   p << L("||");  break;
+    case condition_type::and_then:  p << L("&&");  break;
+    case condition_type::or_else:   p << L("||");  break;
     }
     p.breakLine();
     p.printIndent();
-    p << *mPipeline;
+    p << *m_pipeline;
 }
 
 } // namespace syntax
