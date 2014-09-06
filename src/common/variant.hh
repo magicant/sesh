@@ -169,7 +169,8 @@ public:
     }
 
     /**
-     * Constructs the value of type <code>Head</code> using the given arguments.
+     * Constructs the value of type <code>Head</code> using the given
+     * arguments.
      */
     template<typename... Arg>
     // constexpr XXX C++11 7.1.5.4
