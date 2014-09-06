@@ -23,7 +23,7 @@
 #include <utility>
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/syntax/Assignment.hh"
+#include "language/syntax/assignment.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
 #include "language/syntax/RawString.hh"
@@ -33,22 +33,22 @@
 namespace {
 
 using sesh::common::xstring;
-using sesh::language::syntax::Assignment;
+using sesh::language::syntax::assignment;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::SimpleCommand;
 using sesh::language::syntax::Word;
 using sesh::language::syntax::forEachLineMode;
 
-Assignment::WordPointer newWord(xstring s) {
-    Assignment::WordPointer w(new Word);
+assignment::word_pointer newWord(xstring s) {
+    assignment::word_pointer w(new Word);
     w->addComponent(Word::ComponentPointer(new RawString(s)));
     return w;
 }
 
 SimpleCommand::AssignmentPointer newAssignment(xstring name, xstring value) {
     return SimpleCommand::AssignmentPointer(
-            new Assignment(name, newWord(value)));
+            new assignment(name, newWord(value)));
 }
 
 void addAssignment(SimpleCommand &sc, xstring name, xstring value) {

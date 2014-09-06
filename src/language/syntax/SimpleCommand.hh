@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <vector>
-#include "language/syntax/Assignment.hh"
+#include "language/syntax/assignment.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/Word.hh"
 
@@ -39,7 +39,7 @@ class SimpleCommand : public Command {
 public:
 
     using WordPointer = std::unique_ptr<Word>;
-    using AssignmentPointer = std::unique_ptr<Assignment>;
+    using AssignmentPointer = std::unique_ptr<assignment>;
 
 private:
 

@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Assignment.hh"
+#include "assignment.hh"
 
 #include <stdexcept>
 #include <utility>
@@ -33,27 +33,27 @@ namespace {
 
 using common::xstring;
 
-void createWordIfNull(Assignment::WordPointer &w) {
+void create_word_if_null(assignment::word_pointer &w) {
     if (w == nullptr)
         w.reset(new Word);
 }
 
 } // namespace
 
-Assignment::Assignment() : mVariableName(), mValue(new Word) { }
+assignment::assignment() : m_variable_name(), m_value(new Word) { }
 
-Assignment::Assignment(const xstring &variableName, WordPointer &&value) :
-        mVariableName(variableName), mValue(std::move(value)) {
-    createWordIfNull(mValue);
+assignment::assignment(const xstring &variable_name, word_pointer &&value) :
+        m_variable_name(variable_name), m_value(std::move(value)) {
+    create_word_if_null(m_value);
 }
 
-Assignment::Assignment(xstring &&variableName, WordPointer &&value) :
-        mVariableName(std::move(variableName)), mValue(std::move(value)) {
-    createWordIfNull(mValue);
+assignment::assignment(xstring &&variable_name, word_pointer &&value) :
+        m_variable_name(std::move(variable_name)), m_value(std::move(value)) {
+    create_word_if_null(m_value);
 }
 
-void Assignment::print(Printer &p) const {
-    p << variableName() << L('=') << value();
+void assignment::print(Printer &p) const {
+    p << variable_name() << L('=') << value();
 }
 
 } // namespace syntax

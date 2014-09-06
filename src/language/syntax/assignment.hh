@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_Assignment_hh
-#define INCLUDED_language_syntax_Assignment_hh
+#ifndef INCLUDED_language_syntax_assignment_hh
+#define INCLUDED_language_syntax_assignment_hh
 
 #include "buildconfig.h"
 
@@ -30,47 +30,47 @@ namespace language {
 namespace syntax {
 
 /** An assignment is part of a simple command. */
-class Assignment : public Printable {
+class assignment : public Printable {
 
 public:
 
-    using WordPointer = std::unique_ptr<Word>;
+    using word_pointer = std::unique_ptr<Word>;
 
 private:
 
-    common::xstring mVariableName;
-    WordPointer mValue;
+    common::xstring m_variable_name;
+    word_pointer m_value;
 
 public:
 
-    Assignment();
-    Assignment(const common::xstring &variableName, WordPointer &&value);
-    Assignment(common::xstring &&variableName, WordPointer &&value);
+    assignment();
+    assignment(const common::xstring &variable_name, word_pointer &&value);
+    assignment(common::xstring &&variable_name, word_pointer &&value);
 
-    Assignment(const Assignment &) = delete;
-    Assignment(Assignment &&) = default;
-    Assignment &operator=(const Assignment &) = delete;
-    Assignment &operator=(Assignment &&) = default;
-    ~Assignment() override = default;
+    assignment(const assignment &) = delete;
+    assignment(assignment &&) = default;
+    assignment &operator=(const assignment &) = delete;
+    assignment &operator=(assignment &&) = default;
+    ~assignment() override = default;
 
-    common::xstring &variableName() noexcept {
-        return mVariableName;
+    common::xstring &variable_name() noexcept {
+        return m_variable_name;
     }
-    const common::xstring &variableName() const noexcept {
-        return mVariableName;
+    const common::xstring &variable_name() const noexcept {
+        return m_variable_name;
     }
 
-    Word &value() noexcept { return *mValue; }
-    const Word &value() const noexcept { return *mValue; }
+    Word &value() noexcept { return *m_value; }
+    const Word &value() const noexcept { return *m_value; }
 
     void print(Printer &) const override;
 
-}; // class Assignment
+}; // class assignment
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_Assignment_hh
+#endif // #ifndef INCLUDED_language_syntax_assignment_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

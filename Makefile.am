@@ -43,7 +43,7 @@ TESTPROGRAMS = \
 	src/language/source/location_test \
 	src/language/source/source_test \
 	src/language/syntax/and_or_list_test \
-	src/language/syntax/AssignmentTest \
+	src/language/syntax/assignment_test \
 	src/language/syntax/CommandTest \
 	src/language/syntax/ConditionalPipelineTest \
 	src/language/syntax/PipelineTest \
@@ -136,8 +136,8 @@ src_sesh_SOURCES = \
 	src/language/source/source.hh \
 	src/language/syntax/and_or_list.cc \
 	src/language/syntax/and_or_list.hh \
-	src/language/syntax/Assignment.cc \
-	src/language/syntax/Assignment.hh \
+	src/language/syntax/assignment.cc \
+	src/language/syntax/assignment.hh \
 	src/language/syntax/Command.hh \
 	src/language/syntax/ConditionalPipeline.cc \
 	src/language/syntax/ConditionalPipeline.hh \
@@ -268,9 +268,9 @@ src_language_syntax_and_or_list_test_SOURCES = \
 	src/language/syntax/ConditionalPipeline.cc \
 	src/language/syntax/Pipeline.cc \
 	src/language/syntax/Printer.cc
-src_language_syntax_AssignmentTest_SOURCES = \
-	src/language/syntax/Assignment.cc \
-	src/language/syntax/AssignmentTest.cc \
+src_language_syntax_assignment_test_SOURCES = \
+	src/language/syntax/assignment.cc \
+	src/language/syntax/assignment_test.cc \
 	src/language/syntax/Printer.cc \
 	src/language/syntax/RawString.cc \
 	src/language/syntax/Word.cc
@@ -305,7 +305,7 @@ src_language_syntax_SequenceTest_SOURCES = \
 	src/language/syntax/SequenceTest.cc
 src_language_syntax_SimpleCommandTest_SOURCES = \
 	src/language/source/location.cc \
-	src/language/syntax/Assignment.cc \
+	src/language/syntax/assignment.cc \
 	src/language/syntax/Printer.cc \
 	src/language/syntax/RawString.cc \
 	src/language/syntax/SimpleCommand.cc \
