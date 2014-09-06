@@ -73,7 +73,7 @@ public:
     class pipeline &pipeline() { return *m_pipeline; }
     const class pipeline &pipeline() const { return *m_pipeline; }
 
-    void print(Printer &) const override;
+    void print(printer &) const override;
 
 }; // class conditional_pipeline
 

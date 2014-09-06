@@ -29,16 +29,17 @@ namespace syntax {
 
 namespace {
 
-inline void test(std::function<void(Printer &)> f, Printer::LineMode lm) {
-    Printer p(lm);
+inline void test(
+        std::function<void(printer &)> f, printer::line_mode_type lm) {
+    printer p(lm);
     f(p);
 }
 
 } // namespace
 
-inline void forEachLineMode(std::function<void(Printer &)> f) {
-    test(f, Printer::LineMode::SINGLE_LINE);
-    test(f, Printer::LineMode::MULTI_LINE);
+inline void for_each_line_mode(std::function<void(printer &)> f) {
+    test(f, printer::line_mode_type::single_line);
+    test(f, printer::line_mode_type::multi_line);
 }
 
 } // namespace syntax

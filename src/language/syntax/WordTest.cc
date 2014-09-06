@@ -33,15 +33,15 @@
 namespace {
 
 using sesh::common::xstring;
-using sesh::language::syntax::Printer;
+using sesh::language::syntax::for_each_line_mode;
+using sesh::language::syntax::printer;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::Word;
 using sesh::language::syntax::WordComponent;
-using sesh::language::syntax::forEachLineMode;
 
 class NonConstant : public WordComponent {
     bool appendConstantValue(xstring &) const override { return false; }
-    void print(Printer &) const override { throw "unexpected print"; }
+    void print(printer &) const override { throw "unexpected print"; }
 };
 
 TEST_CASE("Word, constant value") {
@@ -82,20 +82,20 @@ TEST_CASE("Word, is raw string") {
 }
 
 TEST_CASE("Word print") {
-    forEachLineMode([](Printer &p) {
+    for_each_line_mode([](printer &p) {
         Word w;
 
         p << w;
-        CHECK(p.toString() == L(""));
+        CHECK(p.to_string() == L(""));
 
         w.addComponent(Word::ComponentPointer(new RawString(L("1"))));
         w.addComponent(Word::ComponentPointer(new RawString(L("2"))));
         w.addComponent(Word::ComponentPointer(new RawString(L("3"))));
         p << w;
-        CHECK(p.toString() == L("123"));
+        CHECK(p.to_string() == L("123"));
 
         p << L('X');
-        CHECK(p.toString() == L("123X")); // no delayed characters
+        CHECK(p.to_string() == L("123X")); // no delayed characters
     });
 }
 

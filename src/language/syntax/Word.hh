@@ -96,7 +96,7 @@ public:
     /** Returns true if all components of this word are raw strings. */
     bool isRawString() const;
 
-    void print(Printer &) const override;
+    void print(printer &) const override;
 
 }; // class Word
 

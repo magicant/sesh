@@ -78,7 +78,7 @@ public:
         return m_synchronicity;
     }
 
-    void print(Printer &) const override;
+    void print(printer &) const override;
 
 }; // class and_or_list
 

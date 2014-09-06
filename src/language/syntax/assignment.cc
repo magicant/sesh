@@ -52,7 +52,7 @@ assignment::assignment(xstring &&variable_name, word_pointer &&value) :
     create_word_if_null(m_value);
 }
 
-void assignment::print(Printer &p) const {
+void assignment::print(printer &p) const {
     p << variable_name() << L('=') << value();
 }
 

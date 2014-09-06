@@ -73,7 +73,7 @@ bool Word::isRawString() const {
             [](const ComponentPointer &c) { return c->isRawString(); });
 }
 
-void Word::print(Printer &p) const {
+void Word::print(printer &p) const {
     for (const ComponentPointer &c : components())
         p << *c;
 }

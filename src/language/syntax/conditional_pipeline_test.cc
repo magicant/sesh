@@ -36,19 +36,19 @@ using sesh::common::xstring;
 using sesh::language::syntax::command;
 using sesh::language::syntax::conditional_pipeline;
 using sesh::language::syntax::pipeline;
-using sesh::language::syntax::Printer;
+using sesh::language::syntax::printer;
 
 class command_stub : public command {
 private:
     xstring mString;
 public:
     explicit command_stub(const xchar *s) : command(), mString(s) { }
-    void print(Printer &) const override;
+    void print(printer &) const override;
 };
 
-void command_stub::print(Printer &p) const {
+void command_stub::print(printer &p) const {
     p << mString;
-    p.delayedCharacters() << L(' ');
+    p.delayed_characters() << L(' ');
 }
 
 void add_command(pipeline &p, const xchar *s) {
@@ -92,30 +92,31 @@ TEST_CASE("Conditional pipeline constructors") {
 }
 
 TEST_CASE("Conditional pipeline print") {
-    Printer ps(Printer::LineMode::SINGLE_LINE);
-    Printer pm(Printer::LineMode::MULTI_LINE);
+    printer ps(printer::line_mode_type::single_line);
+    printer pm(printer::line_mode_type::multi_line);
 
     conditional_pipeline cp1(
             conditional_pipeline::condition_type::and_then,
             new_pipeline(L("pipeline 1")));
 
-    ps.indentLevel() = 1;
-    pm.indentLevel() = 1;
+    ps.indent_level() = 1;
+    pm.indent_level() = 1;
     ps << cp1;
     pm << cp1;
-    CHECK(ps.toString() == L("&& ! pipeline 1"));
-    CHECK(pm.toString() == L("&&\n    ! pipeline 1"));
+    CHECK(ps.to_string() == L("&& ! pipeline 1"));
+    CHECK(pm.to_string() == L("&&\n    ! pipeline 1"));
 
     conditional_pipeline cp2(
             conditional_pipeline::condition_type::or_else,
             new_pipeline(L("pipeline 2")));
 
-    ps.indentLevel() = 2;
-    pm.indentLevel() = 2;
+    ps.indent_level() = 2;
+    pm.indent_level() = 2;
     ps << cp2;
     pm << cp2;
-    CHECK(ps.toString() == L("&& ! pipeline 1 || ! pipeline 2"));
-    CHECK(pm.toString() == L("&&\n    ! pipeline 1 ||\n        ! pipeline 2"));
+    CHECK(ps.to_string() == L("&& ! pipeline 1 || ! pipeline 2"));
+    CHECK(pm.to_string() ==
+            L("&&\n    ! pipeline 1 ||\n        ! pipeline 2"));
 }
 
 } // namespace

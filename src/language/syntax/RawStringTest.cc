@@ -29,9 +29,9 @@
 namespace {
 
 using sesh::common::xstring;
-using sesh::language::syntax::Printer;
 using sesh::language::syntax::RawString;
-using sesh::language::syntax::forEachLineMode;
+using sesh::language::syntax::for_each_line_mode;
+using sesh::language::syntax::printer;
 
 TEST_CASE("Raw string constructors and value") {
     RawString rs1;
@@ -57,10 +57,10 @@ TEST_CASE("Raw string, append constant value") {
 }
 
 TEST_CASE("Raw string print") {
-    forEachLineMode([](Printer &p) {
+    for_each_line_mode([](printer &p) {
         p << RawString(L("1")) << RawString(L(""));
         p << RawString(L("23"));
-        CHECK(p.toString() == L("123"));
+        CHECK(p.to_string() == L("123"));
     });
 }
 

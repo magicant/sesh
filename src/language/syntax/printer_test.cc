@@ -27,198 +27,198 @@
 
 namespace {
 
-using sesh::language::syntax::Printer;
-using sesh::language::syntax::forEachLineMode;
+using sesh::language::syntax::for_each_line_mode;
+using sesh::language::syntax::printer;
 
 TEST_CASE("Initial printer yields empty string") {
-    forEachLineMode([](Printer &p) {
-        CHECK(p.toString() == L(""));
+    for_each_line_mode([](printer &p) {
+        CHECK(p.to_string() == L(""));
     });
 }
 
 TEST_CASE("Printer << operator") {
-    forEachLineMode([](Printer &p) {
-        CHECK((p << 123).toString() == L("123"));
+    for_each_line_mode([](printer &p) {
+        CHECK((p << 123).to_string() == L("123"));
     });
-    forEachLineMode([](Printer &p) {
-        CHECK((p << L('a')).toString() == L("a"));
+    for_each_line_mode([](printer &p) {
+        CHECK((p << L('a')).to_string() == L("a"));
     });
-    forEachLineMode([](Printer &p) {
-        CHECK((p << 'a').toString() == L("a"));
+    for_each_line_mode([](printer &p) {
+        CHECK((p << 'a').to_string() == L("a"));
     });
-    forEachLineMode([](Printer &p) {
-        CHECK((p << L("abc")).toString() == L("abc"));
+    for_each_line_mode([](printer &p) {
+        CHECK((p << L("abc")).to_string() == L("abc"));
     });
-    forEachLineMode([](Printer &p) {
-        CHECK((p << "abc").toString() == L("abc"));
+    for_each_line_mode([](printer &p) {
+        CHECK((p << "abc").to_string() == L("abc"));
     });
 }
 
 TEST_CASE("Printer << operator concatenation") {
-    forEachLineMode([](Printer &p) {
+    for_each_line_mode([](printer &p) {
         p << L('1');
-        CHECK(p.toString() == L("1"));
+        CHECK(p.to_string() == L("1"));
         p << 2 << L("34");
-        CHECK(p.toString() == L("1234"));
+        CHECK(p.to_string() == L("1234"));
     });
 }
 
 TEST_CASE("Printer delayed character buffer") {
-    forEachLineMode([](Printer &p) {
+    for_each_line_mode([](printer &p) {
         p << L('1');
-        p.delayedCharacters() << L('a');
+        p.delayed_characters() << L('a');
         p << L('2');
-        p.delayedCharacters() << L('b') << L('c');
+        p.delayed_characters() << L('b') << L('c');
         p << L('3');
-        p.delayedCharacters() << L("ignored1");
-        p.clearDelayedCharacters();
+        p.delayed_characters() << L("ignored1");
+        p.clear_delayed_characters();
         p << L('4');
-        p.delayedCharacters() << L("ignored2");
-        p.clearDelayedCharacters();
-        p.delayedCharacters() << L('d');
+        p.delayed_characters() << L("ignored2");
+        p.clear_delayed_characters();
+        p.delayed_characters() << L('d');
         p << L('5');
-        CHECK(p.toString() == L("1a2bc34d5"));
+        CHECK(p.to_string() == L("1a2bc34d5"));
     });
 }
 
-TEST_CASE("Printer breakLine SINGLE_LINE") {
-    Printer p(Printer::LineMode::SINGLE_LINE);
+TEST_CASE("Printer break_line single_line") {
+    printer p(printer::line_mode_type::single_line);
     p << L('1');
-    p.breakLine();
-    CHECK(p.toString() == L("1"));
+    p.break_line();
+    CHECK(p.to_string() == L("1"));
     p << L('2');
-    CHECK(p.toString() == L("1 2"));
-    p.delayedLines() << L("ignored1");
-    CHECK(p.toString() == L("1 2"));
+    CHECK(p.to_string() == L("1 2"));
+    p.delayed_lines() << L("ignored1");
+    CHECK(p.to_string() == L("1 2"));
     p << L('3');
-    CHECK(p.toString() == L("1 23"));
-    p.breakLine();
-    CHECK(p.toString() == L("1 23"));
+    CHECK(p.to_string() == L("1 23"));
+    p.break_line();
+    CHECK(p.to_string() == L("1 23"));
     p << L('4');
-    p.delayedLines() << L("ignored2");
+    p.delayed_lines() << L("ignored2");
     p << L('5');
-    p.delayedLines() << L("ignored3");
+    p.delayed_lines() << L("ignored3");
     p << L('6');
-    CHECK(p.toString() == L("1 23 456"));
-    p.breakLine();
-    p.breakLine();
-    p.delayedCharacters() << L("ignored4");
-    p.breakLine();
-    CHECK(p.toString() == L("1 23 456"));
+    CHECK(p.to_string() == L("1 23 456"));
+    p.break_line();
+    p.break_line();
+    p.delayed_characters() << L("ignored4");
+    p.break_line();
+    CHECK(p.to_string() == L("1 23 456"));
     p << L('7');
-    CHECK(p.toString() == L("1 23 456 7"));
+    CHECK(p.to_string() == L("1 23 456 7"));
 }
 
-TEST_CASE("Printer breakLine MULTI_LINE") {
-    Printer p(Printer::LineMode::MULTI_LINE);
+TEST_CASE("Printer break_line multi_line") {
+    printer p(printer::line_mode_type::multi_line);
     p << L('1');
-    p.breakLine();
-    CHECK(p.toString() == L("1\n"));
+    p.break_line();
+    CHECK(p.to_string() == L("1\n"));
     p << L('2');
-    CHECK(p.toString() == L("1\n2"));
-    p.delayedLines() << L("R\n");
-    CHECK(p.toString() == L("1\n2"));
+    CHECK(p.to_string() == L("1\n2"));
+    p.delayed_lines() << L("R\n");
+    CHECK(p.to_string() == L("1\n2"));
     p << L('3');
-    CHECK(p.toString() == L("1\n23"));
-    p.breakLine();
-    CHECK(p.toString() == L("1\n23\nR\n"));
+    CHECK(p.to_string() == L("1\n23"));
+    p.break_line();
+    CHECK(p.to_string() == L("1\n23\nR\n"));
     p << L('4');
-    p.delayedLines() << L("R1");
+    p.delayed_lines() << L("R1");
     p << L('5');
-    p.delayedLines() << L("R2");
+    p.delayed_lines() << L("R2");
     p << L('6');
-    CHECK(p.toString() == L("1\n23\nR\n456"));
-    p.breakLine();
-    CHECK(p.toString() == L("1\n23\nR\n456\nR1R2"));
-    p.breakLine();
-    CHECK(p.toString() == L("1\n23\nR\n456\nR1R2\n"));
+    CHECK(p.to_string() == L("1\n23\nR\n456"));
+    p.break_line();
+    CHECK(p.to_string() == L("1\n23\nR\n456\nR1R2"));
+    p.break_line();
+    CHECK(p.to_string() == L("1\n23\nR\n456\nR1R2\n"));
 }
 
 TEST_CASE("Printer delayed characters and lines") {
-    Printer p(Printer::LineMode::MULTI_LINE);
+    printer p(printer::line_mode_type::multi_line);
     p << L('1');
-    p.delayedCharacters() << L(';');
-    p.breakLine();
-    CHECK(p.toString() == L("1\n"));
+    p.delayed_characters() << L(';');
+    p.break_line();
+    CHECK(p.to_string() == L("1\n"));
     p << L('2');
-    p.delayedCharacters() << L(' ');
-    p.delayedLines() << L("R1\n");
-    p.delayedCharacters() << L(' ');
-    CHECK(p.toString() == L("1\n2"));
+    p.delayed_characters() << L(' ');
+    p.delayed_lines() << L("R1\n");
+    p.delayed_characters() << L(' ');
+    CHECK(p.to_string() == L("1\n2"));
     p << L('3');
-    CHECK(p.toString() == L("1\n2  3"));
-    p.delayedCharacters() << L(' ');
-    p.delayedLines() << L("R2\n");
-    p.delayedCharacters() << L(' ');
-    p.breakLine();
-    CHECK(p.toString() == L("1\n2  3\nR1\nR2\n"));
+    CHECK(p.to_string() == L("1\n2  3"));
+    p.delayed_characters() << L(' ');
+    p.delayed_lines() << L("R2\n");
+    p.delayed_characters() << L(' ');
+    p.break_line();
+    CHECK(p.to_string() == L("1\n2  3\nR1\nR2\n"));
 }
 
-TEST_CASE("Printer indentation SINGLE_LINE") {
-    Printer p(Printer::LineMode::SINGLE_LINE);
-    CHECK(p.indentLevel() == 0);
-    p.printIndent();
-    CHECK(p.indentLevel() == 0);
-    CHECK(p.toString() == L(""));
-    p.indentLevel() = 5;
-    CHECK(p.indentLevel() == 5);
-    p.printIndent();
-    CHECK(p.toString() == L(""));
+TEST_CASE("Printer indentation single_line") {
+    printer p(printer::line_mode_type::single_line);
+    CHECK(p.indent_level() == 0);
+    p.print_indent();
+    CHECK(p.indent_level() == 0);
+    CHECK(p.to_string() == L(""));
+    p.indent_level() = 5;
+    CHECK(p.indent_level() == 5);
+    p.print_indent();
+    CHECK(p.to_string() == L(""));
     p << L("foo");
-    CHECK(p.indentLevel() == 5);
-    p.printIndent();
-    CHECK(p.toString() == L("foo"));
-    p.indentLevel() = 0;
-    p.printIndent();
-    CHECK(p.toString() == L("foo"));
+    CHECK(p.indent_level() == 5);
+    p.print_indent();
+    CHECK(p.to_string() == L("foo"));
+    p.indent_level() = 0;
+    p.print_indent();
+    CHECK(p.to_string() == L("foo"));
 }
 
-TEST_CASE("Printer indentation MULTI_LINE") {
-    Printer p(Printer::LineMode::MULTI_LINE);
-    p.printIndent();
-    CHECK(p.indentLevel() == 0);
-    CHECK(p.toString() == L(""));
-    p.indentLevel() = 2;
-    CHECK(p.indentLevel() == 2);
-    p.printIndent();
-    CHECK(p.toString() == L("        "));
+TEST_CASE("Printer indentation multi_line") {
+    printer p(printer::line_mode_type::multi_line);
+    p.print_indent();
+    CHECK(p.indent_level() == 0);
+    CHECK(p.to_string() == L(""));
+    p.indent_level() = 2;
+    CHECK(p.indent_level() == 2);
+    p.print_indent();
+    CHECK(p.to_string() == L("        "));
     p << L("foo");
-    CHECK(p.indentLevel() == 2);
-    CHECK(p.toString() == L("        foo"));
-    p.indentLevel() = 1;
-    p.printIndent();
-    CHECK(p.toString() == L("        foo    "));
-    p.printIndent();
-    CHECK(p.toString() == L("        foo        "));
+    CHECK(p.indent_level() == 2);
+    CHECK(p.to_string() == L("        foo"));
+    p.indent_level() = 1;
+    p.print_indent();
+    CHECK(p.to_string() == L("        foo    "));
+    p.print_indent();
+    CHECK(p.to_string() == L("        foo        "));
     p << L("bar");
-    p.indentLevel() = 5;
-    p.printIndent();
-    CHECK(p.toString() == L("        foo        bar                    "));
+    p.indent_level() = 5;
+    p.print_indent();
+    CHECK(p.to_string() == L("        foo        bar                    "));
 }
 
 TEST_CASE("Printer indent guard") {
-    forEachLineMode([](Printer &p) {
-        CHECK(p.indentLevel() == 0);
+    for_each_line_mode([](printer &p) {
+        CHECK(p.indent_level() == 0);
         {
-            Printer::IndentGuard guard(p);
-            CHECK(p.indentLevel() == 1);
+            printer::indent_guard guard(p);
+            CHECK(p.indent_level() == 1);
             {
-                Printer::IndentGuard guard(p, 3);
-                CHECK(p.indentLevel() == 4);
+                printer::indent_guard guard(p, 3);
+                CHECK(p.indent_level() == 4);
             }
-            CHECK(p.indentLevel() == 1);
+            CHECK(p.indent_level() == 1);
             {
-                Printer::IndentGuard guard(p, 6);
-                CHECK(p.indentLevel() == 7);
+                printer::indent_guard guard(p, 6);
+                CHECK(p.indent_level() == 7);
                 {
-                    Printer::IndentGuard guard(p, 0);
-                    CHECK(p.indentLevel() == 7);
+                    printer::indent_guard guard(p, 0);
+                    CHECK(p.indent_level() == 7);
                 }
-                CHECK(p.indentLevel() == 7);
+                CHECK(p.indent_level() == 7);
             }
-            CHECK(p.indentLevel() == 1);
+            CHECK(p.indent_level() == 1);
         }
-        CHECK(p.indentLevel() == 0);
+        CHECK(p.indent_level() == 0);
     });
 }
 

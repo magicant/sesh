@@ -31,62 +31,62 @@ using common::xstring;
 
 } // namespace
 
-Printer::Printer(LineMode lineMode) :
-        mLineMode(lineMode),
-        mMainBuffer(),
-        mDelayedCharacters(),
-        mDelayedLines(),
-        mIndentLevel() {
+printer::printer(line_mode_type line_mode) :
+        m_line_mode(line_mode),
+        m_main_buffer(),
+        m_delayed_characters(),
+        m_delayed_lines(),
+        m_indent_level() {
 }
 
-xstring Printer::toString() const {
-    return mMainBuffer.str();
+xstring printer::to_string() const {
+    return m_main_buffer.str();
 }
 
-void Printer::clearDelayedCharacters() {
-    mDelayedCharacters.str(xstring());
+void printer::clear_delayed_characters() {
+    m_delayed_characters.str(xstring());
 }
 
-void Printer::commitDelayedCharacters(){
-    mMainBuffer << mDelayedCharacters.str();
-    clearDelayedCharacters();
+void printer::commit_delayed_characters(){
+    m_main_buffer << m_delayed_characters.str();
+    clear_delayed_characters();
 }
 
 /**
- * If the line mode is MULTI_LINE, a newline and the contents of the delayed
+ * If the line mode is multi_line, a newline and the contents of the delayed
  * line buffer are appended to the main buffer and the delayed character buffer
  * is cleared.
  *
- * If the line mode is SINGLE_LINE, the contents of the delayed character
+ * If the line mode is single_line, the contents of the delayed character
  * buffer is set to a single space. The delayed line buffer is ignored.
  *
  * In either case, the delayed line buffer is cleared.
  */
-void Printer::breakLine() {
-    switch (mLineMode) {
-    case LineMode::SINGLE_LINE:
-        mDelayedCharacters.str(L(" "));
+void printer::break_line() {
+    switch (m_line_mode) {
+    case line_mode_type::single_line:
+        m_delayed_characters.str(L(" "));
         break;
-    case LineMode::MULTI_LINE:
-        clearDelayedCharacters();
-        mMainBuffer << L('\n') << mDelayedLines.str();
+    case line_mode_type::multi_line:
+        clear_delayed_characters();
+        m_main_buffer << L('\n') << m_delayed_lines.str();
         break;
     }
 
-    mDelayedLines.str(xstring());
+    m_delayed_lines.str(xstring());
 }
 
 /**
  * Inserts a series of spaces. The number of spaces is determined from the
  * current indent level. The delayed character buffer is ignored. This function
- * does nothing if the line mode is not MULTI_LINE.
+ * does nothing if the line mode is not multi_line.
  */
-void Printer::printIndent() {
-    switch (mLineMode) {
-    case LineMode::SINGLE_LINE:
+void printer::print_indent() {
+    switch (m_line_mode) {
+    case line_mode_type::single_line:
         return;
-    case LineMode::MULTI_LINE:
-        mMainBuffer << xstring(4 * mIndentLevel, L(' '));
+    case line_mode_type::multi_line:
+        m_main_buffer << xstring(4 * m_indent_level, L(' '));
         return;
     }
 }

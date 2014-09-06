@@ -31,15 +31,15 @@ namespace {
 
 using sesh::common::xstring;
 using sesh::language::syntax::command;
-using sesh::language::syntax::Printer;
+using sesh::language::syntax::printer;
 
 class command_stub : public command {
 public:
     using command::command;
-    void print(Printer &) const override;
+    void print(printer &) const override;
 };
 
-void command_stub::print(Printer &) const {
+void command_stub::print(printer &) const {
     CHECK(false);
 }
 

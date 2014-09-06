@@ -27,20 +27,20 @@ namespace syntax {
 
 namespace {
 
-inline void printSeparator(Printer &p) {
-    switch (p.lineMode()) {
-    case Printer::LineMode::SINGLE_LINE:
+inline void printSeparator(printer &p) {
+    switch (p.line_mode()) {
+    case printer::line_mode_type::single_line:
         break;
-    case Printer::LineMode::MULTI_LINE:
-        p.breakLine();
-        p.printIndent();
+    case printer::line_mode_type::multi_line:
+        p.break_line();
+        p.print_indent();
         break;
     }
 }
 
 } // namespace
 
-void Sequence::print(Printer &p) const {
+void Sequence::print(printer &p) const {
     bool isFirst = true;
     for (const AndOrListPointer &aol : andOrLists()) {
         if (!isFirst)

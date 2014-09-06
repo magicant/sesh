@@ -73,7 +73,7 @@ public:
         return m_exit_status_mode;
     }
 
-    void print(Printer &) const override;
+    void print(printer &) const override;
 
 }; // class pipeline
 

@@ -61,7 +61,7 @@ public:
 
     bool appendConstantValue(common::xstring &) const override;
 
-    void print(Printer &) const override;
+    void print(printer &) const override;
 
 }; // class RawString
 

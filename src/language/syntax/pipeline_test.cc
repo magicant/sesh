@@ -33,18 +33,18 @@ namespace {
 using sesh::common::xchar;
 using sesh::common::xstring;
 using sesh::language::syntax::command;
+using sesh::language::syntax::for_each_line_mode;
 using sesh::language::syntax::pipeline;
-using sesh::language::syntax::Printer;
-using sesh::language::syntax::forEachLineMode;
+using sesh::language::syntax::printer;
 
 class command_stub : public command {
 private:
     xstring m_string;
 public:
     explicit command_stub(const xchar *s) : command(), m_string(s) { }
-    void print(Printer &p) const override {
+    void print(printer &p) const override {
         p << m_string;
-        p.delayedCharacters() << L(' ');
+        p.delayed_characters() << L(' ');
     }
 };
 
@@ -53,9 +53,9 @@ void add_command(pipeline &p, const xchar *s) {
 }
 
 void check_for_each_line_mode(const pipeline &pl, const xstring &expected) {
-    forEachLineMode([&pl, &expected](Printer &p) {
+    for_each_line_mode([&pl, &expected](printer &p) {
         p << pl;
-        CHECK(p.toString() == expected);
+        CHECK(p.to_string() == expected);
     });
 }
 

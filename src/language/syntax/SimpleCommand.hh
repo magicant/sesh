@@ -70,7 +70,7 @@ public:
         return mAssignments;
     }
 
-    void print(Printer &) const override;
+    void print(printer &) const override;
 
 }; // class SimpleCommand
 

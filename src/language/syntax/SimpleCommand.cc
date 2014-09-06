@@ -28,14 +28,14 @@ namespace syntax {
 
 SimpleCommand::SimpleCommand() : command(), mWords(), mAssignments() { }
 
-void SimpleCommand::print(Printer &p) const {
+void SimpleCommand::print(printer &p) const {
     for (const AssignmentPointer &a : assignments()) {
         p << *a;
-        p.delayedCharacters() << L(' ');
+        p.delayed_characters() << L(' ');
     }
     for (const WordPointer &w : words()) {
         p << *w;
-        p.delayedCharacters() << L(' ');
+        p.delayed_characters() << L(' ');
     }
 }
 

@@ -34,10 +34,10 @@ namespace {
 
 using sesh::common::xstring;
 using sesh::language::syntax::assignment;
-using sesh::language::syntax::Printer;
+using sesh::language::syntax::for_each_line_mode;
+using sesh::language::syntax::printer;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::Word;
-using sesh::language::syntax::forEachLineMode;
 
 struct fixture {
     assignment a;
@@ -95,9 +95,9 @@ TEST_CASE("Assignment data 2") {
 }
 
 TEST_CASE_METHOD(fixture, "Assignment print") {
-    forEachLineMode([this](Printer &p) {
+    for_each_line_mode([this](printer &p) {
         p << a;
-        CHECK(p.toString() == L("varName=assignedValue"));
+        CHECK(p.to_string() == L("varName=assignedValue"));
     });
 }
 

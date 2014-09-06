@@ -31,22 +31,22 @@ and_or_list::and_or_list(pipeline &&first, synchronicity_type s) :
 
 namespace {
 
-inline void print_separator(and_or_list::synchronicity_type s, Printer &p) {
-    p.clearDelayedCharacters();
+inline void print_separator(and_or_list::synchronicity_type s, printer &p) {
+    p.clear_delayed_characters();
     switch (s) {
     case and_or_list::synchronicity_type::sequential:
-        p.delayedCharacters() << L(';');
+        p.delayed_characters() << L(';');
         break;
     case and_or_list::synchronicity_type::asynchronous:
         p << L('&');
         break;
     }
-    p.delayedCharacters() << L(' ');
+    p.delayed_characters() << L(' ');
 }
 
 } // namespace
 
-void and_or_list::print(Printer &p) const {
+void and_or_list::print(printer &p) const {
     p << first();
     for (const conditional_pipeline &cp : rest())
         p << cp;

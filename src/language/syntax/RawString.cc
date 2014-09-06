@@ -32,7 +32,7 @@ bool RawString::appendConstantValue(xstring &s) const {
     return true;
 }
 
-void RawString::print(Printer &p) const {
+void RawString::print(printer &p) const {
     p << value();
 }
 

@@ -63,7 +63,7 @@ public:
     Word &value() noexcept { return *m_value; }
     const Word &value() const noexcept { return *m_value; }
 
-    void print(Printer &) const override;
+    void print(printer &) const override;
 
 }; // class assignment
 

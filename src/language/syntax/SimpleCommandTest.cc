@@ -34,11 +34,11 @@ namespace {
 
 using sesh::common::xstring;
 using sesh::language::syntax::assignment;
-using sesh::language::syntax::Printer;
+using sesh::language::syntax::for_each_line_mode;
+using sesh::language::syntax::printer;
 using sesh::language::syntax::RawString;
 using sesh::language::syntax::SimpleCommand;
 using sesh::language::syntax::Word;
-using sesh::language::syntax::forEachLineMode;
 
 assignment::word_pointer newWord(xstring s) {
     assignment::word_pointer w(new Word);
@@ -60,9 +60,9 @@ void addWord(SimpleCommand &sc, xstring s) {
 }
 
 TEST_CASE("Empty simple command print") {
-    forEachLineMode([](Printer &p) {
+    for_each_line_mode([](printer &p) {
         p << SimpleCommand();
-        CHECK(p.toString() == L(""));
+        CHECK(p.to_string() == L(""));
     });
 }
 
@@ -74,9 +74,9 @@ TEST_CASE("Simple command print") {
     addAssignment(sc, L("bar"), L("Bar-value"));
     addWord(sc, L("world"));
 
-    forEachLineMode([&sc](Printer &p) {
+    for_each_line_mode([&sc](printer &p) {
         p << sc;
-        CHECK(p.toString() == L("foo=Foo.value bar=Bar-value Hello world"));
+        CHECK(p.to_string() == L("foo=Foo.value bar=Bar-value Hello world"));
     });
 }
 

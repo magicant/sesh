@@ -58,49 +58,49 @@ class printable;
  * selection affects insertion of newlines, indentations, and delayed buffer
  * contents.
  */
-class Printer {
+class printer {
 
 public:
 
-    enum class LineMode {
-        SINGLE_LINE,
-        MULTI_LINE,
+    enum class line_mode_type {
+        single_line,
+        multi_line,
     };
 
 private:
 
-    const LineMode mLineMode;
-    common::xostringstream mMainBuffer;
-    common::xostringstream mDelayedCharacters;
-    common::xostringstream mDelayedLines;
-    std::size_t mIndentLevel;
+    const line_mode_type m_line_mode;
+    common::xostringstream m_main_buffer;
+    common::xostringstream m_delayed_characters;
+    common::xostringstream m_delayed_lines;
+    std::size_t m_indent_level;
 
 public:
 
-    explicit Printer(LineMode);
+    explicit printer(line_mode_type);
 
-    Printer(const Printer &) = delete;
-    Printer(Printer &&) = default;
-    Printer &operator=(const Printer &) = delete;
-    Printer &operator=(Printer &&) = default;
-    ~Printer() = default;
+    printer(const printer &) = delete;
+    printer(printer &&) = default;
+    printer &operator=(const printer &) = delete;
+    printer &operator=(printer &&) = default;
+    ~printer() = default;
 
-    LineMode lineMode() const noexcept {
-        return mLineMode;
+    line_mode_type line_mode() const noexcept {
+        return m_line_mode;
     }
 
-    common::xstring toString() const;
+    common::xstring to_string() const;
 
-    common::xostream &delayedCharacters() noexcept {
-        return mDelayedCharacters;
+    common::xostream &delayed_characters() noexcept {
+        return m_delayed_characters;
     }
 
-    common::xostream &delayedLines() noexcept {
-        return mDelayedLines;
+    common::xostream &delayed_lines() noexcept {
+        return m_delayed_lines;
     }
 
-    void clearDelayedCharacters();
-    void commitDelayedCharacters();
+    void clear_delayed_characters();
+    void commit_delayed_characters();
 
     /* If T is printable, another operator overload defined in "printable.hh"
      * is used. */
@@ -110,48 +110,48 @@ public:
                     printable,
                     typename std::decay<T>::type
                     >::value>::type>
-    Printer &operator<<(T &&v) {
-        commitDelayedCharacters();
-        mMainBuffer << std::forward<T>(v);
+    printer &operator<<(T &&v) {
+        commit_delayed_characters();
+        m_main_buffer << std::forward<T>(v);
         return *this;
     }
 
-    void breakLine();
+    void break_line();
 
-    std::size_t &indentLevel() noexcept { return mIndentLevel; }
-    std::size_t indentLevel() const noexcept { return mIndentLevel; }
+    std::size_t &indent_level() noexcept { return m_indent_level; }
+    std::size_t indent_level() const noexcept { return m_indent_level; }
 
-    void printIndent();
+    void print_indent();
 
 public:
 
-    class IndentGuard {
+    class indent_guard {
 
     private:
 
-        Printer &mPrinter;
-        const std::size_t mOldIndentLevel;
+        printer &m_printer;
+        const std::size_t m_old_indent_level;
 
     public:
 
-        explicit IndentGuard(Printer &p, std::size_t indentLevelIncrement = 1)
-                noexcept :
-                mPrinter(p), mOldIndentLevel(p.indentLevel()) {
-            mPrinter.indentLevel() += indentLevelIncrement;
+        explicit indent_guard(
+                printer &p, std::size_t indent_level_increment = 1) noexcept :
+                m_printer(p), m_old_indent_level(p.indent_level()) {
+            m_printer.indent_level() += indent_level_increment;
         }
 
-        IndentGuard(const IndentGuard &) = delete;
-        IndentGuard(IndentGuard &&) = delete;
-        IndentGuard &operator=(const IndentGuard &) = delete;
-        IndentGuard &operator=(IndentGuard &&) = delete;
+        indent_guard(const indent_guard &) = delete;
+        indent_guard(indent_guard &&) = delete;
+        indent_guard &operator=(const indent_guard &) = delete;
+        indent_guard &operator=(indent_guard &&) = delete;
 
-        ~IndentGuard() noexcept {
-            mPrinter.indentLevel() = mOldIndentLevel;
+        ~indent_guard() noexcept {
+            m_printer.indent_level() = m_old_indent_level;
         }
 
-    }; // class IndentGuard
+    }; // class indent_guard
 
-}; // class Printer
+}; // class printer
 
 } // namespace syntax
 } // namespace language

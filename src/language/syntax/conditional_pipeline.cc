@@ -38,13 +38,13 @@ conditional_pipeline::conditional_pipeline(
         m_pipeline.reset(new class pipeline);
 }
 
-void conditional_pipeline::print(Printer &p) const {
+void conditional_pipeline::print(printer &p) const {
     switch (condition()) {
     case condition_type::and_then:  p << L("&&");  break;
     case condition_type::or_else:   p << L("||");  break;
     }
-    p.breakLine();
-    p.printIndent();
+    p.break_line();
+    p.print_indent();
     p << *m_pipeline;
 }
 

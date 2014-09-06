@@ -36,15 +36,15 @@ using sesh::language::syntax::and_or_list;
 using sesh::language::syntax::command;
 using sesh::language::syntax::conditional_pipeline;
 using sesh::language::syntax::pipeline;
-using sesh::language::syntax::Printer;
+using sesh::language::syntax::printer;
 using sesh::language::syntax::Sequence;
 
 struct CommandStub : public command {
     xstring s;
     CommandStub(xstring s) : command(), s(s) { }
-    void print(Printer &p) const override {
+    void print(printer &p) const override {
         p << s;
-        p.delayedCharacters() << L(' ');
+        p.delayed_characters() << L(' ');
     }
 };
 
@@ -80,26 +80,26 @@ struct PrintFixture {
 };
 
 TEST_CASE_METHOD(PrintFixture, "Sequence print single-line") {
-    Printer p(Printer::LineMode::SINGLE_LINE);
-    p.delayedCharacters() << L('X');
-    p.delayedLines() << L("Y\n");
-    p.indentLevel() = 2;
+    printer p(printer::line_mode_type::single_line);
+    p.delayed_characters() << L('X');
+    p.delayed_lines() << L("Y\n");
+    p.indent_level() = 2;
     p << s;
-    CHECK(p.toString() == L("XC1 && C2; ! C3 | C4& C5"));
-    p.commitDelayedCharacters();
-    CHECK(p.toString() == L("XC1 && C2; ! C3 | C4& C5; "));
+    CHECK(p.to_string() == L("XC1 && C2; ! C3 | C4& C5"));
+    p.commit_delayed_characters();
+    CHECK(p.to_string() == L("XC1 && C2; ! C3 | C4& C5; "));
 }
 
 TEST_CASE_METHOD(PrintFixture, "Sequence print multi-line") {
-    Printer p(Printer::LineMode::MULTI_LINE);
-    p.delayedCharacters() << L('X');
-    p.delayedLines() << L("Y\n");
-    p.indentLevel() = 2;
+    printer p(printer::line_mode_type::multi_line);
+    p.delayed_characters() << L('X');
+    p.delayed_lines() << L("Y\n");
+    p.indent_level() = 2;
     p << s;
-    CHECK(p.toString() ==
+    CHECK(p.to_string() ==
             L("XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5"));
-    p.commitDelayedCharacters();
-    CHECK(p.toString() ==
+    p.commit_delayed_characters();
+    CHECK(p.to_string() ==
             L("XC1 &&\nY\n        C2\n        ! C3 | C4&\n        C5; "));
 }
 

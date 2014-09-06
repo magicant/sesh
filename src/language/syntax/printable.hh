@@ -46,11 +46,11 @@ public:
     printable &operator=(printable &&) = default;
     virtual ~printable() = default;
 
-    virtual void print(Printer &) const = 0;
+    virtual void print(printer &) const = 0;
 
 }; // class printable
 
-inline Printer &operator<<(Printer &printer, const printable &printable) {
+inline printer &operator<<(printer &printer, const printable &printable) {
     printable.print(printer);
     return printer;
 }

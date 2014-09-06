@@ -37,13 +37,13 @@ using sesh::language::syntax::and_or_list;
 using sesh::language::syntax::command;
 using sesh::language::syntax::conditional_pipeline;
 using sesh::language::syntax::pipeline;
-using sesh::language::syntax::Printer;
+using sesh::language::syntax::printer;
 
 struct command_stub : public command {
     using command::command;
-    void print(Printer &p) const override {
+    void print(printer &p) const override {
         p << L("command");
-        p.delayedCharacters() << L(' ');
+        p.delayed_characters() << L(' ');
     }
 }; // struct command_stub
 
@@ -54,26 +54,26 @@ pipeline pipeline_stub() {
 }
 
 void test_and_or_list_without_rest(
-        Printer::LineMode line_mode,
+        printer::line_mode_type line_mode,
         and_or_list::synchronicity_type synchronicity,
         const xstring without_delayed,
         const xstring with_delayed) {
     and_or_list aol(pipeline_stub(), synchronicity);
-    Printer p(line_mode);
+    printer p(line_mode);
 
-    p.indentLevel() = 1;
-    p.delayedCharacters() << L("X");
-    p.delayedLines() << L("Y\n");
+    p.indent_level() = 1;
+    p.delayed_characters() << L("X");
+    p.delayed_lines() << L("Y\n");
 
     p << aol;
-    CHECK(p.toString() == without_delayed);
+    CHECK(p.to_string() == without_delayed);
 
     p << L("");
-    CHECK(p.toString() == with_delayed);
+    CHECK(p.to_string() == with_delayed);
 }
 
 void test_and_or_list_with_rest(
-        Printer::LineMode line_mode,
+        printer::line_mode_type line_mode,
         and_or_list::synchronicity_type synchronicity,
         const xstring without_delayed,
         const xstring with_delayed) {
@@ -87,16 +87,16 @@ void test_and_or_list_with_rest(
             conditional_pipeline::pipeline_pointer(
                     new pipeline(pipeline_stub())));
 
-    Printer p(line_mode);
-    p.indentLevel() = 1;
-    p.delayedCharacters() << L("X");
-    p.delayedLines() << L("Y\n");
+    printer p(line_mode);
+    p.indent_level() = 1;
+    p.delayed_characters() << L("X");
+    p.delayed_lines() << L("Y\n");
 
     p << aol;
-    CHECK(p.toString() == without_delayed);
+    CHECK(p.to_string() == without_delayed);
 
     p << L("");
-    CHECK(p.toString() == with_delayed);
+    CHECK(p.to_string() == with_delayed);
 }
 
 TEST_CASE("And-or list constructor 1") {
@@ -136,22 +136,22 @@ TEST_CASE("And-or list constructor 2") {
 
 TEST_CASE("And-or list print w/o rest") {
     test_and_or_list_without_rest(
-            Printer::LineMode::SINGLE_LINE,
+            printer::line_mode_type::single_line,
             and_or_list::synchronicity_type::sequential,
             L("X! command"),
             L("X! command; "));
     test_and_or_list_without_rest(
-            Printer::LineMode::MULTI_LINE,
+            printer::line_mode_type::multi_line,
             and_or_list::synchronicity_type::sequential,
             L("X! command"),
             L("X! command; "));
     test_and_or_list_without_rest(
-            Printer::LineMode::SINGLE_LINE,
+            printer::line_mode_type::single_line,
             and_or_list::synchronicity_type::asynchronous,
             L("X! command&"),
             L("X! command& "));
     test_and_or_list_without_rest(
-            Printer::LineMode::MULTI_LINE,
+            printer::line_mode_type::multi_line,
             and_or_list::synchronicity_type::asynchronous,
             L("X! command&"),
             L("X! command& "));
@@ -159,22 +159,22 @@ TEST_CASE("And-or list print w/o rest") {
 
 TEST_CASE("And-or list print w/ rest") {
     test_and_or_list_with_rest(
-            Printer::LineMode::SINGLE_LINE,
+            printer::line_mode_type::single_line,
             and_or_list::synchronicity_type::sequential,
             L("X! command && ! command || ! command"),
             L("X! command && ! command || ! command; "));
     test_and_or_list_with_rest(
-            Printer::LineMode::MULTI_LINE,
+            printer::line_mode_type::multi_line,
             and_or_list::synchronicity_type::sequential,
             L("X! command &&\nY\n    ! command ||\n    ! command"),
             L("X! command &&\nY\n    ! command ||\n    ! command; "));
     test_and_or_list_with_rest(
-            Printer::LineMode::SINGLE_LINE,
+            printer::line_mode_type::single_line,
             and_or_list::synchronicity_type::asynchronous,
             L("X! command && ! command || ! command&"),
             L("X! command && ! command || ! command& "));
     test_and_or_list_with_rest(
-            Printer::LineMode::MULTI_LINE,
+            printer::line_mode_type::multi_line,
             and_or_list::synchronicity_type::asynchronous,
             L("X! command &&\nY\n    ! command ||\n    ! command&"),
             L("X! command &&\nY\n    ! command ||\n    ! command& "));

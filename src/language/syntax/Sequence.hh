@@ -61,7 +61,7 @@ public:
         return mAndOrLists;
     }
 
-    void print(Printer &) const override;
+    void print(printer &) const override;
 
 }; // class Sequence
 
