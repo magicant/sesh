@@ -27,7 +27,7 @@
 #include "language/syntax/printer.hh"
 #include "language/syntax/printer_test_helper.hh"
 #include "language/syntax/raw_string.hh"
-#include "language/syntax/SimpleCommand.hh"
+#include "language/syntax/simple_command.hh"
 #include "language/syntax/Word.hh"
 
 namespace {
@@ -37,42 +37,43 @@ using sesh::language::syntax::assignment;
 using sesh::language::syntax::for_each_line_mode;
 using sesh::language::syntax::printer;
 using sesh::language::syntax::raw_string;
-using sesh::language::syntax::SimpleCommand;
+using sesh::language::syntax::simple_command;
 using sesh::language::syntax::Word;
 
-assignment::word_pointer newWord(xstring s) {
+assignment::word_pointer new_word(xstring s) {
     assignment::word_pointer w(new Word);
     w->addComponent(Word::ComponentPointer(new raw_string(s)));
     return w;
 }
 
-SimpleCommand::AssignmentPointer newAssignment(xstring name, xstring value) {
-    return SimpleCommand::AssignmentPointer(
-            new assignment(name, newWord(value)));
+simple_command::assignment_pointer new_assignment(
+        xstring name, xstring value) {
+    return simple_command::assignment_pointer(
+            new assignment(name, new_word(value)));
 }
 
-void addAssignment(SimpleCommand &sc, xstring name, xstring value) {
-    sc.assignments().push_back(newAssignment(name, value));
+void add_assignment(simple_command &sc, xstring name, xstring value) {
+    sc.assignments().push_back(new_assignment(name, value));
 }
 
-void addWord(SimpleCommand &sc, xstring s) {
-    sc.words().push_back(newWord(s));
+void add_word(simple_command &sc, xstring s) {
+    sc.words().push_back(new_word(s));
 }
 
 TEST_CASE("Empty simple command print") {
     for_each_line_mode([](printer &p) {
-        p << SimpleCommand();
+        p << simple_command();
         CHECK(p.to_string() == L(""));
     });
 }
 
 TEST_CASE("Simple command print") {
-    SimpleCommand sc;
+    simple_command sc;
 
-    addAssignment(sc, L("foo"), L("Foo.value"));
-    addWord(sc, L("Hello"));
-    addAssignment(sc, L("bar"), L("Bar-value"));
-    addWord(sc, L("world"));
+    add_assignment(sc, L("foo"), L("Foo.value"));
+    add_word(sc, L("Hello"));
+    add_assignment(sc, L("bar"), L("Bar-value"));
+    add_word(sc, L("world"));
 
     for_each_line_mode([&sc](printer &p) {
         p << sc;

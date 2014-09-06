@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "SimpleCommand.hh"
+#include "simple_command.hh"
 
 #include <utility>
 #include "common/xchar.hh"
@@ -26,14 +26,14 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-SimpleCommand::SimpleCommand() : command(), mWords(), mAssignments() { }
+simple_command::simple_command() : command(), m_words(), m_assignments() { }
 
-void SimpleCommand::print(printer &p) const {
-    for (const AssignmentPointer &a : assignments()) {
+void simple_command::print(printer &p) const {
+    for (const assignment_pointer &a : assignments()) {
         p << *a;
         p.delayed_characters() << L(' ');
     }
-    for (const WordPointer &w : words()) {
+    for (const word_pointer &w : words()) {
         p << *w;
         p.delayed_characters() << L(' ');
     }
