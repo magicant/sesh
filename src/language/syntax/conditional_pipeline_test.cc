@@ -35,7 +35,7 @@ using sesh::common::xchar;
 using sesh::common::xstring;
 using sesh::language::syntax::command;
 using sesh::language::syntax::conditional_pipeline;
-using sesh::language::syntax::Pipeline;
+using sesh::language::syntax::pipeline;
 using sesh::language::syntax::Printer;
 
 class command_stub : public command {
@@ -51,13 +51,13 @@ void command_stub::print(Printer &p) const {
     p.delayedCharacters() << L(' ');
 }
 
-void add_command(Pipeline &p, const xchar *s) {
-    p.commands().push_back(Pipeline::CommandPointer(new command_stub(s)));
+void add_command(pipeline &p, const xchar *s) {
+    p.commands().push_back(pipeline::command_pointer(new command_stub(s)));
 }
 
-std::unique_ptr<Pipeline> new_pipeline(const xchar *s) {
-    std::unique_ptr<Pipeline> p(
-            new Pipeline(Pipeline::ExitStatusType::NEGATED));
+std::unique_ptr<pipeline> new_pipeline(const xchar *s) {
+    std::unique_ptr<pipeline> p(
+            new pipeline(pipeline::exit_status_mode_type::negated));
     add_command(*p, s);
     return p;
 }

@@ -36,7 +36,7 @@ using sesh::common::xstring;
 using sesh::language::syntax::and_or_list;
 using sesh::language::syntax::command;
 using sesh::language::syntax::conditional_pipeline;
-using sesh::language::syntax::Pipeline;
+using sesh::language::syntax::pipeline;
 using sesh::language::syntax::Printer;
 
 struct command_stub : public command {
@@ -47,9 +47,9 @@ struct command_stub : public command {
     }
 }; // struct command_stub
 
-Pipeline pipeline_stub() {
-    Pipeline p(Pipeline::ExitStatusType::NEGATED);
-    p.commands().push_back(Pipeline::CommandPointer(new command_stub));
+pipeline pipeline_stub() {
+    pipeline p(pipeline::exit_status_mode_type::negated);
+    p.commands().push_back(pipeline::command_pointer(new command_stub));
     return p;
 }
 
@@ -81,11 +81,11 @@ void test_and_or_list_with_rest(
     aol.rest().emplace_back(
             conditional_pipeline::condition_type::and_then,
             conditional_pipeline::pipeline_pointer(
-                    new Pipeline(pipeline_stub())));
+                    new pipeline(pipeline_stub())));
     aol.rest().emplace_back(
             conditional_pipeline::condition_type::or_else,
             conditional_pipeline::pipeline_pointer(
-                    new Pipeline(pipeline_stub())));
+                    new pipeline(pipeline_stub())));
 
     Printer p(line_mode);
     p.indentLevel() = 1;
@@ -103,18 +103,19 @@ TEST_CASE("And-or list constructor 1") {
     and_or_list aol(pipeline_stub());
     aol.rest().emplace_back(conditional_pipeline::condition_type::and_then);
     aol.rest()[0].pipeline().commands().push_back(
-            Pipeline::CommandPointer(new command_stub));
+            pipeline::command_pointer(new command_stub));
     aol.rest()[0].pipeline().commands().push_back(
-            Pipeline::CommandPointer(new command_stub));
+            pipeline::command_pointer(new command_stub));
 
     CHECK(aol.synchronicity() == and_or_list::synchronicity_type::sequential);
-    CHECK(aol.first().exitStatusType() == Pipeline::ExitStatusType::NEGATED);
+    CHECK(aol.first().exit_status_mode() ==
+            pipeline::exit_status_mode_type::negated);
     CHECK(aol.first().commands().size() == 1);
     CHECK_NOTHROW((void)
             dynamic_cast<command_stub &>(*aol.first().commands()[0]));
     CHECK(aol.rest().size() == 1);
 
-    const Pipeline &p1 = aol.rest()[0].pipeline();
+    const pipeline &p1 = aol.rest()[0].pipeline();
     CHECK(p1.commands().size() == 2);
     CHECK_NOTHROW((void) dynamic_cast<command_stub &>(*p1.commands()[0]));
     CHECK_NOTHROW((void) dynamic_cast<command_stub &>(*p1.commands()[1]));
@@ -122,11 +123,12 @@ TEST_CASE("And-or list constructor 1") {
 
 TEST_CASE("And-or list constructor 2") {
     and_or_list aol(
-            Pipeline(Pipeline::ExitStatusType::NEGATED),
+            pipeline(pipeline::exit_status_mode_type::negated),
             and_or_list::synchronicity_type::asynchronous);
 
     CHECK(aol.first().commands().empty());
-    CHECK(aol.first().exitStatusType() == Pipeline::ExitStatusType::NEGATED);
+    CHECK(aol.first().exit_status_mode() ==
+            pipeline::exit_status_mode_type::negated);
     CHECK(aol.rest().empty());
     CHECK(aol.synchronicity() ==
             and_or_list::synchronicity_type::asynchronous);

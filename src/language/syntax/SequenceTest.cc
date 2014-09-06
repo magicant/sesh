@@ -35,7 +35,7 @@ using sesh::common::xstring;
 using sesh::language::syntax::and_or_list;
 using sesh::language::syntax::command;
 using sesh::language::syntax::conditional_pipeline;
-using sesh::language::syntax::Pipeline;
+using sesh::language::syntax::pipeline;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::Sequence;
 
@@ -53,29 +53,29 @@ struct PrintFixture {
     Sequence s;
     PrintFixture() : s() {
         s.andOrLists().emplace_back(
-                Sequence::AndOrListPointer(new and_or_list(Pipeline())));
+                Sequence::AndOrListPointer(new and_or_list(pipeline())));
         s.andOrLists()[0]->first().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L("C1"))));
+                pipeline::command_pointer(new CommandStub(L("C1"))));
         s.andOrLists()[0]->rest().emplace_back(
                 conditional_pipeline::condition_type::and_then);
         s.andOrLists()[0]->rest()[0].pipeline().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L("C2"))));
+                pipeline::command_pointer(new CommandStub(L("C2"))));
 
         s.andOrLists().emplace_back(
-                Sequence::AndOrListPointer(new and_or_list(Pipeline())));
+                Sequence::AndOrListPointer(new and_or_list(pipeline())));
         s.andOrLists()[1]->synchronicity() =
                 and_or_list::synchronicity_type::asynchronous;
-        s.andOrLists()[1]->first().exitStatusType() =
-                Pipeline::ExitStatusType::NEGATED;
+        s.andOrLists()[1]->first().exit_status_mode() =
+                pipeline::exit_status_mode_type::negated;
         s.andOrLists()[1]->first().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L("C3"))));
+                pipeline::command_pointer(new CommandStub(L("C3"))));
         s.andOrLists()[1]->first().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L("C4"))));
+                pipeline::command_pointer(new CommandStub(L("C4"))));
 
         s.andOrLists().emplace_back(
-                Sequence::AndOrListPointer(new and_or_list(Pipeline())));
+                Sequence::AndOrListPointer(new and_or_list(pipeline())));
         s.andOrLists()[2]->first().commands().emplace_back(
-                Pipeline::CommandPointer(new CommandStub(L("C5"))));
+                pipeline::command_pointer(new CommandStub(L("C5"))));
     }
 };
 

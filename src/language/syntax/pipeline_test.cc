@@ -33,26 +33,26 @@ namespace {
 using sesh::common::xchar;
 using sesh::common::xstring;
 using sesh::language::syntax::command;
-using sesh::language::syntax::Pipeline;
+using sesh::language::syntax::pipeline;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::forEachLineMode;
 
-class CommandStub : public command {
+class command_stub : public command {
 private:
-    xstring mString;
+    xstring m_string;
 public:
-    explicit CommandStub(const xchar *s) : command(), mString(s) { }
+    explicit command_stub(const xchar *s) : command(), m_string(s) { }
     void print(Printer &p) const override {
-        p << mString;
+        p << m_string;
         p.delayedCharacters() << L(' ');
     }
 };
 
-void addCommand(Pipeline &p, const xchar *s) {
-    p.commands().push_back(Pipeline::CommandPointer(new CommandStub(s)));
+void add_command(pipeline &p, const xchar *s) {
+    p.commands().push_back(pipeline::command_pointer(new command_stub(s)));
 }
 
-void checkForEachLineMode(const Pipeline &pl, const xstring &expected) {
+void check_for_each_line_mode(const pipeline &pl, const xstring &expected) {
     forEachLineMode([&pl, &expected](Printer &p) {
         p << pl;
         CHECK(p.toString() == expected);
@@ -60,36 +60,38 @@ void checkForEachLineMode(const Pipeline &pl, const xstring &expected) {
 }
 
 TEST_CASE("Pipeline print") {
-    Pipeline pl;
+    pipeline pl;
 
-    addCommand(pl, L("Command 1"));
+    add_command(pl, L("Command 1"));
 
-    checkForEachLineMode(pl, L("Command 1"));
+    check_for_each_line_mode(pl, L("Command 1"));
 
-    CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
-    pl.exitStatusType() = Pipeline::ExitStatusType::NEGATED;
+    CHECK(pl.exit_status_mode() == pipeline::exit_status_mode_type::straight);
+    pl.exit_status_mode() = pipeline::exit_status_mode_type::negated;
 
-    checkForEachLineMode(pl, L("! Command 1"));
+    check_for_each_line_mode(pl, L("! Command 1"));
 
-    CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::NEGATED);
-    addCommand(pl, L("Command 2"));
+    CHECK(pl.exit_status_mode() == pipeline::exit_status_mode_type::negated);
+    add_command(pl, L("Command 2"));
 
-    checkForEachLineMode(pl, L("! Command 1 | Command 2"));
+    check_for_each_line_mode(pl, L("! Command 1 | Command 2"));
 
-    CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::NEGATED);
-    pl.exitStatusType() = Pipeline::ExitStatusType::STRAIGHT;
+    CHECK(pl.exit_status_mode() == pipeline::exit_status_mode_type::negated);
+    pl.exit_status_mode() = pipeline::exit_status_mode_type::straight;
 
-    checkForEachLineMode(pl, L("Command 1 | Command 2"));
+    check_for_each_line_mode(pl, L("Command 1 | Command 2"));
 
-    CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
-    addCommand(pl, L("The last command"));
+    CHECK(pl.exit_status_mode() == pipeline::exit_status_mode_type::straight);
+    add_command(pl, L("The last command"));
 
-    checkForEachLineMode(pl, L("Command 1 | Command 2 | The last command"));
+    check_for_each_line_mode(
+            pl, L("Command 1 | Command 2 | The last command"));
 
-    CHECK(pl.exitStatusType() == Pipeline::ExitStatusType::STRAIGHT);
-    pl.exitStatusType() = Pipeline::ExitStatusType::NEGATED;
+    CHECK(pl.exit_status_mode() == pipeline::exit_status_mode_type::straight);
+    pl.exit_status_mode() = pipeline::exit_status_mode_type::negated;
 
-    checkForEachLineMode(pl, L("! Command 1 | Command 2 | The last command"));
+    check_for_each_line_mode(
+            pl, L("! Command 1 | Command 2 | The last command"));
 }
 
 } // namespace

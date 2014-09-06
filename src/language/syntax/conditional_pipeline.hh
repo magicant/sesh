@@ -36,7 +36,7 @@ class conditional_pipeline : public Printable {
 
 public:
 
-    using pipeline_pointer = std::unique_ptr<Pipeline>;
+    using pipeline_pointer = std::unique_ptr<class pipeline>;
 
     enum class condition_type {
         /**
@@ -70,8 +70,8 @@ public:
     condition_type &condition() noexcept { return m_condition; }
     condition_type condition() const noexcept { return m_condition; }
 
-    Pipeline &pipeline() { return *m_pipeline; }
-    const Pipeline &pipeline() const { return *m_pipeline; }
+    class pipeline &pipeline() { return *m_pipeline; }
+    const class pipeline &pipeline() const { return *m_pipeline; }
 
     void print(Printer &) const override;
 

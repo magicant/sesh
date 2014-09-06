@@ -29,13 +29,13 @@ namespace language {
 namespace syntax {
 
 conditional_pipeline::conditional_pipeline(condition_type c) :
-        m_condition(c), m_pipeline(new Pipeline) { }
+        m_condition(c), m_pipeline(new class pipeline) { }
 
 conditional_pipeline::conditional_pipeline(
         condition_type c, pipeline_pointer &&p) :
         m_condition(c), m_pipeline(std::move(p)) {
     if (m_pipeline == nullptr)
-        m_pipeline.reset(new Pipeline);
+        m_pipeline.reset(new class pipeline);
 }
 
 void conditional_pipeline::print(Printer &p) const {

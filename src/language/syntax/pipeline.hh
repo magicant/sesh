@@ -33,45 +33,49 @@ namespace syntax {
  * A pipeline is a list of one or more commands that are executed at a time
  * with the standard input/output connected with each other.
  */
-class Pipeline : public Printable {
+class pipeline : public Printable {
 
 public:
 
-    using CommandPointer = std::unique_ptr<command>;
+    using command_pointer = std::unique_ptr<command>;
 
-    enum class ExitStatusType {
-        STRAIGHT,
-        NEGATED,
+    enum class exit_status_mode_type {
+        straight,
+        negated,
     };
 
 private:
 
-    std::vector<CommandPointer> mCommands;
-    ExitStatusType mExitStatusType;
+    std::vector<command_pointer> m_commands;
+    exit_status_mode_type m_exit_status_mode;
 
 public:
 
-    explicit Pipeline(ExitStatusType = ExitStatusType::STRAIGHT);
+    explicit pipeline(exit_status_mode_type = exit_status_mode_type::straight);
 
-    Pipeline(const Pipeline &) = delete;
-    Pipeline(Pipeline &&) = default;
-    Pipeline &operator=(const Pipeline &) = delete;
-    Pipeline &operator=(Pipeline &&) = default;
-    ~Pipeline() override = default;
+    pipeline(const pipeline &) = delete;
+    pipeline(pipeline &&) = default;
+    pipeline &operator=(const pipeline &) = delete;
+    pipeline &operator=(pipeline &&) = default;
+    ~pipeline() override = default;
 
-    std::vector<CommandPointer> &commands() noexcept {
-        return mCommands;
+    std::vector<command_pointer> &commands() noexcept {
+        return m_commands;
     }
-    const std::vector<CommandPointer> &commands() const noexcept {
-        return mCommands;
+    const std::vector<command_pointer> &commands() const noexcept {
+        return m_commands;
     }
 
-    ExitStatusType &exitStatusType() noexcept { return mExitStatusType; }
-    ExitStatusType exitStatusType() const noexcept { return mExitStatusType; }
+    exit_status_mode_type &exit_status_mode() noexcept {
+        return m_exit_status_mode;
+    }
+    exit_status_mode_type exit_status_mode() const noexcept {
+        return m_exit_status_mode;
+    }
 
     void print(Printer &) const override;
 
-}; // class Pipeline
+}; // class pipeline
 
 } // namespace syntax
 } // namespace language

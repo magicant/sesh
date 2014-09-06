@@ -45,14 +45,14 @@ public:
 
 private:
 
-    Pipeline m_first;
+    pipeline m_first;
     std::vector<conditional_pipeline> m_rest;
     synchronicity_type m_synchronicity;
 
 public:
 
     explicit and_or_list(
-            Pipeline &&first,
+            pipeline &&first,
             synchronicity_type = synchronicity_type::sequential);
 
     and_or_list(const and_or_list &) = delete;
@@ -61,8 +61,8 @@ public:
     and_or_list &operator=(and_or_list &&) = default;
     ~and_or_list() override = default;
 
-    Pipeline &first() noexcept { return m_first; }
-    const Pipeline &first() const noexcept { return m_first; }
+    pipeline &first() noexcept { return m_first; }
+    const pipeline &first() const noexcept { return m_first; }
 
     std::vector<conditional_pipeline> &rest() noexcept {
         return m_rest;

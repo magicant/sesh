@@ -27,23 +27,24 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-Pipeline::Pipeline(ExitStatusType e) : mCommands(), mExitStatusType(e) { }
+pipeline::pipeline(exit_status_mode_type e) :
+        m_commands(), m_exit_status_mode(e) { }
 
-void Pipeline::print(Printer &p) const {
-    switch (exitStatusType()) {
-    case ExitStatusType::STRAIGHT:
+void pipeline::print(Printer &p) const {
+    switch (exit_status_mode()) {
+    case exit_status_mode_type::straight:
         break;
-    case ExitStatusType::NEGATED:
+    case exit_status_mode_type::negated:
         p << L("! ");
         break;
     }
 
-    bool isFirst = true;
-    for (const CommandPointer &c : commands()) {
-        if (!isFirst)
+    bool is_first = true;
+    for (const command_pointer &c : commands()) {
+        if (!is_first)
             p << L("| ");
         p << *c;
-        isFirst = false;
+        is_first = false;
     }
 }
 

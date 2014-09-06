@@ -26,7 +26,7 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-and_or_list::and_or_list(Pipeline &&first, synchronicity_type s) :
+and_or_list::and_or_list(pipeline &&first, synchronicity_type s) :
         m_first(std::move(first)), m_rest(), m_synchronicity(s) { }
 
 namespace {
