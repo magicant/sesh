@@ -26,7 +26,7 @@
 #include "common/maybe.hh"
 #include "common/xstring.hh"
 #include "language/syntax/printable.hh"
-#include "language/syntax/WordComponent.hh"
+#include "language/syntax/word_component.hh"
 
 namespace sesh {
 namespace language {
@@ -40,7 +40,7 @@ class word : public printable {
 
 public:
 
-    using component_pointer = std::unique_ptr<WordComponent>;
+    using component_pointer = std::unique_ptr<word_component>;
 
 private:
 

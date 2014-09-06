@@ -28,7 +28,7 @@
 #include "language/syntax/printer_test_helper.hh"
 #include "language/syntax/raw_string.hh"
 #include "language/syntax/word.hh"
-#include "language/syntax/WordComponent.hh"
+#include "language/syntax/word_component.hh"
 
 namespace {
 
@@ -37,10 +37,10 @@ using sesh::language::syntax::for_each_line_mode;
 using sesh::language::syntax::printer;
 using sesh::language::syntax::raw_string;
 using sesh::language::syntax::word;
-using sesh::language::syntax::WordComponent;
+using sesh::language::syntax::word_component;
 
-class non_constant : public WordComponent {
-    bool appendConstantValue(xstring &) const override { return false; }
+class non_constant : public word_component {
+    bool append_constant_value(xstring &) const override { return false; }
     void print(printer &) const override { throw "unexpected print"; }
 };
 

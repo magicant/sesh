@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_WordComponent_hh
-#define INCLUDED_language_syntax_WordComponent_hh
+#ifndef INCLUDED_language_syntax_word_component_hh
+#define INCLUDED_language_syntax_word_component_hh
 
 #include "buildconfig.h"
 
@@ -27,32 +27,32 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-class WordComponent : public printable {
+class word_component : public printable {
 
 public:
 
-    WordComponent() = default;
-    WordComponent(const WordComponent &) = default;
-    WordComponent(WordComponent &&) = default;
-    WordComponent &operator=(const WordComponent &) = default;
-    WordComponent &operator=(WordComponent &&) = default;
-    ~WordComponent() override = default;
+    word_component() = default;
+    word_component(const word_component &) = default;
+    word_component(word_component &&) = default;
+    word_component &operator=(const word_component &) = default;
+    word_component &operator=(word_component &&) = default;
+    ~word_component() override = default;
 
-    virtual bool isRawString() const noexcept { return false; }
+    virtual bool is_raw_string() const noexcept { return false; }
 
     /**
      * If this word component always evaluates to the same string in any shell
      * environment state, appends the string to the argument and returns true.
      * Otherwise, returns false without any side effects.
      */
-    virtual bool appendConstantValue(common::xstring &) const = 0;
+    virtual bool append_constant_value(common::xstring &) const = 0;
 
-}; // class WordComponent
+}; // class word_component
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_WordComponent_hh
+#endif // #ifndef INCLUDED_language_syntax_word_component_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

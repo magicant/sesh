@@ -154,7 +154,7 @@ src_sesh_SOURCES = \
 	src/language/syntax/simple_command.hh \
 	src/language/syntax/word.cc \
 	src/language/syntax/word.hh \
-	src/language/syntax/WordComponent.hh \
+	src/language/syntax/word_component.hh \
 	src/main.cc \
 	src/os/Api.cc \
 	src/os/Api.hh \

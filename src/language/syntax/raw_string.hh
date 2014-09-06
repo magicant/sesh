@@ -22,7 +22,7 @@
 
 #include <utility>
 #include "common/xstring.hh"
-#include "language/syntax/WordComponent.hh"
+#include "language/syntax/word_component.hh"
 
 namespace sesh {
 namespace language {
@@ -36,7 +36,7 @@ namespace syntax {
  * implementation of this class does not itself check the validity of the
  * string value.
  */
-class raw_string : public WordComponent {
+class raw_string : public word_component {
 
 private:
 
@@ -55,12 +55,12 @@ public:
     raw_string &operator=(raw_string &&) = default;
     ~raw_string() override = default;
 
-    bool isRawString() const noexcept override { return true; }
+    bool is_raw_string() const noexcept override { return true; }
 
     common::xstring &value() { return m_value; }
     const common::xstring &value() const { return m_value; }
 
-    bool appendConstantValue(common::xstring &) const override;
+    bool append_constant_value(common::xstring &) const override;
 
     void print(printer &) const override;
 

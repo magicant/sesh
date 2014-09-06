@@ -55,7 +55,7 @@ void word::append(word &&w) {
 maybe<xstring> word::compute_maybe_constant_value() const {
     xstring constantValue;
     for (const component_pointer &c : components())
-        if (!c->appendConstantValue(constantValue))
+        if (!c->append_constant_value(constantValue))
             return maybe<xstring>();
     return make_maybe_of(std::move(constantValue));
 }
@@ -70,7 +70,7 @@ bool word::is_raw_string() const {
     return std::all_of(
             m_components.begin(),
             m_components.end(),
-            [](const component_pointer &c) { return c->isRawString(); });
+            [](const component_pointer &c) { return c->is_raw_string(); });
 }
 
 void word::print(printer &p) const {

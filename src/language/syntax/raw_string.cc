@@ -27,7 +27,7 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-bool raw_string::appendConstantValue(xstring &s) const {
+bool raw_string::append_constant_value(xstring &s) const {
     s += value();
     return true;
 }

@@ -50,9 +50,9 @@ TEST_CASE("Raw string constructors and value") {
 
 TEST_CASE("Raw string, append constant value") {
     xstring s;
-    CHECK(raw_string(L("1")).appendConstantValue(s));
+    CHECK(raw_string(L("1")).append_constant_value(s));
     CHECK(s == L("1"));
-    CHECK(raw_string(L("ABC")).appendConstantValue(s));
+    CHECK(raw_string(L("ABC")).append_constant_value(s));
     CHECK(s == L("1ABC"));
 }
 
