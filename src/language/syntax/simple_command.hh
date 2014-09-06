@@ -24,7 +24,7 @@
 #include <vector>
 #include "language/syntax/assignment.hh"
 #include "language/syntax/command.hh"
-#include "language/syntax/Word.hh"
+#include "language/syntax/word.hh"
 
 namespace sesh {
 namespace language {
@@ -38,7 +38,7 @@ class simple_command : public command {
 
 public:
 
-    using word_pointer = std::unique_ptr<Word>;
+    using word_pointer = std::unique_ptr<word>;
     using assignment_pointer = std::unique_ptr<assignment>;
 
 private:

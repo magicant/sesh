@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Word.hh"
+#include "word.hh"
 
 #include <algorithm>
 #include <cassert>
@@ -34,47 +34,47 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-void Word::addComponent(ComponentPointer c) {
-    mMaybeConstantValueCache.clear();
+void word::add_component(component_pointer c) {
+    m_maybe_constant_value_cache.clear();
 
     assert(c != nullptr);
-    mComponents.push_back(std::move(c));
+    m_components.push_back(std::move(c));
 }
 
-void Word::append(Word &&w) {
-    mMaybeConstantValueCache.clear();
-    w.mMaybeConstantValueCache.clear();
+void word::append(word &&w) {
+    m_maybe_constant_value_cache.clear();
+    w.m_maybe_constant_value_cache.clear();
 
     std::move(
-            w.mComponents.begin(),
-            w.mComponents.end(),
-            std::back_inserter(mComponents));
-    w.mComponents.clear();
+            w.m_components.begin(),
+            w.m_components.end(),
+            std::back_inserter(m_components));
+    w.m_components.clear();
 }
 
-maybe<xstring> Word::computeMaybeConstantValue() const {
+maybe<xstring> word::compute_maybe_constant_value() const {
     xstring constantValue;
-    for (const ComponentPointer &c : components())
+    for (const component_pointer &c : components())
         if (!c->appendConstantValue(constantValue))
             return maybe<xstring>();
     return make_maybe_of(std::move(constantValue));
 }
 
-const maybe<xstring> &Word::maybeConstantValue() const {
-    if (!mMaybeConstantValueCache.has_value())
-        mMaybeConstantValueCache.emplace(computeMaybeConstantValue());
-    return mMaybeConstantValueCache.value();
+const maybe<xstring> &word::maybe_constant_value() const {
+    if (!m_maybe_constant_value_cache.has_value())
+        m_maybe_constant_value_cache.emplace(compute_maybe_constant_value());
+    return m_maybe_constant_value_cache.value();
 }
 
-bool Word::isRawString() const {
+bool word::is_raw_string() const {
     return std::all_of(
-            mComponents.begin(),
-            mComponents.end(),
-            [](const ComponentPointer &c) { return c->isRawString(); });
+            m_components.begin(),
+            m_components.end(),
+            [](const component_pointer &c) { return c->isRawString(); });
 }
 
-void Word::print(printer &p) const {
-    for (const ComponentPointer &c : components())
+void word::print(printer &p) const {
+    for (const component_pointer &c : components())
         p << *c;
 }
 

@@ -51,7 +51,7 @@ TESTPROGRAMS = \
 	src/language/syntax/raw_string_test \
 	src/language/syntax/sequence_test \
 	src/language/syntax/simple_command_test \
-	src/language/syntax/WordTest \
+	src/language/syntax/word_test \
 	src/os/event/AwaiterErrorFileDescriptorTest \
 	src/os/event/AwaiterFileDescriptorTest \
 	src/os/event/AwaiterReadableFileDescriptorTest \
@@ -152,8 +152,8 @@ src_sesh_SOURCES = \
 	src/language/syntax/sequence.hh \
 	src/language/syntax/simple_command.cc \
 	src/language/syntax/simple_command.hh \
-	src/language/syntax/Word.cc \
-	src/language/syntax/Word.hh \
+	src/language/syntax/word.cc \
+	src/language/syntax/word.hh \
 	src/language/syntax/WordComponent.hh \
 	src/main.cc \
 	src/os/Api.cc \
@@ -273,7 +273,7 @@ src_language_syntax_assignment_test_SOURCES = \
 	src/language/syntax/assignment_test.cc \
 	src/language/syntax/printer.cc \
 	src/language/syntax/raw_string.cc \
-	src/language/syntax/Word.cc
+	src/language/syntax/word.cc
 src_language_syntax_command_test_SOURCES = \
 	src/language/source/location.cc \
 	src/language/syntax/command_test.cc
@@ -310,12 +310,12 @@ src_language_syntax_simple_command_test_SOURCES = \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/simple_command.cc \
 	src/language/syntax/simple_command_test.cc \
-	src/language/syntax/Word.cc
-src_language_syntax_WordTest_SOURCES = \
+	src/language/syntax/word.cc
+src_language_syntax_word_test_SOURCES = \
 	src/language/syntax/printer.cc \
 	src/language/syntax/raw_string.cc \
-	src/language/syntax/Word.cc \
-	src/language/syntax/WordTest.cc
+	src/language/syntax/word.cc \
+	src/language/syntax/word_test.cc
 src_os_event_AwaiterErrorFileDescriptorTest_SOURCES = \
 	src/os/event/Awaiter.cc \
 	src/os/event/AwaiterErrorFileDescriptorTest.cc \

@@ -28,7 +28,7 @@
 #include "language/syntax/printer.hh"
 #include "language/syntax/printer_test_helper.hh"
 #include "language/syntax/raw_string.hh"
-#include "language/syntax/Word.hh"
+#include "language/syntax/word.hh"
 
 namespace {
 
@@ -37,15 +37,15 @@ using sesh::language::syntax::assignment;
 using sesh::language::syntax::for_each_line_mode;
 using sesh::language::syntax::printer;
 using sesh::language::syntax::raw_string;
-using sesh::language::syntax::Word;
+using sesh::language::syntax::word;
 
 struct fixture {
     assignment a;
     fixture() : a() {
         a.variable_name() = L("varName");
-        a.value().addComponent(Word::ComponentPointer(
+        a.value().add_component(word::component_pointer(
                 new raw_string(L("assigned"))));
-        a.value().addComponent(Word::ComponentPointer(
+        a.value().add_component(word::component_pointer(
                 new raw_string(L("Value"))));
     }
 };
@@ -64,11 +64,11 @@ TEST_CASE("Assignment constructors") {
     CHECK(a3.variable_name() == name);
     CHECK(a3.value().components().size() == 0);
 
-    assignment a4(name, assignment::word_pointer(new Word));
+    assignment a4(name, assignment::word_pointer(new word));
     CHECK(a4.variable_name() == name);
     CHECK(a4.value().components().size() == 0);
 
-    assignment a5(xstring(name), assignment::word_pointer(new Word));
+    assignment a5(xstring(name), assignment::word_pointer(new word));
     CHECK(a5.variable_name() == name);
     CHECK(a5.value().components().size() == 0);
 }
@@ -79,17 +79,17 @@ TEST_CASE_METHOD(fixture, "Assignment data 1") {
 
 TEST_CASE("Assignment data 2") {
     xstring name(L("name"));
-    assignment a1(name, assignment::word_pointer(new Word));
-    a1.value().addComponent(
-            Word::ComponentPointer(new raw_string(L("value"))));
-    a1.value().addComponent(
-            Word::ComponentPointer(new raw_string(L(" "))));
-    a1.value().addComponent(
-            Word::ComponentPointer(new raw_string(L("string"))));
+    assignment a1(name, assignment::word_pointer(new word));
+    a1.value().add_component(
+            word::component_pointer(new raw_string(L("value"))));
+    a1.value().add_component(
+            word::component_pointer(new raw_string(L(" "))));
+    a1.value().add_component(
+            word::component_pointer(new raw_string(L("string"))));
     CHECK(a1.variable_name() == name);
     CHECK(a1.value().components().size() == 3);
 
-    assignment a2(xstring(name), assignment::word_pointer(new Word));
+    assignment a2(xstring(name), assignment::word_pointer(new word));
     CHECK(a2.variable_name() == name);
     CHECK(a2.value().components().size() == 0);
 }

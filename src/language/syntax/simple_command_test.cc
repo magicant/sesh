@@ -28,7 +28,7 @@
 #include "language/syntax/printer_test_helper.hh"
 #include "language/syntax/raw_string.hh"
 #include "language/syntax/simple_command.hh"
-#include "language/syntax/Word.hh"
+#include "language/syntax/word.hh"
 
 namespace {
 
@@ -38,11 +38,11 @@ using sesh::language::syntax::for_each_line_mode;
 using sesh::language::syntax::printer;
 using sesh::language::syntax::raw_string;
 using sesh::language::syntax::simple_command;
-using sesh::language::syntax::Word;
+using sesh::language::syntax::word;
 
 assignment::word_pointer new_word(xstring s) {
-    assignment::word_pointer w(new Word);
-    w->addComponent(Word::ComponentPointer(new raw_string(s)));
+    assignment::word_pointer w(new word);
+    w->add_component(word::component_pointer(new raw_string(s)));
     return w;
 }
 

@@ -23,7 +23,7 @@
 #include "common/xchar.hh"
 #include "common/xstring.hh"
 #include "language/syntax/printer.hh"
-#include "language/syntax/Word.hh"
+#include "language/syntax/word.hh"
 
 namespace sesh {
 namespace language {
@@ -35,12 +35,12 @@ using common::xstring;
 
 void create_word_if_null(assignment::word_pointer &w) {
     if (w == nullptr)
-        w.reset(new Word);
+        w.reset(new word);
 }
 
 } // namespace
 
-assignment::assignment() : m_variable_name(), m_value(new Word) { }
+assignment::assignment() : m_variable_name(), m_value(new word) { }
 
 assignment::assignment(const xstring &variable_name, word_pointer &&value) :
         m_variable_name(variable_name), m_value(std::move(value)) {

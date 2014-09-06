@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_Word_hh
-#define INCLUDED_language_syntax_Word_hh
+#ifndef INCLUDED_language_syntax_word_hh
+#define INCLUDED_language_syntax_word_hh
 
 #include "buildconfig.h"
 
@@ -36,52 +36,52 @@ namespace syntax {
  * A word is a token that may contain expansions. A word is composed of any
  * number of word components.
  */
-class Word : public printable {
+class word : public printable {
 
 public:
 
-    using ComponentPointer = std::unique_ptr<WordComponent>;
+    using component_pointer = std::unique_ptr<WordComponent>;
 
 private:
 
-    std::vector<ComponentPointer> mComponents;
+    std::vector<component_pointer> m_components;
 
     mutable common::maybe<common::maybe<common::xstring>>
-            mMaybeConstantValueCache;
+            m_maybe_constant_value_cache;
 
 public:
 
     template<typename... Arg>
-    Word(Arg &&... arg) :
-            mComponents(std::forward<Arg>(arg)...),
-            mMaybeConstantValueCache() { }
+    word(Arg &&... arg) :
+            m_components(std::forward<Arg>(arg)...),
+            m_maybe_constant_value_cache() { }
 
-    Word() = default;
-    Word(const Word &) = delete;
-    Word(Word &&) = default;
-    Word &operator=(const Word &) = delete;
-    Word &operator=(Word &&) = default;
-    ~Word() override = default;
+    word() = default;
+    word(const word &) = delete;
+    word(word &&) = default;
+    word &operator=(const word &) = delete;
+    word &operator=(word &&) = default;
+    ~word() override = default;
 
-    const std::vector<ComponentPointer> &components() const noexcept {
-        return mComponents;
+    const std::vector<component_pointer> &components() const noexcept {
+        return m_components;
     }
 
     /**
      * Adds a component to this word.
      * @param c non-null pointer to the component to add.
      */
-    void addComponent(ComponentPointer c);
+    void add_component(component_pointer c);
 
     /**
      * Moves all components of the argument word to the end of this word. The
      * argument word will be empty after this method returns.
      */
-    void append(Word &&);
+    void append(word &&);
 
 private:
 
-    common::maybe<common::xstring> computeMaybeConstantValue() const;
+    common::maybe<common::xstring> compute_maybe_constant_value() const;
 
 public:
 
@@ -91,19 +91,19 @@ public:
      * returns a reference to a maybe object containing the constant value.
      * Otherwise, returns a reference to an empty maybe object.
      */
-    const common::maybe<common::xstring> &maybeConstantValue() const;
+    const common::maybe<common::xstring> &maybe_constant_value() const;
 
     /** Returns true if all components of this word are raw strings. */
-    bool isRawString() const;
+    bool is_raw_string() const;
 
     void print(printer &) const override;
 
-}; // class Word
+}; // class word
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_Word_hh
+#endif // #ifndef INCLUDED_language_syntax_word_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

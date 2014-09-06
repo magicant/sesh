@@ -23,7 +23,7 @@
 #include <memory>
 #include "common/xstring.hh"
 #include "language/syntax/printable.hh"
-#include "language/syntax/Word.hh"
+#include "language/syntax/word.hh"
 
 namespace sesh {
 namespace language {
@@ -34,7 +34,7 @@ class assignment : public printable {
 
 public:
 
-    using word_pointer = std::unique_ptr<Word>;
+    using word_pointer = std::unique_ptr<word>;
 
 private:
 
@@ -60,8 +60,8 @@ public:
         return m_variable_name;
     }
 
-    Word &value() noexcept { return *m_value; }
-    const Word &value() const noexcept { return *m_value; }
+    word &value() noexcept { return *m_value; }
+    const word &value() const noexcept { return *m_value; }
 
     void print(printer &) const override;
 
