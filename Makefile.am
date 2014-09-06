@@ -44,7 +44,7 @@ TESTPROGRAMS = \
 	src/language/source/source_test \
 	src/language/syntax/and_or_list_test \
 	src/language/syntax/assignment_test \
-	src/language/syntax/CommandTest \
+	src/language/syntax/command_test \
 	src/language/syntax/ConditionalPipelineTest \
 	src/language/syntax/PipelineTest \
 	src/language/syntax/PrinterTest \
@@ -138,7 +138,7 @@ src_sesh_SOURCES = \
 	src/language/syntax/and_or_list.hh \
 	src/language/syntax/assignment.cc \
 	src/language/syntax/assignment.hh \
-	src/language/syntax/Command.hh \
+	src/language/syntax/command.hh \
 	src/language/syntax/ConditionalPipeline.cc \
 	src/language/syntax/ConditionalPipeline.hh \
 	src/language/syntax/Pipeline.cc \
@@ -274,9 +274,9 @@ src_language_syntax_assignment_test_SOURCES = \
 	src/language/syntax/Printer.cc \
 	src/language/syntax/RawString.cc \
 	src/language/syntax/Word.cc
-src_language_syntax_CommandTest_SOURCES = \
+src_language_syntax_command_test_SOURCES = \
 	src/language/source/location.cc \
-	src/language/syntax/CommandTest.cc
+	src/language/syntax/command_test.cc
 src_language_syntax_ConditionalPipelineTest_SOURCES = \
 	src/language/source/location.cc \
 	src/language/syntax/ConditionalPipeline.cc \

@@ -23,7 +23,7 @@
 #include <memory>
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/syntax/Command.hh"
+#include "language/syntax/command.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
 #include "language/syntax/PrinterTestHelper.hh"
@@ -32,16 +32,16 @@ namespace {
 
 using sesh::common::xchar;
 using sesh::common::xstring;
-using sesh::language::syntax::Command;
+using sesh::language::syntax::command;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::forEachLineMode;
 
-class CommandStub : public Command {
+class CommandStub : public command {
 private:
     xstring mString;
 public:
-    explicit CommandStub(const xchar *s) : Command(), mString(s) { }
+    explicit CommandStub(const xchar *s) : command(), mString(s) { }
     void print(Printer &p) const override {
         p << mString;
         p.delayedCharacters() << L(' ');

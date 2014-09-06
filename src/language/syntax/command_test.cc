@@ -24,22 +24,22 @@
 #include <memory>
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/syntax/Command.hh"
+#include "language/syntax/command.hh"
 #include "language/syntax/Printer.hh"
 
 namespace {
 
 using sesh::common::xstring;
-using sesh::language::syntax::Command;
+using sesh::language::syntax::command;
 using sesh::language::syntax::Printer;
 
-class CommandStub : public Command {
+class command_stub : public command {
 public:
-    using Command::Command;
+    using command::command;
     void print(Printer &) const override;
 };
 
-void CommandStub::print(Printer &) const {
+void command_stub::print(Printer &) const {
     CHECK(false);
 }
 

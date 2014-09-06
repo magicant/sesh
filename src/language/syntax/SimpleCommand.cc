@@ -26,7 +26,7 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-SimpleCommand::SimpleCommand() : Command(), mWords(), mAssignments() { }
+SimpleCommand::SimpleCommand() : command(), mWords(), mAssignments() { }
 
 void SimpleCommand::print(Printer &p) const {
     for (const AssignmentPointer &a : assignments()) {

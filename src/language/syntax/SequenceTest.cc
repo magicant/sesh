@@ -23,7 +23,7 @@
 #include "common/xchar.hh"
 #include "common/xstring.hh"
 #include "language/syntax/and_or_list.hh"
-#include "language/syntax/Command.hh"
+#include "language/syntax/command.hh"
 #include "language/syntax/ConditionalPipeline.hh"
 #include "language/syntax/Pipeline.hh"
 #include "language/syntax/Printer.hh"
@@ -33,15 +33,15 @@ namespace {
 
 using sesh::common::xstring;
 using sesh::language::syntax::and_or_list;
-using sesh::language::syntax::Command;
+using sesh::language::syntax::command;
 using sesh::language::syntax::ConditionalPipeline;
 using sesh::language::syntax::Pipeline;
 using sesh::language::syntax::Printer;
 using sesh::language::syntax::Sequence;
 
-struct CommandStub : public Command {
+struct CommandStub : public command {
     xstring s;
-    CommandStub(xstring s) : Command(), s(s) { }
+    CommandStub(xstring s) : command(), s(s) { }
     void print(Printer &p) const override {
         p << s;
         p.delayedCharacters() << L(' ');

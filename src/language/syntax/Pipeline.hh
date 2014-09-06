@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <vector>
-#include "language/syntax/Command.hh"
+#include "language/syntax/command.hh"
 #include "language/syntax/Printable.hh"
 
 namespace sesh {
@@ -37,7 +37,7 @@ class Pipeline : public Printable {
 
 public:
 
-    using CommandPointer = std::unique_ptr<Command>;
+    using CommandPointer = std::unique_ptr<command>;
 
     enum class ExitStatusType {
         STRAIGHT,

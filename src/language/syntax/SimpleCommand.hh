@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 #include "language/syntax/assignment.hh"
-#include "language/syntax/Command.hh"
+#include "language/syntax/command.hh"
 #include "language/syntax/Word.hh"
 
 namespace sesh {
@@ -34,7 +34,7 @@ namespace syntax {
  * A valid simple command contains at least one word, assignment, or
  * redirection. Each word must contain at least one word component.
  */
-class SimpleCommand : public Command {
+class SimpleCommand : public command {
 
 public:
 

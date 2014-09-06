@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_Command_hh
-#define INCLUDED_language_syntax_Command_hh
+#ifndef INCLUDED_language_syntax_command_hh
+#define INCLUDED_language_syntax_command_hh
 
 #include "buildconfig.h"
 
@@ -28,7 +28,7 @@ namespace language {
 namespace syntax {
 
 /** A command is either a simple or compound command. */
-class Command : public Printable {
+class command : public Printable {
 
 private:
 
@@ -36,19 +36,19 @@ private:
 
 public:
 
-    Command() = default;
-    Command(const Command &) = default;
-    Command(Command &&) = default;
-    Command &operator=(const Command &) = default;
-    Command &operator=(Command &&) = default;
-    ~Command() override = default;
+    command() = default;
+    command(const command &) = default;
+    command(command &&) = default;
+    command &operator=(const command &) = default;
+    command &operator=(command &&) = default;
+    ~command() override = default;
 
-}; // class Command
+}; // class command
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_Command_hh
+#endif // #ifndef INCLUDED_language_syntax_command_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
