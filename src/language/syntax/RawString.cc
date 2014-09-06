@@ -19,7 +19,7 @@
 #include "RawString.hh"
 
 #include "common/xstring.hh"
-#include "language/syntax/Printer.hh"
+#include "language/syntax/printer.hh"
 
 using sesh::common::xstring;
 

@@ -27,7 +27,7 @@
 #include "language/syntax/command.hh"
 #include "language/syntax/conditional_pipeline.hh"
 #include "language/syntax/pipeline.hh"
-#include "language/syntax/Printer.hh"
+#include "language/syntax/printer.hh"
 
 namespace {
 

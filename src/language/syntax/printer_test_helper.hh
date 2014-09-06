@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_PrinterTestHelper_hh
-#define INCLUDED_language_syntax_PrinterTestHelper_hh
+#ifndef INCLUDED_language_syntax_printer_test_helper_hh
+#define INCLUDED_language_syntax_printer_test_helper_hh
 
 #include "buildconfig.h"
 
 #include <functional>
-#include "language/syntax/Printer.hh"
+#include "language/syntax/printer.hh"
 
 namespace sesh {
 namespace language {
@@ -45,6 +45,6 @@ inline void forEachLineMode(std::function<void(Printer &)> f) {
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_PrinterTestHelper_hh
+#endif // #ifndef INCLUDED_language_syntax_printer_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

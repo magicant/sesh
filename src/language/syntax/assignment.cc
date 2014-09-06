@@ -22,7 +22,7 @@
 #include <utility>
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/syntax/Printer.hh"
+#include "language/syntax/printer.hh"
 #include "language/syntax/Word.hh"
 
 namespace sesh {

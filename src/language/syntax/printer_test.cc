@@ -22,8 +22,8 @@
 
 #include <functional>
 #include "common/xchar.hh"
-#include "language/syntax/Printer.hh"
-#include "language/syntax/PrinterTestHelper.hh"
+#include "language/syntax/printer.hh"
+#include "language/syntax/printer_test_helper.hh"
 
 namespace {
 

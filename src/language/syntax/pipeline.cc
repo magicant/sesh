@@ -21,7 +21,7 @@
 #include <utility>
 #include <vector>
 #include "common/xchar.hh"
-#include "language/syntax/Printer.hh"
+#include "language/syntax/printer.hh"
 
 namespace sesh {
 namespace language {

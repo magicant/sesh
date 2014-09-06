@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Printer.hh"
+#include "printer.hh"
 
 #include "common/xchar.hh"
 #include "common/xstring.hh"

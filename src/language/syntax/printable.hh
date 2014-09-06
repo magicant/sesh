@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "language/syntax/Printer.hh"
+#include "language/syntax/printer.hh"
 
 namespace sesh {
 namespace language {
