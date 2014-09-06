@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "AndOrList.hh"
+#include "and_or_list.hh"
 
 #include <utility>
 #include "common/xchar.hh"
@@ -26,18 +26,18 @@ namespace sesh {
 namespace language {
 namespace syntax {
 
-AndOrList::AndOrList(Pipeline &&first, Synchronicity s) :
-        mFirst(std::move(first)), mRest(), mSynchronicity(s) { }
+and_or_list::and_or_list(Pipeline &&first, synchronicity_type s) :
+        m_first(std::move(first)), m_rest(), m_synchronicity(s) { }
 
 namespace {
 
-inline void printSeparator(AndOrList::Synchronicity s, Printer &p) {
+inline void print_separator(and_or_list::synchronicity_type s, Printer &p) {
     p.clearDelayedCharacters();
     switch (s) {
-    case AndOrList::Synchronicity::SEQUENTIAL:
+    case and_or_list::synchronicity_type::sequential:
         p.delayedCharacters() << L(';');
         break;
-    case AndOrList::Synchronicity::ASYNCHRONOUS:
+    case and_or_list::synchronicity_type::asynchronous:
         p << L('&');
         break;
     }
@@ -46,11 +46,11 @@ inline void printSeparator(AndOrList::Synchronicity s, Printer &p) {
 
 } // namespace
 
-void AndOrList::print(Printer &p) const {
+void and_or_list::print(Printer &p) const {
     p << first();
     for (const ConditionalPipeline &cp : rest())
         p << cp;
-    printSeparator(synchronicity(), p);
+    print_separator(synchronicity(), p);
 }
 
 } // namespace syntax

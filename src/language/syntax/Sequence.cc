@@ -18,7 +18,7 @@
 #include "buildconfig.h"
 #include "Sequence.hh"
 
-#include "language/syntax/AndOrList.hh"
+#include "language/syntax/and_or_list.hh"
 #include "language/syntax/Printer.hh"
 
 namespace sesh {

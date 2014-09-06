@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_AndOrList_hh
-#define INCLUDED_language_syntax_AndOrList_hh
+#ifndef INCLUDED_language_syntax_and_or_list_hh
+#define INCLUDED_language_syntax_and_or_list_hh
 
 #include "buildconfig.h"
 
@@ -34,54 +34,58 @@ namespace syntax {
  * An and-or list is a pipeline possibly followed by any number of conditional
  * pipelines.
  */
-class AndOrList : public Printable {
+class and_or_list : public Printable {
 
 public:
 
-    enum class Synchronicity {
-        SEQUENTIAL,
-        ASYNCHRONOUS,
+    enum class synchronicity_type {
+        sequential,
+        asynchronous,
     };
 
 private:
 
-    Pipeline mFirst;
-    std::vector<ConditionalPipeline> mRest;
-    Synchronicity mSynchronicity;
+    Pipeline m_first;
+    std::vector<ConditionalPipeline> m_rest;
+    synchronicity_type m_synchronicity;
 
 public:
 
-    explicit AndOrList(
+    explicit and_or_list(
             Pipeline &&first,
-            Synchronicity = Synchronicity::SEQUENTIAL);
+            synchronicity_type = synchronicity_type::sequential);
 
-    AndOrList(const AndOrList &) = delete;
-    AndOrList(AndOrList &&) = default;
-    AndOrList &operator=(const AndOrList &) = delete;
-    AndOrList &operator=(AndOrList &&) = default;
-    ~AndOrList() override = default;
+    and_or_list(const and_or_list &) = delete;
+    and_or_list(and_or_list &&) = default;
+    and_or_list &operator=(const and_or_list &) = delete;
+    and_or_list &operator=(and_or_list &&) = default;
+    ~and_or_list() override = default;
 
-    Pipeline &first() noexcept { return mFirst; }
-    const Pipeline &first() const noexcept { return mFirst; }
+    Pipeline &first() noexcept { return m_first; }
+    const Pipeline &first() const noexcept { return m_first; }
 
     std::vector<ConditionalPipeline> &rest() noexcept {
-        return mRest;
+        return m_rest;
     }
     const std::vector<ConditionalPipeline> &rest() const noexcept {
-        return mRest;
+        return m_rest;
     }
 
-    Synchronicity &synchronicity() noexcept { return mSynchronicity; }
-    Synchronicity synchronicity() const noexcept { return mSynchronicity; }
+    synchronicity_type &synchronicity() noexcept {
+        return m_synchronicity;
+    }
+    synchronicity_type synchronicity() const noexcept {
+        return m_synchronicity;
+    }
 
     void print(Printer &) const override;
 
-}; // class AndOrList
+}; // class and_or_list
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_AndOrList_hh
+#endif // #ifndef INCLUDED_language_syntax_and_or_list_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

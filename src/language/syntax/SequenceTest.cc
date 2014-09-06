@@ -22,7 +22,7 @@
 
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/syntax/AndOrList.hh"
+#include "language/syntax/and_or_list.hh"
 #include "language/syntax/Command.hh"
 #include "language/syntax/ConditionalPipeline.hh"
 #include "language/syntax/Pipeline.hh"
@@ -32,7 +32,7 @@
 namespace {
 
 using sesh::common::xstring;
-using sesh::language::syntax::AndOrList;
+using sesh::language::syntax::and_or_list;
 using sesh::language::syntax::Command;
 using sesh::language::syntax::ConditionalPipeline;
 using sesh::language::syntax::Pipeline;
@@ -53,7 +53,7 @@ struct PrintFixture {
     Sequence s;
     PrintFixture() : s() {
         s.andOrLists().emplace_back(
-                Sequence::AndOrListPointer(new AndOrList(Pipeline())));
+                Sequence::AndOrListPointer(new and_or_list(Pipeline())));
         s.andOrLists()[0]->first().commands().emplace_back(
                 Pipeline::CommandPointer(new CommandStub(L("C1"))));
         s.andOrLists()[0]->rest().emplace_back(
@@ -62,9 +62,9 @@ struct PrintFixture {
                 Pipeline::CommandPointer(new CommandStub(L("C2"))));
 
         s.andOrLists().emplace_back(
-                Sequence::AndOrListPointer(new AndOrList(Pipeline())));
+                Sequence::AndOrListPointer(new and_or_list(Pipeline())));
         s.andOrLists()[1]->synchronicity() =
-                AndOrList::Synchronicity::ASYNCHRONOUS;
+                and_or_list::synchronicity_type::asynchronous;
         s.andOrLists()[1]->first().exitStatusType() =
                 Pipeline::ExitStatusType::NEGATED;
         s.andOrLists()[1]->first().commands().emplace_back(
@@ -73,7 +73,7 @@ struct PrintFixture {
                 Pipeline::CommandPointer(new CommandStub(L("C4"))));
 
         s.andOrLists().emplace_back(
-                Sequence::AndOrListPointer(new AndOrList(Pipeline())));
+                Sequence::AndOrListPointer(new and_or_list(Pipeline())));
         s.andOrLists()[2]->first().commands().emplace_back(
                 Pipeline::CommandPointer(new CommandStub(L("C5"))));
     }

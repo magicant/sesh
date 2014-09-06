@@ -42,7 +42,7 @@ TESTPROGRAMS = \
 	src/language/source/line_continued_source_test \
 	src/language/source/location_test \
 	src/language/source/source_test \
-	src/language/syntax/AndOrListTest \
+	src/language/syntax/and_or_list_test \
 	src/language/syntax/AssignmentTest \
 	src/language/syntax/CommandTest \
 	src/language/syntax/ConditionalPipelineTest \
@@ -134,8 +134,8 @@ src_sesh_SOURCES = \
 	src/language/source/origin.hh \
 	src/language/source/source.cc \
 	src/language/source/source.hh \
-	src/language/syntax/AndOrList.cc \
-	src/language/syntax/AndOrList.hh \
+	src/language/syntax/and_or_list.cc \
+	src/language/syntax/and_or_list.hh \
 	src/language/syntax/Assignment.cc \
 	src/language/syntax/Assignment.hh \
 	src/language/syntax/Command.hh \
@@ -261,10 +261,10 @@ src_language_source_source_test_SOURCES = \
 	src/common/message.cc \
 	src/language/source/source.cc \
 	src/language/source/source_test.cc
-src_language_syntax_AndOrListTest_SOURCES = \
+src_language_syntax_and_or_list_test_SOURCES = \
 	src/language/source/location.cc \
-	src/language/syntax/AndOrList.cc \
-	src/language/syntax/AndOrListTest.cc \
+	src/language/syntax/and_or_list.cc \
+	src/language/syntax/and_or_list_test.cc \
 	src/language/syntax/ConditionalPipeline.cc \
 	src/language/syntax/Pipeline.cc \
 	src/language/syntax/Printer.cc
@@ -297,7 +297,7 @@ src_language_syntax_RawStringTest_SOURCES = \
 	src/language/syntax/RawStringTest.cc
 src_language_syntax_SequenceTest_SOURCES = \
 	src/language/source/location.cc \
-	src/language/syntax/AndOrList.cc \
+	src/language/syntax/and_or_list.cc \
 	src/language/syntax/ConditionalPipeline.cc \
 	src/language/syntax/Pipeline.cc \
 	src/language/syntax/Printer.cc \

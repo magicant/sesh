@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <vector>
-#include "language/syntax/AndOrList.hh"
+#include "language/syntax/and_or_list.hh"
 #include "language/syntax/Printable.hh"
 
 namespace sesh {
@@ -39,7 +39,7 @@ class Sequence : public Printable {
 
 public:
 
-    using AndOrListPointer = std::unique_ptr<AndOrList>;
+    using AndOrListPointer = std::unique_ptr<and_or_list>;
 
 private:
 
