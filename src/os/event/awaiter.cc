@@ -56,8 +56,7 @@ using sesh::os::signaling::HandlerConfiguration;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
-using Clock = TimePoint::clock;
+using time_point = sesh::os::event::PselectApi::steady_clock_time;
 
 namespace sesh {
 namespace os {
@@ -65,179 +64,180 @@ namespace event {
 
 namespace {
 
-using FileDescriptorTrigger = variant<
+using file_descriptor_trigger = variant<
         ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
 
-class PendingEvent {
+class pending_event {
 
 private:
 
-    Timeout mTimeout;
-    std::vector<FileDescriptorTrigger> mTriggers;
-    promise<Trigger> mPromise;
-    std::vector<HandlerConfiguration::Canceler> mCancelers;
+    Timeout m_timeout;
+    std::vector<file_descriptor_trigger> m_triggers;
+    promise<Trigger> m_promise;
+    std::vector<HandlerConfiguration::Canceler> m_cancelers;
 
 public:
 
-    explicit PendingEvent(promise<Trigger> p);
-    PendingEvent(PendingEvent &&) = default;
-    PendingEvent &operator=(PendingEvent &&) = default;
-    ~PendingEvent();
+    explicit pending_event(promise<Trigger>);
+    pending_event(pending_event &&) = default;
+    pending_event &operator=(pending_event &&) = default;
+    ~pending_event();
 
-    Timeout &timeout() noexcept { return mTimeout; }
+    Timeout &timeout() noexcept { return m_timeout; }
 
-    const std::vector<FileDescriptorTrigger> &triggers() const noexcept {
-        return mTriggers;
+    const std::vector<file_descriptor_trigger> &triggers() const noexcept {
+        return m_triggers;
     }
 
-    void addTrigger(const FileDescriptorTrigger &t);
+    void add_trigger(const file_descriptor_trigger &t);
 
-    bool hasFired() const noexcept { return !mPromise.is_valid(); }
+    bool has_fired() const noexcept { return !m_promise.is_valid(); }
 
     void fire(Trigger &&);
-    void failWithCurrentException();
+    void fail_with_current_exception();
 
-    void addCanceler(HandlerConfiguration::Canceler &&c);
+    void add_canceler(HandlerConfiguration::Canceler &&c);
 
 };
 
-class SignalHandler {
+class signal_handler {
 
 private:
 
-    std::weak_ptr<PendingEvent> mEvent;
+    std::weak_ptr<pending_event> m_event;
 
 public:
 
-    SignalHandler(const std::shared_ptr<PendingEvent> &) noexcept;
+    signal_handler(const std::shared_ptr<pending_event> &) noexcept;
 
     void operator()(SignalNumber);
 
-}; // class SignalHandler
+}; // class signal_handler
 
-class PselectArgument {
+class pselect_argument {
 
 private:
 
-    FileDescriptor::Value mFdBound;
-    std::unique_ptr<FileDescriptorSet> mReadFds, mWriteFds, mErrorFds;
-    TimePoint::duration mTimeout;
+    FileDescriptor::Value m_fd_bound;
+    std::unique_ptr<FileDescriptorSet> m_read_fds, m_write_fds, m_error_fds;
+    time_point::duration m_timeout;
 
-    void addFd(
+    void add_fd(
             std::unique_ptr<FileDescriptorSet> &fds,
             FileDescriptor::Value fd,
             const PselectApi &api);
 
 public:
 
-    explicit PselectArgument(TimePoint::duration timeout) noexcept;
+    explicit pselect_argument(time_point::duration timeout) noexcept;
 
     /**
      * Updates this p-select argument according to the given trigger. May throw
      * some exception.
      */
-    void add(const FileDescriptorTrigger &, const PselectApi &);
+    void add(const file_descriptor_trigger &, const PselectApi &);
 
     /**
      * Updates this p-select argument according to the given event. This
      * function may fire the event directly if applicable.
      */
-    void addOrFire(PendingEvent &, const PselectApi &);
+    void add_or_fire(pending_event &, const PselectApi &);
 
     /** Calls the p-select API function with this argument. */
     std::error_code call(const PselectApi &api, const SignalNumberSet *);
 
     /** Tests if this p-select call result matches the given trigger. */
-    bool matches(const FileDescriptorTrigger &) const;
+    bool matches(const file_descriptor_trigger &) const;
 
     /**
      * Applies this p-select call result to the argument event. If the result
      * matches the event, the event is fired. If the event has already been
      * fired, this function has no side effect.
      */
-    void applyResult(PendingEvent &) const;
+    void apply_result(pending_event &) const;
 
-}; // class PselectArgument
+}; // class pselect_argument
 
-class AwaiterImpl : public Awaiter {
+class awaiter_impl : public awaiter {
 
 public:
 
-    using TimeLimit = TimePoint;
+    using time_limit = time_point;
 
 private:
 
-    const PselectApi &mApi;
-    std::shared_ptr<HandlerConfiguration> mHandlerConfiguration;
-    std::multimap<TimeLimit, std::shared_ptr<PendingEvent>> mPendingEvents;
+    const PselectApi &m_api;
+    std::shared_ptr<HandlerConfiguration> m_handler_configuration;
+    std::multimap<time_limit, std::shared_ptr<pending_event>> m_pending_events;
 
     future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
 
-    bool removeFiredEvents();
+    bool remove_fired_events();
 
-    void fireTimeouts(TimePoint now);
+    void fire_timeouts(time_point now);
 
     /** @return min for infinity */
-    TimePoint::duration durationToNextTimeout(TimePoint now) const;
+    time_point::duration duration_to_next_timeout(time_point now) const;
 
-    PselectArgument computeArgumentFiringErroredEvents(TimePoint now);
+    pselect_argument compute_argument_firing_errored_events(time_point now);
 
-    void applyResult(const PselectArgument &);
+    void apply_result(const pselect_argument &);
 
 public:
 
-    AwaiterImpl(
+    awaiter_impl(
             const PselectApi &, std::shared_ptr<HandlerConfiguration> &&hc);
 
-    void awaitEvents() final override;
+    void await_events() final override;
 
-}; // class AwaiterImpl
+}; // class awaiter_impl
 
-PendingEvent::PendingEvent(promise<Trigger> p) :
-        mTimeout(Timeout::Interval::max()),
-        mTriggers(),
-        mPromise(std::move(p)),
-        mCancelers() { }
+pending_event::pending_event(promise<Trigger> p) :
+        m_timeout(Timeout::Interval::max()),
+        m_triggers(),
+        m_promise(std::move(p)),
+        m_cancelers() { }
 
-PendingEvent::~PendingEvent() {
-    for (HandlerConfiguration::Canceler &c : mCancelers)
+pending_event::~pending_event() {
+    for (HandlerConfiguration::Canceler &c : m_cancelers)
         (void) c();
 }
 
-void PendingEvent::addTrigger(const FileDescriptorTrigger &t) {
-    mTriggers.push_back(t);
+void pending_event::add_trigger(const file_descriptor_trigger &t) {
+    m_triggers.push_back(t);
 }
 
-void PendingEvent::fire(Trigger &&t) {
-    if (!hasFired())
-        std::move(mPromise).set_result(std::move(t));
+void pending_event::fire(Trigger &&t) {
+    if (!has_fired())
+        std::move(m_promise).set_result(std::move(t));
 }
 
-void PendingEvent::failWithCurrentException() {
-    if (!hasFired())
-        std::move(mPromise).fail_with_current_exception();
+void pending_event::fail_with_current_exception() {
+    if (!has_fired())
+        std::move(m_promise).fail_with_current_exception();
 }
 
-void PendingEvent::addCanceler(HandlerConfiguration::Canceler &&c) {
-    mCancelers.push_back(std::move(c));
+void pending_event::add_canceler(HandlerConfiguration::Canceler &&c) {
+    m_cancelers.push_back(std::move(c));
 }
 
-SignalHandler::SignalHandler(const std::shared_ptr<PendingEvent> &e) noexcept :
-        mEvent(e) { }
+signal_handler::signal_handler(const std::shared_ptr<pending_event> &e)
+        noexcept :
+        m_event(e) { }
 
-void SignalHandler::operator()(SignalNumber n) {
-    if (std::shared_ptr<PendingEvent> e = mEvent.lock())
+void signal_handler::operator()(SignalNumber n) {
+    if (std::shared_ptr<pending_event> e = m_event.lock())
         e->fire(Signal(n));
 }
 
-PselectArgument::PselectArgument(TimePoint::duration timeout) noexcept :
-        mFdBound(0),
-        mReadFds(),
-        mWriteFds(),
-        mErrorFds(),
-        mTimeout(timeout) { }
+pselect_argument::pselect_argument(time_point::duration timeout) noexcept :
+        m_fd_bound(0),
+        m_read_fds(),
+        m_write_fds(),
+        m_error_fds(),
+        m_timeout(timeout) { }
 
-void PselectArgument::addFd(
+void pselect_argument::add_fd(
         std::unique_ptr<FileDescriptorSet> &fds,
         FileDescriptor::Value fd,
         const PselectApi &api) {
@@ -245,46 +245,46 @@ void PselectArgument::addFd(
         fds = api.createFileDescriptorSet();
     fds->set(fd);
 
-    mFdBound = std::max(mFdBound, fd + 1);
+    m_fd_bound = std::max(m_fd_bound, fd + 1);
 }
 
-void PselectArgument::add(
-        const FileDescriptorTrigger &t, const PselectApi &api) {
+void pselect_argument::add(
+        const file_descriptor_trigger &t, const PselectApi &api) {
     switch (t.tag()) {
-    case FileDescriptorTrigger::tag<ReadableFileDescriptor>():
-        addFd(mReadFds, t.value<ReadableFileDescriptor>().value(), api);
+    case file_descriptor_trigger::tag<ReadableFileDescriptor>():
+        add_fd(m_read_fds, t.value<ReadableFileDescriptor>().value(), api);
         return;
-    case FileDescriptorTrigger::tag<WritableFileDescriptor>():
-        addFd(mWriteFds, t.value<WritableFileDescriptor>().value(), api);
+    case file_descriptor_trigger::tag<WritableFileDescriptor>():
+        add_fd(m_write_fds, t.value<WritableFileDescriptor>().value(), api);
         return;
-    case FileDescriptorTrigger::tag<ErrorFileDescriptor>():
-        addFd(mErrorFds, t.value<ErrorFileDescriptor>().value(), api);
+    case file_descriptor_trigger::tag<ErrorFileDescriptor>():
+        add_fd(m_error_fds, t.value<ErrorFileDescriptor>().value(), api);
         return;
     }
     UNREACHABLE();
 }
 
-void PselectArgument::addOrFire(PendingEvent &e, const PselectApi &api) {
-    if (e.hasFired())
+void pselect_argument::add_or_fire(pending_event &e, const PselectApi &api) {
+    if (e.has_fired())
         return;
 
     try {
-        for (const FileDescriptorTrigger &t : e.triggers())
+        for (const file_descriptor_trigger &t : e.triggers())
             add(t, api);
     } catch (...) {
-        e.failWithCurrentException();
+        e.fail_with_current_exception();
     }
 }
 
-std::error_code PselectArgument::call(
-        const PselectApi &api, const SignalNumberSet *signalMask) {
+std::error_code pselect_argument::call(
+        const PselectApi &api, const SignalNumberSet *signal_mask) {
     return api.pselect(
-            mFdBound,
-            mReadFds.get(),
-            mWriteFds.get(),
-            mErrorFds.get(),
-            mTimeout,
-            signalMask);
+            m_fd_bound,
+            m_read_fds.get(),
+            m_write_fds.get(),
+            m_error_fds.get(),
+            m_timeout,
+            signal_mask);
 }
 
 bool contains(
@@ -293,195 +293,201 @@ bool contains(
     return fds != nullptr && fds->test(fd);
 }
 
-bool PselectArgument::matches(const FileDescriptorTrigger &t) const {
+bool pselect_argument::matches(const file_descriptor_trigger &t) const {
     switch (t.tag()) {
-    case FileDescriptorTrigger::tag<ReadableFileDescriptor>():
-        return contains(mReadFds, t.value<ReadableFileDescriptor>().value());
-    case FileDescriptorTrigger::tag<WritableFileDescriptor>():
-        return contains(mWriteFds, t.value<WritableFileDescriptor>().value());
-    case FileDescriptorTrigger::tag<ErrorFileDescriptor>():
-        return contains(mErrorFds, t.value<ErrorFileDescriptor>().value());
+    case file_descriptor_trigger::tag<ReadableFileDescriptor>():
+        return contains(m_read_fds, t.value<ReadableFileDescriptor>().value());
+    case file_descriptor_trigger::tag<WritableFileDescriptor>():
+        return contains(
+                m_write_fds, t.value<WritableFileDescriptor>().value());
+    case file_descriptor_trigger::tag<ErrorFileDescriptor>():
+        return contains(m_error_fds, t.value<ErrorFileDescriptor>().value());
     }
     UNREACHABLE();
 }
 
-void PselectArgument::applyResult(PendingEvent &e) const {
-    if (e.hasFired())
+void pselect_argument::apply_result(pending_event &e) const {
+    if (e.has_fired())
         return;
 
     using namespace std::placeholders;
     auto i = find_if(
-            e.triggers(), std::bind(&PselectArgument::matches, this, _1));
+            e.triggers(), std::bind(&pselect_argument::matches, this, _1));
     if (i != e.triggers().end())
         e.fire(std::move(*i));
 }
 
-AwaiterImpl::AwaiterImpl(
+awaiter_impl::awaiter_impl(
         const PselectApi &api, std::shared_ptr<HandlerConfiguration> &&hc) :
-        mApi(api), mHandlerConfiguration(std::move(hc)), mPendingEvents() {
-    assert(mHandlerConfiguration != nullptr);
+        m_api(api),
+        m_handler_configuration(std::move(hc)),
+        m_pending_events() {
+    assert(m_handler_configuration != nullptr);
 }
 
-void registerSignalTrigger(
-        Signal s, std::shared_ptr<PendingEvent> &e, HandlerConfiguration &hc) {
+void register_signal_trigger(
+        Signal s,
+        std::shared_ptr<pending_event> &e,
+        HandlerConfiguration &hc) {
     auto result = hc.addHandler(
-            s.number(), shared_function<SignalHandler>::create(e));
+            s.number(), shared_function<signal_handler>::create(e));
     switch (result.tag()) {
     case decltype(result)::tag<HandlerConfiguration::Canceler>():
-        return e->addCanceler(
+        return e->add_canceler(
                 std::move(result.value<HandlerConfiguration::Canceler>()));
     case decltype(result)::tag<std::error_code>():
         throw std::system_error(result.value<std::error_code>());
     }
 }
 
-void registerUserProvidedTrigger(
-        UserProvidedTrigger &&t, std::shared_ptr<PendingEvent> &e) {
-    using Result = UserProvidedTrigger::Result;
-    std::weak_ptr<PendingEvent> w = e;
-    std::move(t.future()).then([w](trial<Result> &&t) {
-        if (std::shared_ptr<PendingEvent> e = w.lock()) {
+void register_user_provided_trigger(
+        UserProvidedTrigger &&t, std::shared_ptr<pending_event> &e) {
+    using result = UserProvidedTrigger::Result;
+    std::weak_ptr<pending_event> w = e;
+    std::move(t.future()).then([w](trial<result> &&t) {
+        if (std::shared_ptr<pending_event> e = w.lock()) {
             try {
                 e->fire(UserProvidedTrigger(std::move(*t)));
             } catch (...) {
-                e->failWithCurrentException();
+                e->fail_with_current_exception();
             }
         }
     });
 }
 
-void registerTrigger(
+void register_trigger(
         Trigger &&t,
-        std::shared_ptr<PendingEvent> &e,
+        std::shared_ptr<pending_event> &e,
         HandlerConfiguration &hc) {
     switch (t.tag()) {
     case Trigger::tag<Timeout>():
         e->timeout() = std::min(e->timeout(), t.value<Timeout>());
         return;
     case Trigger::tag<ReadableFileDescriptor>():
-        e->addTrigger(t.value<ReadableFileDescriptor>());
+        e->add_trigger(t.value<ReadableFileDescriptor>());
         return;
     case Trigger::tag<WritableFileDescriptor>():
-        e->addTrigger(t.value<WritableFileDescriptor>());
+        e->add_trigger(t.value<WritableFileDescriptor>());
         return;
     case Trigger::tag<ErrorFileDescriptor>():
-        e->addTrigger(t.value<ErrorFileDescriptor>());
+        e->add_trigger(t.value<ErrorFileDescriptor>());
         return;
     case Trigger::tag<Signal>():
-        registerSignalTrigger(t.value<Signal>(), e, hc);
+        register_signal_trigger(t.value<Signal>(), e, hc);
         return;
     case Trigger::tag<UserProvidedTrigger>():
-        registerUserProvidedTrigger(
+        register_user_provided_trigger(
                 std::move(t.value<UserProvidedTrigger>()), e);
         return;
     }
 }
 
-TimePoint computeTimeLimit(Timeout timeout, const time_api &api) {
+time_point compute_time_limit(Timeout timeout, const time_api &api) {
     if (timeout.interval() < Timeout::Interval::zero())
         timeout = Timeout(Timeout::Interval::zero());
 
     if (timeout.interval() == Timeout::Interval::max())
-        return TimePoint::max();
+        return time_point::max();
 
-    TimePoint now = api.steady_clock_now();
-    if (now > TimePoint::max() - timeout.interval())
-        return TimePoint::max();
+    time_point now = api.steady_clock_now();
+    if (now > time_point::max() - timeout.interval())
+        return time_point::max();
     return now + timeout.interval();
 }
 
-future<Trigger> AwaiterImpl::expectImpl(
+future<Trigger> awaiter_impl::expectImpl(
         std::vector<Trigger> &&triggers) {
-    auto promiseAndFuture = make_promise_future_pair<Trigger>();
+    auto pf = make_promise_future_pair<Trigger>();
     if (triggers.empty())
-        return std::move(promiseAndFuture.second);
+        return std::move(pf.second);
 
-    auto event =
-            std::make_shared<PendingEvent>(std::move(promiseAndFuture.first));
+    auto event = std::make_shared<pending_event>(std::move(pf.first));
     for (Trigger &t : triggers)
-        registerTrigger(std::move(t), event, *mHandlerConfiguration);
+        register_trigger(std::move(t), event, *m_handler_configuration);
 
-    TimePoint timeLimit = computeTimeLimit(event->timeout(), mApi);
-    mPendingEvents.emplace(timeLimit, std::move(event));
+    time_point time_limit = compute_time_limit(event->timeout(), m_api);
+    m_pending_events.emplace(time_limit, std::move(event));
 
-    return std::move(promiseAndFuture.second);
+    return std::move(pf.second);
 }
 
-bool AwaiterImpl::removeFiredEvents() {
-    bool removedAny = false;
-    for (auto i = mPendingEvents.begin(); i != mPendingEvents.end(); ) {
-        PendingEvent &e = *i->second;
-        if (e.hasFired()) {
-            i = mPendingEvents.erase(i);
-            removedAny = true;
+bool awaiter_impl::remove_fired_events() {
+    bool removed_any = false;
+    for (auto i = m_pending_events.begin(); i != m_pending_events.end(); ) {
+        pending_event &e = *i->second;
+        if (e.has_fired()) {
+            i = m_pending_events.erase(i);
+            removed_any = true;
         } else
             ++i;
     }
-    return removedAny;
+    return removed_any;
 }
 
-void AwaiterImpl::fireTimeouts(TimePoint now) {
-    for (auto &p : mPendingEvents) {
-        const TimeLimit &timeLimit = p.first;
-        std::shared_ptr<PendingEvent> &e = p.second;
-        if (timeLimit <= now)
+void awaiter_impl::fire_timeouts(time_point now) {
+    for (auto &p : m_pending_events) {
+        const time_limit &limit = p.first;
+        std::shared_ptr<pending_event> &e = p.second;
+        if (limit <= now)
             e->fire(e->timeout());
     }
 }
 
-TimePoint::duration AwaiterImpl::durationToNextTimeout(TimePoint now) const {
-    if (mPendingEvents.empty())
-        return TimePoint::duration::min();
+time_point::duration awaiter_impl::duration_to_next_timeout(time_point now)
+        const {
+    if (m_pending_events.empty())
+        return time_point::duration::min();
 
-    TimePoint nextTimeLimit = mPendingEvents.begin()->first;
-    if (nextTimeLimit == TimePoint::max())
-        return TimePoint::duration::min();
-    if (nextTimeLimit <= now)
-        return TimePoint::duration::zero();
-    return nextTimeLimit - now;
+    time_point next_time_limit = m_pending_events.begin()->first;
+    if (next_time_limit == time_point::max())
+        return time_point::duration::min();
+    if (next_time_limit <= now)
+        return time_point::duration::zero();
+    return next_time_limit - now;
 }
 
-PselectArgument AwaiterImpl::computeArgumentFiringErroredEvents(
-        TimePoint now) {
-    PselectArgument argument(durationToNextTimeout(now));
-    for (auto &p : mPendingEvents)
-        argument.addOrFire(*p.second, mApi);
+pselect_argument awaiter_impl::compute_argument_firing_errored_events(
+        time_point now) {
+    pselect_argument argument(duration_to_next_timeout(now));
+    for (auto &p : m_pending_events)
+        argument.add_or_fire(*p.second, m_api);
     return argument;
 }
 
-void AwaiterImpl::applyResult(const PselectArgument &a) {
-    for (auto &p : mPendingEvents)
-        a.applyResult(*p.second);
+void awaiter_impl::apply_result(const pselect_argument &a) {
+    for (auto &p : m_pending_events)
+        a.apply_result(*p.second);
 }
 
-void AwaiterImpl::awaitEvents() {
-    while (!mPendingEvents.empty()) {
-        TimePoint now = mApi.steady_clock_now();
-        fireTimeouts(now);
+void awaiter_impl::await_events() {
+    while (!m_pending_events.empty()) {
+        time_point now = m_api.steady_clock_now();
+        fire_timeouts(now);
 
-        PselectArgument argument = computeArgumentFiringErroredEvents(now);
-        if (removeFiredEvents())
+        pselect_argument argument =
+                compute_argument_firing_errored_events(now);
+        if (remove_fired_events())
             continue;
 
         std::error_code e = argument.call(
-                mApi, mHandlerConfiguration->maskForPselect());
+                m_api, m_handler_configuration->maskForPselect());
         assert(e != std::errc::bad_file_descriptor);
 
-        mHandlerConfiguration->callHandlers();
+        m_handler_configuration->callHandlers();
 
         if (e)
             continue;
-        applyResult(argument);
-        removeFiredEvents();
+        apply_result(argument);
+        remove_fired_events();
     }
 }
 
 } // namespace
 
-std::unique_ptr<Awaiter> createAwaiter(
+std::unique_ptr<awaiter> create_awaiter(
         const PselectApi &api,
         std::shared_ptr<HandlerConfiguration> &&hc) {
-    return std::unique_ptr<Awaiter>(new AwaiterImpl(api, std::move(hc)));
+    return std::unique_ptr<awaiter>(new awaiter_impl(api, std::move(hc)));
 }
 
 } // namespace event

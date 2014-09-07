@@ -33,15 +33,15 @@ namespace event {
  * An awaiter is a proactor that can wait for events to happen and dispatch
  * them to appropriate listeners.
  *
- * An awaiter depends on the p-select and now time API.
+ * An awaiter depends on the pselect and now time API.
  *
  * @see PselectApi
  */
-class Awaiter : public Proactor {
+class awaiter : public Proactor {
 
 public:
 
-    virtual ~Awaiter() = default;
+    virtual ~awaiter() = default;
 
     /**
      * Waits for event trigger conditions to be met and dispatches the trigger
@@ -50,9 +50,9 @@ public:
      * events are processed. This function returns immediately if no events are
      * pending.
      */
-    virtual void awaitEvents() = 0;
+    virtual void await_events() = 0;
 
-}; // class Awaiter
+}; // class awaiter
 
 /**
  * Creates a new awaiter.
@@ -62,7 +62,7 @@ public:
  * @param hc non-null pointer to a handler configuration the new awaiter
  * depends on. The awaiter never modifies any trap configuration.
  */
-std::unique_ptr<Awaiter> createAwaiter(
+std::unique_ptr<awaiter> create_awaiter(
         const PselectApi &api,
         std::shared_ptr<signaling::HandlerConfiguration> &&hc);
 

@@ -28,7 +28,6 @@
 #include "async/future.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
-#include "os/event/awaiter.hh"
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/PselectApi.hh"
 #include "os/event/ReadableFileDescriptor.hh"
@@ -42,8 +41,7 @@ namespace {
 
 using sesh::async::future;
 using sesh::common::trial;
-using sesh::os::event::Awaiter;
-using sesh::os::event::AwaiterTestFixture;
+using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
@@ -54,7 +52,7 @@ using sesh::os::signaling::SignalNumberSet;
 using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: awaiting single readable FD") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -85,12 +83,12 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(2);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing different readable FDs: "
         "pselect returning single FD") {
     auto startTime = TimePoint(std::chrono::seconds(0));
@@ -124,12 +122,12 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(2);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing different readable FDs: "
         "pselect returning all FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
@@ -164,12 +162,12 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(2);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing different readable FDs") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutable_steady_clock_now() = startTime;
@@ -226,12 +224,12 @@ TEST_CASE_METHOD(
         };
         return std::error_code();
     };
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(30));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing same readable FD") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutable_steady_clock_now() = startTime;
@@ -264,7 +262,7 @@ TEST_CASE_METHOD(
         CHECK(signalMask == nullptr);
         return std::error_code();
     };
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(2));
 }
 

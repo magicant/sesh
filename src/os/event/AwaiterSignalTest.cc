@@ -42,7 +42,7 @@ namespace {
 
 using sesh::async::future;
 using sesh::common::trial;
-using sesh::os::event::AwaiterTestFixture;
+using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::Signal;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
@@ -54,7 +54,7 @@ using sesh::os::signaling::SignalNumberSet;
 using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: one signal in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -90,12 +90,12 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: irrelevant signals are masked") {
     a.expect(Signal(3));
 
@@ -121,11 +121,11 @@ TEST_CASE_METHOD(
         implementation() = nullptr;
         return std::make_error_code(std::errc::interrupted);
     };
-    a.awaitEvents();
+    a.await_events();
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: two signals in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(100));
     mutable_steady_clock_now() = startTime;
@@ -166,12 +166,12 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: same signal in two trigger sets") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -208,12 +208,12 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: different signals in two trigger sets: fired at a time") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -252,12 +252,12 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: different signals in two trigger sets: "
         "fired intermittently") {
     auto startTime = TimePoint(std::chrono::seconds(0));
@@ -311,12 +311,12 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(15));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: signal handler is reset after event fired") {
     a.expect(Signal(1));
 
@@ -335,7 +335,7 @@ TEST_CASE_METHOD(
         implementation() = nullptr;
         return std::make_error_code(std::errc::interrupted);
     };
-    a.awaitEvents();
+    a.await_events();
 
     Action &a = actions().at(1);
     CHECK(a.tag() == Action::tag<Default>());

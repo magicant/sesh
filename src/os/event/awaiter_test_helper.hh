@@ -32,18 +32,18 @@ namespace os {
 namespace event {
 
 template<typename Base>
-class AwaiterTestFixture : protected PselectApiStub, protected Base {
+class awaiter_test_fixture : protected PselectApiStub, protected Base {
 
 private:
 
-    std::unique_ptr<Awaiter> mAwaiter = createAwaiter(
+    std::unique_ptr<awaiter> m_awaiter = create_awaiter(
             *this, signaling::HandlerConfiguration::create(*this));
 
 protected:
 
-    Awaiter &a = *mAwaiter;
+    awaiter &a = *m_awaiter;
 
-}; // template<typename Base> class AwaiterTestFixture
+}; // template<typename Base> class awaiter_test_fixture
 
 } // namespace event
 } // namespace os

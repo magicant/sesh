@@ -39,7 +39,7 @@ using sesh::async::make_failed_future_of;
 using sesh::async::make_future_of;
 using sesh::async::make_promise_future_pair;
 using sesh::common::trial;
-using sesh::os::event::AwaiterTestFixture;
+using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::Trigger;
 using sesh::os::event::UserProvidedTrigger;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
@@ -47,7 +47,7 @@ using sesh::os::signaling::HandlerConfigurationApiDummy;
 using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one user-provided trigger (successful future)") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -62,12 +62,12 @@ TEST_CASE_METHOD(
     });
 
     mutable_steady_clock_now() += std::chrono::seconds(10);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one user-provided trigger (failed future)") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -84,12 +84,12 @@ TEST_CASE_METHOD(
     });
 
     mutable_steady_clock_now() += std::chrono::seconds(10);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two user-provided triggers in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -107,12 +107,12 @@ TEST_CASE_METHOD(
     });
 
     mutable_steady_clock_now() += std::chrono::seconds(10);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two user-provided triggers in two trigger sets") {
     std::shared_ptr<void> expected = std::make_shared<int>(0);
     auto f1 = a.expect(UserProvidedTrigger(make_future_of(expected)));
@@ -128,7 +128,7 @@ TEST_CASE_METHOD(
         actual = t->value<UserProvidedTrigger>().result();
     });
 
-    a.awaitEvents();
+    a.await_events();
     CHECK(actual.get() == expected.get());
 }
 

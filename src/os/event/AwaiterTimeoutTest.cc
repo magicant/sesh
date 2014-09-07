@@ -27,7 +27,6 @@
 #include "async/future.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
-#include "os/event/awaiter.hh"
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/PselectApi.hh"
 #include "os/event/Timeout.hh"
@@ -61,8 +60,7 @@ namespace {
 
 using sesh::async::future;
 using sesh::common::trial;
-using sesh::os::event::Awaiter;
-using sesh::os::event::AwaiterTestFixture;
+using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
@@ -74,7 +72,7 @@ using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 
 template<int durationInSecondsInt>
 class TimeoutTest :
-        protected AwaiterTestFixture<HandlerConfigurationApiDummy> {
+        protected awaiter_test_fixture<HandlerConfigurationApiDummy> {
 
 protected:
 
@@ -89,7 +87,7 @@ public:
 }; // class TimeoutTest
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: timeout 0") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -122,7 +120,7 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(1);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
     CHECK(callbackCalled);
 }
@@ -160,7 +158,7 @@ TimeoutTest<durationInSecondsInt>::TimeoutTest() {
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(1);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + duration());
     CHECK(callbackCalled);
 }
@@ -170,7 +168,7 @@ TEST_CASE_METHOD(TimeoutTest<1>, "Awaiter: timeout 1") { }
 TEST_CASE_METHOD(TimeoutTest<2>, "Awaiter: timeout 2") { }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: negative timeout") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -202,13 +200,13 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(1);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
     CHECK(callbackCalled);
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: duplicate timeouts in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(-100));
     mutable_steady_clock_now() = startTime;
@@ -243,13 +241,13 @@ TEST_CASE_METHOD(
         implementation() = nullptr;
         return std::error_code();
     };
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
     CHECK(callbackCalled);
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two simultaneous timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(1000));
     mutable_steady_clock_now() = startTime;
@@ -312,14 +310,14 @@ TEST_CASE_METHOD(
         };
         return std::error_code();
     };
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(32));
     CHECK(callback1Called);
     CHECK(callback2Called);
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two successive timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -378,7 +376,7 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(1);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(115));
     CHECK(callbackCalled);
 }

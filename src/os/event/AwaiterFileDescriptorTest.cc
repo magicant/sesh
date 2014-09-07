@@ -44,7 +44,7 @@ namespace {
 using sesh::async::future;
 using sesh::common::trial;
 using sesh::common::variant;
-using sesh::os::event::AwaiterTestFixture;
+using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::ErrorFileDescriptor;
 using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Signal;
@@ -62,7 +62,7 @@ using TriggerFileDescriptor = variant<
         ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing readable and writable FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -106,12 +106,12 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(2);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing readable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -155,12 +155,12 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(2);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing writable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
@@ -204,12 +204,12 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(2);
-    a.awaitEvents();
+    a.await_events();
     CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing readable and writable FDs") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutable_steady_clock_now() = startTime;
@@ -243,13 +243,13 @@ TEST_CASE_METHOD(
         mutable_steady_clock_now() = startTime + std::chrono::seconds(10);
         return std::error_code();
     };
-    a.awaitEvents();
+    a.await_events();
     CHECK(callback1Called);
     CHECK(callback2Called);
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing writable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutable_steady_clock_now() = startTime;
@@ -283,13 +283,13 @@ TEST_CASE_METHOD(
         mutable_steady_clock_now() = startTime + std::chrono::seconds(10);
         return std::error_code();
     };
-    a.awaitEvents();
+    a.await_events();
     CHECK(callback1Called);
     CHECK(callback2Called);
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing readable and error FDs") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutable_steady_clock_now() = startTime;
@@ -323,13 +323,13 @@ TEST_CASE_METHOD(
         mutable_steady_clock_now() = startTime + std::chrono::seconds(10);
         return std::error_code();
     };
-    a.awaitEvents();
+    a.await_events();
     CHECK(callback1Called);
     CHECK(callback2Called);
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: awaiting max readable FD") {
     auto max = FileDescriptorSetImpl::MAX_VALUE;
     bool callbackCalled = false;
@@ -351,12 +351,12 @@ TEST_CASE_METHOD(
             const SignalNumberSet *) -> std::error_code {
         return std::error_code();
     };
-    a.awaitEvents();
+    a.await_events();
     CHECK(callbackCalled);
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: domain error from FD set") {
     auto max = FileDescriptorSetImpl::MAX_VALUE;
     bool callbackCalled = false;
@@ -369,7 +369,7 @@ TEST_CASE_METHOD(
         }
     });
 
-    a.awaitEvents();
+    a.await_events();
     CHECK(callbackCalled);
 }
 
