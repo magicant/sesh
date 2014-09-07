@@ -23,17 +23,17 @@
 #include <chrono>
 #include <memory>
 #include <system_error>
-#include "os/TimeApi.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/SignalNumberSet.hh"
+#include "os/time_api.hh"
 
 namespace sesh {
 namespace os {
 namespace event {
 
 /** Abstraction of the pselect POSIX API function. */
-class PselectApi : public virtual TimeApi {
+class PselectApi : public virtual time_api {
 
 public:
 

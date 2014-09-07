@@ -25,12 +25,12 @@
 #include <memory>
 #include <set>
 #include <string>
-#include "os/TimeApiTestHelper.hh"
 #include "os/event/PselectApi.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/io/FileDescriptorSetTestHelper.hh"
 #include "os/signaling/SignalNumberSet.hh"
+#include "os/time_api_test_helper.hh"
 
 /*
 #include <ostream>
@@ -54,7 +54,7 @@ namespace sesh {
 namespace os {
 namespace event {
 
-class PselectApiStub : public PselectApi, public TimeApiFake {
+class PselectApiStub : public PselectApi, public time_api_fake {
 
 public:
 

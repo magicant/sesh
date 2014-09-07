@@ -15,40 +15,46 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_time_api_test_helper_hh
+#define INCLUDED_os_time_api_test_helper_hh
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
-#include "os/io/FileDescriptionApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/io/ReaderApi.hh"
-#include "os/io/WriterApi.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include "os/time_api.hh"
 
 namespace sesh {
 namespace os {
 
-/** Abstraction of POSIX API. */
-class Api :
-        public event::PselectApi,
-        public io::FileDescriptionApi,
-        public io::FileDescriptorApi,
-        public io::ReaderApi,
-        public io::WriterApi,
-        public signaling::HandlerConfigurationApi {
+class time_api_fake : public virtual time_api {
+
+private:
+
+    system_clock_time m_system_clock_now;
+    steady_clock_time m_steady_clock_now;
 
 public:
 
-    /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
+    system_clock_time &mutable_system_clock_now() noexcept {
+        return m_system_clock_now;
+    }
 
-}; // class Api
+    steady_clock_time &mutable_steady_clock_now() noexcept {
+        return m_steady_clock_now;
+    }
+
+    system_clock_time system_clock_now() const noexcept override {
+        return m_system_clock_now;
+    }
+
+    steady_clock_time steady_clock_now() const noexcept override {
+        return m_steady_clock_now;
+    }
+
+}; // class time_api_fake
 
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_time_api_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

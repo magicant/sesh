@@ -15,37 +15,40 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_TimeApi_hh
-#define INCLUDED_os_TimeApi_hh
+#ifndef INCLUDED_os_api_hh
+#define INCLUDED_os_api_hh
 
 #include "buildconfig.h"
 
-#include <chrono>
+#include "os/event/PselectApi.hh"
+#include "os/io/FileDescriptionApi.hh"
+#include "os/io/FileDescriptorApi.hh"
+#include "os/io/ReaderApi.hh"
+#include "os/io/WriterApi.hh"
+#include "os/signaling/HandlerConfigurationApi.hh"
 
 namespace sesh {
 namespace os {
 
-/** Abstraction of POSIX API that provides current time. */
-class TimeApi {
+/** Abstraction of POSIX API. */
+class api :
+        public event::PselectApi,
+        public io::FileDescriptionApi,
+        public io::FileDescriptorApi,
+        public io::ReaderApi,
+        public io::WriterApi,
+        public signaling::HandlerConfigurationApi {
 
 public:
 
-    using SystemClockTime = std::chrono::time_point<
-            std::chrono::system_clock, std::chrono::nanoseconds>;
-    using SteadyClockTime = std::chrono::time_point<
-            std::chrono::steady_clock, std::chrono::nanoseconds>;
+    /** Reference to the only instance of real API implementation. */
+    static const api &instance;
 
-    /** Returns the current time. */
-    virtual SystemClockTime systemClockNow() const noexcept = 0;
-
-    /** Returns the current time. */
-    virtual SteadyClockTime steadyClockNow() const noexcept = 0;
-
-}; // class TimeApi
+}; // class api
 
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_TimeApi_hh
+#endif // #ifndef INCLUDED_os_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
