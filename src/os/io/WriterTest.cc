@@ -31,7 +31,7 @@
 #include "common/copy.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
-#include "os/event/Proactor.hh"
+#include "os/event/proactor.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
 #include "os/io/FileDescriptor.hh"
@@ -49,7 +49,7 @@ using sesh::async::make_promise_future_pair;
 using sesh::async::promise;
 using sesh::common::copy;
 using sesh::common::trial;
-using sesh::os::event::Proactor;
+using sesh::os::event::proactor;
 using sesh::os::event::Trigger;
 using sesh::os::event::WritableFileDescriptor;
 using sesh::os::io::FileDescriptor;
@@ -69,17 +69,17 @@ class UncallableWriterApi : public WriterApi {
 
 }; // class UncallableWriterApi
 
-class UncallableProactor : public Proactor {
+class UncallableProactor : public proactor {
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
+    future<Trigger> expect_impl(std::vector<Trigger> &&) override {
         throw "unexpected expect";
     }
 
 }; // class UncallableProactor
 
-class EchoingProactor : public Proactor {
+class EchoingProactor : public proactor {
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<Trigger> expect_impl(std::vector<Trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
         return make_future<Trigger>(std::move(triggers.front()));
     }
@@ -113,7 +113,7 @@ namespace non_empty_write {
 
 constexpr static FileDescriptor::Value FD = 3;
 
-class WriteTestFixture : public WriterApi, public Proactor {
+class WriteTestFixture : public WriterApi, public proactor {
 
 private:
 
@@ -153,7 +153,7 @@ private:
         return count;
     }
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<Trigger> expect_impl(std::vector<Trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
         Trigger &t = triggers.front();
         CHECK(t.tag() == t.tag<WritableFileDescriptor>());
@@ -231,9 +231,9 @@ TEST_CASE_METHOD(WriteTestFixture, "Write: 25 bytes in three writes") {
 
 namespace domain_error {
 
-class DomainErrorProactor : public Proactor {
+class DomainErrorProactor : public proactor {
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
+    future<Trigger> expect_impl(std::vector<Trigger> &&) override {
         return make_failed_future_of<Trigger>(
                 std::domain_error("expected error"));
     }

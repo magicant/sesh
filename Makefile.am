@@ -168,7 +168,7 @@ src_sesh_SOURCES = \
 	src/os/event/awaiter.hh \
 	src/os/event/error_file_descriptor.hh \
 	src/os/event/file_descriptor_condition.hh \
-	src/os/event/Proactor.hh \
+	src/os/event/proactor.hh \
 	src/os/event/PselectApi.hh \
 	src/os/event/ReadableFileDescriptor.hh \
 	src/os/event/Signal.hh \

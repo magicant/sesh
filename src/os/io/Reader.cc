@@ -24,7 +24,7 @@
 #include "async/future.hh"
 #include "common/trial.hh"
 #include "common/variant.hh"
-#include "os/event/Proactor.hh"
+#include "os/event/proactor.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Trigger.hh"
 
@@ -32,7 +32,7 @@ using sesh::async::future;
 using sesh::async::make_future;
 using sesh::common::trial;
 using sesh::common::variant;
-using sesh::os::event::Proactor;
+using sesh::os::event::proactor;
 using sesh::os::event::ReadableFileDescriptor;
 using sesh::os::event::Trigger;
 
@@ -82,7 +82,7 @@ struct Reader {
 
 future<ResultPair> read(
         const ReaderApi &api,
-        Proactor &p,
+        proactor &p,
         NonBlockingFileDescriptor &&fd,
         std::vector<char>::size_type maxBytesToRead) {
     if (maxBytesToRead == 0)

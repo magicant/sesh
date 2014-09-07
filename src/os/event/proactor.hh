@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_Proactor_hh
-#define INCLUDED_os_event_Proactor_hh
+#ifndef INCLUDED_os_event_proactor_hh
+#define INCLUDED_os_event_proactor_hh
 
 #include "buildconfig.h"
 
@@ -34,15 +34,15 @@ namespace event {
  * A proactor accepts requests for future notification that should happen when
  * a specific trigger condition is met.
  */
-class Proactor {
+class proactor {
 
 protected:
 
-    virtual async::future<Trigger> expectImpl(std::vector<Trigger> &&) = 0;
+    virtual async::future<Trigger> expect_impl(std::vector<Trigger> &&) = 0;
 
 public:
 
-    virtual ~Proactor() = default;
+    virtual ~proactor() = default;
 
     /**
      * Registers a set of event triggers and returns a future that, when one of
@@ -70,7 +70,7 @@ public:
      * with std::domain_error.
      */
     async::future<Trigger> expect(std::vector<Trigger> &&triggers) {
-        return expectImpl(std::move(triggers));
+        return expect_impl(std::move(triggers));
     }
 
     void expect(std::vector<Trigger> &) = delete;
@@ -82,16 +82,16 @@ public:
      */
     template<typename... TriggerArg>
     async::future<Trigger> expect(TriggerArg &&... t) {
-        return expectImpl(common::make_vector_of<Trigger>(
+        return expect_impl(common::make_vector_of<Trigger>(
                 std::forward<TriggerArg>(t)...));
     }
 
-}; // class Proactor
+}; // class proactor
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_Proactor_hh
+#endif // #ifndef INCLUDED_os_event_proactor_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

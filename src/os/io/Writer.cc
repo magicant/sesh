@@ -24,14 +24,14 @@
 #include <utility>
 #include "async/future.hh"
 #include "common/trial.hh"
-#include "os/event/Proactor.hh"
+#include "os/event/proactor.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
 
 using sesh::async::future;
 using sesh::async::make_future;
 using sesh::common::trial;
-using sesh::os::event::Proactor;
+using sesh::os::event::proactor;
 using sesh::os::event::Trigger;
 using sesh::os::event::WritableFileDescriptor;
 
@@ -46,7 +46,7 @@ using ResultPair = std::pair<NonBlockingFileDescriptor, std::error_code>;
 struct Writer {
 
     const WriterApi &api;
-    Proactor &proactor;
+    class proactor &proactor;
     NonBlockingFileDescriptor fd;
     std::vector<char> bytes;
 
@@ -83,7 +83,7 @@ struct Writer {
 
 future<ResultPair> write(
         const WriterApi &api,
-        Proactor &p,
+        proactor &p,
         NonBlockingFileDescriptor &&fd,
         std::vector<char> &&bytes) {
     if (bytes.empty())

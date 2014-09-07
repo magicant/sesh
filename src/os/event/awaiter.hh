@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include "os/event/Proactor.hh"
+#include "os/event/proactor.hh"
 #include "os/event/PselectApi.hh"
 #include "os/signaling/HandlerConfiguration.hh"
 
@@ -37,7 +37,7 @@ namespace event {
  *
  * @see PselectApi
  */
-class awaiter : public Proactor {
+class awaiter : public proactor {
 
 public:
 

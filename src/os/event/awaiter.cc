@@ -170,7 +170,8 @@ private:
     std::shared_ptr<HandlerConfiguration> m_handler_configuration;
     std::multimap<time_limit, std::shared_ptr<pending_event>> m_pending_events;
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) final override;
+    future<Trigger> expect_impl(std::vector<Trigger> &&triggers)
+            final override;
 
     bool remove_fired_events();
 
@@ -395,7 +396,7 @@ time_point compute_time_limit(Timeout timeout, const time_api &api) {
     return now + timeout.interval();
 }
 
-future<Trigger> awaiter_impl::expectImpl(
+future<Trigger> awaiter_impl::expect_impl(
         std::vector<Trigger> &&triggers) {
     auto pf = make_promise_future_pair<Trigger>();
     if (triggers.empty())
