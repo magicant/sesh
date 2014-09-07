@@ -30,7 +30,7 @@
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/pselect_api.hh"
 #include "os/event/readable_file_descriptor.hh"
-#include "os/event/Signal.hh"
+#include "os/event/signal.hh"
 #include "os/event/Timeout.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
@@ -64,7 +64,7 @@ using sesh::common::trial;
 using sesh::async::future;
 using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::readable_file_descriptor;
-using sesh::os::event::Signal;
+using sesh::os::event::signal;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
@@ -165,7 +165,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: signal handler is reset after event fired (with timeout)") {
-    a.expect(Timeout(std::chrono::seconds(1)), Signal(1));
+    a.expect(Timeout(std::chrono::seconds(1)), signal(1));
 
     implementation() = [this](
             const pselect_api_stub &,
@@ -218,7 +218,7 @@ TEST_CASE_METHOD(
         called = true;
     });
 
-    a.expect(Signal(1));
+    a.expect(signal(1));
 
     implementation() = [this](
             const pselect_api_stub &,

@@ -230,7 +230,7 @@ signal_handler::signal_handler(const std::shared_ptr<pending_event> &e)
 
 void signal_handler::operator()(SignalNumber n) {
     if (std::shared_ptr<pending_event> e = m_event.lock())
-        e->fire(Signal(n));
+        e->fire(signal(n));
 }
 
 pselect_argument::pselect_argument(time_point::duration timeout) noexcept :
@@ -330,7 +330,7 @@ awaiter_impl::awaiter_impl(
 }
 
 void register_signal_trigger(
-        Signal s,
+        signal s,
         std::shared_ptr<pending_event> &e,
         HandlerConfiguration &hc) {
     auto result = hc.addHandler(
@@ -376,8 +376,8 @@ void register_trigger(
     case Trigger::tag<error_file_descriptor>():
         e->add_trigger(t.value<error_file_descriptor>());
         return;
-    case Trigger::tag<Signal>():
-        register_signal_trigger(t.value<Signal>(), e, hc);
+    case Trigger::tag<signal>():
+        register_signal_trigger(t.value<signal>(), e, hc);
         return;
     case Trigger::tag<UserProvidedTrigger>():
         register_user_provided_trigger(

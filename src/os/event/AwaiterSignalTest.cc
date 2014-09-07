@@ -30,7 +30,7 @@
 #include "os/event/awaiter.hh"
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/pselect_api.hh"
-#include "os/event/Signal.hh"
+#include "os/event/signal.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
@@ -43,7 +43,7 @@ namespace {
 using sesh::async::future;
 using sesh::common::trial;
 using sesh::os::event::awaiter_test_fixture;
-using sesh::os::event::Signal;
+using sesh::os::event::signal;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
@@ -58,11 +58,11 @@ TEST_CASE_METHOD(
         "Awaiter: one signal in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
-    future<Trigger> f = a.expect(Signal(3));
+    future<Trigger> f = a.expect(signal(3));
     std::move(f).then([this](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        REQUIRE(t->tag() == Trigger::tag<Signal>());
-        CHECK(t->value<Signal>().number() == 3);
+        REQUIRE(t->tag() == Trigger::tag<signal>());
+        CHECK(t->value<signal>().number() == 3);
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
@@ -97,7 +97,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: irrelevant signals are masked") {
-    a.expect(Signal(3));
+    a.expect(signal(3));
 
     signalMask().set(2);
     signalMask().set(5);
@@ -129,11 +129,11 @@ TEST_CASE_METHOD(
         "Awaiter: two signals in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(100));
     mutable_steady_clock_now() = startTime;
-    future<Trigger> f = a.expect(Signal(2), Signal(6));
+    future<Trigger> f = a.expect(signal(2), signal(6));
     std::move(f).then([this](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        REQUIRE(t->tag() == Trigger::tag<Signal>());
-        CHECK(t->value<Signal>().number() == 6);
+        REQUIRE(t->tag() == Trigger::tag<signal>());
+        CHECK(t->value<signal>().number() == 6);
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
@@ -176,10 +176,10 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
     for (unsigned i = 0; i < 2; ++i) {
-        a.expect(Signal(1)).then([this](trial<Trigger> &&t) {
+        a.expect(signal(1)).then([this](trial<Trigger> &&t) {
             REQUIRE(t.has_value());
-            REQUIRE(t->tag() == Trigger::tag<Signal>());
-            CHECK(t->value<Signal>().number() == 1);
+            REQUIRE(t->tag() == Trigger::tag<signal>());
+            CHECK(t->value<signal>().number() == 1);
             mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
@@ -218,10 +218,10 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
     for (SignalNumber sn : {1, 2}) {
-        a.expect(Signal(sn)).then([this, sn](trial<Trigger> &&t) {
+        a.expect(signal(sn)).then([this, sn](trial<Trigger> &&t) {
             REQUIRE(t.has_value());
-            REQUIRE(t->tag() == Trigger::tag<Signal>());
-            CHECK(t->value<Signal>().number() == sn);
+            REQUIRE(t->tag() == Trigger::tag<signal>());
+            CHECK(t->value<signal>().number() == sn);
             mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
@@ -263,10 +263,10 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
     for (SignalNumber sn : {1, 2}) {
-        a.expect(Signal(sn)).then([this, sn](trial<Trigger> &&t) {
+        a.expect(signal(sn)).then([this, sn](trial<Trigger> &&t) {
             REQUIRE(t.has_value());
-            REQUIRE(t->tag() == Trigger::tag<Signal>());
-            CHECK(t->value<Signal>().number() == sn);
+            REQUIRE(t->tag() == Trigger::tag<signal>());
+            CHECK(t->value<signal>().number() == sn);
             mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
@@ -318,7 +318,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: signal handler is reset after event fired") {
-    a.expect(Signal(1));
+    a.expect(signal(1));
 
     implementation() = [this](
             const pselect_api_stub &,

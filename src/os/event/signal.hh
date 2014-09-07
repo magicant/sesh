@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_Signal_hh
-#define INCLUDED_os_event_Signal_hh
+#ifndef INCLUDED_os_event_signal_hh
+#define INCLUDED_os_event_signal_hh
 
 #include "buildconfig.h"
 
@@ -31,28 +31,28 @@ namespace event {
  *
  * @see Trigger
  */
-class Signal {
+class signal {
 
 private:
 
-    signaling::SignalNumber mNumber;
+    signaling::SignalNumber m_number;
 
 public:
 
-    constexpr explicit Signal(signaling::SignalNumber n) noexcept :
-            mNumber(n) { }
+    constexpr explicit signal(signaling::SignalNumber n) noexcept :
+            m_number(n) { }
 
     constexpr signaling::SignalNumber number() const noexcept {
-        return mNumber;
+        return m_number;
     }
 
-}; // class Signal
+}; // class signal
 
-constexpr inline bool operator==(const Signal &l, const Signal &r) noexcept {
+constexpr inline bool operator==(const signal &l, const signal &r) noexcept {
     return l.number() == r.number();
 }
 
-constexpr inline bool operator<(const Signal &l, const Signal &r) noexcept {
+constexpr inline bool operator<(const signal &l, const signal &r) noexcept {
     return l.number() < r.number();
 }
 
@@ -60,6 +60,6 @@ constexpr inline bool operator<(const Signal &l, const Signal &r) noexcept {
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_Signal_hh
+#endif // #ifndef INCLUDED_os_event_signal_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

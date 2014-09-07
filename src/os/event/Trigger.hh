@@ -23,7 +23,7 @@
 #include "common/variant.hh"
 #include "os/event/error_file_descriptor.hh"
 #include "os/event/readable_file_descriptor.hh"
-#include "os/event/Signal.hh"
+#include "os/event/signal.hh"
 #include "os/event/Timeout.hh"
 #include "os/event/UserProvidedTrigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
@@ -38,7 +38,7 @@ using Trigger = common::variant<
         readable_file_descriptor,
         WritableFileDescriptor,
         error_file_descriptor,
-        Signal,
+        signal,
         UserProvidedTrigger>;
 
 } // namespace event
