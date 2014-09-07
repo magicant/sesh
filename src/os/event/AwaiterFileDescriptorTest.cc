@@ -27,7 +27,7 @@
 #include "common/variant.hh"
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/error_file_descriptor.hh"
-#include "os/event/PselectApi.hh"
+#include "os/event/pselect_api.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Signal.hh"
 #include "os/event/Timeout.hh"
@@ -57,7 +57,7 @@ using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
+using TimePoint = sesh::os::event::pselect_api::steady_clock_time;
 using TriggerFileDescriptor = variant<
         ReadableFileDescriptor, WritableFileDescriptor, error_file_descriptor>;
 
@@ -89,16 +89,16 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEqual(readFds, {3}, fdBound, "readFds");
-        checkEqual(writeFds, {3}, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+        check_equal(readFds, {3}, fdBound, "readFds");
+        check_equal(writeFds, {3}, fdBound, "writeFds");
+        check_empty(errorFds, fdBound, "errorFds");
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -138,16 +138,16 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEqual(readFds, {3}, fdBound, "readFds");
-        checkEmpty(writeFds, fdBound, "writeFds");
-        checkEqual(errorFds, {3}, fdBound, "errorFds");
+        check_equal(readFds, {3}, fdBound, "readFds");
+        check_empty(writeFds, fdBound, "writeFds");
+        check_equal(errorFds, {3}, fdBound, "errorFds");
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -187,16 +187,16 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEqual(writeFds, {3}, fdBound, "writeFds");
-        checkEqual(errorFds, {3}, fdBound, "errorFds");
+        check_empty(readFds, fdBound, "readFds");
+        check_equal(writeFds, {3}, fdBound, "writeFds");
+        check_equal(errorFds, {3}, fdBound, "errorFds");
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -233,7 +233,7 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this, startTime](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -273,7 +273,7 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this, startTime](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -313,7 +313,7 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this, startTime](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -331,7 +331,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: awaiting max readable FD") {
-    auto max = FileDescriptorSetImpl::MAX_VALUE;
+    auto max = file_descriptor_set_impl::MAX_VALUE;
     bool callbackCalled = false;
     a.expect(ReadableFileDescriptor(max)).then(
             [this, max, &callbackCalled](trial<Trigger> &&t) {
@@ -342,7 +342,7 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -358,7 +358,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: domain error from FD set") {
-    auto max = FileDescriptorSetImpl::MAX_VALUE;
+    auto max = file_descriptor_set_impl::MAX_VALUE;
     bool callbackCalled = false;
     a.expect(ReadableFileDescriptor(max + 1)).then(
             [this, &callbackCalled](trial<Trigger> &&t) {

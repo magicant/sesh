@@ -169,7 +169,7 @@ src_sesh_SOURCES = \
 	src/os/event/error_file_descriptor.hh \
 	src/os/event/file_descriptor_condition.hh \
 	src/os/event/proactor.hh \
-	src/os/event/PselectApi.hh \
+	src/os/event/pselect_api.hh \
 	src/os/event/ReadableFileDescriptor.hh \
 	src/os/event/Signal.hh \
 	src/os/event/Timeout.hh \
@@ -396,7 +396,7 @@ TESTHEADERS = \
 	src/language/source/source_test_helper.hh \
 	src/language/syntax/printer_test_helper.hh \
 	src/os/event/awaiter_test_helper.hh \
-	src/os/event/PselectApiTestHelper.hh \
+	src/os/event/pselect_api_test_helper.hh \
 	src/os/io/FileDescriptionApiTestHelper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/io/NonBlockingFileDescriptorTestHelper.hh \

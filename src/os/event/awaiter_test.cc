@@ -28,7 +28,7 @@
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
-#include "os/event/PselectApi.hh"
+#include "os/event/pselect_api.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Signal.hh"
 #include "os/event/Timeout.hh"
@@ -73,7 +73,7 @@ using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalNumberSet;
 
-using time_point = sesh::os::event::PselectApi::steady_clock_time;
+using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
@@ -104,16 +104,16 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signal_mask) -> std::error_code {
-        checkEqual(read_fds, {3}, fd_bound, "read_fds");
-        checkEmpty(write_fds, fd_bound, "write_fds");
-        checkEmpty(error_fds, fd_bound, "error_fds");
+        check_equal(read_fds, {3}, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout == std::chrono::seconds(4));
         CHECK(signal_mask == nullptr);
         read_fds->reset();
@@ -141,16 +141,16 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signal_mask) -> std::error_code {
-        checkEqual(read_fds, {3}, fd_bound, "read_fds");
-        checkEmpty(write_fds, fd_bound, "write_fds");
-        checkEmpty(error_fds, fd_bound, "error_fds");
+        check_equal(read_fds, {3}, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout == std::chrono::seconds(9));
         CHECK(signal_mask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(2);
@@ -168,7 +168,7 @@ TEST_CASE_METHOD(
     a.expect(Timeout(std::chrono::seconds(1)), Signal(1));
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -191,7 +191,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: setting timeout from domain error") {
-    auto fd = ReadableFileDescriptor(FileDescriptorSetImpl::MAX_VALUE + 1);
+    auto fd = ReadableFileDescriptor(file_descriptor_set_impl::MAX_VALUE + 1);
     bool called = false;
     a.expect(fd).wrap().recover([this](std::exception_ptr) {
         return a.expect(Timeout(std::chrono::seconds(0)));
@@ -220,7 +220,7 @@ TEST_CASE_METHOD(
     a.expect(Signal(1));
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -232,7 +232,7 @@ TEST_CASE_METHOD(
         a.value<sesh_osapi_signal_handler *>()(1);
 
         implementation() = [this](
-                const PselectApiStub &,
+                const pselect_api_stub &,
                 FileDescriptor::Value,
                 FileDescriptorSet *read_fds,
                 FileDescriptorSet *,

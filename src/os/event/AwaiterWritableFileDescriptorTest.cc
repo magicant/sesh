@@ -29,7 +29,7 @@
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
-#include "os/event/PselectApi.hh"
+#include "os/event/pselect_api.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
 #include "os/io/FileDescriptor.hh"
@@ -49,7 +49,7 @@ using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
+using TimePoint = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
@@ -66,16 +66,16 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEqual(writeFds, {4}, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+        check_empty(readFds, fdBound, "readFds");
+        check_equal(writeFds, {4}, fdBound, "writeFds");
+        check_empty(errorFds, fdBound, "errorFds");
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -104,16 +104,16 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEqual(writeFds, {0, 2}, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+        check_empty(readFds, fdBound, "readFds");
+        check_equal(writeFds, {0, 2}, fdBound, "writeFds");
+        check_empty(errorFds, fdBound, "errorFds");
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -145,16 +145,16 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEqual(writeFds, {0, 2}, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+        check_empty(readFds, fdBound, "readFds");
+        check_equal(writeFds, {0, 2}, fdBound, "writeFds");
+        check_empty(errorFds, fdBound, "errorFds");
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -190,32 +190,32 @@ TEST_CASE_METHOD(
     });
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds 1");
-        checkEqual(writeFds, {1, 3}, fdBound, "writeFds 1");
-        checkEmpty(errorFds, fdBound, "errorFds 1");
+        check_empty(readFds, fdBound, "readFds 1");
+        check_equal(writeFds, {1, 3}, fdBound, "writeFds 1");
+        check_empty(errorFds, fdBound, "errorFds 1");
         writeFds->reset(3);
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
 
         mutable_steady_clock_now() += std::chrono::seconds(9);
         implementation() = [this](
-                const PselectApiStub &,
+                const pselect_api_stub &,
                 FileDescriptor::Value fdBound,
                 FileDescriptorSet *readFds,
                 FileDescriptorSet *writeFds,
                 FileDescriptorSet *errorFds,
                 std::chrono::nanoseconds timeout,
                 const SignalNumberSet *signalMask) -> std::error_code {
-            checkEmpty(readFds, fdBound, "readFds 2");
-            checkEqual(writeFds, {3}, fdBound, "writeFds 2");
-            checkEmpty(errorFds, fdBound, "errorFds 2");
+            check_empty(readFds, fdBound, "readFds 2");
+            check_equal(writeFds, {3}, fdBound, "writeFds 2");
+            check_empty(errorFds, fdBound, "errorFds 2");
             CHECK(timeout.count() < 0);
             CHECK(signalMask == nullptr);
             mutable_steady_clock_now() += std::chrono::seconds(18);
@@ -245,7 +245,7 @@ TEST_CASE_METHOD(
 
     unsigned count = 0;
     implementation() = [this, &count](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
@@ -254,9 +254,9 @@ TEST_CASE_METHOD(
             const SignalNumberSet *signalMask) -> std::error_code {
         INFO(count);
         ++count;
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEqual(writeFds, {7}, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+        check_empty(readFds, fdBound, "readFds");
+        check_equal(writeFds, {7}, fdBound, "writeFds");
+        check_empty(errorFds, fdBound, "errorFds");
         writeFds->reset(3);
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);

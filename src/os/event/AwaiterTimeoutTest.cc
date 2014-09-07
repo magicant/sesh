@@ -28,7 +28,7 @@
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
-#include "os/event/PselectApi.hh"
+#include "os/event/pselect_api.hh"
 #include "os/event/Timeout.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
@@ -68,7 +68,7 @@ using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
+using TimePoint = sesh::os::event::pselect_api::steady_clock_time;
 
 template<int durationInSecondsInt>
 class TimeoutTest :
@@ -103,16 +103,16 @@ TEST_CASE_METHOD(
     CHECK_FALSE(callbackCalled);
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEmpty(writeFds, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+        check_empty(readFds, fdBound, "readFds");
+        check_empty(writeFds, fdBound, "writeFds");
+        check_empty(errorFds, fdBound, "errorFds");
         CHECK(timeout == std::chrono::seconds(0));
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(1);
@@ -141,16 +141,16 @@ TimeoutTest<durationInSecondsInt>::TimeoutTest() {
     CHECK_FALSE(callbackCalled);
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEmpty(writeFds, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+        check_empty(readFds, fdBound, "readFds");
+        check_empty(writeFds, fdBound, "writeFds");
+        check_empty(errorFds, fdBound, "errorFds");
         CHECK(timeout == duration() - std::chrono::seconds(1));
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += duration() - std::chrono::seconds(1);
@@ -184,16 +184,16 @@ TEST_CASE_METHOD(
     CHECK_FALSE(callbackCalled);
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEmpty(writeFds, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+        check_empty(readFds, fdBound, "readFds");
+        check_empty(writeFds, fdBound, "writeFds");
+        check_empty(errorFds, fdBound, "errorFds");
         CHECK(timeout == std::chrono::nanoseconds::zero());
         CHECK(signalMask == nullptr);
         implementation() = nullptr;
@@ -225,16 +225,16 @@ TEST_CASE_METHOD(
     CHECK_FALSE(callbackCalled);
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEmpty(writeFds, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+        check_empty(readFds, fdBound, "readFds");
+        check_empty(writeFds, fdBound, "writeFds");
+        check_empty(errorFds, fdBound, "errorFds");
         CHECK(timeout == std::chrono::seconds(5));
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(5);
@@ -277,31 +277,31 @@ TEST_CASE_METHOD(
     CHECK_FALSE(callback2Called);
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds 1");
-        checkEmpty(writeFds, fdBound, "writeFds 1");
-        checkEmpty(errorFds, fdBound, "errorFds 1");
+        check_empty(readFds, fdBound, "readFds 1");
+        check_empty(writeFds, fdBound, "writeFds 1");
+        check_empty(errorFds, fdBound, "errorFds 1");
         CHECK(timeout == std::chrono::seconds(9));
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(10);
 
         implementation() = [this](
-                const PselectApiStub &,
+                const pselect_api_stub &,
                 FileDescriptor::Value fdBound,
                 FileDescriptorSet *readFds,
                 FileDescriptorSet *writeFds,
                 FileDescriptorSet *errorFds,
                 std::chrono::nanoseconds timeout,
                 const SignalNumberSet *signalMask) -> std::error_code {
-            checkEmpty(readFds, fdBound, "readFds 2");
-            checkEmpty(writeFds, fdBound, "writeFds 2");
-            checkEmpty(errorFds, fdBound, "errorFds 2");
+            check_empty(readFds, fdBound, "readFds 2");
+            check_empty(writeFds, fdBound, "writeFds 2");
+            check_empty(errorFds, fdBound, "errorFds 2");
             CHECK(timeout == std::chrono::seconds(19));
             CHECK(signalMask == nullptr);
             mutable_steady_clock_now() += std::chrono::seconds(21);
@@ -342,31 +342,31 @@ TEST_CASE_METHOD(
     CHECK_FALSE(callbackCalled);
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value fdBound,
             FileDescriptorSet *readFds,
             FileDescriptorSet *writeFds,
             FileDescriptorSet *errorFds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds 1");
-        checkEmpty(writeFds, fdBound, "writeFds 1");
-        checkEmpty(errorFds, fdBound, "errorFds 1");
+        check_empty(readFds, fdBound, "readFds 1");
+        check_empty(writeFds, fdBound, "writeFds 1");
+        check_empty(errorFds, fdBound, "errorFds 1");
         CHECK(timeout == std::chrono::seconds(99));
         CHECK(signalMask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(101);
 
         implementation() = [this](
-                const PselectApiStub &,
+                const pselect_api_stub &,
                 FileDescriptor::Value fdBound,
                 FileDescriptorSet *readFds,
                 FileDescriptorSet *writeFds,
                 FileDescriptorSet *errorFds,
                 std::chrono::nanoseconds timeout,
                 const SignalNumberSet *signalMask) -> std::error_code {
-            checkEmpty(readFds, fdBound, "readFds 2");
-            checkEmpty(writeFds, fdBound, "writeFds 2");
-            checkEmpty(errorFds, fdBound, "errorFds 2");
+            check_empty(readFds, fdBound, "readFds 2");
+            check_empty(writeFds, fdBound, "writeFds 2");
+            check_empty(errorFds, fdBound, "errorFds 2");
             CHECK(timeout == std::chrono::seconds(7));
             CHECK(signalMask == nullptr);
             mutable_steady_clock_now() += std::chrono::seconds(10);

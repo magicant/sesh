@@ -22,7 +22,7 @@
 
 #include <memory>
 #include "os/event/proactor.hh"
-#include "os/event/PselectApi.hh"
+#include "os/event/pselect_api.hh"
 #include "os/signaling/HandlerConfiguration.hh"
 
 namespace sesh {
@@ -35,7 +35,7 @@ namespace event {
  *
  * An awaiter depends on the pselect and now time API.
  *
- * @see PselectApi
+ * @see pselect_api
  */
 class awaiter : public proactor {
 
@@ -63,7 +63,7 @@ public:
  * depends on. The awaiter never modifies any trap configuration.
  */
 std::unique_ptr<awaiter> create_awaiter(
-        const PselectApi &api,
+        const pselect_api &api,
         std::shared_ptr<signaling::HandlerConfiguration> &&hc);
 
 } // namespace event

@@ -34,7 +34,7 @@
 #include "common/trial.hh"
 #include "common/variant.hh"
 #include "helpermacros.h"
-#include "os/event/PselectApi.hh"
+#include "os/event/pselect_api.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
@@ -56,7 +56,7 @@ using sesh::os::signaling::HandlerConfiguration;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
-using time_point = sesh::os::event::PselectApi::steady_clock_time;
+using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 namespace sesh {
 namespace os {
@@ -125,7 +125,7 @@ private:
     void add_fd(
             std::unique_ptr<FileDescriptorSet> &fds,
             FileDescriptor::Value fd,
-            const PselectApi &api);
+            const pselect_api &api);
 
 public:
 
@@ -135,16 +135,16 @@ public:
      * Updates this p-select argument according to the given trigger. May throw
      * some exception.
      */
-    void add(const file_descriptor_trigger &, const PselectApi &);
+    void add(const file_descriptor_trigger &, const pselect_api &);
 
     /**
      * Updates this p-select argument according to the given event. This
      * function may fire the event directly if applicable.
      */
-    void add_or_fire(pending_event &, const PselectApi &);
+    void add_or_fire(pending_event &, const pselect_api &);
 
     /** Calls the p-select API function with this argument. */
-    std::error_code call(const PselectApi &api, const SignalNumberSet *);
+    std::error_code call(const pselect_api &api, const SignalNumberSet *);
 
     /** Tests if this p-select call result matches the given trigger. */
     bool matches(const file_descriptor_trigger &) const;
@@ -166,7 +166,7 @@ public:
 
 private:
 
-    const PselectApi &m_api;
+    const pselect_api &m_api;
     std::shared_ptr<HandlerConfiguration> m_handler_configuration;
     std::multimap<time_limit, std::shared_ptr<pending_event>> m_pending_events;
 
@@ -187,7 +187,7 @@ private:
 public:
 
     awaiter_impl(
-            const PselectApi &, std::shared_ptr<HandlerConfiguration> &&hc);
+            const pselect_api &, std::shared_ptr<HandlerConfiguration> &&hc);
 
     void await_events() final override;
 
@@ -241,16 +241,16 @@ pselect_argument::pselect_argument(time_point::duration timeout) noexcept :
 void pselect_argument::add_fd(
         std::unique_ptr<FileDescriptorSet> &fds,
         FileDescriptor::Value fd,
-        const PselectApi &api) {
+        const pselect_api &api) {
     if (fds == nullptr)
-        fds = api.createFileDescriptorSet();
+        fds = api.create_file_descriptor_set();
     fds->set(fd);
 
     m_fd_bound = std::max(m_fd_bound, fd + 1);
 }
 
 void pselect_argument::add(
-        const file_descriptor_trigger &t, const PselectApi &api) {
+        const file_descriptor_trigger &t, const pselect_api &api) {
     switch (t.tag()) {
     case file_descriptor_trigger::tag<ReadableFileDescriptor>():
         add_fd(m_read_fds, t.value<ReadableFileDescriptor>().value(), api);
@@ -265,7 +265,7 @@ void pselect_argument::add(
     UNREACHABLE();
 }
 
-void pselect_argument::add_or_fire(pending_event &e, const PselectApi &api) {
+void pselect_argument::add_or_fire(pending_event &e, const pselect_api &api) {
     if (e.has_fired())
         return;
 
@@ -278,7 +278,7 @@ void pselect_argument::add_or_fire(pending_event &e, const PselectApi &api) {
 }
 
 std::error_code pselect_argument::call(
-        const PselectApi &api, const SignalNumberSet *signal_mask) {
+        const pselect_api &api, const SignalNumberSet *signal_mask) {
     return api.pselect(
             m_fd_bound,
             m_read_fds.get(),
@@ -319,7 +319,7 @@ void pselect_argument::apply_result(pending_event &e) const {
 }
 
 awaiter_impl::awaiter_impl(
-        const PselectApi &api, std::shared_ptr<HandlerConfiguration> &&hc) :
+        const pselect_api &api, std::shared_ptr<HandlerConfiguration> &&hc) :
         m_api(api),
         m_handler_configuration(std::move(hc)),
         m_pending_events() {
@@ -486,7 +486,7 @@ void awaiter_impl::await_events() {
 } // namespace
 
 std::unique_ptr<awaiter> create_awaiter(
-        const PselectApi &api,
+        const pselect_api &api,
         std::shared_ptr<HandlerConfiguration> &&hc) {
     return std::unique_ptr<awaiter>(new awaiter_impl(api, std::move(hc)));
 }

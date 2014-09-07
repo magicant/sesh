@@ -27,7 +27,7 @@
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
-#include "os/event/PselectApi.hh"
+#include "os/event/pselect_api.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/UserProvidedTrigger.hh"
 #include "os/signaling/HandlerConfigurationApiTestHelper.hh"
@@ -44,7 +44,7 @@ using sesh::os::event::Trigger;
 using sesh::os::event::UserProvidedTrigger;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 
-using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
+using TimePoint = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,

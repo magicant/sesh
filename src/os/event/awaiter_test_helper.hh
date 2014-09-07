@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 #include "os/event/awaiter.hh"
-#include "os/event/PselectApiTestHelper.hh"
+#include "os/event/pselect_api_test_helper.hh"
 #include "os/signaling/HandlerConfiguration.hh"
 
 namespace sesh {
@@ -32,7 +32,7 @@ namespace os {
 namespace event {
 
 template<typename Base>
-class awaiter_test_fixture : protected PselectApiStub, protected Base {
+class awaiter_test_fixture : protected pselect_api_stub, protected Base {
 
 private:
 
