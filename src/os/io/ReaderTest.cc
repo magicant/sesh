@@ -33,7 +33,7 @@
 #include "common/variant.hh"
 #include "os/event/proactor.hh"
 #include "os/event/readable_file_descriptor.hh"
-#include "os/event/Trigger.hh"
+#include "os/event/trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptorTestHelper.hh"
@@ -51,7 +51,7 @@ using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::event::proactor;
 using sesh::os::event::readable_file_descriptor;
-using sesh::os::event::Trigger;
+using sesh::os::event::trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::NonBlockingFileDescriptor;
 using sesh::os::io::ReaderApi;
@@ -73,7 +73,7 @@ class UncallableReaderApi : public ReaderApi {
 
 class UncallableProactor : public proactor {
 
-    future<Trigger> expect_impl(std::vector<Trigger> &&) override {
+    future<trigger> expect_impl(std::vector<trigger> &&) override {
         throw "unexpected expect";
     }
 
@@ -81,9 +81,9 @@ class UncallableProactor : public proactor {
 
 class EchoingProactor : public proactor {
 
-    future<Trigger> expect_impl(std::vector<Trigger> &&triggers) override {
+    future<trigger> expect_impl(std::vector<trigger> &&triggers) override {
         REQUIRE_FALSE(triggers.empty());
-        return make_future<Trigger>(std::move(triggers.front()));
+        return make_future<trigger>(std::move(triggers.front()));
     }
 
 }; // class EchoingProactor
@@ -120,7 +120,7 @@ class ReadTestFixture : public ReaderApi, public proactor {
 private:
 
     mutable bool mIsReadyToRead = false;
-    promise<Trigger> mPromise;
+    promise<trigger> mPromise;
 
 public:
 
@@ -157,13 +157,13 @@ private:
         return count;
     }
 
-    future<Trigger> expect_impl(std::vector<Trigger> &&triggers) override {
+    future<trigger> expect_impl(std::vector<trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
-        Trigger &t = triggers.front();
+        trigger &t = triggers.front();
         CHECK(t.tag() == t.tag<readable_file_descriptor>());
         CHECK(t.value<readable_file_descriptor>().value() == FD);
 
-        auto pf = make_promise_future_pair<Trigger>();
+        auto pf = make_promise_future_pair<trigger>();
         mPromise = std::move(pf.first);
         return std::move(pf.second);
     }
@@ -231,8 +231,8 @@ namespace domain_error {
 
 class DomainErrorProactor : public proactor {
 
-    future<Trigger> expect_impl(std::vector<Trigger> &&) override {
-        return make_failed_future_of<Trigger>(
+    future<trigger> expect_impl(std::vector<trigger> &&) override {
+        return make_failed_future_of<trigger>(
                 std::domain_error("expected error"));
     }
 

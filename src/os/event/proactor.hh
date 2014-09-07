@@ -24,7 +24,7 @@
 #include <vector>
 #include "async/future.hh"
 #include "common/container_helper.hh"
-#include "os/event/Trigger.hh"
+#include "os/event/trigger.hh"
 
 namespace sesh {
 namespace os {
@@ -38,7 +38,7 @@ class proactor {
 
 protected:
 
-    virtual async::future<Trigger> expect_impl(std::vector<Trigger> &&) = 0;
+    virtual async::future<trigger> expect_impl(std::vector<trigger> &&) = 0;
 
 public:
 
@@ -69,20 +69,20 @@ public:
      * is not supported by the underlying OS API, the returned future fails
      * with std::domain_error.
      */
-    async::future<Trigger> expect(std::vector<Trigger> &&triggers) {
+    async::future<trigger> expect(std::vector<trigger> &&triggers) {
         return expect_impl(std::move(triggers));
     }
 
-    void expect(std::vector<Trigger> &) = delete;
-    void expect(const std::vector<Trigger> &) = delete;
+    void expect(std::vector<trigger> &) = delete;
+    void expect(const std::vector<trigger> &) = delete;
 
     /**
-     * A convenient version of {@link #expect(std::vector<Trigger> &&)} to
+     * A convenient version of {@link #expect(std::vector<trigger> &&)} to
      * which you can directly pass triggers as arguments.
      */
     template<typename... TriggerArg>
-    async::future<Trigger> expect(TriggerArg &&... t) {
-        return expect_impl(common::make_vector_of<Trigger>(
+    async::future<trigger> expect(TriggerArg &&... t) {
+        return expect_impl(common::make_vector_of<trigger>(
                 std::forward<TriggerArg>(t)...));
     }
 

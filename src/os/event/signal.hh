@@ -29,7 +29,7 @@ namespace event {
 /**
  * A signal event trigger.
  *
- * @see Trigger
+ * @see trigger
  */
 class signal {
 

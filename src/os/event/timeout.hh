@@ -29,7 +29,7 @@ namespace event {
 /**
  * A timeout event trigger.
  *
- * @see Trigger
+ * @see trigger
  */
 class timeout {
 

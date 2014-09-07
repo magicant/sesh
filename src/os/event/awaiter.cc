@@ -35,7 +35,7 @@
 #include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/event/pselect_api.hh"
-#include "os/event/Trigger.hh"
+#include "os/event/trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfiguration.hh"
@@ -75,12 +75,12 @@ private:
 
     class timeout m_timeout;
     std::vector<file_descriptor_trigger> m_triggers;
-    promise<Trigger> m_promise;
+    promise<trigger> m_promise;
     std::vector<HandlerConfiguration::Canceler> m_cancelers;
 
 public:
 
-    explicit pending_event(promise<Trigger>);
+    explicit pending_event(promise<trigger>);
     pending_event(pending_event &&) = default;
     pending_event &operator=(pending_event &&) = default;
     ~pending_event();
@@ -95,7 +95,7 @@ public:
 
     bool has_fired() const noexcept { return !m_promise.is_valid(); }
 
-    void fire(Trigger &&);
+    void fire(trigger &&);
     void fail_with_current_exception();
 
     void add_canceler(HandlerConfiguration::Canceler &&c);
@@ -172,7 +172,7 @@ private:
     std::shared_ptr<HandlerConfiguration> m_handler_configuration;
     std::multimap<time_limit, std::shared_ptr<pending_event>> m_pending_events;
 
-    future<Trigger> expect_impl(std::vector<Trigger> &&triggers)
+    future<trigger> expect_impl(std::vector<trigger> &&triggers)
             final override;
 
     bool remove_fired_events();
@@ -195,7 +195,7 @@ public:
 
 }; // class awaiter_impl
 
-pending_event::pending_event(promise<Trigger> p) :
+pending_event::pending_event(promise<trigger> p) :
         m_timeout(timeout::internal_type::max()),
         m_triggers(),
         m_promise(std::move(p)),
@@ -210,7 +210,7 @@ void pending_event::add_trigger(const file_descriptor_trigger &t) {
     m_triggers.push_back(t);
 }
 
-void pending_event::fire(Trigger &&t) {
+void pending_event::fire(trigger &&t) {
     if (!has_fired())
         std::move(m_promise).set_result(std::move(t));
 }
@@ -360,26 +360,26 @@ void register_user_provided_trigger(
 }
 
 void register_trigger(
-        Trigger &&t,
+        trigger &&t,
         std::shared_ptr<pending_event> &e,
         HandlerConfiguration &hc) {
     switch (t.tag()) {
-    case Trigger::tag<timeout>():
+    case trigger::tag<timeout>():
         e->timeout() = std::min(e->timeout(), t.value<timeout>());
         return;
-    case Trigger::tag<readable_file_descriptor>():
+    case trigger::tag<readable_file_descriptor>():
         e->add_trigger(t.value<readable_file_descriptor>());
         return;
-    case Trigger::tag<WritableFileDescriptor>():
+    case trigger::tag<WritableFileDescriptor>():
         e->add_trigger(t.value<WritableFileDescriptor>());
         return;
-    case Trigger::tag<error_file_descriptor>():
+    case trigger::tag<error_file_descriptor>():
         e->add_trigger(t.value<error_file_descriptor>());
         return;
-    case Trigger::tag<signal>():
+    case trigger::tag<signal>():
         register_signal_trigger(t.value<signal>(), e, hc);
         return;
-    case Trigger::tag<UserProvidedTrigger>():
+    case trigger::tag<UserProvidedTrigger>():
         register_user_provided_trigger(
                 std::move(t.value<UserProvidedTrigger>()), e);
         return;
@@ -399,14 +399,14 @@ time_point compute_time_limit(timeout to, const time_api &api) {
     return now + to.interval();
 }
 
-future<Trigger> awaiter_impl::expect_impl(
-        std::vector<Trigger> &&triggers) {
-    auto pf = make_promise_future_pair<Trigger>();
+future<trigger> awaiter_impl::expect_impl(
+        std::vector<trigger> &&triggers) {
+    auto pf = make_promise_future_pair<trigger>();
     if (triggers.empty())
         return std::move(pf.second);
 
     auto event = std::make_shared<pending_event>(std::move(pf.first));
-    for (Trigger &t : triggers)
+    for (trigger &t : triggers)
         register_trigger(std::move(t), event, *m_handler_configuration);
 
     time_point time_limit = compute_time_limit(event->timeout(), m_api);

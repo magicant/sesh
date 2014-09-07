@@ -26,7 +26,7 @@
 #include "common/variant.hh"
 #include "os/event/proactor.hh"
 #include "os/event/readable_file_descriptor.hh"
-#include "os/event/Trigger.hh"
+#include "os/event/trigger.hh"
 
 using sesh::async::future;
 using sesh::async::make_future;
@@ -34,7 +34,7 @@ using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::event::proactor;
 using sesh::os::event::readable_file_descriptor;
-using sesh::os::event::Trigger;
+using sesh::os::event::trigger;
 
 namespace sesh {
 namespace os {
@@ -61,7 +61,7 @@ struct Reader {
         return ResultPair(std::move(fd), std::move(e));
     }
 
-    ResultPair operator()(trial<Trigger> &&t) {
+    ResultPair operator()(trial<trigger> &&t) {
         try {
             *t;
         } catch (std::domain_error &) {

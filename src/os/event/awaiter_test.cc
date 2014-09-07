@@ -32,7 +32,7 @@
 #include "os/event/readable_file_descriptor.hh"
 #include "os/event/signal.hh"
 #include "os/event/timeout.hh"
-#include "os/event/Trigger.hh"
+#include "os/event/trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfigurationApiTestHelper.hh"
@@ -66,7 +66,7 @@ using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::signal;
 using sesh::os::event::timeout;
-using sesh::os::event::Trigger;
+using sesh::os::event::trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
@@ -84,8 +84,8 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: does nothing for empty trigger set") {
-    future<Trigger> f = a.expect();
-    std::move(f).then([](trial<Trigger> &&) { FAIL("callback called"); });
+    future<trigger> f = a.expect();
+    std::move(f).then([](trial<trigger> &&) { FAIL("callback called"); });
     a.await_events();
 }
 
@@ -94,9 +94,9 @@ TEST_CASE_METHOD(
         "Awaiter: timeout with FD trigger in same set") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<Trigger> f = a.expect(
+    future<trigger> f = a.expect(
             timeout(std::chrono::seconds(5)), readable_file_descriptor(3));
-    std::move(f).then([this, start_time](trial<Trigger> &&t) {
+    std::move(f).then([this, start_time](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == t->tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(5));
@@ -131,9 +131,9 @@ TEST_CASE_METHOD(
         "Awaiter: FD trigger with timeout in same set") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<Trigger> f = a.expect(
+    future<trigger> f = a.expect(
             timeout(std::chrono::seconds(10)), readable_file_descriptor(3));
-    std::move(f).then([this, start_time](trial<Trigger> &&t) {
+    std::move(f).then([this, start_time](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == t->tag<readable_file_descriptor>());
         CHECK(t->value<readable_file_descriptor>().value() == 3);
@@ -196,7 +196,7 @@ TEST_CASE_METHOD(
     bool called = false;
     a.expect(fd).wrap().recover([this](std::exception_ptr) {
         return a.expect(timeout(std::chrono::seconds(0)));
-    }).unwrap().then([&](trial<Trigger> &&) {
+    }).unwrap().then([&](trial<trigger> &&) {
         called = true;
     });
     a.await_events();
@@ -212,7 +212,7 @@ TEST_CASE_METHOD(
     bool called = false;
     auto f = a.expect(
             timeout(std::chrono::seconds(1)), readable_file_descriptor(0));
-    std::move(f).then([&called](trial<Trigger> &&t) {
+    std::move(f).then([&called](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == t->tag<timeout>());
         called = true;

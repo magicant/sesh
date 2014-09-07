@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_Trigger_hh
-#define INCLUDED_os_event_Trigger_hh
+#ifndef INCLUDED_os_event_trigger_hh
+#define INCLUDED_os_event_trigger_hh
 
 #include "buildconfig.h"
 
@@ -33,7 +33,7 @@ namespace os {
 namespace event {
 
 /** A trigger describes the cause of an event. */
-using Trigger = common::variant<
+using trigger = common::variant<
         timeout,
         readable_file_descriptor,
         WritableFileDescriptor,
@@ -45,6 +45,6 @@ using Trigger = common::variant<
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_Trigger_hh
+#endif // #ifndef INCLUDED_os_event_trigger_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
