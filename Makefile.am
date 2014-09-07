@@ -174,7 +174,7 @@ src_sesh_SOURCES = \
 	src/os/event/signal.hh \
 	src/os/event/timeout.hh \
 	src/os/event/trigger.hh \
-	src/os/event/UserProvidedTrigger.hh \
+	src/os/event/user_provided_trigger.hh \
 	src/os/event/WritableFileDescriptor.hh \
 	src/os/io/FileDescriptionAccessMode.hh \
 	src/os/io/FileDescriptionApi.hh \

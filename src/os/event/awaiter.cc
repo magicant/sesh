@@ -345,13 +345,13 @@ void register_signal_trigger(
 }
 
 void register_user_provided_trigger(
-        UserProvidedTrigger &&t, std::shared_ptr<pending_event> &e) {
-    using result = UserProvidedTrigger::Result;
+        user_provided_trigger &&t, std::shared_ptr<pending_event> &e) {
+    using result = user_provided_trigger::result_type;
     std::weak_ptr<pending_event> w = e;
     std::move(t.future()).then([w](trial<result> &&t) {
         if (std::shared_ptr<pending_event> e = w.lock()) {
             try {
-                e->fire(UserProvidedTrigger(std::move(*t)));
+                e->fire(user_provided_trigger(std::move(*t)));
             } catch (...) {
                 e->fail_with_current_exception();
             }
@@ -379,9 +379,9 @@ void register_trigger(
     case trigger::tag<signal>():
         register_signal_trigger(t.value<signal>(), e, hc);
         return;
-    case trigger::tag<UserProvidedTrigger>():
+    case trigger::tag<user_provided_trigger>():
         register_user_provided_trigger(
-                std::move(t.value<UserProvidedTrigger>()), e);
+                std::move(t.value<user_provided_trigger>()), e);
         return;
     }
 }

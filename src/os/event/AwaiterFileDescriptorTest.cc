@@ -32,7 +32,7 @@
 #include "os/event/signal.hh"
 #include "os/event/timeout.hh"
 #include "os/event/trigger.hh"
-#include "os/event/UserProvidedTrigger.hh"
+#include "os/event/user_provided_trigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
@@ -50,7 +50,7 @@ using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::signal;
 using sesh::os::event::timeout;
 using sesh::os::event::trigger;
-using sesh::os::event::UserProvidedTrigger;
+using sesh::os::event::user_provided_trigger;
 using sesh::os::event::WritableFileDescriptor;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
@@ -82,7 +82,7 @@ TEST_CASE_METHOD(
         case trigger::tag<error_file_descriptor>():
         case trigger::tag<timeout>():
         case trigger::tag<signal>():
-        case trigger::tag<UserProvidedTrigger>():
+        case trigger::tag<user_provided_trigger>():
             FAIL("tag=" << t->tag());
             break;
         }
@@ -131,7 +131,7 @@ TEST_CASE_METHOD(
         case trigger::tag<WritableFileDescriptor>():
         case trigger::tag<timeout>():
         case trigger::tag<signal>():
-        case trigger::tag<UserProvidedTrigger>():
+        case trigger::tag<user_provided_trigger>():
             FAIL("tag=" << t->tag());
             break;
         }
@@ -180,7 +180,7 @@ TEST_CASE_METHOD(
         case trigger::tag<readable_file_descriptor>():
         case trigger::tag<timeout>():
         case trigger::tag<signal>():
-        case trigger::tag<UserProvidedTrigger>():
+        case trigger::tag<user_provided_trigger>():
             FAIL("tag=" << t->tag());
             break;
         }

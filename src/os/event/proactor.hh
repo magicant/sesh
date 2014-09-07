@@ -59,7 +59,7 @@ public:
      * Otherwise, the behavior is undefined. That means you must ensure
      * validity of the file descriptors before calling this function.
      *
-     * Any {@link UserProvidedTrigger} contained in the trigger set must have
+     * Any {@link user_provided_trigger} contained in the trigger set must have
      * been constructed by the constructor that takes a future argument. If a
      * user-provided trigger fires the event, the future that was returned from
      * this function provides a user-provided trigger object that was

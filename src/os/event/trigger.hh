@@ -25,7 +25,7 @@
 #include "os/event/readable_file_descriptor.hh"
 #include "os/event/signal.hh"
 #include "os/event/timeout.hh"
-#include "os/event/UserProvidedTrigger.hh"
+#include "os/event/user_provided_trigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
 
 namespace sesh {
@@ -39,7 +39,7 @@ using trigger = common::variant<
         WritableFileDescriptor,
         error_file_descriptor,
         signal,
-        UserProvidedTrigger>;
+        user_provided_trigger>;
 
 } // namespace event
 } // namespace os
