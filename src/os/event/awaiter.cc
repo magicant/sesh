@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Awaiter.hh"
+#include "awaiter.hh"
 
 #include <algorithm>
 #include <cassert>

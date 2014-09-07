@@ -26,7 +26,7 @@
 #include "async/future.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
-#include "os/event/AwaiterTestHelper.hh"
+#include "os/event/awaiter_test_helper.hh"
 #include "os/event/PselectApi.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/UserProvidedTrigger.hh"

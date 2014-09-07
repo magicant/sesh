@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_Awaiter_hh
-#define INCLUDED_os_event_Awaiter_hh
+#ifndef INCLUDED_os_event_awaiter_hh
+#define INCLUDED_os_event_awaiter_hh
 
 #include "buildconfig.h"
 
@@ -70,6 +70,6 @@ std::unique_ptr<Awaiter> createAwaiter(
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_Awaiter_hh
+#endif // #ifndef INCLUDED_os_event_awaiter_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

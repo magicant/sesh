@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_AwaiterTestHelper_hh
-#define INCLUDED_os_event_AwaiterTestHelper_hh
+#ifndef INCLUDED_os_event_awaiter_test_helper_hh
+#define INCLUDED_os_event_awaiter_test_helper_hh
 
 #include "buildconfig.h"
 
 #include <memory>
 #include <utility>
 #include <vector>
-#include "os/event/Awaiter.hh"
+#include "os/event/awaiter.hh"
 #include "os/event/PselectApiTestHelper.hh"
 #include "os/signaling/HandlerConfiguration.hh"
 
@@ -49,6 +49,6 @@ protected:
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_AwaiterTestHelper_hh
+#endif // #ifndef INCLUDED_os_event_awaiter_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
