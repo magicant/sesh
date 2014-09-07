@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "os/event/FileDescriptorCondition.hh"
+#include "os/event/file_descriptor_condition.hh"
 
 namespace sesh {
 namespace os {
@@ -29,9 +29,9 @@ namespace event {
 /**
  * Represents an event triggered by an error condition of a file descriptor.
  */
-class error_file_descriptor : public FileDescriptorCondition {
+class error_file_descriptor : public file_descriptor_condition {
 
-    using FileDescriptorCondition::FileDescriptorCondition;
+    using file_descriptor_condition::file_descriptor_condition;
 
 }; // class error_file_descriptor
 

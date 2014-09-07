@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_FileDescriptorCondition_hh
-#define INCLUDED_os_event_FileDescriptorCondition_hh
+#ifndef INCLUDED_os_event_file_descriptor_condition_hh
+#define INCLUDED_os_event_file_descriptor_condition_hh
 
 #include "buildconfig.h"
 
@@ -29,36 +29,36 @@ namespace event {
 /**
  * Represents an event triggered by a specific condition of a file descriptor.
  */
-class FileDescriptorCondition {
+class file_descriptor_condition {
 
 private:
 
-    io::FileDescriptor::Value mValue;
+    io::FileDescriptor::Value m_value;
 
 public:
 
-    constexpr explicit FileDescriptorCondition(io::FileDescriptor::Value fd)
-            noexcept : mValue(fd) { }
+    constexpr explicit file_descriptor_condition(io::FileDescriptor::Value fd)
+            noexcept : m_value(fd) { }
 
-    FileDescriptorCondition(const io::FileDescriptor &fd) noexcept :
-            FileDescriptorCondition(fd.value()) { }
+    file_descriptor_condition(const io::FileDescriptor &fd) noexcept :
+            file_descriptor_condition(fd.value()) { }
 
-    FileDescriptorCondition(const io::FileDescriptor &&) = delete;
+    file_descriptor_condition(const io::FileDescriptor &&) = delete;
 
     constexpr io::FileDescriptor::Value value() const noexcept {
-        return mValue;
+        return m_value;
     }
 
-}; // class FileDescriptorCondition
+}; // class file_descriptor_condition
 
 constexpr inline bool operator==(
-        const FileDescriptorCondition &l, const FileDescriptorCondition &r)
+        const file_descriptor_condition &l, const file_descriptor_condition &r)
         noexcept {
     return l.value() == r.value();
 }
 
 constexpr inline bool operator<(
-        const FileDescriptorCondition &l, const FileDescriptorCondition &r)
+        const file_descriptor_condition &l, const file_descriptor_condition &r)
         noexcept {
     return l.value() < r.value();
 }
@@ -67,6 +67,6 @@ constexpr inline bool operator<(
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_FileDescriptorCondition_hh
+#endif // #ifndef INCLUDED_os_event_file_descriptor_condition_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

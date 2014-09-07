@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "os/event/FileDescriptorCondition.hh"
+#include "os/event/file_descriptor_condition.hh"
 
 namespace sesh {
 namespace os {
@@ -30,9 +30,9 @@ namespace event {
  * Represents an event triggered by a file descriptor becoming ready for
  * non-blocking writing.
  */
-class WritableFileDescriptor : public FileDescriptorCondition {
+class WritableFileDescriptor : public file_descriptor_condition {
 
-    using FileDescriptorCondition::FileDescriptorCondition;
+    using file_descriptor_condition::file_descriptor_condition;
 
 }; // class WritableFileDescriptor
 
