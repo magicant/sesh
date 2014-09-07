@@ -159,8 +159,8 @@ src_sesh_SOURCES = \
 	src/language/syntax/word.hh \
 	src/language/syntax/word_component.hh \
 	src/main.cc \
-	src/os/Api.cc \
-	src/os/Api.hh \
+	src/os/api.cc \
+	src/os/api.hh \
 	src/os/TimeApi.hh \
 	src/os/capi.c \
 	src/os/capi.h \

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_Api_hh
-#define INCLUDED_os_Api_hh
+#ifndef INCLUDED_os_api_hh
+#define INCLUDED_os_api_hh
 
 #include "buildconfig.h"
 
@@ -31,7 +31,7 @@ namespace sesh {
 namespace os {
 
 /** Abstraction of POSIX API. */
-class Api :
+class api :
         public event::PselectApi,
         public io::FileDescriptionApi,
         public io::FileDescriptorApi,
@@ -42,13 +42,13 @@ class Api :
 public:
 
     /** Reference to the only instance of real API implementation. */
-    static const Api &INSTANCE;
+    static const api &instance;
 
-}; // class Api
+}; // class api
 
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_Api_hh
+#endif // #ifndef INCLUDED_os_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
