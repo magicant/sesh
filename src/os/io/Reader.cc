@@ -25,7 +25,7 @@
 #include "common/trial.hh"
 #include "common/variant.hh"
 #include "os/event/proactor.hh"
-#include "os/event/ReadableFileDescriptor.hh"
+#include "os/event/readable_file_descriptor.hh"
 #include "os/event/Trigger.hh"
 
 using sesh::async::future;
@@ -33,7 +33,7 @@ using sesh::async::make_future;
 using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::event::proactor;
-using sesh::os::event::ReadableFileDescriptor;
+using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::Trigger;
 
 namespace sesh {
@@ -69,7 +69,7 @@ struct Reader {
                     std::make_error_code(std::errc::too_many_files_open));
         }
 
-        assert(t->value<ReadableFileDescriptor>().value() == fd.value());
+        assert(t->value<readable_file_descriptor>().value() == fd.value());
 
         auto bufferBody = static_cast<void *>(buffer.data());
         auto size = static_cast<std::size_t>(buffer.size());
@@ -91,7 +91,7 @@ future<ResultPair> read(
     if (maxBytesToRead > SIZE_MAX)
         maxBytesToRead = SIZE_MAX;
 
-    auto trigger = ReadableFileDescriptor(fd.value());
+    auto trigger = readable_file_descriptor(fd.value());
     return p.expect(trigger).then(
             Reader{api, std::move(fd), std::vector<char>(maxBytesToRead)});
 }

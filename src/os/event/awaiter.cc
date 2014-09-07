@@ -65,7 +65,9 @@ namespace event {
 namespace {
 
 using file_descriptor_trigger = variant<
-        ReadableFileDescriptor, WritableFileDescriptor, error_file_descriptor>;
+        readable_file_descriptor,
+        WritableFileDescriptor,
+        error_file_descriptor>;
 
 class pending_event {
 
@@ -252,8 +254,8 @@ void pselect_argument::add_fd(
 void pselect_argument::add(
         const file_descriptor_trigger &t, const pselect_api &api) {
     switch (t.tag()) {
-    case file_descriptor_trigger::tag<ReadableFileDescriptor>():
-        add_fd(m_read_fds, t.value<ReadableFileDescriptor>().value(), api);
+    case file_descriptor_trigger::tag<readable_file_descriptor>():
+        add_fd(m_read_fds, t.value<readable_file_descriptor>().value(), api);
         return;
     case file_descriptor_trigger::tag<WritableFileDescriptor>():
         add_fd(m_write_fds, t.value<WritableFileDescriptor>().value(), api);
@@ -296,8 +298,9 @@ bool contains(
 
 bool pselect_argument::matches(const file_descriptor_trigger &t) const {
     switch (t.tag()) {
-    case file_descriptor_trigger::tag<ReadableFileDescriptor>():
-        return contains(m_read_fds, t.value<ReadableFileDescriptor>().value());
+    case file_descriptor_trigger::tag<readable_file_descriptor>():
+        return contains(
+                m_read_fds, t.value<readable_file_descriptor>().value());
     case file_descriptor_trigger::tag<WritableFileDescriptor>():
         return contains(
                 m_write_fds, t.value<WritableFileDescriptor>().value());
@@ -364,8 +367,8 @@ void register_trigger(
     case Trigger::tag<Timeout>():
         e->timeout() = std::min(e->timeout(), t.value<Timeout>());
         return;
-    case Trigger::tag<ReadableFileDescriptor>():
-        e->add_trigger(t.value<ReadableFileDescriptor>());
+    case Trigger::tag<readable_file_descriptor>():
+        e->add_trigger(t.value<readable_file_descriptor>());
         return;
     case Trigger::tag<WritableFileDescriptor>():
         e->add_trigger(t.value<WritableFileDescriptor>());

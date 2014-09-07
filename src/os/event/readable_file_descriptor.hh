@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_ReadableFileDescriptor_hh
-#define INCLUDED_os_event_ReadableFileDescriptor_hh
+#ifndef INCLUDED_os_event_readable_file_descriptor_hh
+#define INCLUDED_os_event_readable_file_descriptor_hh
 
 #include "buildconfig.h"
 
@@ -30,16 +30,16 @@ namespace event {
  * Represents an event triggered by a file descriptor becoming ready for
  * non-blocking reading.
  */
-class ReadableFileDescriptor : public file_descriptor_condition {
+class readable_file_descriptor : public file_descriptor_condition {
 
     using file_descriptor_condition::file_descriptor_condition;
 
-}; // class ReadableFileDescriptor
+}; // class readable_file_descriptor
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_ReadableFileDescriptor_hh
+#endif // #ifndef INCLUDED_os_event_readable_file_descriptor_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

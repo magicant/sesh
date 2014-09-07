@@ -29,7 +29,7 @@
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/pselect_api.hh"
-#include "os/event/ReadableFileDescriptor.hh"
+#include "os/event/readable_file_descriptor.hh"
 #include "os/event/Signal.hh"
 #include "os/event/Timeout.hh"
 #include "os/event/Trigger.hh"
@@ -63,7 +63,7 @@ namespace {
 using sesh::common::trial;
 using sesh::async::future;
 using sesh::os::event::awaiter_test_fixture;
-using sesh::os::event::ReadableFileDescriptor;
+using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::Signal;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
@@ -95,7 +95,7 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
     future<Trigger> f = a.expect(
-            Timeout(std::chrono::seconds(5)), ReadableFileDescriptor(3));
+            Timeout(std::chrono::seconds(5)), readable_file_descriptor(3));
     std::move(f).then([this, start_time](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == t->tag<Timeout>());
@@ -132,11 +132,11 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
     future<Trigger> f = a.expect(
-            Timeout(std::chrono::seconds(10)), ReadableFileDescriptor(3));
+            Timeout(std::chrono::seconds(10)), readable_file_descriptor(3));
     std::move(f).then([this, start_time](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        REQUIRE(t->tag() == t->tag<ReadableFileDescriptor>());
-        CHECK(t->value<ReadableFileDescriptor>().value() == 3);
+        REQUIRE(t->tag() == t->tag<readable_file_descriptor>());
+        CHECK(t->value<readable_file_descriptor>().value() == 3);
         mutable_steady_clock_now() += std::chrono::seconds(4);
     });
 
@@ -191,7 +191,8 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: setting timeout from domain error") {
-    auto fd = ReadableFileDescriptor(file_descriptor_set_impl::MAX_VALUE + 1);
+    auto fd =
+            readable_file_descriptor(file_descriptor_set_impl::MAX_VALUE + 1);
     bool called = false;
     a.expect(fd).wrap().recover([this](std::exception_ptr) {
         return a.expect(Timeout(std::chrono::seconds(0)));
@@ -210,7 +211,7 @@ TEST_CASE_METHOD(
 
     bool called = false;
     auto f = a.expect(
-            Timeout(std::chrono::seconds(1)), ReadableFileDescriptor(0));
+            Timeout(std::chrono::seconds(1)), readable_file_descriptor(0));
     std::move(f).then([&called](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == t->tag<Timeout>());

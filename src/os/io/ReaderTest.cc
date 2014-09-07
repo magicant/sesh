@@ -32,7 +32,7 @@
 #include "common/type_tag_test_helper.hh"
 #include "common/variant.hh"
 #include "os/event/proactor.hh"
-#include "os/event/ReadableFileDescriptor.hh"
+#include "os/event/readable_file_descriptor.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
@@ -50,7 +50,7 @@ using sesh::async::promise;
 using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::event::proactor;
-using sesh::os::event::ReadableFileDescriptor;
+using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::NonBlockingFileDescriptor;
@@ -131,7 +131,7 @@ public:
             return;
         mIsReadyToRead = true;
         if (mPromise.is_valid())
-            std::move(mPromise).set_result(ReadableFileDescriptor(FD));
+            std::move(mPromise).set_result(readable_file_descriptor(FD));
     }
 
 private:
@@ -160,8 +160,8 @@ private:
     future<Trigger> expect_impl(std::vector<Trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
         Trigger &t = triggers.front();
-        CHECK(t.tag() == t.tag<ReadableFileDescriptor>());
-        CHECK(t.value<ReadableFileDescriptor>().value() == FD);
+        CHECK(t.tag() == t.tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == FD);
 
         auto pf = make_promise_future_pair<Trigger>();
         mPromise = std::move(pf.first);

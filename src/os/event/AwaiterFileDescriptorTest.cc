@@ -28,7 +28,7 @@
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/error_file_descriptor.hh"
 #include "os/event/pselect_api.hh"
-#include "os/event/ReadableFileDescriptor.hh"
+#include "os/event/readable_file_descriptor.hh"
 #include "os/event/Signal.hh"
 #include "os/event/Timeout.hh"
 #include "os/event/Trigger.hh"
@@ -46,7 +46,7 @@ using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::error_file_descriptor;
-using sesh::os::event::ReadableFileDescriptor;
+using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::Signal;
 using sesh::os::event::Timeout;
 using sesh::os::event::Trigger;
@@ -59,7 +59,9 @@ using sesh::os::signaling::SignalNumberSet;
 
 using TimePoint = sesh::os::event::pselect_api::steady_clock_time;
 using TriggerFileDescriptor = variant<
-        ReadableFileDescriptor, WritableFileDescriptor, error_file_descriptor>;
+        readable_file_descriptor,
+        WritableFileDescriptor,
+        error_file_descriptor>;
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
@@ -67,12 +69,12 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
-            ReadableFileDescriptor(3), WritableFileDescriptor(3));
+            readable_file_descriptor(3), WritableFileDescriptor(3));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         switch (t->tag()) {
-        case Trigger::tag<ReadableFileDescriptor>():
-            CHECK(t->value<ReadableFileDescriptor>().value() == 3);
+        case Trigger::tag<readable_file_descriptor>():
+            CHECK(t->value<readable_file_descriptor>().value() == 3);
             break;
         case Trigger::tag<WritableFileDescriptor>():
             CHECK(t->value<WritableFileDescriptor>().value() == 3);
@@ -116,12 +118,12 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
-            ReadableFileDescriptor(3), error_file_descriptor(3));
+            readable_file_descriptor(3), error_file_descriptor(3));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         switch (t->tag()) {
-        case Trigger::tag<ReadableFileDescriptor>():
-            CHECK(t->value<ReadableFileDescriptor>().value() == 3);
+        case Trigger::tag<readable_file_descriptor>():
+            CHECK(t->value<readable_file_descriptor>().value() == 3);
             break;
         case Trigger::tag<error_file_descriptor>():
             CHECK(t->value<error_file_descriptor>().value() == 3);
@@ -175,7 +177,7 @@ TEST_CASE_METHOD(
         case Trigger::tag<error_file_descriptor>():
             CHECK(t->value<error_file_descriptor>().value() == 3);
             break;
-        case Trigger::tag<ReadableFileDescriptor>():
+        case Trigger::tag<readable_file_descriptor>():
         case Trigger::tag<Timeout>():
         case Trigger::tag<Signal>():
         case Trigger::tag<UserProvidedTrigger>():
@@ -215,11 +217,11 @@ TEST_CASE_METHOD(
     mutable_steady_clock_now() = startTime;
 
     bool callback1Called = false, callback2Called = false;
-    a.expect(ReadableFileDescriptor(2)).then(
+    a.expect(readable_file_descriptor(2)).then(
             [this, startTime, &callback1Called](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
-        CHECK(t->value<ReadableFileDescriptor>().value() == 2);
+        CHECK(t->tag() == Trigger::tag<readable_file_descriptor>());
+        CHECK(t->value<readable_file_descriptor>().value() == 2);
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(10));
         callback1Called = true;
     });
@@ -295,11 +297,11 @@ TEST_CASE_METHOD(
     mutable_steady_clock_now() = startTime;
 
     bool callback1Called = false, callback2Called = false;
-    a.expect(ReadableFileDescriptor(2)).then(
+    a.expect(readable_file_descriptor(2)).then(
             [this, startTime, &callback1Called](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
-        CHECK(t->value<ReadableFileDescriptor>().value() == 2);
+        CHECK(t->tag() == Trigger::tag<readable_file_descriptor>());
+        CHECK(t->value<readable_file_descriptor>().value() == 2);
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(10));
         callback1Called = true;
     });
@@ -333,11 +335,11 @@ TEST_CASE_METHOD(
         "Awaiter: awaiting max readable FD") {
     auto max = file_descriptor_set_impl::MAX_VALUE;
     bool callbackCalled = false;
-    a.expect(ReadableFileDescriptor(max)).then(
+    a.expect(readable_file_descriptor(max)).then(
             [this, max, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
-        CHECK(t->value<ReadableFileDescriptor>().value() == max);
+        CHECK(t->tag() == Trigger::tag<readable_file_descriptor>());
+        CHECK(t->value<readable_file_descriptor>().value() == max);
         callbackCalled = true;
     });
 
@@ -360,7 +362,7 @@ TEST_CASE_METHOD(
         "Awaiter: domain error from FD set") {
     auto max = file_descriptor_set_impl::MAX_VALUE;
     bool callbackCalled = false;
-    a.expect(ReadableFileDescriptor(max + 1)).then(
+    a.expect(readable_file_descriptor(max + 1)).then(
             [this, &callbackCalled](trial<Trigger> &&t) {
         try {
             *t;

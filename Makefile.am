@@ -170,7 +170,7 @@ src_sesh_SOURCES = \
 	src/os/event/file_descriptor_condition.hh \
 	src/os/event/proactor.hh \
 	src/os/event/pselect_api.hh \
-	src/os/event/ReadableFileDescriptor.hh \
+	src/os/event/readable_file_descriptor.hh \
 	src/os/event/Signal.hh \
 	src/os/event/Timeout.hh \
 	src/os/event/Trigger.hh \
