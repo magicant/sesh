@@ -29,7 +29,7 @@
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
-#include "os/event/ErrorFileDescriptor.hh"
+#include "os/event/error_file_descriptor.hh"
 #include "os/event/PselectApi.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
@@ -42,7 +42,7 @@ namespace {
 using sesh::async::future;
 using sesh::common::trial;
 using sesh::os::event::awaiter_test_fixture;
-using sesh::os::event::ErrorFileDescriptor;
+using sesh::os::event::error_file_descriptor;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
@@ -56,11 +56,11 @@ TEST_CASE_METHOD(
         "Awaiter: awaiting single error FD") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
-    future<Trigger> f = a.expect(ErrorFileDescriptor(4));
+    future<Trigger> f = a.expect(error_file_descriptor(4));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<ErrorFileDescriptor>());
-        CHECK(t->value<ErrorFileDescriptor>().value() == 4);
+        CHECK(t->tag() == Trigger::tag<error_file_descriptor>());
+        CHECK(t->value<error_file_descriptor>().value() == 4);
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
@@ -94,11 +94,11 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
-            ErrorFileDescriptor(2), ErrorFileDescriptor(0));
+            error_file_descriptor(2), error_file_descriptor(0));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<ErrorFileDescriptor>());
-        CHECK(t->value<ErrorFileDescriptor>().value() == 0);
+        CHECK(t->tag() == Trigger::tag<error_file_descriptor>());
+        CHECK(t->value<error_file_descriptor>().value() == 0);
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
@@ -133,11 +133,11 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
-            ErrorFileDescriptor(2), ErrorFileDescriptor(0));
+            error_file_descriptor(2), error_file_descriptor(0));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<ErrorFileDescriptor>());
-        auto fd = t->value<ErrorFileDescriptor>().value();
+        CHECK(t->tag() == Trigger::tag<error_file_descriptor>());
+        auto fd = t->value<error_file_descriptor>().value();
         if (fd != 0)
             CHECK(fd == 2);
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
@@ -172,19 +172,19 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(10000));
     mutable_steady_clock_now() = startTime;
 
-    a.expect(ErrorFileDescriptor(1)).then(
+    a.expect(error_file_descriptor(1)).then(
             [this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<ErrorFileDescriptor>());
-        CHECK(t->value<ErrorFileDescriptor>().value() == 1);
+        CHECK(t->tag() == Trigger::tag<error_file_descriptor>());
+        CHECK(t->value<error_file_descriptor>().value() == 1);
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(9));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
-    a.expect(ErrorFileDescriptor(3)).then(
+    a.expect(error_file_descriptor(3)).then(
             [this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<ErrorFileDescriptor>());
-        CHECK(t->value<ErrorFileDescriptor>().value() == 3);
+        CHECK(t->tag() == Trigger::tag<error_file_descriptor>());
+        CHECK(t->value<error_file_descriptor>().value() == 3);
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(28));
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
@@ -236,12 +236,12 @@ TEST_CASE_METHOD(
 
     auto callback = [this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<ErrorFileDescriptor>());
-        CHECK(t->value<ErrorFileDescriptor>().value() == 7);
+        CHECK(t->tag() == Trigger::tag<error_file_descriptor>());
+        CHECK(t->value<error_file_descriptor>().value() == 7);
         mutable_steady_clock_now() += std::chrono::seconds(1);
     };
-    a.expect(ErrorFileDescriptor(7)).then(callback);
-    a.expect(ErrorFileDescriptor(7)).then(callback);
+    a.expect(error_file_descriptor(7)).then(callback);
+    a.expect(error_file_descriptor(7)).then(callback);
 
     unsigned count = 0;
     implementation() = [this, &count](

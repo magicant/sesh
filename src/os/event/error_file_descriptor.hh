@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_ErrorFileDescriptor_hh
-#define INCLUDED_os_event_ErrorFileDescriptor_hh
+#ifndef INCLUDED_os_event_error_file_descriptor_hh
+#define INCLUDED_os_event_error_file_descriptor_hh
 
 #include "buildconfig.h"
 
@@ -29,16 +29,16 @@ namespace event {
 /**
  * Represents an event triggered by an error condition of a file descriptor.
  */
-class ErrorFileDescriptor : public FileDescriptorCondition {
+class error_file_descriptor : public FileDescriptorCondition {
 
     using FileDescriptorCondition::FileDescriptorCondition;
 
-}; // class ErrorFileDescriptor
+}; // class error_file_descriptor
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_ErrorFileDescriptor_hh
+#endif // #ifndef INCLUDED_os_event_error_file_descriptor_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

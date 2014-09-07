@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include "common/variant.hh"
-#include "os/event/ErrorFileDescriptor.hh"
+#include "os/event/error_file_descriptor.hh"
 #include "os/event/ReadableFileDescriptor.hh"
 #include "os/event/Signal.hh"
 #include "os/event/Timeout.hh"
@@ -37,7 +37,7 @@ using Trigger = common::variant<
         Timeout,
         ReadableFileDescriptor,
         WritableFileDescriptor,
-        ErrorFileDescriptor,
+        error_file_descriptor,
         Signal,
         UserProvidedTrigger>;
 

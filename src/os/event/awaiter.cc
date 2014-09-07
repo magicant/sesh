@@ -65,7 +65,7 @@ namespace event {
 namespace {
 
 using file_descriptor_trigger = variant<
-        ReadableFileDescriptor, WritableFileDescriptor, ErrorFileDescriptor>;
+        ReadableFileDescriptor, WritableFileDescriptor, error_file_descriptor>;
 
 class pending_event {
 
@@ -257,8 +257,8 @@ void pselect_argument::add(
     case file_descriptor_trigger::tag<WritableFileDescriptor>():
         add_fd(m_write_fds, t.value<WritableFileDescriptor>().value(), api);
         return;
-    case file_descriptor_trigger::tag<ErrorFileDescriptor>():
-        add_fd(m_error_fds, t.value<ErrorFileDescriptor>().value(), api);
+    case file_descriptor_trigger::tag<error_file_descriptor>():
+        add_fd(m_error_fds, t.value<error_file_descriptor>().value(), api);
         return;
     }
     UNREACHABLE();
@@ -300,8 +300,8 @@ bool pselect_argument::matches(const file_descriptor_trigger &t) const {
     case file_descriptor_trigger::tag<WritableFileDescriptor>():
         return contains(
                 m_write_fds, t.value<WritableFileDescriptor>().value());
-    case file_descriptor_trigger::tag<ErrorFileDescriptor>():
-        return contains(m_error_fds, t.value<ErrorFileDescriptor>().value());
+    case file_descriptor_trigger::tag<error_file_descriptor>():
+        return contains(m_error_fds, t.value<error_file_descriptor>().value());
     }
     UNREACHABLE();
 }
@@ -369,8 +369,8 @@ void register_trigger(
     case Trigger::tag<WritableFileDescriptor>():
         e->add_trigger(t.value<WritableFileDescriptor>());
         return;
-    case Trigger::tag<ErrorFileDescriptor>():
-        e->add_trigger(t.value<ErrorFileDescriptor>());
+    case Trigger::tag<error_file_descriptor>():
+        e->add_trigger(t.value<error_file_descriptor>());
         return;
     case Trigger::tag<Signal>():
         register_signal_trigger(t.value<Signal>(), e, hc);

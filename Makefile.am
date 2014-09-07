@@ -166,7 +166,7 @@ src_sesh_SOURCES = \
 	src/os/capitypes.h \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter.hh \
-	src/os/event/ErrorFileDescriptor.hh \
+	src/os/event/error_file_descriptor.hh \
 	src/os/event/FileDescriptorCondition.hh \
 	src/os/event/Proactor.hh \
 	src/os/event/PselectApi.hh \
