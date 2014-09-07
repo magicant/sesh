@@ -73,7 +73,7 @@ class pending_event {
 
 private:
 
-    Timeout m_timeout;
+    class timeout m_timeout;
     std::vector<file_descriptor_trigger> m_triggers;
     promise<Trigger> m_promise;
     std::vector<HandlerConfiguration::Canceler> m_cancelers;
@@ -85,7 +85,7 @@ public:
     pending_event &operator=(pending_event &&) = default;
     ~pending_event();
 
-    Timeout &timeout() noexcept { return m_timeout; }
+    class timeout &timeout() noexcept { return m_timeout; }
 
     const std::vector<file_descriptor_trigger> &triggers() const noexcept {
         return m_triggers;
@@ -196,7 +196,7 @@ public:
 }; // class awaiter_impl
 
 pending_event::pending_event(promise<Trigger> p) :
-        m_timeout(Timeout::Interval::max()),
+        m_timeout(timeout::internal_type::max()),
         m_triggers(),
         m_promise(std::move(p)),
         m_cancelers() { }
@@ -364,8 +364,8 @@ void register_trigger(
         std::shared_ptr<pending_event> &e,
         HandlerConfiguration &hc) {
     switch (t.tag()) {
-    case Trigger::tag<Timeout>():
-        e->timeout() = std::min(e->timeout(), t.value<Timeout>());
+    case Trigger::tag<timeout>():
+        e->timeout() = std::min(e->timeout(), t.value<timeout>());
         return;
     case Trigger::tag<readable_file_descriptor>():
         e->add_trigger(t.value<readable_file_descriptor>());
@@ -386,17 +386,17 @@ void register_trigger(
     }
 }
 
-time_point compute_time_limit(Timeout timeout, const time_api &api) {
-    if (timeout.interval() < Timeout::Interval::zero())
-        timeout = Timeout(Timeout::Interval::zero());
+time_point compute_time_limit(timeout to, const time_api &api) {
+    if (to.interval() < timeout::internal_type::zero())
+        to = timeout(timeout::internal_type::zero());
 
-    if (timeout.interval() == Timeout::Interval::max())
+    if (to.interval() == timeout::internal_type::max())
         return time_point::max();
 
     time_point now = api.steady_clock_now();
-    if (now > time_point::max() - timeout.interval())
+    if (now > time_point::max() - to.interval())
         return time_point::max();
-    return now + timeout.interval();
+    return now + to.interval();
 }
 
 future<Trigger> awaiter_impl::expect_impl(

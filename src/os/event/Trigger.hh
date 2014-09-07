@@ -24,7 +24,7 @@
 #include "os/event/error_file_descriptor.hh"
 #include "os/event/readable_file_descriptor.hh"
 #include "os/event/signal.hh"
-#include "os/event/Timeout.hh"
+#include "os/event/timeout.hh"
 #include "os/event/UserProvidedTrigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
 
@@ -34,7 +34,7 @@ namespace event {
 
 /** A trigger describes the cause of an event. */
 using Trigger = common::variant<
-        Timeout,
+        timeout,
         readable_file_descriptor,
         WritableFileDescriptor,
         error_file_descriptor,

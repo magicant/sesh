@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_Timeout_hh
-#define INCLUDED_os_event_Timeout_hh
+#ifndef INCLUDED_os_event_timeout_hh
+#define INCLUDED_os_event_timeout_hh
 
 #include "buildconfig.h"
 
@@ -31,29 +31,29 @@ namespace event {
  *
  * @see Trigger
  */
-class Timeout {
+class timeout {
 
 public:
 
-    using Interval = std::chrono::nanoseconds;
+    using internal_type = std::chrono::nanoseconds;
 
 private:
 
-    Interval mInterval;
+    internal_type m_interval;
 
 public:
 
-    constexpr explicit Timeout(Interval i) noexcept : mInterval(i) { }
+    constexpr explicit timeout(internal_type i) noexcept : m_interval(i) { }
 
-    constexpr Interval interval() const noexcept { return mInterval; }
+    constexpr internal_type interval() const noexcept { return m_interval; }
 
 };
 
-constexpr inline bool operator==(const Timeout &l, const Timeout &r) noexcept {
+constexpr inline bool operator==(const timeout &l, const timeout &r) noexcept {
     return l.interval() == r.interval();
 }
 
-constexpr inline bool operator<(const Timeout &l, const Timeout &r) noexcept {
+constexpr inline bool operator<(const timeout &l, const timeout &r) noexcept {
     return l.interval() < r.interval();
 }
 
@@ -61,6 +61,6 @@ constexpr inline bool operator<(const Timeout &l, const Timeout &r) noexcept {
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_Timeout_hh
+#endif // #ifndef INCLUDED_os_event_timeout_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

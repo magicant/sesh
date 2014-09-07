@@ -30,7 +30,7 @@
 #include "os/event/pselect_api.hh"
 #include "os/event/readable_file_descriptor.hh"
 #include "os/event/signal.hh"
-#include "os/event/Timeout.hh"
+#include "os/event/timeout.hh"
 #include "os/event/Trigger.hh"
 #include "os/event/UserProvidedTrigger.hh"
 #include "os/event/WritableFileDescriptor.hh"
@@ -48,7 +48,7 @@ using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::error_file_descriptor;
 using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::signal;
-using sesh::os::event::Timeout;
+using sesh::os::event::timeout;
 using sesh::os::event::Trigger;
 using sesh::os::event::UserProvidedTrigger;
 using sesh::os::event::WritableFileDescriptor;
@@ -80,7 +80,7 @@ TEST_CASE_METHOD(
             CHECK(t->value<WritableFileDescriptor>().value() == 3);
             break;
         case Trigger::tag<error_file_descriptor>():
-        case Trigger::tag<Timeout>():
+        case Trigger::tag<timeout>():
         case Trigger::tag<signal>():
         case Trigger::tag<UserProvidedTrigger>():
             FAIL("tag=" << t->tag());
@@ -129,7 +129,7 @@ TEST_CASE_METHOD(
             CHECK(t->value<error_file_descriptor>().value() == 3);
             break;
         case Trigger::tag<WritableFileDescriptor>():
-        case Trigger::tag<Timeout>():
+        case Trigger::tag<timeout>():
         case Trigger::tag<signal>():
         case Trigger::tag<UserProvidedTrigger>():
             FAIL("tag=" << t->tag());
@@ -178,7 +178,7 @@ TEST_CASE_METHOD(
             CHECK(t->value<error_file_descriptor>().value() == 3);
             break;
         case Trigger::tag<readable_file_descriptor>():
-        case Trigger::tag<Timeout>():
+        case Trigger::tag<timeout>():
         case Trigger::tag<signal>():
         case Trigger::tag<UserProvidedTrigger>():
             FAIL("tag=" << t->tag());

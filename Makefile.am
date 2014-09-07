@@ -172,7 +172,7 @@ src_sesh_SOURCES = \
 	src/os/event/pselect_api.hh \
 	src/os/event/readable_file_descriptor.hh \
 	src/os/event/signal.hh \
-	src/os/event/Timeout.hh \
+	src/os/event/timeout.hh \
 	src/os/event/Trigger.hh \
 	src/os/event/UserProvidedTrigger.hh \
 	src/os/event/WritableFileDescriptor.hh \

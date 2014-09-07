@@ -29,7 +29,7 @@
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/pselect_api.hh"
-#include "os/event/Timeout.hh"
+#include "os/event/timeout.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
@@ -61,7 +61,7 @@ namespace {
 using sesh::async::future;
 using sesh::common::trial;
 using sesh::os::event::awaiter_test_fixture;
-using sesh::os::event::Timeout;
+using sesh::os::event::timeout;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
@@ -91,12 +91,12 @@ TEST_CASE_METHOD(
         "Awaiter: timeout 0") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
-    future<Trigger> f = a.expect(Timeout(std::chrono::seconds(0)));
+    future<Trigger> f = a.expect(timeout(std::chrono::seconds(0)));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<Timeout>());
-        CHECK(t->value<Timeout>().interval() == std::chrono::seconds(0));
+        CHECK(t->tag() == Trigger::tag<timeout>());
+        CHECK(t->value<timeout>().interval() == std::chrono::seconds(0));
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
         callbackCalled = true;
     });
@@ -129,12 +129,12 @@ template<int durationInSecondsInt>
 TimeoutTest<durationInSecondsInt>::TimeoutTest() {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
-    future<Trigger> f = a.expect(Timeout(duration()));
+    future<Trigger> f = a.expect(timeout(duration()));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<Timeout>());
-        CHECK(t->value<Timeout>().interval() == duration());
+        CHECK(t->tag() == Trigger::tag<timeout>());
+        CHECK(t->value<timeout>().interval() == duration());
         CHECK(steady_clock_now() == startTime + duration());
         callbackCalled = true;
     });
@@ -172,12 +172,12 @@ TEST_CASE_METHOD(
         "Awaiter: negative timeout") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
-    future<Trigger> f = a.expect(Timeout(std::chrono::seconds(-10)));
+    future<Trigger> f = a.expect(timeout(std::chrono::seconds(-10)));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<Timeout>());
-        CHECK(t->value<Timeout>().interval() == std::chrono::seconds(-10));
+        CHECK(t->tag() == Trigger::tag<timeout>());
+        CHECK(t->value<timeout>().interval() == std::chrono::seconds(-10));
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
         callbackCalled = true;
     });
@@ -211,14 +211,14 @@ TEST_CASE_METHOD(
     auto startTime = TimePoint(std::chrono::seconds(-100));
     mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
-            Timeout(std::chrono::seconds(10)),
-            Timeout(std::chrono::seconds(5)),
-            Timeout(std::chrono::seconds(20)));
+            timeout(std::chrono::seconds(10)),
+            timeout(std::chrono::seconds(5)),
+            timeout(std::chrono::seconds(20)));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<Timeout>());
-        CHECK(t->value<Timeout>().interval() == std::chrono::seconds(5));
+        CHECK(t->tag() == Trigger::tag<timeout>());
+        CHECK(t->value<timeout>().interval() == std::chrono::seconds(5));
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
         callbackCalled = true;
     });
@@ -251,26 +251,26 @@ TEST_CASE_METHOD(
         "Awaiter: two simultaneous timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(1000));
     mutable_steady_clock_now() = startTime;
-    future<Trigger> f1 = a.expect(Timeout(std::chrono::seconds(10)));
+    future<Trigger> f1 = a.expect(timeout(std::chrono::seconds(10)));
     bool callback1Called = false;
     std::move(f1).then(
             [this, startTime, &callback1Called](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<Timeout>());
-        CHECK(t->value<Timeout>().interval() == std::chrono::seconds(10));
+        CHECK(t->tag() == Trigger::tag<timeout>());
+        CHECK(t->value<timeout>().interval() == std::chrono::seconds(10));
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(11));
         callback1Called = true;
     });
     CHECK_FALSE(callback1Called);
 
     mutable_steady_clock_now() = startTime + std::chrono::seconds(1);
-    future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(29)));
+    future<Trigger> f2 = a.expect(timeout(std::chrono::seconds(29)));
     bool callback2Called = false;
     std::move(f2).then(
             [this, startTime, &callback2Called](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == Trigger::tag<Timeout>());
-        CHECK(t->value<Timeout>().interval() == std::chrono::seconds(29));
+        CHECK(t->tag() == Trigger::tag<timeout>());
+        CHECK(t->value<timeout>().interval() == std::chrono::seconds(29));
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(32));
         callback2Called = true;
     });
@@ -321,19 +321,19 @@ TEST_CASE_METHOD(
         "Awaiter: two successive timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(0));
     mutable_steady_clock_now() = startTime;
-    future<Trigger> f = a.expect(Timeout(std::chrono::seconds(100)));
+    future<Trigger> f = a.expect(timeout(std::chrono::seconds(100)));
     bool callbackCalled = false;
     std::move(f).map([this, startTime](Trigger &&t) -> future<Trigger> {
-        CHECK(t.tag() == Trigger::tag<Timeout>());
-        CHECK(t.value<Timeout>().interval() == std::chrono::seconds(100));
+        CHECK(t.tag() == Trigger::tag<timeout>());
+        CHECK(t.value<timeout>().interval() == std::chrono::seconds(100));
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(102));
 
-        future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(8)));
+        future<Trigger> f2 = a.expect(timeout(std::chrono::seconds(8)));
         mutable_steady_clock_now() += std::chrono::seconds(1);
         return f2;
     }).unwrap().then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
-        CHECK(t->tag() == Trigger::tag<Timeout>());
-        CHECK(t->value<Timeout>().interval() == std::chrono::seconds(8));
+        CHECK(t->tag() == Trigger::tag<timeout>());
+        CHECK(t->value<timeout>().interval() == std::chrono::seconds(8));
         CHECK(steady_clock_now() == startTime + std::chrono::seconds(113));
 
         callbackCalled = true;

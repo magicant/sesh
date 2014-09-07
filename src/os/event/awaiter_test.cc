@@ -31,7 +31,7 @@
 #include "os/event/pselect_api.hh"
 #include "os/event/readable_file_descriptor.hh"
 #include "os/event/signal.hh"
-#include "os/event/Timeout.hh"
+#include "os/event/timeout.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
@@ -65,7 +65,7 @@ using sesh::async::future;
 using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::signal;
-using sesh::os::event::Timeout;
+using sesh::os::event::timeout;
 using sesh::os::event::Trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
@@ -95,11 +95,11 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
     future<Trigger> f = a.expect(
-            Timeout(std::chrono::seconds(5)), readable_file_descriptor(3));
+            timeout(std::chrono::seconds(5)), readable_file_descriptor(3));
     std::move(f).then([this, start_time](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        REQUIRE(t->tag() == t->tag<Timeout>());
-        CHECK(t->value<Timeout>().interval() == std::chrono::seconds(5));
+        REQUIRE(t->tag() == t->tag<timeout>());
+        CHECK(t->value<timeout>().interval() == std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
@@ -132,7 +132,7 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
     future<Trigger> f = a.expect(
-            Timeout(std::chrono::seconds(10)), readable_file_descriptor(3));
+            timeout(std::chrono::seconds(10)), readable_file_descriptor(3));
     std::move(f).then([this, start_time](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == t->tag<readable_file_descriptor>());
@@ -165,7 +165,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: signal handler is reset after event fired (with timeout)") {
-    a.expect(Timeout(std::chrono::seconds(1)), signal(1));
+    a.expect(timeout(std::chrono::seconds(1)), signal(1));
 
     implementation() = [this](
             const pselect_api_stub &,
@@ -195,7 +195,7 @@ TEST_CASE_METHOD(
             readable_file_descriptor(file_descriptor_set_impl::MAX_VALUE + 1);
     bool called = false;
     a.expect(fd).wrap().recover([this](std::exception_ptr) {
-        return a.expect(Timeout(std::chrono::seconds(0)));
+        return a.expect(timeout(std::chrono::seconds(0)));
     }).unwrap().then([&](trial<Trigger> &&) {
         called = true;
     });
@@ -211,10 +211,10 @@ TEST_CASE_METHOD(
 
     bool called = false;
     auto f = a.expect(
-            Timeout(std::chrono::seconds(1)), readable_file_descriptor(0));
+            timeout(std::chrono::seconds(1)), readable_file_descriptor(0));
     std::move(f).then([&called](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
-        CHECK(t->tag() == t->tag<Timeout>());
+        CHECK(t->tag() == t->tag<timeout>());
         called = true;
     });
 
