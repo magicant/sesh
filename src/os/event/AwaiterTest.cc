@@ -73,7 +73,7 @@ using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
@@ -93,14 +93,14 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: timeout with FD trigger in same set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(5)), ReadableFileDescriptor(3));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == t->tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(5));
-        mutableSteadyClockNow() += std::chrono::seconds(2);
+        mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
     implementation() = [this](
@@ -117,27 +117,27 @@ TEST_CASE_METHOD(
         CHECK(timeout == std::chrono::seconds(4));
         CHECK(signalMask == nullptr);
         readFds->reset();
-        mutableSteadyClockNow() += std::chrono::seconds(4);
+        mutable_steady_clock_now() += std::chrono::seconds(4);
         implementation() = nullptr;
         return std::error_code();
     };
-    mutableSteadyClockNow() += std::chrono::seconds(1);
+    mutable_steady_clock_now() += std::chrono::seconds(1);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(7));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(7));
 }
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: FD trigger with timeout in same set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(10)), ReadableFileDescriptor(3));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == t->tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 3);
-        mutableSteadyClockNow() += std::chrono::seconds(4);
+        mutable_steady_clock_now() += std::chrono::seconds(4);
     });
 
     implementation() = [this](
@@ -153,13 +153,13 @@ TEST_CASE_METHOD(
         checkEmpty(errorFds, fdBound, "errorFds");
         CHECK(timeout == std::chrono::seconds(9));
         CHECK(signalMask == nullptr);
-        mutableSteadyClockNow() += std::chrono::seconds(2);
+        mutable_steady_clock_now() += std::chrono::seconds(2);
         implementation() = nullptr;
         return std::error_code();
     };
-    mutableSteadyClockNow() += std::chrono::seconds(1);
+    mutable_steady_clock_now() += std::chrono::seconds(1);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(7));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(7));
 }
 
 TEST_CASE_METHOD(
@@ -178,7 +178,7 @@ TEST_CASE_METHOD(
         Action &a = actions().at(1);
         CHECK(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
 
-        mutableSteadyClockNow() += std::chrono::seconds(1);
+        mutable_steady_clock_now() += std::chrono::seconds(1);
         implementation() = nullptr;
         return std::error_code();
     };
@@ -206,7 +206,7 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: ignores FD set if pselect failed") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
 
     bool called = false;
     auto f = a.expect(
@@ -241,7 +241,7 @@ TEST_CASE_METHOD(
                 const SignalNumberSet *) -> std::error_code {
             if (readFds != nullptr)
                 readFds->reset();
-            mutableSteadyClockNow() += std::chrono::seconds(1);
+            mutable_steady_clock_now() += std::chrono::seconds(1);
             return std::error_code();
         };
         return std::make_error_code(std::errc::interrupted);

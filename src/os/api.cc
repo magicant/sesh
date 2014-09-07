@@ -376,14 +376,14 @@ public:
 
 class api_impl : public api {
 
-    SystemClockTime systemClockNow() const noexcept final override {
-        return std::chrono::time_point_cast<SystemClockTime::duration>(
-                SystemClockTime::clock::now());
+    system_clock_time system_clock_now() const noexcept final override {
+        return std::chrono::time_point_cast<system_clock_time::duration>(
+                system_clock_time::clock::now());
     }
 
-    SteadyClockTime steadyClockNow() const noexcept final override {
-        return std::chrono::time_point_cast<SteadyClockTime::duration>(
-                SteadyClockTime::clock::now());
+    steady_clock_time steady_clock_now() const noexcept final override {
+        return std::chrono::time_point_cast<steady_clock_time::duration>(
+                steady_clock_time::clock::now());
     }
 
     auto getFileDescriptionStatus(const FileDescriptor &fd) const

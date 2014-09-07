@@ -70,7 +70,7 @@ using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 
 template<int durationInSecondsInt>
 class TimeoutTest :
@@ -92,14 +92,14 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: timeout 0") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(Timeout(std::chrono::seconds(0)));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(0));
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
         callbackCalled = true;
     });
     CHECK_FALSE(callbackCalled);
@@ -117,27 +117,27 @@ TEST_CASE_METHOD(
         checkEmpty(errorFds, fdBound, "errorFds");
         CHECK(timeout == std::chrono::seconds(0));
         CHECK(signalMask == nullptr);
-        mutableSteadyClockNow() += std::chrono::seconds(1);
+        mutable_steady_clock_now() += std::chrono::seconds(1);
         implementation() = nullptr;
         return std::error_code();
     };
-    mutableSteadyClockNow() += std::chrono::seconds(1);
+    mutable_steady_clock_now() += std::chrono::seconds(1);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
     CHECK(callbackCalled);
 }
 
 template<int durationInSecondsInt>
 TimeoutTest<durationInSecondsInt>::TimeoutTest() {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(Timeout(duration()));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == duration());
-        CHECK(steadyClockNow() == startTime + duration());
+        CHECK(steady_clock_now() == startTime + duration());
         callbackCalled = true;
     });
     CHECK_FALSE(callbackCalled);
@@ -155,13 +155,13 @@ TimeoutTest<durationInSecondsInt>::TimeoutTest() {
         checkEmpty(errorFds, fdBound, "errorFds");
         CHECK(timeout == duration() - std::chrono::seconds(1));
         CHECK(signalMask == nullptr);
-        mutableSteadyClockNow() += duration() - std::chrono::seconds(1);
+        mutable_steady_clock_now() += duration() - std::chrono::seconds(1);
         implementation() = nullptr;
         return std::error_code();
     };
-    mutableSteadyClockNow() += std::chrono::seconds(1);
+    mutable_steady_clock_now() += std::chrono::seconds(1);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + duration());
+    CHECK(steady_clock_now() == startTime + duration());
     CHECK(callbackCalled);
 }
 
@@ -173,14 +173,14 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: negative timeout") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(Timeout(std::chrono::seconds(-10)));
     bool callbackCalled = false;
     std::move(f).then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(-10));
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
         callbackCalled = true;
     });
     CHECK_FALSE(callbackCalled);
@@ -201,9 +201,9 @@ TEST_CASE_METHOD(
         implementation() = nullptr;
         return std::error_code();
     };
-    mutableSteadyClockNow() += std::chrono::seconds(1);
+    mutable_steady_clock_now() += std::chrono::seconds(1);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(1));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
     CHECK(callbackCalled);
 }
 
@@ -211,7 +211,7 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: duplicate timeouts in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(-100));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
             Timeout(std::chrono::seconds(10)),
             Timeout(std::chrono::seconds(5)),
@@ -221,7 +221,7 @@ TEST_CASE_METHOD(
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(5));
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
         callbackCalled = true;
     });
     CHECK_FALSE(callbackCalled);
@@ -239,12 +239,12 @@ TEST_CASE_METHOD(
         checkEmpty(errorFds, fdBound, "errorFds");
         CHECK(timeout == std::chrono::seconds(5));
         CHECK(signalMask == nullptr);
-        mutableSteadyClockNow() += std::chrono::seconds(5);
+        mutable_steady_clock_now() += std::chrono::seconds(5);
         implementation() = nullptr;
         return std::error_code();
     };
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
     CHECK(callbackCalled);
 }
 
@@ -252,7 +252,7 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two simultaneous timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(1000));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f1 = a.expect(Timeout(std::chrono::seconds(10)));
     bool callback1Called = false;
     std::move(f1).then(
@@ -260,12 +260,12 @@ TEST_CASE_METHOD(
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(10));
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(11));
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(11));
         callback1Called = true;
     });
     CHECK_FALSE(callback1Called);
 
-    mutableSteadyClockNow() = startTime + std::chrono::seconds(1);
+    mutable_steady_clock_now() = startTime + std::chrono::seconds(1);
     future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(29)));
     bool callback2Called = false;
     std::move(f2).then(
@@ -273,7 +273,7 @@ TEST_CASE_METHOD(
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(29));
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(32));
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(32));
         callback2Called = true;
     });
     CHECK_FALSE(callback2Called);
@@ -291,7 +291,7 @@ TEST_CASE_METHOD(
         checkEmpty(errorFds, fdBound, "errorFds 1");
         CHECK(timeout == std::chrono::seconds(9));
         CHECK(signalMask == nullptr);
-        mutableSteadyClockNow() += std::chrono::seconds(10);
+        mutable_steady_clock_now() += std::chrono::seconds(10);
 
         implementation() = [this](
                 const PselectApiStub &,
@@ -306,14 +306,14 @@ TEST_CASE_METHOD(
             checkEmpty(errorFds, fdBound, "errorFds 2");
             CHECK(timeout == std::chrono::seconds(19));
             CHECK(signalMask == nullptr);
-            mutableSteadyClockNow() += std::chrono::seconds(21);
+            mutable_steady_clock_now() += std::chrono::seconds(21);
             implementation() = nullptr;
             return std::error_code();
         };
         return std::error_code();
     };
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(32));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(32));
     CHECK(callback1Called);
     CHECK(callback2Called);
 }
@@ -322,24 +322,24 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two successive timeouts") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(Timeout(std::chrono::seconds(100)));
     bool callbackCalled = false;
     std::move(f).map([this, startTime](Trigger &&t) -> future<Trigger> {
         CHECK(t.tag() == Trigger::tag<Timeout>());
         CHECK(t.value<Timeout>().interval() == std::chrono::seconds(100));
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(102));
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(102));
 
         future<Trigger> f2 = a.expect(Timeout(std::chrono::seconds(8)));
-        mutableSteadyClockNow() += std::chrono::seconds(1);
+        mutable_steady_clock_now() += std::chrono::seconds(1);
         return f2;
     }).unwrap().then([this, startTime, &callbackCalled](trial<Trigger> &&t) {
         CHECK(t->tag() == Trigger::tag<Timeout>());
         CHECK(t->value<Timeout>().interval() == std::chrono::seconds(8));
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(113));
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(113));
 
         callbackCalled = true;
-        mutableSteadyClockNow() += std::chrono::seconds(2);
+        mutable_steady_clock_now() += std::chrono::seconds(2);
     });
     CHECK_FALSE(callbackCalled);
 
@@ -356,7 +356,7 @@ TEST_CASE_METHOD(
         checkEmpty(errorFds, fdBound, "errorFds 1");
         CHECK(timeout == std::chrono::seconds(99));
         CHECK(signalMask == nullptr);
-        mutableSteadyClockNow() += std::chrono::seconds(101);
+        mutable_steady_clock_now() += std::chrono::seconds(101);
 
         implementation() = [this](
                 const PselectApiStub &,
@@ -371,15 +371,15 @@ TEST_CASE_METHOD(
             checkEmpty(errorFds, fdBound, "errorFds 2");
             CHECK(timeout == std::chrono::seconds(7));
             CHECK(signalMask == nullptr);
-            mutableSteadyClockNow() += std::chrono::seconds(10);
+            mutable_steady_clock_now() += std::chrono::seconds(10);
             implementation() = nullptr;
             return std::error_code();
         };
         return std::error_code();
     };
-    mutableSteadyClockNow() += std::chrono::seconds(1);
+    mutable_steady_clock_now() += std::chrono::seconds(1);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(115));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(115));
     CHECK(callbackCalled);
 }
 

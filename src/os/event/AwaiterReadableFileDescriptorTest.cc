@@ -51,20 +51,20 @@ using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: awaiting single readable FD") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(ReadableFileDescriptor(4));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 4);
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
-        mutableSteadyClockNow() += std::chrono::seconds(1);
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
+        mutable_steady_clock_now() += std::chrono::seconds(1);
     });
 
     implementation() = [this](
@@ -80,13 +80,13 @@ TEST_CASE_METHOD(
         checkEmpty(errorFds, fdBound, "errorFds");
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
-        mutableSteadyClockNow() += std::chrono::seconds(3);
+        mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = nullptr;
         return std::error_code();
     };
-    mutableSteadyClockNow() += std::chrono::seconds(2);
+    mutable_steady_clock_now() += std::chrono::seconds(2);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(6));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
@@ -94,15 +94,15 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing different readable FDs: "
         "pselect returning single FD") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
             ReadableFileDescriptor(2), ReadableFileDescriptor(0));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 0);
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
-        mutableSteadyClockNow() += std::chrono::seconds(1);
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
+        mutable_steady_clock_now() += std::chrono::seconds(1);
     });
 
     implementation() = [this](
@@ -118,14 +118,14 @@ TEST_CASE_METHOD(
         checkEmpty(errorFds, fdBound, "errorFds");
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
-        mutableSteadyClockNow() += std::chrono::seconds(3);
+        mutable_steady_clock_now() += std::chrono::seconds(3);
         readFds->reset(2);
         implementation() = nullptr;
         return std::error_code();
     };
-    mutableSteadyClockNow() += std::chrono::seconds(2);
+    mutable_steady_clock_now() += std::chrono::seconds(2);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(6));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
@@ -133,7 +133,7 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing different readable FDs: "
         "pselect returning all FDs") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(
             ReadableFileDescriptor(2), ReadableFileDescriptor(0));
     std::move(f).then([this, startTime](trial<Trigger> &&t) {
@@ -142,8 +142,8 @@ TEST_CASE_METHOD(
         auto fd = t->value<ReadableFileDescriptor>().value();
         if (fd != 0)
             CHECK(fd == 2);
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(5));
-        mutableSteadyClockNow() += std::chrono::seconds(1);
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
+        mutable_steady_clock_now() += std::chrono::seconds(1);
     });
 
     implementation() = [this](
@@ -159,36 +159,36 @@ TEST_CASE_METHOD(
         checkEmpty(errorFds, fdBound, "errorFds");
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
-        mutableSteadyClockNow() += std::chrono::seconds(3);
+        mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = nullptr;
         return std::error_code();
     };
-    mutableSteadyClockNow() += std::chrono::seconds(2);
+    mutable_steady_clock_now() += std::chrono::seconds(2);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(6));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing different readable FDs") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
 
     a.expect(ReadableFileDescriptor(1)).then(
             [this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 1);
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(9));
-        mutableSteadyClockNow() += std::chrono::seconds(1);
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(9));
+        mutable_steady_clock_now() += std::chrono::seconds(1);
     });
     a.expect(ReadableFileDescriptor(3)).then(
             [this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 3);
-        CHECK(steadyClockNow() == startTime + std::chrono::seconds(28));
-        mutableSteadyClockNow() += std::chrono::seconds(2);
+        CHECK(steady_clock_now() == startTime + std::chrono::seconds(28));
+        mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
     implementation() = [this](
@@ -206,7 +206,7 @@ TEST_CASE_METHOD(
         CHECK(timeout.count() < 0);
         CHECK(signalMask == nullptr);
 
-        mutableSteadyClockNow() += std::chrono::seconds(9);
+        mutable_steady_clock_now() += std::chrono::seconds(9);
         implementation() = [this](
                 const PselectApiStub &,
                 FileDescriptor::Value fdBound,
@@ -220,27 +220,27 @@ TEST_CASE_METHOD(
             checkEmpty(errorFds, fdBound, "errorFds 2");
             CHECK(timeout.count() < 0);
             CHECK(signalMask == nullptr);
-            mutableSteadyClockNow() += std::chrono::seconds(18);
+            mutable_steady_clock_now() += std::chrono::seconds(18);
             implementation() = nullptr;
             return std::error_code();
         };
         return std::error_code();
     };
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(30));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(30));
 }
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing same readable FD") {
     auto startTime = TimePoint(std::chrono::seconds(10000));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
 
     auto callback = [this, startTime](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == Trigger::tag<ReadableFileDescriptor>());
         CHECK(t->value<ReadableFileDescriptor>().value() == 7);
-        mutableSteadyClockNow() += std::chrono::seconds(1);
+        mutable_steady_clock_now() += std::chrono::seconds(1);
     };
     a.expect(ReadableFileDescriptor(7)).then(callback);
     a.expect(ReadableFileDescriptor(7)).then(callback);
@@ -265,7 +265,7 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(2));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(2));
 }
 
 } // namespace

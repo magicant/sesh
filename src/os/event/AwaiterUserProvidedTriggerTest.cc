@@ -44,13 +44,13 @@ using sesh::os::event::Trigger;
 using sesh::os::event::UserProvidedTrigger;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 
-using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: one user-provided trigger (successful future)") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
 
     std::shared_ptr<void> result = std::make_shared<int>(1);
     future<Trigger> f = a.expect(UserProvidedTrigger(make_future_of(result)));
@@ -58,19 +58,19 @@ TEST_CASE_METHOD(
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<UserProvidedTrigger>());
         CHECK(t->value<UserProvidedTrigger>().result() == result);
-        mutableSteadyClockNow() += std::chrono::seconds(2);
+        mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
-    mutableSteadyClockNow() += std::chrono::seconds(10);
+    mutable_steady_clock_now() += std::chrono::seconds(10);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: one user-provided trigger (failed future)") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
 
     future<Trigger> f = a.expect(UserProvidedTrigger(
                 make_failed_future_of<std::shared_ptr<void>>(7)));
@@ -79,20 +79,20 @@ TEST_CASE_METHOD(
             *t;
         } catch (int i) {
             CHECK(i == 7);
-            mutableSteadyClockNow() += std::chrono::seconds(2);
+            mutable_steady_clock_now() += std::chrono::seconds(2);
         }
     });
 
-    mutableSteadyClockNow() += std::chrono::seconds(10);
+    mutable_steady_clock_now() += std::chrono::seconds(10);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiDummy>,
         "Awaiter: two user-provided triggers in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
 
     using UPT = UserProvidedTrigger;
     std::shared_ptr<void> result = std::make_shared<int>(2);
@@ -103,12 +103,12 @@ TEST_CASE_METHOD(
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<UserProvidedTrigger>());
         CHECK(t->value<UserProvidedTrigger>().result() == result);
-        mutableSteadyClockNow() += std::chrono::seconds(2);
+        mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
-    mutableSteadyClockNow() += std::chrono::seconds(10);
+    mutable_steady_clock_now() += std::chrono::seconds(10);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(

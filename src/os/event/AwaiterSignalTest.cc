@@ -51,19 +51,19 @@ using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: one signal in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(Signal(3));
     std::move(f).then([this](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<Signal>());
         CHECK(t->value<Signal>().number() == 3);
-        mutableSteadyClockNow() += std::chrono::seconds(2);
+        mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
     implementation() = [this](
@@ -85,13 +85,13 @@ TEST_CASE_METHOD(
         REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(3);
 
-        mutableSteadyClockNow() += std::chrono::seconds(3);
+        mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = nullptr;
         return std::make_error_code(std::errc::interrupted);
     };
-    mutableSteadyClockNow() += std::chrono::seconds(7);
+    mutable_steady_clock_now() += std::chrono::seconds(7);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
@@ -128,13 +128,13 @@ TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: two signals in one trigger set") {
     auto startTime = TimePoint(std::chrono::seconds(100));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     future<Trigger> f = a.expect(Signal(2), Signal(6));
     std::move(f).then([this](trial<Trigger> &&t) {
         REQUIRE(t.has_value());
         REQUIRE(t->tag() == Trigger::tag<Signal>());
         CHECK(t->value<Signal>().number() == 6);
-        mutableSteadyClockNow() += std::chrono::seconds(2);
+        mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
     implementation() = [this](
@@ -161,26 +161,26 @@ TEST_CASE_METHOD(
         REQUIRE(a6.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a6.value<sesh_osapi_signal_handler *>()(6);
 
-        mutableSteadyClockNow() += std::chrono::seconds(3);
+        mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = nullptr;
         return std::make_error_code(std::errc::interrupted);
     };
-    mutableSteadyClockNow() += std::chrono::seconds(7);
+    mutable_steady_clock_now() += std::chrono::seconds(7);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: same signal in two trigger sets") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     for (unsigned i = 0; i < 2; ++i) {
         a.expect(Signal(1)).then([this](trial<Trigger> &&t) {
             REQUIRE(t.has_value());
             REQUIRE(t->tag() == Trigger::tag<Signal>());
             CHECK(t->value<Signal>().number() == 1);
-            mutableSteadyClockNow() += std::chrono::seconds(1);
+            mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
 
@@ -203,26 +203,26 @@ TEST_CASE_METHOD(
         REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
-        mutableSteadyClockNow() += std::chrono::seconds(3);
+        mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = nullptr;
         return std::make_error_code(std::errc::interrupted);
     };
-    mutableSteadyClockNow() += std::chrono::seconds(7);
+    mutable_steady_clock_now() += std::chrono::seconds(7);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
         AwaiterTestFixture<HandlerConfigurationApiFake>,
         "Awaiter: different signals in two trigger sets: fired at a time") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     for (SignalNumber sn : {1, 2}) {
         a.expect(Signal(sn)).then([this, sn](trial<Trigger> &&t) {
             REQUIRE(t.has_value());
             REQUIRE(t->tag() == Trigger::tag<Signal>());
             CHECK(t->value<Signal>().number() == sn);
-            mutableSteadyClockNow() += std::chrono::seconds(1);
+            mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
 
@@ -247,13 +247,13 @@ TEST_CASE_METHOD(
         REQUIRE(a2.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a2.value<sesh_osapi_signal_handler *>()(2);
 
-        mutableSteadyClockNow() += std::chrono::seconds(3);
+        mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = nullptr;
         return std::make_error_code(std::errc::interrupted);
     };
-    mutableSteadyClockNow() += std::chrono::seconds(7);
+    mutable_steady_clock_now() += std::chrono::seconds(7);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
@@ -261,13 +261,13 @@ TEST_CASE_METHOD(
         "Awaiter: different signals in two trigger sets: "
         "fired intermittently") {
     auto startTime = TimePoint(std::chrono::seconds(0));
-    mutableSteadyClockNow() = startTime;
+    mutable_steady_clock_now() = startTime;
     for (SignalNumber sn : {1, 2}) {
         a.expect(Signal(sn)).then([this, sn](trial<Trigger> &&t) {
             REQUIRE(t.has_value());
             REQUIRE(t->tag() == Trigger::tag<Signal>());
             CHECK(t->value<Signal>().number() == sn);
-            mutableSteadyClockNow() += std::chrono::seconds(1);
+            mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
 
@@ -288,7 +288,7 @@ TEST_CASE_METHOD(
         REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
-        mutableSteadyClockNow() += std::chrono::seconds(3);
+        mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = [this](
                 const PselectApiStub &,
                 FileDescriptor::Value,
@@ -304,15 +304,15 @@ TEST_CASE_METHOD(
             REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
             a.value<sesh_osapi_signal_handler *>()(2);
 
-            mutableSteadyClockNow() += std::chrono::seconds(3);
+            mutable_steady_clock_now() += std::chrono::seconds(3);
             implementation() = nullptr;
             return std::make_error_code(std::errc::interrupted);
         };
         return std::make_error_code(std::errc::interrupted);
     };
-    mutableSteadyClockNow() += std::chrono::seconds(7);
+    mutable_steady_clock_now() += std::chrono::seconds(7);
     a.awaitEvents();
-    CHECK(steadyClockNow() == startTime + std::chrono::seconds(15));
+    CHECK(steady_clock_now() == startTime + std::chrono::seconds(15));
 }
 
 TEST_CASE_METHOD(

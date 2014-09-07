@@ -161,7 +161,6 @@ src_sesh_SOURCES = \
 	src/main.cc \
 	src/os/api.cc \
 	src/os/api.hh \
-	src/os/TimeApi.hh \
 	src/os/capi.c \
 	src/os/capi.h \
 	src/os/capitypes.h \
@@ -202,7 +201,8 @@ src_sesh_SOURCES = \
 	src/os/signaling/SignalErrorCategory.hh \
 	src/os/signaling/SignalErrorCode.hh \
 	src/os/signaling/SignalNumber.hh \
-	src/os/signaling/SignalNumberSet.hh
+	src/os/signaling/SignalNumberSet.hh \
+	src/os/time_api.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_delay_holder_test_SOURCES = \
@@ -395,14 +395,14 @@ TESTHEADERS = \
 	src/language/source/origin_test_helper.hh \
 	src/language/source/source_test_helper.hh \
 	src/language/syntax/printer_test_helper.hh \
-	src/os/TimeApiTestHelper.hh \
 	src/os/event/AwaiterTestHelper.hh \
 	src/os/event/PselectApiTestHelper.hh \
 	src/os/io/FileDescriptionApiTestHelper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/io/NonBlockingFileDescriptorTestHelper.hh \
 	src/os/signaling/HandlerConfigurationApiTestHelper.hh \
-	src/os/signaling/SignalNumberSetTestHelper.hh
+	src/os/signaling/SignalNumberSetTestHelper.hh \
+	src/os/time_api_test_helper.hh
 
 ### Documentation
 

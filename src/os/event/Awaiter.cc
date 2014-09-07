@@ -34,7 +34,6 @@
 #include "common/trial.hh"
 #include "common/variant.hh"
 #include "helpermacros.h"
-#include "os/TimeApi.hh"
 #include "os/event/PselectApi.hh"
 #include "os/event/Trigger.hh"
 #include "os/io/FileDescriptor.hh"
@@ -42,6 +41,7 @@
 #include "os/signaling/HandlerConfiguration.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
+#include "os/time_api.hh"
 
 using sesh::async::future;
 using sesh::async::make_promise_future_pair;
@@ -56,7 +56,7 @@ using sesh::os::signaling::HandlerConfiguration;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::SteadyClockTime;
+using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
 using Clock = TimePoint::clock;
 
 namespace sesh {
@@ -377,14 +377,14 @@ void registerTrigger(
     }
 }
 
-TimePoint computeTimeLimit(Timeout timeout, const TimeApi &api) {
+TimePoint computeTimeLimit(Timeout timeout, const time_api &api) {
     if (timeout.interval() < Timeout::Interval::zero())
         timeout = Timeout(Timeout::Interval::zero());
 
     if (timeout.interval() == Timeout::Interval::max())
         return TimePoint::max();
 
-    TimePoint now = api.steadyClockNow();
+    TimePoint now = api.steady_clock_now();
     if (now > TimePoint::max() - timeout.interval())
         return TimePoint::max();
     return now + timeout.interval();
@@ -456,7 +456,7 @@ void AwaiterImpl::applyResult(const PselectArgument &a) {
 
 void AwaiterImpl::awaitEvents() {
     while (!mPendingEvents.empty()) {
-        TimePoint now = mApi.steadyClockNow();
+        TimePoint now = mApi.steady_clock_now();
         fireTimeouts(now);
 
         PselectArgument argument = computeArgumentFiringErroredEvents(now);
