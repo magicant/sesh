@@ -26,7 +26,7 @@
 #include "os/event/signal.hh"
 #include "os/event/timeout.hh"
 #include "os/event/user_provided_trigger.hh"
-#include "os/event/WritableFileDescriptor.hh"
+#include "os/event/writable_file_descriptor.hh"
 
 namespace sesh {
 namespace os {
@@ -36,7 +36,7 @@ namespace event {
 using trigger = common::variant<
         timeout,
         readable_file_descriptor,
-        WritableFileDescriptor,
+        writable_file_descriptor,
         error_file_descriptor,
         signal,
         user_provided_trigger>;

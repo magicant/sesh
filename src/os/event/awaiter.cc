@@ -66,7 +66,7 @@ namespace {
 
 using file_descriptor_trigger = variant<
         readable_file_descriptor,
-        WritableFileDescriptor,
+        writable_file_descriptor,
         error_file_descriptor>;
 
 class pending_event {
@@ -257,8 +257,8 @@ void pselect_argument::add(
     case file_descriptor_trigger::tag<readable_file_descriptor>():
         add_fd(m_read_fds, t.value<readable_file_descriptor>().value(), api);
         return;
-    case file_descriptor_trigger::tag<WritableFileDescriptor>():
-        add_fd(m_write_fds, t.value<WritableFileDescriptor>().value(), api);
+    case file_descriptor_trigger::tag<writable_file_descriptor>():
+        add_fd(m_write_fds, t.value<writable_file_descriptor>().value(), api);
         return;
     case file_descriptor_trigger::tag<error_file_descriptor>():
         add_fd(m_error_fds, t.value<error_file_descriptor>().value(), api);
@@ -301,9 +301,9 @@ bool pselect_argument::matches(const file_descriptor_trigger &t) const {
     case file_descriptor_trigger::tag<readable_file_descriptor>():
         return contains(
                 m_read_fds, t.value<readable_file_descriptor>().value());
-    case file_descriptor_trigger::tag<WritableFileDescriptor>():
+    case file_descriptor_trigger::tag<writable_file_descriptor>():
         return contains(
-                m_write_fds, t.value<WritableFileDescriptor>().value());
+                m_write_fds, t.value<writable_file_descriptor>().value());
     case file_descriptor_trigger::tag<error_file_descriptor>():
         return contains(m_error_fds, t.value<error_file_descriptor>().value());
     }
@@ -370,8 +370,8 @@ void register_trigger(
     case trigger::tag<readable_file_descriptor>():
         e->add_trigger(t.value<readable_file_descriptor>());
         return;
-    case trigger::tag<WritableFileDescriptor>():
-        e->add_trigger(t.value<WritableFileDescriptor>());
+    case trigger::tag<writable_file_descriptor>():
+        e->add_trigger(t.value<writable_file_descriptor>());
         return;
     case trigger::tag<error_file_descriptor>():
         e->add_trigger(t.value<error_file_descriptor>());
