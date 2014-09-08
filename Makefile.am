@@ -53,14 +53,14 @@ TESTPROGRAMS = \
 	src/language/syntax/sequence_test \
 	src/language/syntax/simple_command_test \
 	src/language/syntax/word_test \
-	src/os/event/AwaiterErrorFileDescriptorTest \
-	src/os/event/AwaiterFileDescriptorTest \
-	src/os/event/AwaiterReadableFileDescriptorTest \
-	src/os/event/AwaiterSignalTest \
+	src/os/event/awaiter_error_file_descriptor_test \
+	src/os/event/awaiter_file_descriptor_test \
+	src/os/event/awaiter_readable_file_descriptor_test \
+	src/os/event/awaiter_signal_test \
 	src/os/event/awaiter_test \
-	src/os/event/AwaiterTimeoutTest \
-	src/os/event/AwaiterUserProvidedTriggerTest \
-	src/os/event/AwaiterWritableFileDescriptorTest \
+	src/os/event/awaiter_timeout_test \
+	src/os/event/awaiter_user_provided_trigger_test \
+	src/os/event/awaiter_writable_file_descriptor_test \
 	src/os/io/FileDescriptorTest \
 	src/os/io/NonBlockingFileDescriptorTest \
 	src/os/io/ReaderTest \
@@ -321,27 +321,27 @@ src_language_syntax_word_test_SOURCES = \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/word.cc \
 	src/language/syntax/word_test.cc
-src_os_event_AwaiterErrorFileDescriptorTest_SOURCES = \
+src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
 	src/os/event/awaiter.cc \
-	src/os/event/AwaiterErrorFileDescriptorTest.cc \
+	src/os/event/awaiter_error_file_descriptor_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterFileDescriptorTest_SOURCES = \
+src_os_event_awaiter_file_descriptor_test_SOURCES = \
 	src/os/event/awaiter.cc \
-	src/os/event/AwaiterFileDescriptorTest.cc \
+	src/os/event/awaiter_file_descriptor_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterReadableFileDescriptorTest_SOURCES = \
+src_os_event_awaiter_readable_file_descriptor_test_SOURCES = \
 	src/os/event/awaiter.cc \
-	src/os/event/AwaiterReadableFileDescriptorTest.cc \
+	src/os/event/awaiter_readable_file_descriptor_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterSignalTest_SOURCES = \
+src_os_event_awaiter_signal_test_SOURCES = \
 	src/os/event/awaiter.cc \
-	src/os/event/AwaiterSignalTest.cc \
+	src/os/event/awaiter_signal_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
@@ -351,21 +351,21 @@ src_os_event_awaiter_test_SOURCES = \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterTimeoutTest_SOURCES = \
+src_os_event_awaiter_timeout_test_SOURCES = \
 	src/os/event/awaiter.cc \
-	src/os/event/AwaiterTimeoutTest.cc \
+	src/os/event/awaiter_timeout_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterUserProvidedTriggerTest_SOURCES = \
+src_os_event_awaiter_user_provided_trigger_test_SOURCES = \
 	src/os/event/awaiter.cc \
-	src/os/event/AwaiterUserProvidedTriggerTest.cc \
+	src/os/event/awaiter_user_provided_trigger_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterWritableFileDescriptorTest_SOURCES = \
+src_os_event_awaiter_writable_file_descriptor_test_SOURCES = \
 	src/os/event/awaiter.cc \
-	src/os/event/AwaiterWritableFileDescriptorTest.cc \
+	src/os/event/awaiter_writable_file_descriptor_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
