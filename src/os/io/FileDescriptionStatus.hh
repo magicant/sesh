@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include "os/io/FileDescriptionAccessMode.hh"
+#include "os/io/file_description_access_mode.hh"
 #include "os/io/FileDescriptionAttribute.hh"
 
 namespace sesh {
@@ -42,7 +42,7 @@ public:
     virtual ~FileDescriptionStatus() = default;
 
     /** Returns the access mode in this status. */
-    virtual FileDescriptionAccessMode accessMode() const noexcept = 0;
+    virtual file_description_access_mode accessMode() const noexcept = 0;
 
     /**
      * Checks if an open file description attribute is included in this status.

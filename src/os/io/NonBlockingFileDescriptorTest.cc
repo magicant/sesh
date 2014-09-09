@@ -23,7 +23,7 @@
 #include <memory>
 #include <system_error>
 #include "common/variant.hh"
-#include "os/io/FileDescriptionAccessMode.hh"
+#include "os/io/file_description_access_mode.hh"
 #include "os/io/FileDescriptionApi.hh"
 #include "os/io/FileDescriptionAttribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
@@ -33,7 +33,7 @@
 namespace {
 
 using sesh::common::variant;
-using sesh::os::io::FileDescriptionAccessMode;
+using sesh::os::io::file_description_access_mode;
 using sesh::os::io::FileDescriptionApi;
 using sesh::os::io::FileDescriptionAttribute;
 using sesh::os::io::FileDescriptionStatus;
@@ -110,7 +110,7 @@ public:
         return std::unique_ptr<FileDescriptionStatus>(new auto(*this));
     }
 
-    FileDescriptionAccessMode accessMode() const noexcept override {
+    file_description_access_mode accessMode() const noexcept override {
         throw "unexpected accessMode";
     }
     FileDescriptionStatus &resetAttributes() noexcept override {

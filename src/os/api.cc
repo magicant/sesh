@@ -31,7 +31,7 @@
 #include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/capi.h"
-#include "os/io/FileDescriptionAccessMode.hh"
+#include "os/io/file_description_access_mode.hh"
 #include "os/io/FileDescriptionAttribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
@@ -46,7 +46,7 @@ using sesh::common::enumerators;
 using sesh::common::errno_code;
 using sesh::common::type_tag;
 using sesh::common::variant;
-using sesh::os::io::FileDescriptionAccessMode;
+using sesh::os::io::file_description_access_mode;
 using sesh::os::io::FileDescriptionAttribute;
 using sesh::os::io::FileDescriptionStatus;
 using sesh::os::io::FileDescriptor;
@@ -63,41 +63,41 @@ namespace os {
 
 namespace {
 
-enum sesh_osapi_fcntl_file_access_mode convert(FileDescriptionAccessMode mode)
-        noexcept {
+enum sesh_osapi_fcntl_file_access_mode convert(
+        file_description_access_mode mode) noexcept {
     switch (mode) {
-    case FileDescriptionAccessMode::EXEC:
+    case file_description_access_mode::exec:
         return SESH_OSAPI_O_EXEC;
-    case FileDescriptionAccessMode::READ_ONLY:
+    case file_description_access_mode::read_only:
         return SESH_OSAPI_O_RDONLY;
-    case FileDescriptionAccessMode::READ_WRITE:
+    case file_description_access_mode::read_write:
         return SESH_OSAPI_O_RDWR;
-    case FileDescriptionAccessMode::SEARCH:
+    case file_description_access_mode::search:
         return SESH_OSAPI_O_SEARCH;
-    case FileDescriptionAccessMode::WRITE_ONLY:
+    case file_description_access_mode::write_only:
         return SESH_OSAPI_O_WRONLY;
     }
     UNREACHABLE();
 }
 
 /** @return -1 if not supported. */
-int to_raw_flag(FileDescriptionAccessMode mode) {
+int to_raw_flag(file_description_access_mode mode) {
     return sesh_osapi_fcntl_file_access_mode_to_raw(convert(mode));
 }
 
-FileDescriptionAccessMode convert(enum sesh_osapi_fcntl_file_access_mode mode)
-        noexcept {
+file_description_access_mode convert(
+        enum sesh_osapi_fcntl_file_access_mode mode) noexcept {
     switch (mode) {
     case SESH_OSAPI_O_EXEC:
-        return FileDescriptionAccessMode::EXEC;
+        return file_description_access_mode::exec;
     case SESH_OSAPI_O_RDONLY:
-        return FileDescriptionAccessMode::READ_ONLY;
+        return file_description_access_mode::read_only;
     case SESH_OSAPI_O_RDWR:
-        return FileDescriptionAccessMode::READ_WRITE;
+        return file_description_access_mode::read_write;
     case SESH_OSAPI_O_SEARCH:
-        return FileDescriptionAccessMode::SEARCH;
+        return file_description_access_mode::search;
     case SESH_OSAPI_O_WRONLY:
-        return FileDescriptionAccessMode::WRITE_ONLY;
+        return file_description_access_mode::write_only;
     }
     UNREACHABLE();
 }
@@ -151,7 +151,7 @@ int to_raw_flag(FileDescriptorOpenMode mode) {
 
 /** @return -1 if the access mode is not supported. */
 int to_raw_flags(
-        FileDescriptionAccessMode access_mode,
+        file_description_access_mode access_mode,
         enum_set<FileDescriptionAttribute> attributes,
         enum_set<FileDescriptorOpenMode> open_modes) {
     int raw_flags = to_raw_flag(access_mode);
@@ -217,7 +217,7 @@ public:
 
     int raw_flags() const noexcept { return m_raw_flags; }
 
-    FileDescriptionAccessMode accessMode() const noexcept final override {
+    file_description_access_mode accessMode() const noexcept final override {
         return convert(
                 sesh_osapi_fcntl_file_access_mode_from_raw(m_raw_flags));
     }
@@ -407,7 +407,7 @@ class api_impl : public api {
 
     variant<FileDescriptor, std::error_code> open(
             const char *path,
-            FileDescriptionAccessMode access_mode,
+            file_description_access_mode access_mode,
             enum_set<FileDescriptionAttribute> attributes,
             enum_set<FileDescriptorOpenMode> open_modes,
             enum_set<FileMode> file_modes) const final override {

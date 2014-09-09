@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptionAccessMode_hh
-#define INCLUDED_os_io_FileDescriptionAccessMode_hh
+#ifndef INCLUDED_os_io_file_description_access_mode_hh
+#define INCLUDED_os_io_file_description_access_mode_hh
 
 #include "buildconfig.h"
 
@@ -25,18 +25,18 @@ namespace os {
 namespace io {
 
 /** This enum class defines file access modes of open file descriptions. */
-enum class FileDescriptionAccessMode {
-    READ_ONLY,
-    WRITE_ONLY,
-    READ_WRITE,
-    EXEC,
-    SEARCH,
+enum class file_description_access_mode {
+    read_only,
+    write_only,
+    read_write,
+    exec,
+    search,
 };
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptionAccessMode_hh
+#endif // #ifndef INCLUDED_os_io_file_description_access_mode_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

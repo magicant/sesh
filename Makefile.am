@@ -176,7 +176,7 @@ src_sesh_SOURCES = \
 	src/os/event/trigger.hh \
 	src/os/event/user_provided_trigger.hh \
 	src/os/event/writable_file_descriptor.hh \
-	src/os/io/FileDescriptionAccessMode.hh \
+	src/os/io/file_description_access_mode.hh \
 	src/os/io/FileDescriptionApi.hh \
 	src/os/io/FileDescriptionAttribute.hh \
 	src/os/io/FileDescriptionStatus.hh \
