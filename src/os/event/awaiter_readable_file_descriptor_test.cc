@@ -49,175 +49,175 @@ using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::pselect_api::steady_clock_time;
+using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: awaiting single readable FD") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(readable_file_descriptor(4));
-    std::move(f).then([this, startTime](trial<trigger> &&t) {
+    std::move(f).then([this, start_time](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
         CHECK(t->value<readable_file_descriptor>().value() == 4);
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_equal(readFds, {4}, fdBound, "readFds");
-        check_empty(writeFds, fdBound, "writeFds");
-        check_empty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_equal(read_fds, {4}, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout.count() < 0);
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = nullptr;
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(2);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing different readable FDs: "
         "pselect returning single FD") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(
             readable_file_descriptor(2), readable_file_descriptor(0));
-    std::move(f).then([this, startTime](trial<trigger> &&t) {
+    std::move(f).then([this, start_time](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
         CHECK(t->value<readable_file_descriptor>().value() == 0);
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_equal(readFds, {0, 2}, fdBound, "readFds");
-        check_empty(writeFds, fdBound, "writeFds");
-        check_empty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_equal(read_fds, {0, 2}, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout.count() < 0);
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(3);
-        readFds->reset(2);
+        read_fds->reset(2);
         implementation() = nullptr;
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(2);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one trigger set containing different readable FDs: "
         "pselect returning all FDs") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(
             readable_file_descriptor(2), readable_file_descriptor(0));
-    std::move(f).then([this, startTime](trial<trigger> &&t) {
+    std::move(f).then([this, start_time](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
         auto fd = t->value<readable_file_descriptor>().value();
         if (fd != 0)
             CHECK(fd == 2);
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_equal(readFds, {0, 2}, fdBound, "readFds");
-        check_empty(writeFds, fdBound, "writeFds");
-        check_empty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_equal(read_fds, {0, 2}, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout.count() < 0);
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = nullptr;
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(2);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(6));
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(6));
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing different readable FDs") {
-    auto startTime = TimePoint(std::chrono::seconds(10000));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(10000));
+    mutable_steady_clock_now() = start_time;
 
     a.expect(readable_file_descriptor(1)).then(
-            [this, startTime](trial<trigger> &&t) {
+            [this, start_time](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
         CHECK(t->value<readable_file_descriptor>().value() == 1);
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(9));
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(9));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
     a.expect(readable_file_descriptor(3)).then(
-            [this, startTime](trial<trigger> &&t) {
+            [this, start_time](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
         CHECK(t->value<readable_file_descriptor>().value() == 3);
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(28));
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(28));
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_equal(readFds, {1, 3}, fdBound, "readFds 1");
-        check_empty(writeFds, fdBound, "writeFds 1");
-        check_empty(errorFds, fdBound, "errorFds 1");
-        readFds->reset(3);
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_equal(read_fds, {1, 3}, fd_bound, "read_fds 1");
+        check_empty(write_fds, fd_bound, "write_fds 1");
+        check_empty(error_fds, fd_bound, "error_fds 1");
+        read_fds->reset(3);
         CHECK(timeout.count() < 0);
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
 
         mutable_steady_clock_now() += std::chrono::seconds(9);
         implementation() = [this](
                 const pselect_api_stub &,
-                FileDescriptor::Value fdBound,
-                FileDescriptorSet *readFds,
-                FileDescriptorSet *writeFds,
-                FileDescriptorSet *errorFds,
+                FileDescriptor::Value fd_bound,
+                FileDescriptorSet *read_fds,
+                FileDescriptorSet *write_fds,
+                FileDescriptorSet *error_fds,
                 std::chrono::nanoseconds timeout,
-                const SignalNumberSet *signalMask) -> std::error_code {
-            check_equal(readFds, {3}, fdBound, "readFds 2");
-            check_empty(writeFds, fdBound, "writeFds 2");
-            check_empty(errorFds, fdBound, "errorFds 2");
+                const SignalNumberSet *signal_mask) -> std::error_code {
+            check_equal(read_fds, {3}, fd_bound, "read_fds 2");
+            check_empty(write_fds, fd_bound, "write_fds 2");
+            check_empty(error_fds, fd_bound, "error_fds 2");
             CHECK(timeout.count() < 0);
-            CHECK(signalMask == nullptr);
+            CHECK(signal_mask == nullptr);
             mutable_steady_clock_now() += std::chrono::seconds(18);
             implementation() = nullptr;
             return std::error_code();
@@ -225,16 +225,16 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(30));
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(30));
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two trigger sets containing same readable FD") {
-    auto startTime = TimePoint(std::chrono::seconds(10000));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(10000));
+    mutable_steady_clock_now() = start_time;
 
-    auto callback = [this, startTime](trial<trigger> &&t) {
+    auto callback = [this, start_time](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
         CHECK(t->value<readable_file_descriptor>().value() == 7);
@@ -246,24 +246,24 @@ TEST_CASE_METHOD(
     unsigned count = 0;
     implementation() = [this, &count](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
+            const SignalNumberSet *signal_mask) -> std::error_code {
         INFO(count);
         ++count;
-        check_equal(readFds, {7}, fdBound, "readFds");
-        check_empty(writeFds, fdBound, "writeFds");
-        check_empty(errorFds, fdBound, "errorFds");
-        readFds->reset(3);
+        check_equal(read_fds, {7}, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
+        read_fds->reset(3);
         CHECK(timeout.count() < 0);
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         return std::error_code();
     };
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(2));
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(2));
 }
 
 } // namespace

@@ -44,13 +44,13 @@ using sesh::os::event::trigger;
 using sesh::os::event::user_provided_trigger;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 
-using TimePoint = sesh::os::event::pselect_api::steady_clock_time;
+using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one user-provided trigger (successful future)") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
 
     std::shared_ptr<void> result = std::make_shared<int>(1);
     future<trigger> f =
@@ -64,14 +64,14 @@ TEST_CASE_METHOD(
 
     mutable_steady_clock_now() += std::chrono::seconds(10);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: one user-provided trigger (failed future)") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
 
     future<trigger> f = a.expect(user_provided_trigger(
                 make_failed_future_of<std::shared_ptr<void>>(7)));
@@ -86,14 +86,14 @@ TEST_CASE_METHOD(
 
     mutable_steady_clock_now() += std::chrono::seconds(10);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two user-provided triggers in one trigger set") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
 
     using UPT = user_provided_trigger;
     std::shared_ptr<void> result = std::make_shared<int>(2);
@@ -109,7 +109,7 @@ TEST_CASE_METHOD(
 
     mutable_steady_clock_now() += std::chrono::seconds(10);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(

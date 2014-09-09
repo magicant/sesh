@@ -68,16 +68,16 @@ using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::pselect_api::steady_clock_time;
+using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
-template<int durationInSecondsInt>
+template<int DurationInSecondsInt>
 class TimeoutTest :
         protected awaiter_test_fixture<HandlerConfigurationApiDummy> {
 
 protected:
 
     constexpr static std::chrono::seconds duration() noexcept {
-        return std::chrono::seconds(durationInSecondsInt);
+        return std::chrono::seconds(DurationInSecondsInt);
     }
 
 public:
@@ -89,78 +89,80 @@ public:
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: timeout 0") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(timeout(std::chrono::seconds(0)));
-    bool callbackCalled = false;
-    std::move(f).then([this, startTime, &callbackCalled](trial<trigger> &&t) {
+    bool callback_called = false;
+    std::move(f).then(
+            [this, start_time, &callback_called](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(0));
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
-        callbackCalled = true;
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(1));
+        callback_called = true;
     });
-    CHECK_FALSE(callbackCalled);
+    CHECK_FALSE(callback_called);
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_empty(readFds, fdBound, "readFds");
-        check_empty(writeFds, fdBound, "writeFds");
-        check_empty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_empty(read_fds, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout == std::chrono::seconds(0));
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(1);
         implementation() = nullptr;
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(1);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
-    CHECK(callbackCalled);
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(1));
+    CHECK(callback_called);
 }
 
-template<int durationInSecondsInt>
-TimeoutTest<durationInSecondsInt>::TimeoutTest() {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+template<int DurationInSecondsInt>
+TimeoutTest<DurationInSecondsInt>::TimeoutTest() {
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(timeout(duration()));
-    bool callbackCalled = false;
-    std::move(f).then([this, startTime, &callbackCalled](trial<trigger> &&t) {
+    bool callback_called = false;
+    std::move(f).then([
+            this, start_time, &callback_called](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == duration());
-        CHECK(steady_clock_now() == startTime + duration());
-        callbackCalled = true;
+        CHECK(steady_clock_now() == start_time + duration());
+        callback_called = true;
     });
-    CHECK_FALSE(callbackCalled);
+    CHECK_FALSE(callback_called);
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_empty(readFds, fdBound, "readFds");
-        check_empty(writeFds, fdBound, "writeFds");
-        check_empty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_empty(read_fds, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout == duration() - std::chrono::seconds(1));
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         mutable_steady_clock_now() += duration() - std::chrono::seconds(1);
         implementation() = nullptr;
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(1);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + duration());
-    CHECK(callbackCalled);
+    CHECK(steady_clock_now() == start_time + duration());
+    CHECK(callback_called);
 }
 
 TEST_CASE_METHOD(TimeoutTest<1>, "Awaiter: timeout 1") { }
@@ -170,140 +172,142 @@ TEST_CASE_METHOD(TimeoutTest<2>, "Awaiter: timeout 2") { }
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: negative timeout") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(timeout(std::chrono::seconds(-10)));
-    bool callbackCalled = false;
-    std::move(f).then([this, startTime, &callbackCalled](trial<trigger> &&t) {
+    bool callback_called = false;
+    std::move(f).then([
+            this, start_time, &callback_called](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(-10));
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
-        callbackCalled = true;
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(1));
+        callback_called = true;
     });
-    CHECK_FALSE(callbackCalled);
+    CHECK_FALSE(callback_called);
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_empty(readFds, fdBound, "readFds");
-        check_empty(writeFds, fdBound, "writeFds");
-        check_empty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_empty(read_fds, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout == std::chrono::nanoseconds::zero());
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         implementation() = nullptr;
         return std::error_code();
     };
     mutable_steady_clock_now() += std::chrono::seconds(1);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(1));
-    CHECK(callbackCalled);
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(1));
+    CHECK(callback_called);
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: duplicate timeouts in one trigger set") {
-    auto startTime = TimePoint(std::chrono::seconds(-100));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(-100));
+    mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(
             timeout(std::chrono::seconds(10)),
             timeout(std::chrono::seconds(5)),
             timeout(std::chrono::seconds(20)));
-    bool callbackCalled = false;
-    std::move(f).then([this, startTime, &callbackCalled](trial<trigger> &&t) {
+    bool callback_called = false;
+    std::move(f).then([
+            this, start_time, &callback_called](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(5));
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
-        callbackCalled = true;
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
+        callback_called = true;
     });
-    CHECK_FALSE(callbackCalled);
+    CHECK_FALSE(callback_called);
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_empty(readFds, fdBound, "readFds");
-        check_empty(writeFds, fdBound, "writeFds");
-        check_empty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_empty(read_fds, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout == std::chrono::seconds(5));
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(5);
         implementation() = nullptr;
         return std::error_code();
     };
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(5));
-    CHECK(callbackCalled);
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
+    CHECK(callback_called);
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two simultaneous timeouts") {
-    auto startTime = TimePoint(std::chrono::seconds(1000));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(1000));
+    mutable_steady_clock_now() = start_time;
     future<trigger> f1 = a.expect(timeout(std::chrono::seconds(10)));
     bool callback1Called = false;
     std::move(f1).then(
-            [this, startTime, &callback1Called](trial<trigger> &&t) {
+            [this, start_time, &callback1Called](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(10));
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(11));
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(11));
         callback1Called = true;
     });
     CHECK_FALSE(callback1Called);
 
-    mutable_steady_clock_now() = startTime + std::chrono::seconds(1);
+    mutable_steady_clock_now() = start_time + std::chrono::seconds(1);
     future<trigger> f2 = a.expect(timeout(std::chrono::seconds(29)));
     bool callback2Called = false;
     std::move(f2).then(
-            [this, startTime, &callback2Called](trial<trigger> &&t) {
+            [this, start_time, &callback2Called](trial<trigger> &&t) {
         REQUIRE(t.has_value());
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(29));
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(32));
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(32));
         callback2Called = true;
     });
     CHECK_FALSE(callback2Called);
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_empty(readFds, fdBound, "readFds 1");
-        check_empty(writeFds, fdBound, "writeFds 1");
-        check_empty(errorFds, fdBound, "errorFds 1");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_empty(read_fds, fd_bound, "read_fds 1");
+        check_empty(write_fds, fd_bound, "write_fds 1");
+        check_empty(error_fds, fd_bound, "error_fds 1");
         CHECK(timeout == std::chrono::seconds(9));
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(10);
 
         implementation() = [this](
                 const pselect_api_stub &,
-                FileDescriptor::Value fdBound,
-                FileDescriptorSet *readFds,
-                FileDescriptorSet *writeFds,
-                FileDescriptorSet *errorFds,
+                FileDescriptor::Value fd_bound,
+                FileDescriptorSet *read_fds,
+                FileDescriptorSet *write_fds,
+                FileDescriptorSet *error_fds,
                 std::chrono::nanoseconds timeout,
-                const SignalNumberSet *signalMask) -> std::error_code {
-            check_empty(readFds, fdBound, "readFds 2");
-            check_empty(writeFds, fdBound, "writeFds 2");
-            check_empty(errorFds, fdBound, "errorFds 2");
+                const SignalNumberSet *signal_mask) -> std::error_code {
+            check_empty(read_fds, fd_bound, "read_fds 2");
+            check_empty(write_fds, fd_bound, "write_fds 2");
+            check_empty(error_fds, fd_bound, "error_fds 2");
             CHECK(timeout == std::chrono::seconds(19));
-            CHECK(signalMask == nullptr);
+            CHECK(signal_mask == nullptr);
             mutable_steady_clock_now() += std::chrono::seconds(21);
             implementation() = nullptr;
             return std::error_code();
@@ -311,7 +315,7 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(32));
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(32));
     CHECK(callback1Called);
     CHECK(callback2Called);
 }
@@ -319,56 +323,56 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<HandlerConfigurationApiDummy>,
         "Awaiter: two successive timeouts") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(timeout(std::chrono::seconds(100)));
-    bool callbackCalled = false;
-    std::move(f).map([this, startTime](trigger &&t) -> future<trigger> {
+    bool callback_called = false;
+    std::move(f).map([this, start_time](trigger &&t) -> future<trigger> {
         CHECK(t.tag() == trigger::tag<timeout>());
         CHECK(t.value<timeout>().interval() == std::chrono::seconds(100));
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(102));
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(102));
 
         future<trigger> f2 = a.expect(timeout(std::chrono::seconds(8)));
         mutable_steady_clock_now() += std::chrono::seconds(1);
         return f2;
-    }).unwrap().then([this, startTime, &callbackCalled](trial<trigger> &&t) {
+    }).unwrap().then([this, start_time, &callback_called](trial<trigger> &&t) {
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(8));
-        CHECK(steady_clock_now() == startTime + std::chrono::seconds(113));
+        CHECK(steady_clock_now() == start_time + std::chrono::seconds(113));
 
-        callbackCalled = true;
+        callback_called = true;
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
-    CHECK_FALSE(callbackCalled);
+    CHECK_FALSE(callback_called);
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        check_empty(readFds, fdBound, "readFds 1");
-        check_empty(writeFds, fdBound, "writeFds 1");
-        check_empty(errorFds, fdBound, "errorFds 1");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_empty(read_fds, fd_bound, "read_fds 1");
+        check_empty(write_fds, fd_bound, "write_fds 1");
+        check_empty(error_fds, fd_bound, "error_fds 1");
         CHECK(timeout == std::chrono::seconds(99));
-        CHECK(signalMask == nullptr);
+        CHECK(signal_mask == nullptr);
         mutable_steady_clock_now() += std::chrono::seconds(101);
 
         implementation() = [this](
                 const pselect_api_stub &,
-                FileDescriptor::Value fdBound,
-                FileDescriptorSet *readFds,
-                FileDescriptorSet *writeFds,
-                FileDescriptorSet *errorFds,
+                FileDescriptor::Value fd_bound,
+                FileDescriptorSet *read_fds,
+                FileDescriptorSet *write_fds,
+                FileDescriptorSet *error_fds,
                 std::chrono::nanoseconds timeout,
-                const SignalNumberSet *signalMask) -> std::error_code {
-            check_empty(readFds, fdBound, "readFds 2");
-            check_empty(writeFds, fdBound, "writeFds 2");
-            check_empty(errorFds, fdBound, "errorFds 2");
+                const SignalNumberSet *signal_mask) -> std::error_code {
+            check_empty(read_fds, fd_bound, "read_fds 2");
+            check_empty(write_fds, fd_bound, "write_fds 2");
+            check_empty(error_fds, fd_bound, "error_fds 2");
             CHECK(timeout == std::chrono::seconds(7));
-            CHECK(signalMask == nullptr);
+            CHECK(signal_mask == nullptr);
             mutable_steady_clock_now() += std::chrono::seconds(10);
             implementation() = nullptr;
             return std::error_code();
@@ -377,8 +381,8 @@ TEST_CASE_METHOD(
     };
     mutable_steady_clock_now() += std::chrono::seconds(1);
     a.await_events();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(115));
-    CHECK(callbackCalled);
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(115));
+    CHECK(callback_called);
 }
 
 } // namespace
