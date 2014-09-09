@@ -32,7 +32,7 @@
 #include "helpermacros.h"
 #include "os/capi.h"
 #include "os/io/file_description_access_mode.hh"
-#include "os/io/FileDescriptionAttribute.hh"
+#include "os/io/file_description_attribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorOpenMode.hh"
@@ -47,7 +47,7 @@ using sesh::common::errno_code;
 using sesh::common::type_tag;
 using sesh::common::variant;
 using sesh::os::io::file_description_access_mode;
-using sesh::os::io::FileDescriptionAttribute;
+using sesh::os::io::file_description_attribute;
 using sesh::os::io::FileDescriptionStatus;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorOpenMode;
@@ -102,18 +102,18 @@ file_description_access_mode convert(
     UNREACHABLE();
 }
 
-enum sesh_osapi_fcntl_file_attribute convert(FileDescriptionAttribute a)
+enum sesh_osapi_fcntl_file_attribute convert(file_description_attribute a)
         noexcept {
     switch (a) {
-    case FileDescriptionAttribute::APPEND:
+    case file_description_attribute::append:
         return SESH_OSAPI_O_APPEND;
-    case FileDescriptionAttribute::DATA_SYNC:
+    case file_description_attribute::data_sync:
         return SESH_OSAPI_O_DSYNC;
-    case FileDescriptionAttribute::NON_BLOCKING:
+    case file_description_attribute::non_blocking:
         return SESH_OSAPI_O_NONBLOCK;
-    case FileDescriptionAttribute::READ_SYNC:
+    case file_description_attribute::read_sync:
         return SESH_OSAPI_O_RSYNC;
-    case FileDescriptionAttribute::SYNC:
+    case file_description_attribute::sync:
         return SESH_OSAPI_O_SYNC;
     }
     UNREACHABLE();
@@ -141,7 +141,7 @@ enum sesh_osapi_open_mode convert(FileDescriptorOpenMode mode) noexcept {
     UNREACHABLE();
 }
 
-int to_raw_flag(FileDescriptionAttribute a) {
+int to_raw_flag(file_description_attribute a) {
     return sesh_osapi_fcntl_file_attribute_to_raw(convert(a));
 }
 
@@ -152,13 +152,13 @@ int to_raw_flag(FileDescriptorOpenMode mode) {
 /** @return -1 if the access mode is not supported. */
 int to_raw_flags(
         file_description_access_mode access_mode,
-        enum_set<FileDescriptionAttribute> attributes,
+        enum_set<file_description_attribute> attributes,
         enum_set<FileDescriptorOpenMode> open_modes) {
     int raw_flags = to_raw_flag(access_mode);
     if (raw_flags == -1)
         return -1;
 
-    for (auto a : enumerators<FileDescriptionAttribute>())
+    for (auto a : enumerators<file_description_attribute>())
         if (attributes[a])
             raw_flags |= to_raw_flag(a);
 
@@ -222,11 +222,11 @@ public:
                 sesh_osapi_fcntl_file_access_mode_from_raw(m_raw_flags));
     }
 
-    bool test(FileDescriptionAttribute a) const noexcept final override {
+    bool test(file_description_attribute a) const noexcept final override {
         return m_raw_flags & to_raw_flag(a);
     }
 
-    FileDescriptionStatus &set(FileDescriptionAttribute a, bool value)
+    FileDescriptionStatus &set(file_description_attribute a, bool value)
             noexcept final override {
         int flag = to_raw_flag(a);
         if (value)
@@ -408,7 +408,7 @@ class api_impl : public api {
     variant<FileDescriptor, std::error_code> open(
             const char *path,
             file_description_access_mode access_mode,
-            enum_set<FileDescriptionAttribute> attributes,
+            enum_set<file_description_attribute> attributes,
             enum_set<FileDescriptorOpenMode> open_modes,
             enum_set<FileMode> file_modes) const final override {
         int flags = to_raw_flags(access_mode, attributes, open_modes);

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptionAttribute_hh
-#define INCLUDED_os_io_FileDescriptionAttribute_hh
+#ifndef INCLUDED_os_io_file_description_attribute_hh
+#define INCLUDED_os_io_file_description_attribute_hh
 
 #include "buildconfig.h"
 
@@ -28,12 +28,12 @@ namespace os {
 namespace io {
 
 /** This enum class defines attributes an open file description can have. */
-enum class FileDescriptionAttribute {
-    APPEND,
-    DATA_SYNC,
-    NON_BLOCKING,
-    READ_SYNC,
-    SYNC,
+enum class file_description_attribute {
+    append,
+    data_sync,
+    non_blocking,
+    read_sync,
+    sync,
 };
 
 } // namespace io
@@ -42,16 +42,16 @@ enum class FileDescriptionAttribute {
 namespace common {
 
 template<>
-class enum_traits<os::io::FileDescriptionAttribute> {
+class enum_traits<os::io::file_description_attribute> {
 public:
-    constexpr static os::io::FileDescriptionAttribute max =
-            os::io::FileDescriptionAttribute::SYNC;
+    constexpr static os::io::file_description_attribute max =
+            os::io::file_description_attribute::sync;
 };
 
 } // namespace common
 
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptionAttribute_hh
+#endif // #ifndef INCLUDED_os_io_file_description_attribute_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

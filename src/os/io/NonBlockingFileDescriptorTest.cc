@@ -25,7 +25,7 @@
 #include "common/variant.hh"
 #include "os/io/file_description_access_mode.hh"
 #include "os/io/file_description_api.hh"
-#include "os/io/FileDescriptionAttribute.hh"
+#include "os/io/file_description_attribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
@@ -35,7 +35,7 @@ namespace {
 using sesh::common::variant;
 using sesh::os::io::file_description_access_mode;
 using sesh::os::io::file_description_api;
-using sesh::os::io::FileDescriptionAttribute;
+using sesh::os::io::file_description_attribute;
 using sesh::os::io::FileDescriptionStatus;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::NonBlockingFileDescriptor;
@@ -94,14 +94,14 @@ public:
     explicit FileDescriptionStatusMock(bool isNonBlocking) noexcept :
             isNonBlocking(isNonBlocking) { }
 
-    bool test(FileDescriptionAttribute a) const noexcept override {
-        CHECK(a == FileDescriptionAttribute::NON_BLOCKING);
+    bool test(file_description_attribute a) const noexcept override {
+        CHECK(a == file_description_attribute::non_blocking);
         return isNonBlocking;
     }
 
-    FileDescriptionStatus &set(FileDescriptionAttribute a, bool value = true)
+    FileDescriptionStatus &set(file_description_attribute a, bool value = true)
             noexcept {
-        CHECK(a == FileDescriptionAttribute::NON_BLOCKING);
+        CHECK(a == file_description_attribute::non_blocking);
         isNonBlocking = value;
         return *this;
     }

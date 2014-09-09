@@ -22,7 +22,7 @@
 
 #include <memory>
 #include "os/io/file_description_access_mode.hh"
-#include "os/io/FileDescriptionAttribute.hh"
+#include "os/io/file_description_attribute.hh"
 
 namespace sesh {
 namespace os {
@@ -47,14 +47,14 @@ public:
     /**
      * Checks if an open file description attribute is included in this status.
      */
-    virtual bool test(FileDescriptionAttribute) const noexcept = 0;
+    virtual bool test(file_description_attribute) const noexcept = 0;
 
     /** Adds/removes an open file description attribute to/from this status. */
-    virtual FileDescriptionStatus &set(FileDescriptionAttribute, bool = true)
+    virtual FileDescriptionStatus &set(file_description_attribute, bool = true)
             noexcept = 0;
 
     /** Removes an open file description attribute from this status. */
-    FileDescriptionStatus &reset(FileDescriptionAttribute a) noexcept {
+    FileDescriptionStatus &reset(file_description_attribute a) noexcept {
         return set(a, false);
     }
 

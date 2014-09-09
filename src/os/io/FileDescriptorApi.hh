@@ -25,7 +25,7 @@
 #include "common/enum_set.hh"
 #include "common/variant.hh"
 #include "os/io/file_description_access_mode.hh"
-#include "os/io/FileDescriptionAttribute.hh"
+#include "os/io/file_description_attribute.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorOpenMode.hh"
 #include "os/io/FileMode.hh"
@@ -48,7 +48,7 @@ public:
     virtual common::variant<FileDescriptor, std::error_code> open(
             const char *path,
             file_description_access_mode,
-            common::enum_set<FileDescriptionAttribute>,
+            common::enum_set<file_description_attribute>,
             common::enum_set<FileDescriptorOpenMode>,
             common::enum_set<FileMode>) const = 0;
 

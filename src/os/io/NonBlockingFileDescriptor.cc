@@ -21,7 +21,7 @@
 #include <utility>
 #include "helpermacros.h"
 #include "os/io/file_description_api.hh"
-#include "os/io/FileDescriptionAttribute.hh"
+#include "os/io/file_description_attribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
 
@@ -55,7 +55,7 @@ NonBlockingFileDescriptor::NonBlockingFileDescriptor(
         return;
 
     auto nonBlockingStatus = mOriginalStatus->clone();
-    nonBlockingStatus->set(FileDescriptionAttribute::NON_BLOCKING);
+    nonBlockingStatus->set(file_description_attribute::non_blocking);
     mApi.set_file_description_status(mFileDescriptor, *nonBlockingStatus);
 }
 
