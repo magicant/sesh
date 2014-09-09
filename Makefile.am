@@ -177,7 +177,7 @@ src_sesh_SOURCES = \
 	src/os/event/user_provided_trigger.hh \
 	src/os/event/writable_file_descriptor.hh \
 	src/os/io/file_description_access_mode.hh \
-	src/os/io/FileDescriptionApi.hh \
+	src/os/io/file_description_api.hh \
 	src/os/io/FileDescriptionAttribute.hh \
 	src/os/io/FileDescriptionStatus.hh \
 	src/os/io/FileDescriptor.hh \
@@ -397,7 +397,7 @@ TESTHEADERS = \
 	src/language/syntax/printer_test_helper.hh \
 	src/os/event/awaiter_test_helper.hh \
 	src/os/event/pselect_api_test_helper.hh \
-	src/os/io/FileDescriptionApiTestHelper.hh \
+	src/os/io/file_description_api_test_helper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/io/NonBlockingFileDescriptorTestHelper.hh \
 	src/os/signaling/HandlerConfigurationApiTestHelper.hh \

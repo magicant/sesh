@@ -22,7 +22,7 @@
 
 #include <system_error>
 #include <utility>
-#include "os/io/FileDescriptionApiTestHelper.hh"
+#include "os/io/file_description_api_test_helper.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 
@@ -32,7 +32,7 @@ namespace io {
 
 inline auto dummyNonBlockingFileDescriptor(FileDescriptor &&fd)
         -> NonBlockingFileDescriptor {
-    static FileDescriptionApiDummy api;
+    static file_description_api_dummy api;
     return NonBlockingFileDescriptor(api, std::move(fd));
 }
 

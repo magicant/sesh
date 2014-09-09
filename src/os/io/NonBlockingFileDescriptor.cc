@@ -20,7 +20,7 @@
 
 #include <utility>
 #include "helpermacros.h"
-#include "os/io/FileDescriptionApi.hh"
+#include "os/io/file_description_api.hh"
 #include "os/io/FileDescriptionAttribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
@@ -32,9 +32,9 @@ namespace io {
 namespace {
 
 std::unique_ptr<FileDescriptionStatus> statusOrNull(
-        const FileDescriptionApi &api, const FileDescriptor &fd) {
+        const file_description_api &api, const FileDescriptor &fd) {
     using StatusPointer = std::unique_ptr<FileDescriptionStatus>;
-    auto statusOrError = api.getFileDescriptionStatus(fd);
+    auto statusOrError = api.get_file_description_status(fd);
     switch (statusOrError.tag()) {
     case statusOrError.tag<StatusPointer>():
         return std::move(statusOrError.value<StatusPointer>());
@@ -47,7 +47,7 @@ std::unique_ptr<FileDescriptionStatus> statusOrNull(
 } // namespace
 
 NonBlockingFileDescriptor::NonBlockingFileDescriptor(
-        const FileDescriptionApi &api, FileDescriptor &&fd) :
+        const file_description_api &api, FileDescriptor &&fd) :
         mApi(api),
         mFileDescriptor(std::move(fd)),
         mOriginalStatus(statusOrNull(mApi, mFileDescriptor)) {
@@ -56,12 +56,12 @@ NonBlockingFileDescriptor::NonBlockingFileDescriptor(
 
     auto nonBlockingStatus = mOriginalStatus->clone();
     nonBlockingStatus->set(FileDescriptionAttribute::NON_BLOCKING);
-    mApi.setFileDescriptionStatus(mFileDescriptor, *nonBlockingStatus);
+    mApi.set_file_description_status(mFileDescriptor, *nonBlockingStatus);
 }
 
 FileDescriptor NonBlockingFileDescriptor::release() {
     if (mOriginalStatus != nullptr)
-        mApi.setFileDescriptionStatus(mFileDescriptor, *mOriginalStatus);
+        mApi.set_file_description_status(mFileDescriptor, *mOriginalStatus);
     return std::move(mFileDescriptor);
 }
 

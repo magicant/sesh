@@ -386,7 +386,7 @@ class api_impl : public api {
                 steady_clock_time::clock::now());
     }
 
-    auto getFileDescriptionStatus(const FileDescriptor &fd) const
+    auto get_file_description_status(const FileDescriptor &fd) const
             -> variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
             final override {
         int flags = sesh_osapi_fcntl_getfl(fd.value());
@@ -396,7 +396,7 @@ class api_impl : public api {
                 new file_description_status_impl(flags));
     }
 
-    std::error_code setFileDescriptionStatus(
+    std::error_code set_file_description_status(
             const FileDescriptor &fd, const FileDescriptionStatus &s) const
             final override {
         const auto &i = static_cast<const file_description_status_impl &>(s);

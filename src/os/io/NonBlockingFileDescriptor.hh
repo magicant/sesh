@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include "os/io/FileDescriptionApi.hh"
+#include "os/io/file_description_api.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
 
@@ -41,7 +41,7 @@ class NonBlockingFileDescriptor {
 
 private:
 
-    const FileDescriptionApi &mApi;
+    const file_description_api &mApi;
 
     FileDescriptor mFileDescriptor;
     std::unique_ptr<FileDescriptionStatus> mOriginalStatus;
@@ -78,7 +78,7 @@ public:
      * @param fd File descriptor whose non-blocking flag will be set.
      */
     NonBlockingFileDescriptor(
-            const FileDescriptionApi &api, FileDescriptor &&fd);
+            const file_description_api &api, FileDescriptor &&fd);
 
     /** Move constructor. */
     NonBlockingFileDescriptor(NonBlockingFileDescriptor &&) noexcept = default;

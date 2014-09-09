@@ -24,7 +24,7 @@
 #include <system_error>
 #include "common/variant.hh"
 #include "os/io/file_description_access_mode.hh"
-#include "os/io/FileDescriptionApi.hh"
+#include "os/io/file_description_api.hh"
 #include "os/io/FileDescriptionAttribute.hh"
 #include "os/io/FileDescriptionStatus.hh"
 #include "os/io/FileDescriptor.hh"
@@ -34,7 +34,7 @@ namespace {
 
 using sesh::common::variant;
 using sesh::os::io::file_description_access_mode;
-using sesh::os::io::FileDescriptionApi;
+using sesh::os::io::file_description_api;
 using sesh::os::io::FileDescriptionAttribute;
 using sesh::os::io::FileDescriptionStatus;
 using sesh::os::io::FileDescriptor;
@@ -42,23 +42,23 @@ using sesh::os::io::NonBlockingFileDescriptor;
 
 namespace closed_fd {
 
-class FileDescriptionApiMock : public FileDescriptionApi {
+class FileDescriptionApiMock : public file_description_api {
 
 public:
 
     constexpr static FileDescriptor::Value value() noexcept { return 3; }
 
     variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
-    getFileDescriptionStatus(const FileDescriptor &fd) const override {
+    get_file_description_status(const FileDescriptor &fd) const override {
         CHECK(fd.isValid());
         CHECK(fd.value() == value());
         return std::make_error_code(std::errc::bad_file_descriptor);
     }
 
-    std::error_code setFileDescriptionStatus(
+    std::error_code set_file_description_status(
             const FileDescriptor &, const FileDescriptionStatus &) const
             override {
-        throw "unexpected setFileDescriptionStatus";
+        throw "unexpected set_file_description_status";
     }
 
 }; // class FileDescriptionApiMock
@@ -119,7 +119,7 @@ public:
 
 }; // class FileDescriptionStatusMock
 
-class FileDescriptionApiMock : public FileDescriptionApi {
+class FileDescriptionApiMock : public file_description_api {
 
 public:
 
@@ -131,14 +131,14 @@ public:
             isNonBlocking(isNonBlocking) { }
 
     variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
-    getFileDescriptionStatus(const FileDescriptor &fd) const override {
+    get_file_description_status(const FileDescriptor &fd) const override {
         CHECK(fd.isValid());
         CHECK(fd.value() == value());
         return std::unique_ptr<FileDescriptionStatus>(
                 new FileDescriptionStatusMock(isNonBlocking));
     }
 
-    std::error_code setFileDescriptionStatus(
+    std::error_code set_file_description_status(
             const FileDescriptor &fd, const FileDescriptionStatus &status)
             const override {
         CHECK(fd.isValid());
