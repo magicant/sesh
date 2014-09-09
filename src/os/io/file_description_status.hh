@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptionStatus_hh
-#define INCLUDED_os_io_FileDescriptionStatus_hh
+#ifndef INCLUDED_os_io_file_description_status_hh
+#define INCLUDED_os_io_file_description_status_hh
 
 #include "buildconfig.h"
 
@@ -35,14 +35,14 @@ namespace io {
  * of any number of file description attributes. The access mode is not
  * modifiable.
  */
-class FileDescriptionStatus {
+class file_description_status {
 
 public:
 
-    virtual ~FileDescriptionStatus() = default;
+    virtual ~file_description_status() = default;
 
     /** Returns the access mode in this status. */
-    virtual file_description_access_mode accessMode() const noexcept = 0;
+    virtual file_description_access_mode access_mode() const noexcept = 0;
 
     /**
      * Checks if an open file description attribute is included in this status.
@@ -50,26 +50,26 @@ public:
     virtual bool test(file_description_attribute) const noexcept = 0;
 
     /** Adds/removes an open file description attribute to/from this status. */
-    virtual FileDescriptionStatus &set(file_description_attribute, bool = true)
-            noexcept = 0;
+    virtual file_description_status &set(
+            file_description_attribute, bool = true) noexcept = 0;
 
     /** Removes an open file description attribute from this status. */
-    FileDescriptionStatus &reset(file_description_attribute a) noexcept {
+    file_description_status &reset(file_description_attribute a) noexcept {
         return set(a, false);
     }
 
     /** Clears all open file description attributes of this status. */
-    virtual FileDescriptionStatus &resetAttributes() noexcept = 0;
+    virtual file_description_status &reset_attributes() noexcept = 0;
 
     /** Creates a copy of this instance. */
-    virtual std::unique_ptr<FileDescriptionStatus> clone() const = 0;
+    virtual std::unique_ptr<file_description_status> clone() const = 0;
 
-};
+}; // class file_description_status
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptionStatus_hh
+#endif // #ifndef INCLUDED_os_io_file_description_status_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

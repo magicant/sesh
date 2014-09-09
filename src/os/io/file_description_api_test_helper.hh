@@ -29,13 +29,13 @@ namespace io {
 
 class file_description_api_dummy : public file_description_api {
 
-    common::variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    common::variant<std::unique_ptr<file_description_status>, std::error_code>
     get_file_description_status(const FileDescriptor &) const override {
         return std::error_code();
     }
 
     std::error_code set_file_description_status(
-            const FileDescriptor &, const FileDescriptionStatus &) const
+            const FileDescriptor &, const file_description_status &) const
             override {
         return std::error_code();
     }

@@ -179,7 +179,7 @@ src_sesh_SOURCES = \
 	src/os/io/file_description_access_mode.hh \
 	src/os/io/file_description_api.hh \
 	src/os/io/file_description_attribute.hh \
-	src/os/io/FileDescriptionStatus.hh \
+	src/os/io/file_description_status.hh \
 	src/os/io/FileDescriptor.hh \
 	src/os/io/FileDescriptorApi.hh \
 	src/os/io/FileDescriptorOpenMode.hh \

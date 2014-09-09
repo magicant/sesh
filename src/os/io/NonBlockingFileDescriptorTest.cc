@@ -26,7 +26,7 @@
 #include "os/io/file_description_access_mode.hh"
 #include "os/io/file_description_api.hh"
 #include "os/io/file_description_attribute.hh"
-#include "os/io/FileDescriptionStatus.hh"
+#include "os/io/file_description_status.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 
@@ -36,7 +36,7 @@ using sesh::common::variant;
 using sesh::os::io::file_description_access_mode;
 using sesh::os::io::file_description_api;
 using sesh::os::io::file_description_attribute;
-using sesh::os::io::FileDescriptionStatus;
+using sesh::os::io::file_description_status;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::NonBlockingFileDescriptor;
 
@@ -48,7 +48,7 @@ public:
 
     constexpr static FileDescriptor::Value value() noexcept { return 3; }
 
-    variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    variant<std::unique_ptr<file_description_status>, std::error_code>
     get_file_description_status(const FileDescriptor &fd) const override {
         CHECK(fd.isValid());
         CHECK(fd.value() == value());
@@ -56,7 +56,7 @@ public:
     }
 
     std::error_code set_file_description_status(
-            const FileDescriptor &, const FileDescriptionStatus &) const
+            const FileDescriptor &, const file_description_status &) const
             override {
         throw "unexpected set_file_description_status";
     }
@@ -85,7 +85,7 @@ TEST_CASE("Non-blocking file descriptor: releasing closed FD") {
 
 namespace open_fd {
 
-class FileDescriptionStatusMock : public FileDescriptionStatus {
+class FileDescriptionStatusMock : public file_description_status {
 
 public:
 
@@ -99,21 +99,21 @@ public:
         return isNonBlocking;
     }
 
-    FileDescriptionStatus &set(file_description_attribute a, bool value = true)
-            noexcept {
+    file_description_status &set(
+            file_description_attribute a, bool value = true) noexcept {
         CHECK(a == file_description_attribute::non_blocking);
         isNonBlocking = value;
         return *this;
     }
 
-    std::unique_ptr<FileDescriptionStatus> clone() const override {
-        return std::unique_ptr<FileDescriptionStatus>(new auto(*this));
+    std::unique_ptr<file_description_status> clone() const override {
+        return std::unique_ptr<file_description_status>(new auto(*this));
     }
 
-    file_description_access_mode accessMode() const noexcept override {
+    file_description_access_mode access_mode() const noexcept override {
         throw "unexpected accessMode";
     }
-    FileDescriptionStatus &resetAttributes() noexcept override {
+    file_description_status &reset_attributes() noexcept override {
         throw "unexpected resetAttributes";
     }
 
@@ -130,16 +130,16 @@ public:
     explicit FileDescriptionApiMock(bool isNonBlocking) noexcept :
             isNonBlocking(isNonBlocking) { }
 
-    variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    variant<std::unique_ptr<file_description_status>, std::error_code>
     get_file_description_status(const FileDescriptor &fd) const override {
         CHECK(fd.isValid());
         CHECK(fd.value() == value());
-        return std::unique_ptr<FileDescriptionStatus>(
+        return std::unique_ptr<file_description_status>(
                 new FileDescriptionStatusMock(isNonBlocking));
     }
 
     std::error_code set_file_description_status(
-            const FileDescriptor &fd, const FileDescriptionStatus &status)
+            const FileDescriptor &fd, const file_description_status &status)
             const override {
         CHECK(fd.isValid());
         CHECK(fd.value() == value());

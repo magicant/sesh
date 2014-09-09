@@ -23,7 +23,7 @@
 #include <memory>
 #include <system_error>
 #include "common/variant.hh"
-#include "os/io/FileDescriptionStatus.hh"
+#include "os/io/file_description_status.hh"
 #include "os/io/FileDescriptor.hh"
 
 namespace sesh {
@@ -42,7 +42,7 @@ public:
      * instance or a non-zero system error code.
      */
     virtual
-    common::variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    common::variant<std::unique_ptr<file_description_status>, std::error_code>
     get_file_description_status(const FileDescriptor &) const = 0;
 
     /**
@@ -58,7 +58,7 @@ public:
      * *this}.
      */
     virtual std::error_code set_file_description_status(
-            const FileDescriptor &, const FileDescriptionStatus &) const = 0;
+            const FileDescriptor &, const file_description_status &) const = 0;
 
 }; // class file_description_api
 

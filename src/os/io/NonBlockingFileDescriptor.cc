@@ -22,7 +22,7 @@
 #include "helpermacros.h"
 #include "os/io/file_description_api.hh"
 #include "os/io/file_description_attribute.hh"
-#include "os/io/FileDescriptionStatus.hh"
+#include "os/io/file_description_status.hh"
 #include "os/io/FileDescriptor.hh"
 
 namespace sesh {
@@ -31,9 +31,9 @@ namespace io {
 
 namespace {
 
-std::unique_ptr<FileDescriptionStatus> statusOrNull(
+std::unique_ptr<file_description_status> statusOrNull(
         const file_description_api &api, const FileDescriptor &fd) {
-    using StatusPointer = std::unique_ptr<FileDescriptionStatus>;
+    using StatusPointer = std::unique_ptr<file_description_status>;
     auto statusOrError = api.get_file_description_status(fd);
     switch (statusOrError.tag()) {
     case statusOrError.tag<StatusPointer>():

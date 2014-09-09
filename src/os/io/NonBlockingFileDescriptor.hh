@@ -22,7 +22,7 @@
 
 #include <memory>
 #include "os/io/file_description_api.hh"
-#include "os/io/FileDescriptionStatus.hh"
+#include "os/io/file_description_status.hh"
 #include "os/io/FileDescriptor.hh"
 
 namespace sesh {
@@ -44,7 +44,7 @@ private:
     const file_description_api &mApi;
 
     FileDescriptor mFileDescriptor;
-    std::unique_ptr<FileDescriptionStatus> mOriginalStatus;
+    std::unique_ptr<file_description_status> mOriginalStatus;
 
 public:
 

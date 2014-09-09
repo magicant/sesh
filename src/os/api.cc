@@ -33,7 +33,7 @@
 #include "os/capi.h"
 #include "os/io/file_description_access_mode.hh"
 #include "os/io/file_description_attribute.hh"
-#include "os/io/FileDescriptionStatus.hh"
+#include "os/io/file_description_status.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorOpenMode.hh"
 #include "os/io/FileDescriptorSet.hh"
@@ -48,7 +48,7 @@ using sesh::common::type_tag;
 using sesh::common::variant;
 using sesh::os::io::file_description_access_mode;
 using sesh::os::io::file_description_attribute;
-using sesh::os::io::FileDescriptionStatus;
+using sesh::os::io::file_description_status;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorOpenMode;
 using sesh::os::io::FileDescriptorSet;
@@ -204,7 +204,7 @@ void convert(const struct sesh_osapi_signal_action &from, SignalAction &to) {
     }
 }
 
-class file_description_status_impl : public FileDescriptionStatus {
+class file_description_status_impl : public file_description_status {
 
 private:
 
@@ -217,7 +217,7 @@ public:
 
     int raw_flags() const noexcept { return m_raw_flags; }
 
-    file_description_access_mode accessMode() const noexcept final override {
+    file_description_access_mode access_mode() const noexcept final override {
         return convert(
                 sesh_osapi_fcntl_file_access_mode_from_raw(m_raw_flags));
     }
@@ -226,7 +226,7 @@ public:
         return m_raw_flags & to_raw_flag(a);
     }
 
-    FileDescriptionStatus &set(file_description_attribute a, bool value)
+    file_description_status &set(file_description_attribute a, bool value)
             noexcept final override {
         int flag = to_raw_flag(a);
         if (value)
@@ -236,14 +236,14 @@ public:
         return *this;
     }
 
-    FileDescriptionStatus &resetAttributes() noexcept final override {
+    file_description_status &reset_attributes() noexcept final override {
         m_raw_flags &=
                 sesh_osapi_fcntl_file_attribute_to_raw(SESH_OSAPI_O_ACCMODE);
         return *this;
     }
 
-    std::unique_ptr<FileDescriptionStatus> clone() const final override {
-        return std::unique_ptr<FileDescriptionStatus>(new auto(*this));
+    std::unique_ptr<file_description_status> clone() const final override {
+        return std::unique_ptr<file_description_status>(new auto(*this));
     }
 
 }; // class file_description_status_impl
@@ -387,17 +387,18 @@ class api_impl : public api {
     }
 
     auto get_file_description_status(const FileDescriptor &fd) const
-            -> variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+            -> variant<
+                    std::unique_ptr<file_description_status>, std::error_code>
             final override {
         int flags = sesh_osapi_fcntl_getfl(fd.value());
         if (flags == -1)
             return errno_code();
-        return std::unique_ptr<FileDescriptionStatus>(
+        return std::unique_ptr<file_description_status>(
                 new file_description_status_impl(flags));
     }
 
     std::error_code set_file_description_status(
-            const FileDescriptor &fd, const FileDescriptionStatus &s) const
+            const FileDescriptor &fd, const file_description_status &s) const
             final override {
         const auto &i = static_cast<const file_description_status_impl &>(s);
         if (sesh_osapi_fcntl_setfl(fd.value(), i.raw_flags()) == -1)
