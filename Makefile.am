@@ -53,14 +53,14 @@ TESTPROGRAMS = \
 	src/language/syntax/sequence_test \
 	src/language/syntax/simple_command_test \
 	src/language/syntax/word_test \
-	src/os/event/AwaiterErrorFileDescriptorTest \
-	src/os/event/AwaiterFileDescriptorTest \
-	src/os/event/AwaiterReadableFileDescriptorTest \
-	src/os/event/AwaiterSignalTest \
-	src/os/event/AwaiterTest \
-	src/os/event/AwaiterTimeoutTest \
-	src/os/event/AwaiterUserProvidedTriggerTest \
-	src/os/event/AwaiterWritableFileDescriptorTest \
+	src/os/event/awaiter_error_file_descriptor_test \
+	src/os/event/awaiter_file_descriptor_test \
+	src/os/event/awaiter_readable_file_descriptor_test \
+	src/os/event/awaiter_signal_test \
+	src/os/event/awaiter_test \
+	src/os/event/awaiter_timeout_test \
+	src/os/event/awaiter_user_provided_trigger_test \
+	src/os/event/awaiter_writable_file_descriptor_test \
 	src/os/io/FileDescriptorTest \
 	src/os/io/NonBlockingFileDescriptorTest \
 	src/os/io/ReaderTest \
@@ -164,18 +164,18 @@ src_sesh_SOURCES = \
 	src/os/capi.c \
 	src/os/capi.h \
 	src/os/capitypes.h \
-	src/os/event/Awaiter.cc \
-	src/os/event/Awaiter.hh \
-	src/os/event/ErrorFileDescriptor.hh \
-	src/os/event/FileDescriptorCondition.hh \
-	src/os/event/Proactor.hh \
-	src/os/event/PselectApi.hh \
-	src/os/event/ReadableFileDescriptor.hh \
-	src/os/event/Signal.hh \
-	src/os/event/Timeout.hh \
-	src/os/event/Trigger.hh \
-	src/os/event/UserProvidedTrigger.hh \
-	src/os/event/WritableFileDescriptor.hh \
+	src/os/event/awaiter.cc \
+	src/os/event/awaiter.hh \
+	src/os/event/error_file_descriptor.hh \
+	src/os/event/file_descriptor_condition.hh \
+	src/os/event/proactor.hh \
+	src/os/event/pselect_api.hh \
+	src/os/event/readable_file_descriptor.hh \
+	src/os/event/signal.hh \
+	src/os/event/timeout.hh \
+	src/os/event/trigger.hh \
+	src/os/event/user_provided_trigger.hh \
+	src/os/event/writable_file_descriptor.hh \
 	src/os/io/FileDescriptionAccessMode.hh \
 	src/os/io/FileDescriptionApi.hh \
 	src/os/io/FileDescriptionAttribute.hh \
@@ -321,51 +321,51 @@ src_language_syntax_word_test_SOURCES = \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/word.cc \
 	src/language/syntax/word_test.cc
-src_os_event_AwaiterErrorFileDescriptorTest_SOURCES = \
-	src/os/event/Awaiter.cc \
-	src/os/event/AwaiterErrorFileDescriptorTest.cc \
+src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
+	src/os/event/awaiter.cc \
+	src/os/event/awaiter_error_file_descriptor_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterFileDescriptorTest_SOURCES = \
-	src/os/event/Awaiter.cc \
-	src/os/event/AwaiterFileDescriptorTest.cc \
+src_os_event_awaiter_file_descriptor_test_SOURCES = \
+	src/os/event/awaiter.cc \
+	src/os/event/awaiter_file_descriptor_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterReadableFileDescriptorTest_SOURCES = \
-	src/os/event/Awaiter.cc \
-	src/os/event/AwaiterReadableFileDescriptorTest.cc \
+src_os_event_awaiter_readable_file_descriptor_test_SOURCES = \
+	src/os/event/awaiter.cc \
+	src/os/event/awaiter_readable_file_descriptor_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterSignalTest_SOURCES = \
-	src/os/event/Awaiter.cc \
-	src/os/event/AwaiterSignalTest.cc \
+src_os_event_awaiter_signal_test_SOURCES = \
+	src/os/event/awaiter.cc \
+	src/os/event/awaiter_signal_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterTest_SOURCES = \
-	src/os/event/Awaiter.cc \
-	src/os/event/AwaiterTest.cc \
+src_os_event_awaiter_test_SOURCES = \
+	src/os/event/awaiter.cc \
+	src/os/event/awaiter_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterTimeoutTest_SOURCES = \
-	src/os/event/Awaiter.cc \
-	src/os/event/AwaiterTimeoutTest.cc \
+src_os_event_awaiter_timeout_test_SOURCES = \
+	src/os/event/awaiter.cc \
+	src/os/event/awaiter_timeout_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterUserProvidedTriggerTest_SOURCES = \
-	src/os/event/Awaiter.cc \
-	src/os/event/AwaiterUserProvidedTriggerTest.cc \
+src_os_event_awaiter_user_provided_trigger_test_SOURCES = \
+	src/os/event/awaiter.cc \
+	src/os/event/awaiter_user_provided_trigger_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_event_AwaiterWritableFileDescriptorTest_SOURCES = \
-	src/os/event/Awaiter.cc \
-	src/os/event/AwaiterWritableFileDescriptorTest.cc \
+src_os_event_awaiter_writable_file_descriptor_test_SOURCES = \
+	src/os/event/awaiter.cc \
+	src/os/event/awaiter_writable_file_descriptor_test.cc \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
@@ -395,8 +395,8 @@ TESTHEADERS = \
 	src/language/source/origin_test_helper.hh \
 	src/language/source/source_test_helper.hh \
 	src/language/syntax/printer_test_helper.hh \
-	src/os/event/AwaiterTestHelper.hh \
-	src/os/event/PselectApiTestHelper.hh \
+	src/os/event/awaiter_test_helper.hh \
+	src/os/event/pselect_api_test_helper.hh \
 	src/os/io/FileDescriptionApiTestHelper.hh \
 	src/os/io/FileDescriptorSetTestHelper.hh \
 	src/os/io/NonBlockingFileDescriptorTestHelper.hh \

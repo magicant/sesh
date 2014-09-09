@@ -24,16 +24,16 @@
 #include <utility>
 #include "async/future.hh"
 #include "common/trial.hh"
-#include "os/event/Proactor.hh"
-#include "os/event/Trigger.hh"
-#include "os/event/WritableFileDescriptor.hh"
+#include "os/event/proactor.hh"
+#include "os/event/trigger.hh"
+#include "os/event/writable_file_descriptor.hh"
 
 using sesh::async::future;
 using sesh::async::make_future;
 using sesh::common::trial;
-using sesh::os::event::Proactor;
-using sesh::os::event::Trigger;
-using sesh::os::event::WritableFileDescriptor;
+using sesh::os::event::proactor;
+using sesh::os::event::trigger;
+using sesh::os::event::writable_file_descriptor;
 
 namespace sesh {
 namespace os {
@@ -46,7 +46,7 @@ using ResultPair = std::pair<NonBlockingFileDescriptor, std::error_code>;
 struct Writer {
 
     const WriterApi &api;
-    Proactor &proactor;
+    class proactor &proactor;
     NonBlockingFileDescriptor fd;
     std::vector<char> bytes;
 
@@ -60,7 +60,7 @@ struct Writer {
         return make_future<ResultPair>(std::move(fd), e);
     }
 
-    future<ResultPair> operator()(trial<Trigger> &&t) {
+    future<ResultPair> operator()(trial<trigger> &&t) {
         try {
             *t;
         } catch (std::domain_error &e) {
@@ -68,7 +68,7 @@ struct Writer {
                     std::make_error_code(std::errc::too_many_files_open));
         }
 
-        assert(t->value<WritableFileDescriptor>().value() == fd.value());
+        assert(t->value<writable_file_descriptor>().value() == fd.value());
 
         auto r = api.write(
                 fd,
@@ -83,13 +83,13 @@ struct Writer {
 
 future<ResultPair> write(
         const WriterApi &api,
-        Proactor &p,
+        proactor &p,
         NonBlockingFileDescriptor &&fd,
         std::vector<char> &&bytes) {
     if (bytes.empty())
         return make_future<ResultPair>(std::move(fd), std::error_code());
 
-    auto trigger = WritableFileDescriptor(fd.value());
+    auto trigger = writable_file_descriptor(fd.value());
     auto writer = Writer{api, p, std::move(fd), std::move(bytes)};
     return p.expect(trigger).then(std::move(writer)).unwrap();
 }

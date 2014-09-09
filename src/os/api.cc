@@ -458,7 +458,7 @@ class api_impl : public api {
         return bytes_written;
     }
 
-    std::unique_ptr<FileDescriptorSet> createFileDescriptorSet() const
+    std::unique_ptr<FileDescriptorSet> create_file_descriptor_set() const
             final override {
         std::unique_ptr<FileDescriptorSet> set(new file_descriptor_set_impl);
         return set;

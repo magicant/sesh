@@ -15,52 +15,30 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_Timeout_hh
-#define INCLUDED_os_event_Timeout_hh
+#ifndef INCLUDED_os_event_error_file_descriptor_hh
+#define INCLUDED_os_event_error_file_descriptor_hh
 
 #include "buildconfig.h"
 
-#include <chrono>
+#include "os/event/file_descriptor_condition.hh"
 
 namespace sesh {
 namespace os {
 namespace event {
 
 /**
- * A timeout event trigger.
- *
- * @see Trigger
+ * Represents an event triggered by an error condition of a file descriptor.
  */
-class Timeout {
+class error_file_descriptor : public file_descriptor_condition {
 
-public:
+    using file_descriptor_condition::file_descriptor_condition;
 
-    using Interval = std::chrono::nanoseconds;
-
-private:
-
-    Interval mInterval;
-
-public:
-
-    constexpr explicit Timeout(Interval i) noexcept : mInterval(i) { }
-
-    constexpr Interval interval() const noexcept { return mInterval; }
-
-};
-
-constexpr inline bool operator==(const Timeout &l, const Timeout &r) noexcept {
-    return l.interval() == r.interval();
-}
-
-constexpr inline bool operator<(const Timeout &l, const Timeout &r) noexcept {
-    return l.interval() < r.interval();
-}
+}; // class error_file_descriptor
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_Timeout_hh
+#endif // #ifndef INCLUDED_os_event_error_file_descriptor_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

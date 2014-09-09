@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_UserProvidedTrigger_hh
-#define INCLUDED_os_event_UserProvidedTrigger_hh
+#ifndef INCLUDED_os_event_user_provided_trigger_hh
+#define INCLUDED_os_event_user_provided_trigger_hh
 
 #include "buildconfig.h"
 
@@ -37,23 +37,21 @@ namespace event {
  * promise corresponding to the future. The event handler can access the shared
  * pointer via the {@link #result()} method.
  */
-class UserProvidedTrigger {
+class user_provided_trigger {
 
 public:
 
-    using Result = std::shared_ptr<void>;
+    using result_type = std::shared_ptr<void>;
 
 private:
 
-    using Value = common::variant<async::future<Result>, Result>;
-
-    Value mValue;
+    common::variant<async::future<result_type>, result_type> m_value;
 
 public:
 
     /** Constructs a new user-provided trigger from the given future. */
-    explicit UserProvidedTrigger(async::future<Result> &&f) noexcept :
-            mValue(std::move(f)) { }
+    explicit user_provided_trigger(async::future<result_type> &&f) noexcept :
+            m_value(std::move(f)) { }
 
     /**
      * Constructs a new user-provided trigger that has the given result.
@@ -61,16 +59,16 @@ public:
      * User-provided triggers constructed by this constructor must not be used
      * to specify a trigger set.
      */
-    explicit UserProvidedTrigger(Result &&r) noexcept :
-            mValue(std::move(r)) { }
+    explicit user_provided_trigger(result_type &&r) noexcept :
+            m_value(std::move(r)) { }
 
     /**
      * Returns a reference to the future that triggers the event. This function
      * can be called only for objects that were constructed by the constructor
      * that takes a future argument.
      */
-    async::future<Result> &future() noexcept {
-        return mValue.value<async::future<Result>>();
+    async::future<result_type> &future() noexcept {
+        return m_value.value<async::future<result_type>>();
     }
 
     /**
@@ -78,20 +76,24 @@ public:
      * called only for objects that were constructed by the constructor that
      * takes a shared pointer argument.
      */
-    Result &result() noexcept { return mValue.value<Result>(); }
+    result_type &result() noexcept {
+        return m_value.value<result_type>();
+    }
     /**
      * Returns a reference to the result shared pointer. This function can be
      * called only for objects that were constructed by the constructor that
      * takes a shared pointer argument.
      */
-    const Result &result() const noexcept { return mValue.value<Result>(); }
+    const result_type &result() const noexcept {
+        return m_value.value<result_type>();
+    }
 
-}; // class UserProvidedTrigger
+}; // class user_provided_trigger
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_UserProvidedTrigger_hh
+#endif // #ifndef INCLUDED_os_event_user_provided_trigger_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

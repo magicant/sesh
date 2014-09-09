@@ -15,31 +15,51 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_ReadableFileDescriptor_hh
-#define INCLUDED_os_event_ReadableFileDescriptor_hh
+#ifndef INCLUDED_os_event_signal_hh
+#define INCLUDED_os_event_signal_hh
 
 #include "buildconfig.h"
 
-#include "os/event/FileDescriptorCondition.hh"
+#include "os/signaling/SignalNumber.hh"
 
 namespace sesh {
 namespace os {
 namespace event {
 
 /**
- * Represents an event triggered by a file descriptor becoming ready for
- * non-blocking reading.
+ * A signal event trigger.
+ *
+ * @see trigger
  */
-class ReadableFileDescriptor : public FileDescriptorCondition {
+class signal {
 
-    using FileDescriptorCondition::FileDescriptorCondition;
+private:
 
-}; // class ReadableFileDescriptor
+    signaling::SignalNumber m_number;
+
+public:
+
+    constexpr explicit signal(signaling::SignalNumber n) noexcept :
+            m_number(n) { }
+
+    constexpr signaling::SignalNumber number() const noexcept {
+        return m_number;
+    }
+
+}; // class signal
+
+constexpr inline bool operator==(const signal &l, const signal &r) noexcept {
+    return l.number() == r.number();
+}
+
+constexpr inline bool operator<(const signal &l, const signal &r) noexcept {
+    return l.number() < r.number();
+}
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_ReadableFileDescriptor_hh
+#endif // #ifndef INCLUDED_os_event_signal_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

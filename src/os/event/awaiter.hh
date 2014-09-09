@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_Awaiter_hh
-#define INCLUDED_os_event_Awaiter_hh
+#ifndef INCLUDED_os_event_awaiter_hh
+#define INCLUDED_os_event_awaiter_hh
 
 #include "buildconfig.h"
 
 #include <memory>
-#include "os/event/Proactor.hh"
-#include "os/event/PselectApi.hh"
+#include "os/event/proactor.hh"
+#include "os/event/pselect_api.hh"
 #include "os/signaling/HandlerConfiguration.hh"
 
 namespace sesh {
@@ -33,15 +33,15 @@ namespace event {
  * An awaiter is a proactor that can wait for events to happen and dispatch
  * them to appropriate listeners.
  *
- * An awaiter depends on the p-select and now time API.
+ * An awaiter depends on the pselect and now time API.
  *
- * @see PselectApi
+ * @see pselect_api
  */
-class Awaiter : public Proactor {
+class awaiter : public proactor {
 
 public:
 
-    virtual ~Awaiter() = default;
+    virtual ~awaiter() = default;
 
     /**
      * Waits for event trigger conditions to be met and dispatches the trigger
@@ -50,9 +50,9 @@ public:
      * events are processed. This function returns immediately if no events are
      * pending.
      */
-    virtual void awaitEvents() = 0;
+    virtual void await_events() = 0;
 
-}; // class Awaiter
+}; // class awaiter
 
 /**
  * Creates a new awaiter.
@@ -62,14 +62,14 @@ public:
  * @param hc non-null pointer to a handler configuration the new awaiter
  * depends on. The awaiter never modifies any trap configuration.
  */
-std::unique_ptr<Awaiter> createAwaiter(
-        const PselectApi &api,
+std::unique_ptr<awaiter> create_awaiter(
+        const pselect_api &api,
         std::shared_ptr<signaling::HandlerConfiguration> &&hc);
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_Awaiter_hh
+#endif // #ifndef INCLUDED_os_event_awaiter_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

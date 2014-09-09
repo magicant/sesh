@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_PselectApiTestHelper_hh
-#define INCLUDED_os_event_PselectApiTestHelper_hh
+#ifndef INCLUDED_os_event_pselect_api_test_helper_hh
+#define INCLUDED_os_event_pselect_api_test_helper_hh
 
 #include "buildconfig.h"
 
@@ -25,7 +25,7 @@
 #include <memory>
 #include <set>
 #include <string>
-#include "os/event/PselectApi.hh"
+#include "os/event/pselect_api.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/io/FileDescriptorSetTestHelper.hh"
@@ -54,14 +54,14 @@ namespace sesh {
 namespace os {
 namespace event {
 
-class PselectApiStub : public PselectApi, public time_api_fake {
+class pselect_api_stub : public pselect_api, public time_api_fake {
 
 public:
 
-    using FileDescriptorSetImpl = io::FileDescriptorSetFake;
+    using file_descriptor_set_impl = io::FileDescriptorSetFake;
 
-    using PselectFunction = std::function<std::error_code(
-            const PselectApiStub &,
+    using pselect_function = std::function<std::error_code(
+            const pselect_api_stub &,
             io::FileDescriptor::Value,
             io::FileDescriptorSet *,
             io::FileDescriptorSet *,
@@ -71,66 +71,67 @@ public:
 
 private:
 
-    mutable PselectFunction mImplementation;
+    mutable pselect_function m_implementation;
 
 public:
 
-    std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet() const
+    std::unique_ptr<io::FileDescriptorSet> create_file_descriptor_set() const
             override {
         return std::unique_ptr<io::FileDescriptorSet>(
-                new FileDescriptorSetImpl());
+                new file_descriptor_set_impl());
     }
 
-    static void checkEqual(
+    static void check_equal(
             const io::FileDescriptorSet *actual,
             const std::set<io::FileDescriptor::Value> &expected,
-            io::FileDescriptor::Value actualBound,
+            io::FileDescriptor::Value actual_bound,
             const std::string &info) {
         INFO(info);
 
-        const FileDescriptorSetImpl emptySet{};
+        const file_descriptor_set_impl empty_set{};
         if (actual == nullptr)
-            actual = &emptySet;
+            actual = &empty_set;
 
-        const FileDescriptorSetImpl *actualImpl =
-                dynamic_cast<const FileDescriptorSetImpl *>(actual);
-        REQUIRE(actualImpl != nullptr);
-        CHECK(*actualImpl == expected);
-        CHECK(actualImpl->bound() <= actualBound);
+        const file_descriptor_set_impl *actual_impl =
+                dynamic_cast<const file_descriptor_set_impl *>(actual);
+        REQUIRE(actual_impl != nullptr);
+        CHECK(*actual_impl == expected);
+        CHECK(actual_impl->bound() <= actual_bound);
     }
 
-    static void checkEmpty(
+    static void check_empty(
             const io::FileDescriptorSet *fds,
-            io::FileDescriptor::Value fdBound,
+            io::FileDescriptor::Value fd_bound,
             const std::string &info) {
-        checkEqual(fds, std::set<io::FileDescriptor::Value>{}, fdBound, info);
+        check_equal(
+                fds, std::set<io::FileDescriptor::Value>{}, fd_bound, info);
     }
 
-    PselectFunction &implementation() const { return mImplementation; }
+    pselect_function &implementation() const { return m_implementation; }
 
     std::error_code pselect(
-            io::FileDescriptor::Value fdBound,
-            io::FileDescriptorSet *readFds,
-            io::FileDescriptorSet *writeFds,
-            io::FileDescriptorSet *errorFds,
+            io::FileDescriptor::Value fd_bound,
+            io::FileDescriptorSet *read_fds,
+            io::FileDescriptorSet *write_fds,
+            io::FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const signaling::SignalNumberSet *signalMask) const override {
-        return mImplementation(
+            const signaling::SignalNumberSet *signal_mask) const override {
+        return m_implementation(
                 *this,
-                fdBound,
-                readFds,
-                writeFds,
-                errorFds,
+                fd_bound,
+                read_fds,
+                write_fds,
+                error_fds,
                 timeout,
-                signalMask);
+                signal_mask);
     }
 
-}; // class PselectApiStub
+}; // class pselect_api_stub
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_PselectApiTestHelper_hh
+#endif // #ifndef INCLUDED_os_event_pselect_api_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -31,9 +31,9 @@
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "common/variant.hh"
-#include "os/event/Proactor.hh"
-#include "os/event/ReadableFileDescriptor.hh"
-#include "os/event/Trigger.hh"
+#include "os/event/proactor.hh"
+#include "os/event/readable_file_descriptor.hh"
+#include "os/event/trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptorTestHelper.hh"
@@ -49,9 +49,9 @@ using sesh::async::make_promise_future_pair;
 using sesh::async::promise;
 using sesh::common::trial;
 using sesh::common::variant;
-using sesh::os::event::Proactor;
-using sesh::os::event::ReadableFileDescriptor;
-using sesh::os::event::Trigger;
+using sesh::os::event::proactor;
+using sesh::os::event::readable_file_descriptor;
+using sesh::os::event::trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::NonBlockingFileDescriptor;
 using sesh::os::io::ReaderApi;
@@ -71,19 +71,19 @@ class UncallableReaderApi : public ReaderApi {
 
 }; // class UncallableReaderApi
 
-class UncallableProactor : public Proactor {
+class UncallableProactor : public proactor {
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
+    future<trigger> expect_impl(std::vector<trigger> &&) override {
         throw "unexpected expect";
     }
 
 }; // class UncallableProactor
 
-class EchoingProactor : public Proactor {
+class EchoingProactor : public proactor {
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<trigger> expect_impl(std::vector<trigger> &&triggers) override {
         REQUIRE_FALSE(triggers.empty());
-        return make_future<Trigger>(std::move(triggers.front()));
+        return make_future<trigger>(std::move(triggers.front()));
     }
 
 }; // class EchoingProactor
@@ -115,12 +115,12 @@ namespace non_empty_read {
 
 constexpr static FileDescriptor::Value FD = 3;
 
-class ReadTestFixture : public ReaderApi, public Proactor {
+class ReadTestFixture : public ReaderApi, public proactor {
 
 private:
 
     mutable bool mIsReadyToRead = false;
-    promise<Trigger> mPromise;
+    promise<trigger> mPromise;
 
 public:
 
@@ -131,7 +131,7 @@ public:
             return;
         mIsReadyToRead = true;
         if (mPromise.is_valid())
-            std::move(mPromise).set_result(ReadableFileDescriptor(FD));
+            std::move(mPromise).set_result(readable_file_descriptor(FD));
     }
 
 private:
@@ -157,13 +157,13 @@ private:
         return count;
     }
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<trigger> expect_impl(std::vector<trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
-        Trigger &t = triggers.front();
-        CHECK(t.tag() == t.tag<ReadableFileDescriptor>());
-        CHECK(t.value<ReadableFileDescriptor>().value() == FD);
+        trigger &t = triggers.front();
+        CHECK(t.tag() == t.tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == FD);
 
-        auto pf = make_promise_future_pair<Trigger>();
+        auto pf = make_promise_future_pair<trigger>();
         mPromise = std::move(pf.first);
         return std::move(pf.second);
     }
@@ -229,10 +229,10 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than buffer size") {
 
 namespace domain_error {
 
-class DomainErrorProactor : public Proactor {
+class DomainErrorProactor : public proactor {
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
-        return make_failed_future_of<Trigger>(
+    future<trigger> expect_impl(std::vector<trigger> &&) override {
+        return make_failed_future_of<trigger>(
                 std::domain_error("expected error"));
     }
 

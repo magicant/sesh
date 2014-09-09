@@ -31,9 +31,9 @@
 #include "common/copy.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
-#include "os/event/Proactor.hh"
-#include "os/event/Trigger.hh"
-#include "os/event/WritableFileDescriptor.hh"
+#include "os/event/proactor.hh"
+#include "os/event/trigger.hh"
+#include "os/event/writable_file_descriptor.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptorTestHelper.hh"
@@ -49,9 +49,9 @@ using sesh::async::make_promise_future_pair;
 using sesh::async::promise;
 using sesh::common::copy;
 using sesh::common::trial;
-using sesh::os::event::Proactor;
-using sesh::os::event::Trigger;
-using sesh::os::event::WritableFileDescriptor;
+using sesh::os::event::proactor;
+using sesh::os::event::trigger;
+using sesh::os::event::writable_file_descriptor;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::NonBlockingFileDescriptor;
 using sesh::os::io::WriterApi;
@@ -69,19 +69,19 @@ class UncallableWriterApi : public WriterApi {
 
 }; // class UncallableWriterApi
 
-class UncallableProactor : public Proactor {
+class UncallableProactor : public proactor {
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
+    future<trigger> expect_impl(std::vector<trigger> &&) override {
         throw "unexpected expect";
     }
 
 }; // class UncallableProactor
 
-class EchoingProactor : public Proactor {
+class EchoingProactor : public proactor {
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<trigger> expect_impl(std::vector<trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
-        return make_future<Trigger>(std::move(triggers.front()));
+        return make_future<trigger>(std::move(triggers.front()));
     }
 
 }; // class EchoingProactor
@@ -113,12 +113,12 @@ namespace non_empty_write {
 
 constexpr static FileDescriptor::Value FD = 3;
 
-class WriteTestFixture : public WriterApi, public Proactor {
+class WriteTestFixture : public WriterApi, public proactor {
 
 private:
 
     mutable bool mIsReadyToWrite = false;
-    promise<Trigger> mPromise;
+    promise<trigger> mPromise;
 
 public:
 
@@ -129,7 +129,7 @@ public:
             return;
         mIsReadyToWrite = true;
         if (mPromise.is_valid())
-            std::move(mPromise).set_result(WritableFileDescriptor(FD));
+            std::move(mPromise).set_result(writable_file_descriptor(FD));
     }
 
 private:
@@ -153,13 +153,13 @@ private:
         return count;
     }
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&triggers) override {
+    future<trigger> expect_impl(std::vector<trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
-        Trigger &t = triggers.front();
-        CHECK(t.tag() == t.tag<WritableFileDescriptor>());
-        CHECK(t.value<WritableFileDescriptor>().value() == FD);
+        trigger &t = triggers.front();
+        CHECK(t.tag() == t.tag<writable_file_descriptor>());
+        CHECK(t.value<writable_file_descriptor>().value() == FD);
 
-        auto pf = make_promise_future_pair<Trigger>();
+        auto pf = make_promise_future_pair<trigger>();
         mPromise = std::move(pf.first);
         return std::move(pf.second);
     }
@@ -231,10 +231,10 @@ TEST_CASE_METHOD(WriteTestFixture, "Write: 25 bytes in three writes") {
 
 namespace domain_error {
 
-class DomainErrorProactor : public Proactor {
+class DomainErrorProactor : public proactor {
 
-    future<Trigger> expectImpl(std::vector<Trigger> &&) override {
-        return make_failed_future_of<Trigger>(
+    future<trigger> expect_impl(std::vector<trigger> &&) override {
+        return make_failed_future_of<trigger>(
                 std::domain_error("expected error"));
     }
 

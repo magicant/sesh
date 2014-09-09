@@ -27,11 +27,11 @@
 #include "async/future.hh"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
-#include "os/event/Awaiter.hh"
-#include "os/event/AwaiterTestHelper.hh"
-#include "os/event/PselectApi.hh"
-#include "os/event/Signal.hh"
-#include "os/event/Trigger.hh"
+#include "os/event/awaiter.hh"
+#include "os/event/awaiter_test_helper.hh"
+#include "os/event/pselect_api.hh"
+#include "os/event/signal.hh"
+#include "os/event/trigger.hh"
 #include "os/io/FileDescriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfigurationApiTestHelper.hh"
@@ -42,44 +42,44 @@ namespace {
 
 using sesh::async::future;
 using sesh::common::trial;
-using sesh::os::event::AwaiterTestFixture;
-using sesh::os::event::Signal;
-using sesh::os::event::Trigger;
+using sesh::os::event::awaiter_test_fixture;
+using sesh::os::event::signal;
+using sesh::os::event::trigger;
 using sesh::os::io::FileDescriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
-using TimePoint = sesh::os::event::PselectApi::steady_clock_time;
+using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: one signal in one trigger set") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
-    future<Trigger> f = a.expect(Signal(3));
-    std::move(f).then([this](trial<Trigger> &&t) {
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
+    future<trigger> f = a.expect(signal(3));
+    std::move(f).then([this](trial<trigger> &&t) {
         REQUIRE(t.has_value());
-        REQUIRE(t->tag() == Trigger::tag<Signal>());
-        CHECK(t->value<Signal>().number() == 3);
+        REQUIRE(t->tag() == trigger::tag<signal>());
+        CHECK(t->value<signal>().number() == 3);
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
     implementation() = [this](
-            const PselectApiStub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            const pselect_api_stub &,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEmpty(writeFds, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_empty(read_fds, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout.count() < 0);
-        if (signalMask != nullptr)
-            CHECK_FALSE(signalMask->test(3));
+        if (signal_mask != nullptr)
+            CHECK_FALSE(signal_mask->test(3));
 
         Action &a = actions().at(3);
         REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
@@ -90,27 +90,27 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
+    a.await_events();
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: irrelevant signals are masked") {
-    a.expect(Signal(3));
+    a.expect(signal(3));
 
     signalMask().set(2);
     signalMask().set(5);
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
             FileDescriptorSet *,
             std::chrono::nanoseconds,
-            const SignalNumberSet *maskWhileAwaiting) -> std::error_code {
-        if (maskWhileAwaiting != nullptr)
-            CHECK_FALSE(maskWhileAwaiting->test(3));
+            const SignalNumberSet *mask_while_awaiting) -> std::error_code {
+        if (mask_while_awaiting != nullptr)
+            CHECK_FALSE(mask_while_awaiting->test(3));
         CHECK(signalMask().test(2));
         CHECK(signalMask().test(5));
 
@@ -121,37 +121,37 @@ TEST_CASE_METHOD(
         implementation() = nullptr;
         return std::make_error_code(std::errc::interrupted);
     };
-    a.awaitEvents();
+    a.await_events();
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: two signals in one trigger set") {
-    auto startTime = TimePoint(std::chrono::seconds(100));
-    mutable_steady_clock_now() = startTime;
-    future<Trigger> f = a.expect(Signal(2), Signal(6));
-    std::move(f).then([this](trial<Trigger> &&t) {
+    auto start_time = time_point(std::chrono::seconds(100));
+    mutable_steady_clock_now() = start_time;
+    future<trigger> f = a.expect(signal(2), signal(6));
+    std::move(f).then([this](trial<trigger> &&t) {
         REQUIRE(t.has_value());
-        REQUIRE(t->tag() == Trigger::tag<Signal>());
-        CHECK(t->value<Signal>().number() == 6);
+        REQUIRE(t->tag() == trigger::tag<signal>());
+        CHECK(t->value<signal>().number() == 6);
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
     implementation() = [this](
-            const PselectApiStub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            const pselect_api_stub &,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEmpty(writeFds, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_empty(read_fds, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout.count() < 0);
-        if (signalMask != nullptr) {
-            CHECK_FALSE(signalMask->test(3));
-            CHECK_FALSE(signalMask->test(6));
+        if (signal_mask != nullptr) {
+            CHECK_FALSE(signal_mask->test(3));
+            CHECK_FALSE(signal_mask->test(6));
         }
 
         Action &a2 = actions().at(2);
@@ -166,38 +166,38 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
+    a.await_events();
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: same signal in two trigger sets") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     for (unsigned i = 0; i < 2; ++i) {
-        a.expect(Signal(1)).then([this](trial<Trigger> &&t) {
+        a.expect(signal(1)).then([this](trial<trigger> &&t) {
             REQUIRE(t.has_value());
-            REQUIRE(t->tag() == Trigger::tag<Signal>());
-            CHECK(t->value<Signal>().number() == 1);
+            REQUIRE(t->tag() == trigger::tag<signal>());
+            CHECK(t->value<signal>().number() == 1);
             mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
 
     implementation() = [this](
-            const PselectApiStub &,
-            FileDescriptor::Value fdBound,
-            FileDescriptorSet *readFds,
-            FileDescriptorSet *writeFds,
-            FileDescriptorSet *errorFds,
+            const pselect_api_stub &,
+            FileDescriptor::Value fd_bound,
+            FileDescriptorSet *read_fds,
+            FileDescriptorSet *write_fds,
+            FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        checkEmpty(readFds, fdBound, "readFds");
-        checkEmpty(writeFds, fdBound, "writeFds");
-        checkEmpty(errorFds, fdBound, "errorFds");
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        check_empty(read_fds, fd_bound, "read_fds");
+        check_empty(write_fds, fd_bound, "write_fds");
+        check_empty(error_fds, fd_bound, "error_fds");
         CHECK(timeout.count() < 0);
-        if (signalMask != nullptr)
-            CHECK_FALSE(signalMask->test(1));
+        if (signal_mask != nullptr)
+            CHECK_FALSE(signal_mask->test(1));
 
         Action &a = actions().at(1);
         REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
@@ -208,35 +208,35 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
+    a.await_events();
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: different signals in two trigger sets: fired at a time") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     for (SignalNumber sn : {1, 2}) {
-        a.expect(Signal(sn)).then([this, sn](trial<Trigger> &&t) {
+        a.expect(signal(sn)).then([this, sn](trial<trigger> &&t) {
             REQUIRE(t.has_value());
-            REQUIRE(t->tag() == Trigger::tag<Signal>());
-            CHECK(t->value<Signal>().number() == sn);
+            REQUIRE(t->tag() == trigger::tag<signal>());
+            CHECK(t->value<signal>().number() == sn);
             mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
             FileDescriptorSet *,
             std::chrono::nanoseconds,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        if (signalMask != nullptr) {
-            CHECK_FALSE(signalMask->test(1));
-            CHECK_FALSE(signalMask->test(2));
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        if (signal_mask != nullptr) {
+            CHECK_FALSE(signal_mask->test(1));
+            CHECK_FALSE(signal_mask->test(2));
         }
 
         Action &a1 = actions().at(1);
@@ -252,36 +252,36 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(12));
+    a.await_events();
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(12));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: different signals in two trigger sets: "
         "fired intermittently") {
-    auto startTime = TimePoint(std::chrono::seconds(0));
-    mutable_steady_clock_now() = startTime;
+    auto start_time = time_point(std::chrono::seconds(0));
+    mutable_steady_clock_now() = start_time;
     for (SignalNumber sn : {1, 2}) {
-        a.expect(Signal(sn)).then([this, sn](trial<Trigger> &&t) {
+        a.expect(signal(sn)).then([this, sn](trial<trigger> &&t) {
             REQUIRE(t.has_value());
-            REQUIRE(t->tag() == Trigger::tag<Signal>());
-            CHECK(t->value<Signal>().number() == sn);
+            REQUIRE(t->tag() == trigger::tag<signal>());
+            CHECK(t->value<signal>().number() == sn);
             mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
             FileDescriptorSet *,
             std::chrono::nanoseconds,
-            const SignalNumberSet *signalMask) -> std::error_code {
-        if (signalMask != nullptr) {
-            CHECK_FALSE(signalMask->test(1));
-            CHECK_FALSE(signalMask->test(2));
+            const SignalNumberSet *signal_mask) -> std::error_code {
+        if (signal_mask != nullptr) {
+            CHECK_FALSE(signal_mask->test(1));
+            CHECK_FALSE(signal_mask->test(2));
         }
 
         Action &a = actions().at(1);
@@ -290,15 +290,15 @@ TEST_CASE_METHOD(
 
         mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = [this](
-                const PselectApiStub &,
+                const pselect_api_stub &,
                 FileDescriptor::Value,
                 FileDescriptorSet *,
                 FileDescriptorSet *,
                 FileDescriptorSet *,
                 std::chrono::nanoseconds,
-                const SignalNumberSet *signalMask) -> std::error_code {
-            if (signalMask != nullptr)
-                CHECK_FALSE(signalMask->test(2));
+                const SignalNumberSet *signal_mask) -> std::error_code {
+            if (signal_mask != nullptr)
+                CHECK_FALSE(signal_mask->test(2));
 
             Action &a = actions().at(2);
             REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
@@ -311,17 +311,17 @@ TEST_CASE_METHOD(
         return std::make_error_code(std::errc::interrupted);
     };
     mutable_steady_clock_now() += std::chrono::seconds(7);
-    a.awaitEvents();
-    CHECK(steady_clock_now() == startTime + std::chrono::seconds(15));
+    a.await_events();
+    CHECK(steady_clock_now() == start_time + std::chrono::seconds(15));
 }
 
 TEST_CASE_METHOD(
-        AwaiterTestFixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<HandlerConfigurationApiFake>,
         "Awaiter: signal handler is reset after event fired") {
-    a.expect(Signal(1));
+    a.expect(signal(1));
 
     implementation() = [this](
-            const PselectApiStub &,
+            const pselect_api_stub &,
             FileDescriptor::Value,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -335,7 +335,7 @@ TEST_CASE_METHOD(
         implementation() = nullptr;
         return std::make_error_code(std::errc::interrupted);
     };
-    a.awaitEvents();
+    a.await_events();
 
     Action &a = actions().at(1);
     CHECK(a.tag() == Action::tag<Default>());

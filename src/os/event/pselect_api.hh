@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_PselectApi_hh
-#define INCLUDED_os_event_PselectApi_hh
+#ifndef INCLUDED_os_event_pselect_api_hh
+#define INCLUDED_os_event_pselect_api_hh
 
 #include "buildconfig.h"
 
@@ -33,12 +33,12 @@ namespace os {
 namespace event {
 
 /** Abstraction of the pselect POSIX API function. */
-class PselectApi : public virtual time_api {
+class pselect_api : public virtual time_api {
 
 public:
 
     /** Returns a unique pointer to a new empty file descriptor set. */
-    virtual std::unique_ptr<io::FileDescriptorSet> createFileDescriptorSet()
+    virtual std::unique_ptr<io::FileDescriptorSet> create_file_descriptor_set()
             const = 0;
 
     /**
@@ -46,25 +46,25 @@ public:
      *
      * The pointer arguments to file descriptor sets and a signal number set
      * may be null. Non-null pointers passed to this function must be obtained
-     * from the {@link #createFileDescriptorSet} and {@link
+     * from the {@link #create_file_descriptor_set} and {@link
      * #createSignalNumberSet} functions called for the same {@code *this}.
      *
      * @param timeout A negative value means no timeout.
      */
     virtual std::error_code pselect(
-            io::FileDescriptor::Value fdBound,
-            io::FileDescriptorSet *readFds,
-            io::FileDescriptorSet *writeFds,
-            io::FileDescriptorSet *errorFds,
+            io::FileDescriptor::Value fd_bound,
+            io::FileDescriptorSet *read_fds,
+            io::FileDescriptorSet *write_fds,
+            io::FileDescriptorSet *error_fds,
             std::chrono::nanoseconds timeout,
-            const signaling::SignalNumberSet *signalMask) const = 0;
+            const signaling::SignalNumberSet *signal_mask) const = 0;
 
-}; // class PselectApi
+}; // class pselect_api
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_PselectApi_hh
+#endif // #ifndef INCLUDED_os_event_pselect_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

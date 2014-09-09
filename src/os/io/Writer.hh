@@ -23,7 +23,7 @@
 #include <system_error>
 #include <utility>
 #include "async/future.hh"
-#include "os/event/Proactor.hh"
+#include "os/event/proactor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 #include "os/io/WriterApi.hh"
 
@@ -49,7 +49,7 @@ namespace io {
  */
 async::future<std::pair<NonBlockingFileDescriptor, std::error_code>> write(
         const WriterApi &,
-        event::Proactor &,
+        event::proactor &,
         NonBlockingFileDescriptor &&,
         std::vector<char> &&);
 

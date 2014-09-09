@@ -25,7 +25,7 @@
 #include <vector>
 #include "async/future.hh"
 #include "common/variant.hh"
-#include "os/event/Proactor.hh"
+#include "os/event/proactor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 #include "os/io/ReaderApi.hh"
 
@@ -55,7 +55,7 @@ namespace io {
  */
 auto read(
         const ReaderApi &,
-        event::Proactor &,
+        event::proactor &,
         NonBlockingFileDescriptor &&,
         std::vector<char>::size_type maxBytesToRead)
         -> async::future<std::pair<

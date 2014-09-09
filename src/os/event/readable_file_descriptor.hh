@@ -15,40 +15,31 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_AwaiterTestHelper_hh
-#define INCLUDED_os_event_AwaiterTestHelper_hh
+#ifndef INCLUDED_os_event_readable_file_descriptor_hh
+#define INCLUDED_os_event_readable_file_descriptor_hh
 
 #include "buildconfig.h"
 
-#include <memory>
-#include <utility>
-#include <vector>
-#include "os/event/Awaiter.hh"
-#include "os/event/PselectApiTestHelper.hh"
-#include "os/signaling/HandlerConfiguration.hh"
+#include "os/event/file_descriptor_condition.hh"
 
 namespace sesh {
 namespace os {
 namespace event {
 
-template<typename Base>
-class AwaiterTestFixture : protected PselectApiStub, protected Base {
+/**
+ * Represents an event triggered by a file descriptor becoming ready for
+ * non-blocking reading.
+ */
+class readable_file_descriptor : public file_descriptor_condition {
 
-private:
+    using file_descriptor_condition::file_descriptor_condition;
 
-    std::unique_ptr<Awaiter> mAwaiter = createAwaiter(
-            *this, signaling::HandlerConfiguration::create(*this));
-
-protected:
-
-    Awaiter &a = *mAwaiter;
-
-}; // template<typename Base> class AwaiterTestFixture
+}; // class readable_file_descriptor
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_AwaiterTestHelper_hh
+#endif // #ifndef INCLUDED_os_event_readable_file_descriptor_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

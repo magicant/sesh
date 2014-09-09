@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "os/event/PselectApi.hh"
+#include "os/event/pselect_api.hh"
 #include "os/io/FileDescriptionApi.hh"
 #include "os/io/FileDescriptorApi.hh"
 #include "os/io/ReaderApi.hh"
@@ -32,7 +32,7 @@ namespace os {
 
 /** Abstraction of POSIX API. */
 class api :
-        public event::PselectApi,
+        public event::pselect_api,
         public io::FileDescriptionApi,
         public io::FileDescriptorApi,
         public io::ReaderApi,

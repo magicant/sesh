@@ -15,36 +15,36 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_event_Trigger_hh
-#define INCLUDED_os_event_Trigger_hh
+#ifndef INCLUDED_os_event_trigger_hh
+#define INCLUDED_os_event_trigger_hh
 
 #include "buildconfig.h"
 
 #include "common/variant.hh"
-#include "os/event/ErrorFileDescriptor.hh"
-#include "os/event/ReadableFileDescriptor.hh"
-#include "os/event/Signal.hh"
-#include "os/event/Timeout.hh"
-#include "os/event/UserProvidedTrigger.hh"
-#include "os/event/WritableFileDescriptor.hh"
+#include "os/event/error_file_descriptor.hh"
+#include "os/event/readable_file_descriptor.hh"
+#include "os/event/signal.hh"
+#include "os/event/timeout.hh"
+#include "os/event/user_provided_trigger.hh"
+#include "os/event/writable_file_descriptor.hh"
 
 namespace sesh {
 namespace os {
 namespace event {
 
 /** A trigger describes the cause of an event. */
-using Trigger = common::variant<
-        Timeout,
-        ReadableFileDescriptor,
-        WritableFileDescriptor,
-        ErrorFileDescriptor,
-        Signal,
-        UserProvidedTrigger>;
+using trigger = common::variant<
+        timeout,
+        readable_file_descriptor,
+        writable_file_descriptor,
+        error_file_descriptor,
+        signal,
+        user_provided_trigger>;
 
 } // namespace event
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_event_Trigger_hh
+#endif // #ifndef INCLUDED_os_event_trigger_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
