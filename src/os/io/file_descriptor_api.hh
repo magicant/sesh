@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptorApi_hh
-#define INCLUDED_os_io_FileDescriptorApi_hh
+#ifndef INCLUDED_os_io_file_descriptor_api_hh
+#define INCLUDED_os_io_file_descriptor_api_hh
 
 #include "buildconfig.h"
 
@@ -34,7 +34,7 @@ namespace sesh {
 namespace os {
 namespace io {
 
-class FileDescriptorApi {
+class file_descriptor_api {
 
 public:
 
@@ -63,12 +63,12 @@ public:
      */
     virtual std::error_code close(file_descriptor &) const = 0;
 
-}; // class FileDescriptorApi
+}; // class file_descriptor_api
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptorApi_hh
+#endif // #ifndef INCLUDED_os_io_file_descriptor_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
