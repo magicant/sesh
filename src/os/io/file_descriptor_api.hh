@@ -28,7 +28,7 @@
 #include "os/io/file_description_attribute.hh"
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_open_mode.hh"
-#include "os/io/FileMode.hh"
+#include "os/io/file_mode.hh"
 
 namespace sesh {
 namespace os {
@@ -50,7 +50,7 @@ public:
             file_description_access_mode,
             common::enum_set<file_description_attribute>,
             common::enum_set<file_descriptor_open_mode>,
-            common::enum_set<FileMode>) const = 0;
+            common::enum_set<file_mode>) const = 0;
 
     /**
      * Closes the given file descriptor. This function may block on some

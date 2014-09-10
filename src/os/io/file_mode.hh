@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileMode_hh
-#define INCLUDED_os_io_FileMode_hh
+#ifndef INCLUDED_os_io_file_mode_hh
+#define INCLUDED_os_io_file_mode_hh
 
 #include "buildconfig.h"
 
@@ -28,20 +28,20 @@ namespace os {
 namespace io {
 
 /** Defines file permission bits. */
-enum class FileMode {
+enum class file_mode {
     // ordered by the bit position, starting from the least significant bit.
-    OTHERS_EXECUTE,
-    OTHERS_WRITE,
-    OTHERS_READ,
-    GROUP_EXECUTE,
-    GROUP_WRITE,
-    GROUP_READ,
-    OWNER_EXECUTE,
-    OWNER_WRITE,
-    OWNER_READ,
-    STICKY,
-    SET_GROUP_ID,
-    SET_USER_ID,
+    others_execute,
+    others_write,
+    others_read,
+    group_execute,
+    group_write,
+    group_read,
+    owner_execute,
+    owner_write,
+    owner_read,
+    sticky,
+    set_group_id,
+    set_user_id,
 };
 
 } // namespace io
@@ -50,15 +50,15 @@ enum class FileMode {
 namespace common {
 
 template<>
-class enum_traits<os::io::FileMode> {
+class enum_traits<os::io::file_mode> {
 public:
-    constexpr static os::io::FileMode max = os::io::FileMode::SET_USER_ID;
+    constexpr static os::io::file_mode max = os::io::file_mode::set_user_id;
 };
 
 } // namespace common
 
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileMode_hh
+#endif // #ifndef INCLUDED_os_io_file_mode_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

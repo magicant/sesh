@@ -37,7 +37,7 @@
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_open_mode.hh"
 #include "os/io/file_descriptor_set.hh"
-#include "os/io/FileMode.hh"
+#include "os/io/file_mode.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
@@ -52,7 +52,7 @@ using sesh::os::io::file_description_status;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_open_mode;
 using sesh::os::io::file_descriptor_set;
-using sesh::os::io::FileMode;
+using sesh::os::io::file_mode;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
@@ -169,7 +169,7 @@ int to_raw_flags(
     return raw_flags;
 }
 
-int to_raw_modes(enum_set<FileMode> modes) {
+int to_raw_modes(enum_set<file_mode> modes) {
     return sesh_osapi_mode_to_raw(static_cast<int>(modes.to_ulong()));
 }
 
@@ -412,7 +412,7 @@ class api_impl : public api {
             file_description_access_mode access_mode,
             enum_set<file_description_attribute> attributes,
             enum_set<file_descriptor_open_mode> open_modes,
-            enum_set<FileMode> file_modes) const final override {
+            enum_set<file_mode> file_modes) const final override {
         int flags = to_raw_flags(access_mode, attributes, open_modes);
         if (flags == -1)
             return std::make_error_code(std::errc::invalid_argument);

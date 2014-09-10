@@ -184,7 +184,7 @@ src_sesh_SOURCES = \
 	src/os/io/file_descriptor_api.hh \
 	src/os/io/file_descriptor_open_mode.hh \
 	src/os/io/file_descriptor_set.hh \
-	src/os/io/FileMode.hh \
+	src/os/io/file_mode.hh \
 	src/os/io/NonBlockingFileDescriptor.cc \
 	src/os/io/NonBlockingFileDescriptor.hh \
 	src/os/io/Reader.cc \
