@@ -27,8 +27,8 @@
 #include <string>
 #include "os/event/pselect_api.hh"
 #include "os/io/file_descriptor.hh"
-#include "os/io/FileDescriptorSet.hh"
-#include "os/io/FileDescriptorSetTestHelper.hh"
+#include "os/io/file_descriptor_set.hh"
+#include "os/io/file_descriptor_set_test_helper.hh"
 #include "os/signaling/SignalNumberSet.hh"
 #include "os/time_api_test_helper.hh"
 
@@ -58,14 +58,14 @@ class pselect_api_stub : public pselect_api, public time_api_fake {
 
 public:
 
-    using file_descriptor_set_impl = io::FileDescriptorSetFake;
+    using file_descriptor_set_impl = io::file_descriptor_set_fake;
 
     using pselect_function = std::function<std::error_code(
             const pselect_api_stub &,
             io::file_descriptor::value_type,
-            io::FileDescriptorSet *,
-            io::FileDescriptorSet *,
-            io::FileDescriptorSet *,
+            io::file_descriptor_set *,
+            io::file_descriptor_set *,
+            io::file_descriptor_set *,
             std::chrono::nanoseconds,
             const signaling::SignalNumberSet *)>;
 
@@ -75,14 +75,14 @@ private:
 
 public:
 
-    std::unique_ptr<io::FileDescriptorSet> create_file_descriptor_set() const
+    std::unique_ptr<io::file_descriptor_set> create_file_descriptor_set() const
             override {
-        return std::unique_ptr<io::FileDescriptorSet>(
+        return std::unique_ptr<io::file_descriptor_set>(
                 new file_descriptor_set_impl());
     }
 
     static void check_equal(
-            const io::FileDescriptorSet *actual,
+            const io::file_descriptor_set *actual,
             const std::set<io::file_descriptor::value_type> &expected,
             io::file_descriptor::value_type actual_bound,
             const std::string &info) {
@@ -100,7 +100,7 @@ public:
     }
 
     static void check_empty(
-            const io::FileDescriptorSet *fds,
+            const io::file_descriptor_set *fds,
             io::file_descriptor::value_type fd_bound,
             const std::string &info) {
         check_equal(
@@ -114,9 +114,9 @@ public:
 
     std::error_code pselect(
             io::file_descriptor::value_type fd_bound,
-            io::FileDescriptorSet *read_fds,
-            io::FileDescriptorSet *write_fds,
-            io::FileDescriptorSet *error_fds,
+            io::file_descriptor_set *read_fds,
+            io::file_descriptor_set *write_fds,
+            io::file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
             const signaling::SignalNumberSet *signal_mask) const override {
         return m_implementation(

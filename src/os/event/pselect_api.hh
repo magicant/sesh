@@ -24,7 +24,7 @@
 #include <memory>
 #include <system_error>
 #include "os/io/file_descriptor.hh"
-#include "os/io/FileDescriptorSet.hh"
+#include "os/io/file_descriptor_set.hh"
 #include "os/signaling/SignalNumberSet.hh"
 #include "os/time_api.hh"
 
@@ -38,8 +38,8 @@ class pselect_api : public virtual time_api {
 public:
 
     /** Returns a unique pointer to a new empty file descriptor set. */
-    virtual std::unique_ptr<io::FileDescriptorSet> create_file_descriptor_set()
-            const = 0;
+    virtual auto create_file_descriptor_set() const
+            -> std::unique_ptr<io::file_descriptor_set> = 0;
 
     /**
      * Wait for a file descriptor or signal event.
@@ -53,9 +53,9 @@ public:
      */
     virtual std::error_code pselect(
             io::file_descriptor::value_type fd_bound,
-            io::FileDescriptorSet *read_fds,
-            io::FileDescriptorSet *write_fds,
-            io::FileDescriptorSet *error_fds,
+            io::file_descriptor_set *read_fds,
+            io::file_descriptor_set *write_fds,
+            io::file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
             const signaling::SignalNumberSet *signal_mask) const = 0;
 

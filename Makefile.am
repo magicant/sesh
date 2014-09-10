@@ -183,7 +183,7 @@ src_sesh_SOURCES = \
 	src/os/io/file_descriptor.hh \
 	src/os/io/file_descriptor_api.hh \
 	src/os/io/file_descriptor_open_mode.hh \
-	src/os/io/FileDescriptorSet.hh \
+	src/os/io/file_descriptor_set.hh \
 	src/os/io/FileMode.hh \
 	src/os/io/NonBlockingFileDescriptor.cc \
 	src/os/io/NonBlockingFileDescriptor.hh \
@@ -398,7 +398,7 @@ TESTHEADERS = \
 	src/os/event/awaiter_test_helper.hh \
 	src/os/event/pselect_api_test_helper.hh \
 	src/os/io/file_description_api_test_helper.hh \
-	src/os/io/FileDescriptorSetTestHelper.hh \
+	src/os/io/file_descriptor_set_test_helper.hh \
 	src/os/io/NonBlockingFileDescriptorTestHelper.hh \
 	src/os/signaling/HandlerConfigurationApiTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh \

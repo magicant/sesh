@@ -36,7 +36,7 @@
 #include "os/io/file_description_status.hh"
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_open_mode.hh"
-#include "os/io/FileDescriptorSet.hh"
+#include "os/io/file_descriptor_set.hh"
 #include "os/io/FileMode.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
@@ -51,7 +51,7 @@ using sesh::os::io::file_description_attribute;
 using sesh::os::io::file_description_status;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_open_mode;
-using sesh::os::io::FileDescriptorSet;
+using sesh::os::io::file_descriptor_set;
 using sesh::os::io::FileMode;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
@@ -248,7 +248,7 @@ public:
 
 }; // class file_description_status_impl
 
-class file_descriptor_set_impl : public FileDescriptorSet {
+class file_descriptor_set_impl : public file_descriptor_set {
 
 private:
 
@@ -283,7 +283,7 @@ private:
 
 public:
 
-    file_descriptor::value_type maxValue() const override {
+    file_descriptor::value_type max_value() const override {
         return sesh_osapi_fd_setsize() - 1;
     }
 
@@ -297,8 +297,8 @@ public:
                 m_set != nullptr && sesh_osapi_fd_isset(fd, m_set.get());
     }
 
-    FileDescriptorSet &set(file_descriptor::value_type fd, bool value) override
-    {
+    file_descriptor_set &set(file_descriptor::value_type fd, bool value)
+            override {
         if (value)
             set_impl(fd);
         else
@@ -306,7 +306,7 @@ public:
         return *this;
     }
 
-    FileDescriptorSet &reset() override {
+    file_descriptor_set &reset() override {
         if (m_set != nullptr)
             sesh_osapi_fd_zero(m_set.get());
         return *this;
@@ -460,9 +460,9 @@ class api_impl : public api {
         return bytes_written;
     }
 
-    std::unique_ptr<FileDescriptorSet> create_file_descriptor_set() const
+    std::unique_ptr<file_descriptor_set> create_file_descriptor_set() const
             final override {
-        std::unique_ptr<FileDescriptorSet> set(new file_descriptor_set_impl);
+        std::unique_ptr<file_descriptor_set> set(new file_descriptor_set_impl);
         return set;
     }
 
@@ -474,9 +474,9 @@ class api_impl : public api {
 
     std::error_code pselect(
                 file_descriptor::value_type fd_bound,
-                FileDescriptorSet *read_fds,
-                FileDescriptorSet *write_fds,
-                FileDescriptorSet *error_fds,
+                file_descriptor_set *read_fds,
+                file_descriptor_set *write_fds,
+                file_descriptor_set *error_fds,
                 std::chrono::nanoseconds timeout,
                 const SignalNumberSet *signal_mask) const final override {
         file_descriptor_set_impl *read_fds_impl =

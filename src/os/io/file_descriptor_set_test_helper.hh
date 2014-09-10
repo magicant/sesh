@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptorSetTestHelper_hh
-#define INCLUDED_os_io_FileDescriptorSetTestHelper_hh
+#ifndef INCLUDED_os_io_file_descriptor_set_test_helper_hh
+#define INCLUDED_os_io_file_descriptor_set_test_helper_hh
 
 #include "buildconfig.h"
 
@@ -24,21 +24,21 @@
 #include <stdexcept>
 #include "common/container_helper.hh"
 #include "os/io/file_descriptor.hh"
-#include "os/io/FileDescriptorSet.hh"
+#include "os/io/file_descriptor_set.hh"
 
 namespace sesh {
 namespace os {
 namespace io {
 
-class FileDescriptorSetFake :
-        public FileDescriptorSet,
+class file_descriptor_set_fake :
+        public file_descriptor_set,
         public std::set<file_descriptor::value_type> {
 
 public:
 
     constexpr static file_descriptor::value_type MAX_VALUE = 20;
 
-    file_descriptor::value_type maxValue() const override {
+    file_descriptor::value_type max_value() const override {
         return MAX_VALUE;
     }
 
@@ -52,7 +52,7 @@ public:
         return std::set<file_descriptor::value_type>::insert(fd);
     }
 
-    FileDescriptorSet &set(file_descriptor::value_type fd, bool v = true)
+    file_descriptor_set &set(file_descriptor::value_type fd, bool v = true)
             override {
         if (v)
             insert(fd);
@@ -61,7 +61,7 @@ public:
         return *this;
     }
 
-    FileDescriptorSet &reset() override {
+    file_descriptor_set &reset() override {
         clear();
         return *this;
     }
@@ -70,12 +70,12 @@ public:
         return empty() ? 0 : *rbegin() + 1;
     }
 
-}; // class FileDescriptorSetFake
+}; // class file_descriptor_set_fake
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptorSetTestHelper_hh
+#endif // #ifndef INCLUDED_os_io_file_descriptor_set_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
