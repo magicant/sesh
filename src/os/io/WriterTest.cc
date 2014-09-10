@@ -34,7 +34,7 @@
 #include "os/event/proactor.hh"
 #include "os/event/trigger.hh"
 #include "os/event/writable_file_descriptor.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptorTestHelper.hh"
 #include "os/io/Writer.hh"
@@ -52,7 +52,7 @@ using sesh::common::trial;
 using sesh::os::event::proactor;
 using sesh::os::event::trigger;
 using sesh::os::event::writable_file_descriptor;
-using sesh::os::io::FileDescriptor;
+using sesh::os::io::file_descriptor;
 using sesh::os::io::NonBlockingFileDescriptor;
 using sesh::os::io::WriterApi;
 using sesh::os::io::dummyNonBlockingFileDescriptor;
@@ -62,8 +62,8 @@ using ResultPair = std::pair<NonBlockingFileDescriptor, std::error_code>;
 
 class UncallableWriterApi : public WriterApi {
 
-    WriteResult write(
-            const FileDescriptor &, const void *, std::size_t) const override {
+    WriteResult write(const file_descriptor &, const void *, std::size_t) const
+            override {
         throw "unexpected write";
     }
 
@@ -89,7 +89,7 @@ class EchoingProactor : public proactor {
 namespace empty_write {
 
 TEST_CASE("Write: empty") {
-    const FileDescriptor::Value FD = 2;
+    const file_descriptor::value_type FD = 2;
     UncallableWriterApi api;
     UncallableProactor p;
     future<ResultPair> f = write(
@@ -111,7 +111,7 @@ TEST_CASE("Write: empty") {
 
 namespace non_empty_write {
 
-constexpr static FileDescriptor::Value FD = 3;
+constexpr static file_descriptor::value_type FD = 3;
 
 class WriteTestFixture : public WriterApi, public proactor {
 
@@ -135,7 +135,7 @@ public:
 private:
 
     WriteResult write(
-            const FileDescriptor &fd, const void *bytes, std::size_t count)
+            const file_descriptor &fd, const void *bytes, std::size_t count)
             const override {
         CHECK(mIsReadyToWrite);
         mIsReadyToWrite = false;
@@ -241,7 +241,7 @@ class DomainErrorProactor : public proactor {
 }; // class DomainErrorProactor
 
 TEST_CASE("Write: domain error in proactor") {
-    const FileDescriptor::Value FD = 2;
+    const file_descriptor::value_type FD = 2;
     UncallableWriterApi api;
     DomainErrorProactor p;
     future<ResultPair> f = write(
@@ -266,7 +266,7 @@ namespace write_error {
 
 class WriteErrorApi : public WriterApi {
 
-    WriteResult write(const FileDescriptor &, const void *, std::size_t) const
+    WriteResult write(const file_descriptor &, const void *, std::size_t) const
             override {
         return std::make_error_code(std::errc::io_error);
     }
@@ -274,7 +274,7 @@ class WriteErrorApi : public WriterApi {
 }; // class WriteErrorApi
 
 TEST_CASE("Write: write error") {
-    const FileDescriptor::Value FD = 4;
+    const file_descriptor::value_type FD = 4;
     WriteErrorApi api;
     EchoingProactor proactor;
     future<ResultPair> f = sesh::os::io::write(

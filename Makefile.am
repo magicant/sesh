@@ -61,7 +61,7 @@ TESTPROGRAMS = \
 	src/os/event/awaiter_timeout_test \
 	src/os/event/awaiter_user_provided_trigger_test \
 	src/os/event/awaiter_writable_file_descriptor_test \
-	src/os/io/FileDescriptorTest \
+	src/os/io/file_descriptor_test \
 	src/os/io/NonBlockingFileDescriptorTest \
 	src/os/io/ReaderTest \
 	src/os/io/WriterTest \
@@ -180,7 +180,7 @@ src_sesh_SOURCES = \
 	src/os/io/file_description_api.hh \
 	src/os/io/file_description_attribute.hh \
 	src/os/io/file_description_status.hh \
-	src/os/io/FileDescriptor.hh \
+	src/os/io/file_descriptor.hh \
 	src/os/io/FileDescriptorApi.hh \
 	src/os/io/FileDescriptorOpenMode.hh \
 	src/os/io/FileDescriptorSet.hh \
@@ -369,8 +369,8 @@ src_os_event_awaiter_writable_file_descriptor_test_SOURCES = \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_io_FileDescriptorTest_SOURCES = \
-	src/os/io/FileDescriptorTest.cc
+src_os_io_file_descriptor_test_SOURCES = \
+	src/os/io/file_descriptor_test.cc
 src_os_io_NonBlockingFileDescriptorTest_SOURCES = \
 	src/os/io/NonBlockingFileDescriptor.cc \
 	src/os/io/NonBlockingFileDescriptorTest.cc

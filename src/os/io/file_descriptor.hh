@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptor_hh
-#define INCLUDED_os_io_FileDescriptor_hh
+#ifndef INCLUDED_os_io_file_descriptor_hh
+#define INCLUDED_os_io_file_descriptor_hh
 
 #include "buildconfig.h"
 
@@ -36,19 +36,19 @@ namespace io {
  * that is <em>expected</em> to be a valid POSIX file descriptor. (The value
  * might not be an actual valid POSIX file descriptor.)
  */
-class FileDescriptor {
+class file_descriptor {
 
 public:
 
     /** The internal representation type. */
-    using Value = int;
+    using value_type = int;
 
     /** An internal representation of an invalid file descriptor. */
-    constexpr static Value INVALID_VALUE = -1;
+    constexpr static value_type invalid_value = -1;
 
 private:
 
-    Value mValue;
+    value_type m_value;
 
 public:
 
@@ -56,13 +56,13 @@ public:
      * Returns a copy of the internal representation of this file descriptor.
      * The result is unspecified if this file descriptor is invalid.
      */
-    Value value() const noexcept {
-        return mValue;
+    value_type value() const noexcept {
+        return m_value;
     }
 
     /** Checks if this file descriptor contains a valid value. */
-    bool isValid() const noexcept {
-        return mValue >= 0;
+    bool is_valid() const noexcept {
+        return m_value >= 0;
     }
 
     /**
@@ -70,30 +70,31 @@ public:
      * instance invalid without affecting the actual POSIX file descriptor.
      */
     void clear() noexcept {
-        mValue = INVALID_VALUE;
+        m_value = invalid_value;
     }
 
     /** Swaps this file descriptor with the argument. */
-    void swap(FileDescriptor &that) noexcept {
-        std::swap(this->mValue, that.mValue);
+    void swap(file_descriptor &that) noexcept {
+        std::swap(this->m_value, that.m_value);
     }
 
     /** Constructs an invalid file descriptor. */
-    constexpr FileDescriptor() noexcept : mValue(INVALID_VALUE) { }
+    constexpr file_descriptor() noexcept : m_value(invalid_value) { }
 
     /**
      * Constructs a file descriptor of the given internal representation. A
      * negative internal representation value will be considered invalid.
      */
-    constexpr explicit FileDescriptor(Value value) noexcept : mValue(value) { }
+    constexpr explicit file_descriptor(value_type value) noexcept :
+            m_value(value) { }
 
     /** Move constructor, which invalidates the other file descriptor. */
-    FileDescriptor(FileDescriptor &&fd) noexcept : mValue(fd.value()) {
+    file_descriptor(file_descriptor &&fd) noexcept : m_value(fd.value()) {
         fd.clear();
     }
 
     /** Move assignment, which swaps this and the other file descriptors. */
-    FileDescriptor &operator=(FileDescriptor &&fd) noexcept {
+    file_descriptor &operator=(file_descriptor &&fd) noexcept {
         swap(fd);
         return *this;
     }
@@ -104,15 +105,15 @@ public:
      * destruction. Destruction of a valid file descriptor is considered a
      * serious resource leak and results in termination of the whole program.
      */
-    ~FileDescriptor() noexcept {
-        assert(!isValid());
+    ~file_descriptor() noexcept {
+        assert(!is_valid());
     }
 #endif
 
-}; // class FileDescriptor
+}; // class file_descriptor
 
 /** Swaps two file descriptors. */
-inline void swap(FileDescriptor &l, FileDescriptor &r) noexcept {
+inline void swap(file_descriptor &l, file_descriptor &r) noexcept {
     l.swap(r);
 }
 
@@ -120,6 +121,6 @@ inline void swap(FileDescriptor &l, FileDescriptor &r) noexcept {
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptor_hh
+#endif // #ifndef INCLUDED_os_io_file_descriptor_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

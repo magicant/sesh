@@ -24,7 +24,7 @@
 #include <system_error>
 #include "common/variant.hh"
 #include "os/io/file_description_status.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
 namespace os {
@@ -43,7 +43,7 @@ public:
      */
     virtual
     common::variant<std::unique_ptr<file_description_status>, std::error_code>
-    get_file_description_status(const FileDescriptor &) const = 0;
+    get_file_description_status(const file_descriptor &) const = 0;
 
     /**
      * Modifies the status of the open file description associated with the
@@ -58,7 +58,8 @@ public:
      * *this}.
      */
     virtual std::error_code set_file_description_status(
-            const FileDescriptor &, const file_description_status &) const = 0;
+            const file_descriptor &, const file_description_status &) const
+            = 0;
 
 }; // class file_description_api
 

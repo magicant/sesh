@@ -26,7 +26,7 @@
 #include "common/variant.hh"
 #include "os/io/file_description_access_mode.hh"
 #include "os/io/file_description_attribute.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/FileDescriptorOpenMode.hh"
 #include "os/io/FileMode.hh"
 
@@ -45,7 +45,7 @@ public:
      * The file mode set argument is ignored unless the CREATE flag is included
      * in the file descriptor open mode set argument.
      */
-    virtual common::variant<FileDescriptor, std::error_code> open(
+    virtual common::variant<file_descriptor, std::error_code> open(
             const char *path,
             file_description_access_mode,
             common::enum_set<file_description_attribute>,
@@ -61,7 +61,7 @@ public:
      *
      * On failure, the file descriptor may be left still valid.
      */
-    virtual std::error_code close(FileDescriptor &) const = 0;
+    virtual std::error_code close(file_descriptor &) const = 0;
 
 }; // class FileDescriptorApi
 

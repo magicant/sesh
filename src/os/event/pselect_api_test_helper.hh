@@ -26,7 +26,7 @@
 #include <set>
 #include <string>
 #include "os/event/pselect_api.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/io/FileDescriptorSetTestHelper.hh"
 #include "os/signaling/SignalNumberSet.hh"
@@ -40,7 +40,7 @@ namespace std {
 template<typename ChatT, typename Traits>
 std::basic_ostream<ChatT, Traits> &operator<<(
         std::basic_ostream<ChatT, Traits> &os,
-        const std::set<sesh::os::io::FileDescriptor::Value> &fds) {
+        const std::set<sesh::os::io::file_descriptor::value_type> &fds) {
     os << '{';
     for (const auto &fd : fds)
         os << fd << ',';
@@ -62,7 +62,7 @@ public:
 
     using pselect_function = std::function<std::error_code(
             const pselect_api_stub &,
-            io::FileDescriptor::Value,
+            io::file_descriptor::value_type,
             io::FileDescriptorSet *,
             io::FileDescriptorSet *,
             io::FileDescriptorSet *,
@@ -83,8 +83,8 @@ public:
 
     static void check_equal(
             const io::FileDescriptorSet *actual,
-            const std::set<io::FileDescriptor::Value> &expected,
-            io::FileDescriptor::Value actual_bound,
+            const std::set<io::file_descriptor::value_type> &expected,
+            io::file_descriptor::value_type actual_bound,
             const std::string &info) {
         INFO(info);
 
@@ -101,16 +101,19 @@ public:
 
     static void check_empty(
             const io::FileDescriptorSet *fds,
-            io::FileDescriptor::Value fd_bound,
+            io::file_descriptor::value_type fd_bound,
             const std::string &info) {
         check_equal(
-                fds, std::set<io::FileDescriptor::Value>{}, fd_bound, info);
+                fds,
+                std::set<io::file_descriptor::value_type>{},
+                fd_bound,
+                info);
     }
 
     pselect_function &implementation() const { return m_implementation; }
 
     std::error_code pselect(
-            io::FileDescriptor::Value fd_bound,
+            io::file_descriptor::value_type fd_bound,
             io::FileDescriptorSet *read_fds,
             io::FileDescriptorSet *write_fds,
             io::FileDescriptorSet *error_fds,

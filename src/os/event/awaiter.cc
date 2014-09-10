@@ -36,7 +36,7 @@
 #include "helpermacros.h"
 #include "os/event/pselect_api.hh"
 #include "os/event/trigger.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfiguration.hh"
 #include "os/signaling/SignalNumber.hh"
@@ -50,7 +50,7 @@ using sesh::common::find_if;
 using sesh::common::shared_function;
 using sesh::common::trial;
 using sesh::common::variant;
-using sesh::os::io::FileDescriptor;
+using sesh::os::io::file_descriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfiguration;
 using sesh::os::signaling::SignalNumber;
@@ -120,13 +120,13 @@ class pselect_argument {
 
 private:
 
-    FileDescriptor::Value m_fd_bound;
+    file_descriptor::value_type m_fd_bound;
     std::unique_ptr<FileDescriptorSet> m_read_fds, m_write_fds, m_error_fds;
     time_point::duration m_timeout;
 
     void add_fd(
             std::unique_ptr<FileDescriptorSet> &fds,
-            FileDescriptor::Value fd,
+            file_descriptor::value_type fd,
             const pselect_api &api);
 
 public:
@@ -242,7 +242,7 @@ pselect_argument::pselect_argument(time_point::duration timeout) noexcept :
 
 void pselect_argument::add_fd(
         std::unique_ptr<FileDescriptorSet> &fds,
-        FileDescriptor::Value fd,
+        file_descriptor::value_type fd,
         const pselect_api &api) {
     if (fds == nullptr)
         fds = api.create_file_descriptor_set();
@@ -292,7 +292,7 @@ std::error_code pselect_argument::call(
 
 bool contains(
         const std::unique_ptr<FileDescriptorSet> &fds,
-        FileDescriptor::Value fd) {
+        file_descriptor::value_type fd) {
     return fds != nullptr && fds->test(fd);
 }
 

@@ -31,7 +31,7 @@
 #include "os/event/pselect_api.hh"
 #include "os/event/timeout.hh"
 #include "os/event/trigger.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalNumberSet.hh"
@@ -63,7 +63,7 @@ using sesh::common::trial;
 using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::timeout;
 using sesh::os::event::trigger;
-using sesh::os::io::FileDescriptor;
+using sesh::os::io::file_descriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiDummy;
 using sesh::os::signaling::SignalNumberSet;
@@ -105,7 +105,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
+            file_descriptor::value_type fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
@@ -144,7 +144,7 @@ TimeoutTest<DurationInSecondsInt>::TimeoutTest() {
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
+            file_descriptor::value_type fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
@@ -188,7 +188,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
+            file_descriptor::value_type fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
@@ -230,7 +230,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
+            file_descriptor::value_type fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
@@ -282,7 +282,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
+            file_descriptor::value_type fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
@@ -297,7 +297,7 @@ TEST_CASE_METHOD(
 
         implementation() = [this](
                 const pselect_api_stub &,
-                FileDescriptor::Value fd_bound,
+                file_descriptor::value_type fd_bound,
                 FileDescriptorSet *read_fds,
                 FileDescriptorSet *write_fds,
                 FileDescriptorSet *error_fds,
@@ -347,7 +347,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
+            file_descriptor::value_type fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
@@ -362,7 +362,7 @@ TEST_CASE_METHOD(
 
         implementation() = [this](
                 const pselect_api_stub &,
-                FileDescriptor::Value fd_bound,
+                file_descriptor::value_type fd_bound,
                 FileDescriptorSet *read_fds,
                 FileDescriptorSet *write_fds,
                 FileDescriptorSet *error_fds,

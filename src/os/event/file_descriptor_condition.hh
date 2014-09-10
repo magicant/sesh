@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
 namespace os {
@@ -33,19 +33,20 @@ class file_descriptor_condition {
 
 private:
 
-    io::FileDescriptor::Value m_value;
+    io::file_descriptor::value_type m_value;
 
 public:
 
-    constexpr explicit file_descriptor_condition(io::FileDescriptor::Value fd)
-            noexcept : m_value(fd) { }
+    constexpr explicit file_descriptor_condition(
+            io::file_descriptor::value_type fd) noexcept :
+            m_value(fd) { }
 
-    file_descriptor_condition(const io::FileDescriptor &fd) noexcept :
+    file_descriptor_condition(const io::file_descriptor &fd) noexcept :
             file_descriptor_condition(fd.value()) { }
 
-    file_descriptor_condition(const io::FileDescriptor &&) = delete;
+    file_descriptor_condition(const io::file_descriptor &&) = delete;
 
-    constexpr io::FileDescriptor::Value value() const noexcept {
+    constexpr io::file_descriptor::value_type value() const noexcept {
         return m_value;
     }
 

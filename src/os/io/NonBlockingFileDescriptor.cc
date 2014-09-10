@@ -23,7 +23,7 @@
 #include "os/io/file_description_api.hh"
 #include "os/io/file_description_attribute.hh"
 #include "os/io/file_description_status.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
 namespace os {
@@ -32,7 +32,7 @@ namespace io {
 namespace {
 
 std::unique_ptr<file_description_status> statusOrNull(
-        const file_description_api &api, const FileDescriptor &fd) {
+        const file_description_api &api, const file_descriptor &fd) {
     using StatusPointer = std::unique_ptr<file_description_status>;
     auto statusOrError = api.get_file_description_status(fd);
     switch (statusOrError.tag()) {
@@ -47,7 +47,7 @@ std::unique_ptr<file_description_status> statusOrNull(
 } // namespace
 
 NonBlockingFileDescriptor::NonBlockingFileDescriptor(
-        const file_description_api &api, FileDescriptor &&fd) :
+        const file_description_api &api, file_descriptor &&fd) :
         mApi(api),
         mFileDescriptor(std::move(fd)),
         mOriginalStatus(statusOrNull(mApi, mFileDescriptor)) {
@@ -59,7 +59,7 @@ NonBlockingFileDescriptor::NonBlockingFileDescriptor(
     mApi.set_file_description_status(mFileDescriptor, *nonBlockingStatus);
 }
 
-FileDescriptor NonBlockingFileDescriptor::release() {
+file_descriptor NonBlockingFileDescriptor::release() {
     if (mOriginalStatus != nullptr)
         mApi.set_file_description_status(mFileDescriptor, *mOriginalStatus);
     return std::move(mFileDescriptor);

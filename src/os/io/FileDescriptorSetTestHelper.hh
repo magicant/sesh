@@ -23,7 +23,7 @@
 #include <set>
 #include <stdexcept>
 #include "common/container_helper.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 
 namespace sesh {
@@ -31,27 +31,29 @@ namespace os {
 namespace io {
 
 class FileDescriptorSetFake :
-        public FileDescriptorSet, public std::set<FileDescriptor::Value> {
+        public FileDescriptorSet,
+        public std::set<file_descriptor::value_type> {
 
 public:
 
-    constexpr static FileDescriptor::Value MAX_VALUE = 20;
+    constexpr static file_descriptor::value_type MAX_VALUE = 20;
 
-    FileDescriptor::Value maxValue() const override {
+    file_descriptor::value_type maxValue() const override {
         return MAX_VALUE;
     }
 
-    bool test(FileDescriptor::Value fd) const override {
+    bool test(file_descriptor::value_type fd) const override {
         return common::contains(*this, fd);
     }
 
-    std::pair<iterator, bool> insert(FileDescriptor::Value fd) {
+    std::pair<iterator, bool> insert(file_descriptor::value_type fd) {
         if (fd > MAX_VALUE)
             throw std::domain_error("too large file descriptor");
-        return std::set<FileDescriptor::Value>::insert(fd);
+        return std::set<file_descriptor::value_type>::insert(fd);
     }
 
-    FileDescriptorSet &set(FileDescriptor::Value fd, bool v = true) override {
+    FileDescriptorSet &set(file_descriptor::value_type fd, bool v = true)
+            override {
         if (v)
             insert(fd);
         else
@@ -64,7 +66,7 @@ public:
         return *this;
     }
 
-    FileDescriptor::Value bound() const {
+    file_descriptor::value_type bound() const {
         return empty() ? 0 : *rbegin() + 1;
     }
 

@@ -23,7 +23,7 @@
 #include <chrono>
 #include <memory>
 #include <system_error>
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/SignalNumberSet.hh"
 #include "os/time_api.hh"
@@ -52,7 +52,7 @@ public:
      * @param timeout A negative value means no timeout.
      */
     virtual std::error_code pselect(
-            io::FileDescriptor::Value fd_bound,
+            io::file_descriptor::value_type fd_bound,
             io::FileDescriptorSet *read_fds,
             io::FileDescriptorSet *write_fds,
             io::FileDescriptorSet *error_fds,

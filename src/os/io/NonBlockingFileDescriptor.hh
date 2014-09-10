@@ -23,7 +23,7 @@
 #include <memory>
 #include "os/io/file_description_api.hh"
 #include "os/io/file_description_status.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
 namespace os {
@@ -43,7 +43,7 @@ private:
 
     const file_description_api &mApi;
 
-    FileDescriptor mFileDescriptor;
+    file_descriptor mFileDescriptor;
     std::unique_ptr<file_description_status> mOriginalStatus;
 
 public:
@@ -52,16 +52,16 @@ public:
      * Returns a copy of the internal representation of this file descriptor.
      * The result is unspecified if this file descriptor is invalid.
      */
-    FileDescriptor::Value value() const noexcept {
+    file_descriptor::value_type value() const noexcept {
         return mFileDescriptor.value();
     }
 
     /** Checks if this file descriptor contains a valid value. */
     bool isValid() const noexcept {
-        return mFileDescriptor.isValid();
+        return mFileDescriptor.is_valid();
     }
 
-    operator const FileDescriptor &() const noexcept {
+    operator const file_descriptor &() const noexcept {
         return mFileDescriptor;
     }
 
@@ -78,7 +78,7 @@ public:
      * @param fd File descriptor whose non-blocking flag will be set.
      */
     NonBlockingFileDescriptor(
-            const file_description_api &api, FileDescriptor &&fd);
+            const file_description_api &api, file_descriptor &&fd);
 
     /** Move constructor. */
     NonBlockingFileDescriptor(NonBlockingFileDescriptor &&) noexcept = default;
@@ -96,7 +96,7 @@ public:
      * this non-blocking file descriptor, the new native file descriptor will
      * be affected by this function.
      */
-    FileDescriptor release();
+    file_descriptor release();
 
     /**
      * Destructs the non-blocking file descriptor instance. The file descriptor

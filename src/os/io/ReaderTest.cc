@@ -34,7 +34,7 @@
 #include "os/event/proactor.hh"
 #include "os/event/readable_file_descriptor.hh"
 #include "os/event/trigger.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 #include "os/io/NonBlockingFileDescriptorTestHelper.hh"
 #include "os/io/Reader.hh"
@@ -52,7 +52,7 @@ using sesh::common::variant;
 using sesh::os::event::proactor;
 using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::trigger;
-using sesh::os::io::FileDescriptor;
+using sesh::os::io::file_descriptor;
 using sesh::os::io::NonBlockingFileDescriptor;
 using sesh::os::io::ReaderApi;
 using sesh::os::io::dummyNonBlockingFileDescriptor;
@@ -64,7 +64,7 @@ using ResultPair = std::pair<
 
 class UncallableReaderApi : public ReaderApi {
 
-    ReadResult read(const FileDescriptor &, void *, std::size_t) const
+    ReadResult read(const file_descriptor &, void *, std::size_t) const
             override {
         throw "unexpected read";
     }
@@ -91,7 +91,7 @@ class EchoingProactor : public proactor {
 namespace empty_read {
 
 TEST_CASE("Read: empty") {
-    const FileDescriptor::Value FD = 2;
+    const file_descriptor::value_type FD = 2;
     UncallableReaderApi api;
     UncallableProactor p;
     future<ResultPair> f = read(api, p, dummyNonBlockingFileDescriptor(FD), 0);
@@ -113,7 +113,7 @@ TEST_CASE("Read: empty") {
 
 namespace non_empty_read {
 
-constexpr static FileDescriptor::Value FD = 3;
+constexpr static file_descriptor::value_type FD = 3;
 
 class ReadTestFixture : public ReaderApi, public proactor {
 
@@ -136,12 +136,12 @@ public:
 
 private:
 
-    ReadResult read(const FileDescriptor &fd, void *buffer, std::size_t count)
+    ReadResult read(const file_descriptor &fd, void *buffer, std::size_t count)
             const override {
         CHECK(mIsReadyToRead);
         mIsReadyToRead = false;
 
-        CHECK(fd.isValid());
+        CHECK(fd.is_valid());
         CHECK(fd.value() == FD);
         REQUIRE(buffer != nullptr);
         CHECK(count > 0);
@@ -239,7 +239,7 @@ class DomainErrorProactor : public proactor {
 }; // class DomainErrorProactor
 
 TEST_CASE("Read: domain error in proactor") {
-    const FileDescriptor::Value FD = 2;
+    const file_descriptor::value_type FD = 2;
     UncallableReaderApi api;
     DomainErrorProactor p;
     future<ResultPair> f = read(
@@ -265,7 +265,7 @@ namespace read_error {
 
 class ReadErrorApiStub : public ReaderApi {
 
-    ReadResult read(const FileDescriptor &, void *, std::size_t) const
+    ReadResult read(const file_descriptor &, void *, std::size_t) const
             override {
         return std::make_error_code(std::errc::io_error);
     }
@@ -273,7 +273,7 @@ class ReadErrorApiStub : public ReaderApi {
 }; // class ReadErrorApiStub
 
 TEST_CASE("Read: read error") {
-    const FileDescriptor::Value FD = 4;
+    const file_descriptor::value_type FD = 4;
     ReadErrorApiStub api;
     EchoingProactor proactor;
     future<ResultPair> f = sesh::os::io::read(

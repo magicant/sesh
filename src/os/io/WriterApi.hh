@@ -23,7 +23,7 @@
 #include <cstddef>
 #include <system_error>
 #include "common/variant.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
 namespace os {
@@ -44,7 +44,7 @@ public:
      * failure, a non-zero error code is returned.
      */
     virtual WriteResult write(
-            const FileDescriptor &, const void *, std::size_t) const = 0;
+            const file_descriptor &, const void *, std::size_t) const = 0;
 
 }; // class WriterApi
 

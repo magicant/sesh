@@ -23,22 +23,22 @@
 #include <system_error>
 #include <utility>
 #include "os/io/file_description_api_test_helper.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 
 namespace sesh {
 namespace os {
 namespace io {
 
-inline auto dummyNonBlockingFileDescriptor(FileDescriptor &&fd)
+inline auto dummyNonBlockingFileDescriptor(file_descriptor &&fd)
         -> NonBlockingFileDescriptor {
     static file_description_api_dummy api;
     return NonBlockingFileDescriptor(api, std::move(fd));
 }
 
-inline auto dummyNonBlockingFileDescriptor(FileDescriptor::Value fd)
+inline auto dummyNonBlockingFileDescriptor(file_descriptor::value_type fd)
         -> NonBlockingFileDescriptor {
-    return dummyNonBlockingFileDescriptor(FileDescriptor(fd));
+    return dummyNonBlockingFileDescriptor(file_descriptor(fd));
 }
 
 } // namespace io

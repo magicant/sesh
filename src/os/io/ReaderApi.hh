@@ -23,7 +23,7 @@
 #include <cstddef>
 #include <system_error>
 #include "common/variant.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
 namespace os {
@@ -43,7 +43,7 @@ public:
      * On success, the number of actually read bytes is returned. On failure, a
      * non-zero error code is returned.
      */
-    virtual ReadResult read(const FileDescriptor &, void *, std::size_t) const
+    virtual ReadResult read(const file_descriptor &, void *, std::size_t) const
             = 0;
 
 }; // class ReaderApi

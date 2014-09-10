@@ -32,7 +32,7 @@
 #include "os/event/pselect_api.hh"
 #include "os/event/signal.hh"
 #include "os/event/trigger.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalNumber.hh"
@@ -45,7 +45,7 @@ using sesh::common::trial;
 using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::signal;
 using sesh::os::event::trigger;
-using sesh::os::io::FileDescriptor;
+using sesh::os::io::file_descriptor;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalNumber;
@@ -68,7 +68,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
+            file_descriptor::value_type fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
@@ -103,7 +103,7 @@ TEST_CASE_METHOD(
     signalMask().set(5);
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value,
+            file_descriptor::value_type,
             FileDescriptorSet *,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -139,7 +139,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
+            file_descriptor::value_type fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
@@ -186,7 +186,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
+            file_descriptor::value_type fd_bound,
             FileDescriptorSet *read_fds,
             FileDescriptorSet *write_fds,
             FileDescriptorSet *error_fds,
@@ -228,7 +228,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value,
+            file_descriptor::value_type,
             FileDescriptorSet *,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -273,7 +273,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value,
+            file_descriptor::value_type,
             FileDescriptorSet *,
             FileDescriptorSet *,
             FileDescriptorSet *,
@@ -291,7 +291,7 @@ TEST_CASE_METHOD(
         mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = [this](
                 const pselect_api_stub &,
-                FileDescriptor::Value,
+                file_descriptor::value_type,
                 FileDescriptorSet *,
                 FileDescriptorSet *,
                 FileDescriptorSet *,
@@ -322,7 +322,7 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value,
+            file_descriptor::value_type,
             FileDescriptorSet *,
             FileDescriptorSet *,
             FileDescriptorSet *,

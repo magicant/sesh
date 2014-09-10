@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
 namespace os {
@@ -39,19 +39,20 @@ public:
     virtual ~FileDescriptorSet() = default;
 
     /** Returns the maximum value that can be contained in this set. */
-    virtual FileDescriptor::Value maxValue() const = 0;
+    virtual file_descriptor::value_type maxValue() const = 0;
 
     /** Checks if the given file descriptor is included in this set. */
-    virtual bool test(FileDescriptor::Value) const = 0;
+    virtual bool test(file_descriptor::value_type) const = 0;
 
     /**
      * Adds/removes a file descriptor to/from this set.
      * @throws std::domain_error the value is too large.
      */
-    virtual FileDescriptorSet &set(FileDescriptor::Value, bool = true) = 0;
+    virtual FileDescriptorSet &set(file_descriptor::value_type, bool = true)
+            = 0;
 
     /** Removes a file descriptor from this set. */
-    FileDescriptorSet &reset(FileDescriptor::Value fd) {
+    FileDescriptorSet &reset(file_descriptor::value_type fd) {
         return set(fd, false);
     }
 
@@ -64,11 +65,11 @@ public:
     private:
 
         FileDescriptorSet &mSet;
-        FileDescriptor::Value mValue;
+        file_descriptor::value_type mValue;
 
     public:
 
-        Reference(FileDescriptorSet &set, FileDescriptor::Value value)
+        Reference(FileDescriptorSet &set, file_descriptor::value_type value)
                 noexcept : mSet(set), mValue(value) { }
 
         Reference &operator=(bool value) {
@@ -87,12 +88,12 @@ public:
     }; // class Reference
 
     /** Returns a reference to the specified entry of this set. */
-    Reference operator[](FileDescriptor::Value fd) noexcept {
+    Reference operator[](file_descriptor::value_type fd) noexcept {
         return Reference(*this, fd);
     }
 
     /** Alias to {@link #test}. */
-    bool operator[](FileDescriptor::Value fd) const {
+    bool operator[](file_descriptor::value_type fd) const {
         return test(fd);
     }
 

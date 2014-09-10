@@ -27,7 +27,7 @@
 #include "os/io/file_description_api.hh"
 #include "os/io/file_description_attribute.hh"
 #include "os/io/file_description_status.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/NonBlockingFileDescriptor.hh"
 
 namespace {
@@ -37,7 +37,7 @@ using sesh::os::io::file_description_access_mode;
 using sesh::os::io::file_description_api;
 using sesh::os::io::file_description_attribute;
 using sesh::os::io::file_description_status;
-using sesh::os::io::FileDescriptor;
+using sesh::os::io::file_descriptor;
 using sesh::os::io::NonBlockingFileDescriptor;
 
 namespace closed_fd {
@@ -46,17 +46,17 @@ class FileDescriptionApiMock : public file_description_api {
 
 public:
 
-    constexpr static FileDescriptor::Value value() noexcept { return 3; }
+    constexpr static file_descriptor::value_type value() noexcept { return 3; }
 
     variant<std::unique_ptr<file_description_status>, std::error_code>
-    get_file_description_status(const FileDescriptor &fd) const override {
-        CHECK(fd.isValid());
+    get_file_description_status(const file_descriptor &fd) const override {
+        CHECK(fd.is_valid());
         CHECK(fd.value() == value());
         return std::make_error_code(std::errc::bad_file_descriptor);
     }
 
     std::error_code set_file_description_status(
-            const FileDescriptor &, const file_description_status &) const
+            const file_descriptor &, const file_description_status &) const
             override {
         throw "unexpected set_file_description_status";
     }
@@ -65,7 +65,7 @@ public:
 
 TEST_CASE("Non-blocking file descriptor: construction with closed FD") {
     const auto api = FileDescriptionApiMock();
-    auto nbfd = NonBlockingFileDescriptor(api, FileDescriptor(api.value()));
+    auto nbfd = NonBlockingFileDescriptor(api, file_descriptor(api.value()));
     CHECK(nbfd.isValid());
     CHECK(nbfd.value() == api.value());
     nbfd.release().clear();
@@ -73,10 +73,10 @@ TEST_CASE("Non-blocking file descriptor: construction with closed FD") {
 
 TEST_CASE("Non-blocking file descriptor: releasing closed FD") {
     const auto api = FileDescriptionApiMock();
-    auto nbfd = NonBlockingFileDescriptor(api, FileDescriptor(api.value()));
-    FileDescriptor fd = nbfd.release();
+    auto nbfd = NonBlockingFileDescriptor(api, file_descriptor(api.value()));
+    file_descriptor fd = nbfd.release();
     CHECK_FALSE(nbfd.isValid());
-    CHECK(fd.isValid());
+    CHECK(fd.is_valid());
     CHECK(fd.value() == api.value());
     fd.clear();
 }
@@ -123,7 +123,7 @@ class FileDescriptionApiMock : public file_description_api {
 
 public:
 
-    constexpr static FileDescriptor::Value value() noexcept { return 5; }
+    constexpr static file_descriptor::value_type value() noexcept { return 5; }
 
     mutable bool isNonBlocking;
 
@@ -131,17 +131,17 @@ public:
             isNonBlocking(isNonBlocking) { }
 
     variant<std::unique_ptr<file_description_status>, std::error_code>
-    get_file_description_status(const FileDescriptor &fd) const override {
-        CHECK(fd.isValid());
+    get_file_description_status(const file_descriptor &fd) const override {
+        CHECK(fd.is_valid());
         CHECK(fd.value() == value());
         return std::unique_ptr<file_description_status>(
                 new FileDescriptionStatusMock(isNonBlocking));
     }
 
     std::error_code set_file_description_status(
-            const FileDescriptor &fd, const file_description_status &status)
+            const file_descriptor &fd, const file_description_status &status)
             const override {
-        CHECK(fd.isValid());
+        CHECK(fd.is_valid());
         CHECK(fd.value() == value());
         const FileDescriptionStatusMock &statusMock =
                 dynamic_cast<const FileDescriptionStatusMock &>(status);
@@ -153,7 +153,7 @@ public:
 
 void testConstruction(bool isInitiallyNonBlocking) {
     const auto api = FileDescriptionApiMock(isInitiallyNonBlocking);
-    auto nbfd = NonBlockingFileDescriptor(api, FileDescriptor(api.value()));
+    auto nbfd = NonBlockingFileDescriptor(api, file_descriptor(api.value()));
     CHECK(nbfd.isValid());
     CHECK(nbfd.value() == api.value());
     CHECK(api.isNonBlocking);
@@ -170,10 +170,10 @@ TEST_CASE("Non-blocking file descriptor: construction with non-blocking FD") {
 
 void testRelease(bool isInitiallyNonBlocking) {
     const auto api = FileDescriptionApiMock(isInitiallyNonBlocking);
-    auto nbfd = NonBlockingFileDescriptor(api, FileDescriptor(api.value()));
-    FileDescriptor fd = nbfd.release();
+    auto nbfd = NonBlockingFileDescriptor(api, file_descriptor(api.value()));
+    file_descriptor fd = nbfd.release();
     CHECK_FALSE(nbfd.isValid());
-    CHECK(fd.isValid());
+    CHECK(fd.is_valid());
     CHECK(fd.value() == api.value());
     CHECK(api.isNonBlocking == isInitiallyNonBlocking);
     fd.clear();

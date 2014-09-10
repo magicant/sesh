@@ -34,7 +34,7 @@
 #include "os/io/file_description_access_mode.hh"
 #include "os/io/file_description_attribute.hh"
 #include "os/io/file_description_status.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 #include "os/io/FileDescriptorOpenMode.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/io/FileMode.hh"
@@ -49,7 +49,7 @@ using sesh::common::variant;
 using sesh::os::io::file_description_access_mode;
 using sesh::os::io::file_description_attribute;
 using sesh::os::io::file_description_status;
-using sesh::os::io::FileDescriptor;
+using sesh::os::io::file_descriptor;
 using sesh::os::io::FileDescriptorOpenMode;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::io::FileMode;
@@ -264,18 +264,18 @@ private:
         sesh_osapi_fd_zero(m_set.get());
     }
 
-    void throw_if_out_of_domain(FileDescriptor::Value fd) {
+    void throw_if_out_of_domain(file_descriptor::value_type fd) {
         if (fd >= sesh_osapi_fd_setsize())
             throw std::domain_error("too large file descriptor");
     }
 
-    void set_impl(FileDescriptor::Value fd) {
+    void set_impl(file_descriptor::value_type fd) {
         throw_if_out_of_domain(fd);
         allocate_if_null();
         sesh_osapi_fd_set(fd, m_set.get());
     }
 
-    void reset_impl(FileDescriptor::Value fd) {
+    void reset_impl(file_descriptor::value_type fd) {
         throw_if_out_of_domain(fd);
         if (m_set != nullptr)
             sesh_osapi_fd_clr(fd, m_set.get());
@@ -283,7 +283,7 @@ private:
 
 public:
 
-    FileDescriptor::Value maxValue() const override {
+    file_descriptor::value_type maxValue() const override {
         return sesh_osapi_fd_setsize() - 1;
     }
 
@@ -292,12 +292,13 @@ public:
         return m_set.get();
     }
 
-    bool test(FileDescriptor::Value fd) const override {
+    bool test(file_descriptor::value_type fd) const override {
         return fd < sesh_osapi_fd_setsize() &&
                 m_set != nullptr && sesh_osapi_fd_isset(fd, m_set.get());
     }
 
-    FileDescriptorSet &set(FileDescriptor::Value fd, bool value) override {
+    FileDescriptorSet &set(file_descriptor::value_type fd, bool value) override
+    {
         if (value)
             set_impl(fd);
         else
@@ -386,7 +387,7 @@ class api_impl : public api {
                 steady_clock_time::clock::now());
     }
 
-    auto get_file_description_status(const FileDescriptor &fd) const
+    auto get_file_description_status(const file_descriptor &fd) const
             -> variant<
                     std::unique_ptr<file_description_status>, std::error_code>
             final override {
@@ -398,7 +399,7 @@ class api_impl : public api {
     }
 
     std::error_code set_file_description_status(
-            const FileDescriptor &fd, const file_description_status &s) const
+            const file_descriptor &fd, const file_description_status &s) const
             final override {
         const auto &i = static_cast<const file_description_status_impl &>(s);
         if (sesh_osapi_fcntl_setfl(fd.value(), i.raw_flags()) == -1)
@@ -406,7 +407,7 @@ class api_impl : public api {
         return std::error_code();
     }
 
-    variant<FileDescriptor, std::error_code> open(
+    variant<file_descriptor, std::error_code> open(
             const char *path,
             file_description_access_mode access_mode,
             enum_set<file_description_attribute> attributes,
@@ -420,10 +421,10 @@ class api_impl : public api {
         int fd = sesh_osapi_open(path, flags, modes);
         if (fd < 0)
             return errno_code();
-        return FileDescriptor(fd);
+        return file_descriptor(fd);
     }
 
-    std::error_code close(FileDescriptor &fd) const final override {
+    std::error_code close(file_descriptor &fd) const final override {
         if (sesh_osapi_close(fd.value()) == 0) {
             fd.clear();
             return std::error_code();
@@ -436,7 +437,7 @@ class api_impl : public api {
     }
 
     ReadResult read(
-            const FileDescriptor &fd,
+            const file_descriptor &fd,
             void *buffer,
             std::size_t max_bytes_to_read)
             const final override {
@@ -448,7 +449,7 @@ class api_impl : public api {
     }
 
     WriteResult write(
-            const FileDescriptor &fd,
+            const file_descriptor &fd,
             const void *bytes,
             std::size_t bytes_to_write)
             const final override {
@@ -472,7 +473,7 @@ class api_impl : public api {
     }
 
     std::error_code pselect(
-                FileDescriptor::Value fd_bound,
+                file_descriptor::value_type fd_bound,
                 FileDescriptorSet *read_fds,
                 FileDescriptorSet *write_fds,
                 FileDescriptorSet *error_fds,
