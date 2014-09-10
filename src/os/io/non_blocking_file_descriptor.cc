@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "NonBlockingFileDescriptor.hh"
+#include "non_blocking_file_descriptor.hh"
 
 #include <utility>
 #include "helpermacros.h"
@@ -31,14 +31,14 @@ namespace io {
 
 namespace {
 
-std::unique_ptr<file_description_status> statusOrNull(
+std::unique_ptr<file_description_status> status_or_null(
         const file_description_api &api, const file_descriptor &fd) {
-    using StatusPointer = std::unique_ptr<file_description_status>;
-    auto statusOrError = api.get_file_description_status(fd);
-    switch (statusOrError.tag()) {
-    case statusOrError.tag<StatusPointer>():
-        return std::move(statusOrError.value<StatusPointer>());
-    case statusOrError.tag<std::error_code>():
+    using status_pointer = std::unique_ptr<file_description_status>;
+    auto status_or_error = api.get_file_description_status(fd);
+    switch (status_or_error.tag()) {
+    case status_or_error.tag<status_pointer>():
+        return std::move(status_or_error.value<status_pointer>());
+    case status_or_error.tag<std::error_code>():
         return nullptr;
     }
     UNREACHABLE();
@@ -46,23 +46,24 @@ std::unique_ptr<file_description_status> statusOrNull(
 
 } // namespace
 
-NonBlockingFileDescriptor::NonBlockingFileDescriptor(
+non_blocking_file_descriptor::non_blocking_file_descriptor(
         const file_description_api &api, file_descriptor &&fd) :
-        mApi(api),
-        mFileDescriptor(std::move(fd)),
-        mOriginalStatus(statusOrNull(mApi, mFileDescriptor)) {
-    if (mOriginalStatus == nullptr)
+        m_api(api),
+        m_file_descriptor(std::move(fd)),
+        m_original_status(status_or_null(m_api, m_file_descriptor)) {
+    if (m_original_status == nullptr)
         return;
 
-    auto nonBlockingStatus = mOriginalStatus->clone();
-    nonBlockingStatus->set(file_description_attribute::non_blocking);
-    mApi.set_file_description_status(mFileDescriptor, *nonBlockingStatus);
+    auto non_blocking_status = m_original_status->clone();
+    non_blocking_status->set(file_description_attribute::non_blocking);
+    m_api.set_file_description_status(m_file_descriptor, *non_blocking_status);
 }
 
-file_descriptor NonBlockingFileDescriptor::release() {
-    if (mOriginalStatus != nullptr)
-        mApi.set_file_description_status(mFileDescriptor, *mOriginalStatus);
-    return std::move(mFileDescriptor);
+file_descriptor non_blocking_file_descriptor::release() {
+    if (m_original_status != nullptr)
+        m_api.set_file_description_status(
+                m_file_descriptor, *m_original_status);
+    return std::move(m_file_descriptor);
 }
 
 } // namespace io

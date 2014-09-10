@@ -43,13 +43,13 @@ namespace io {
 namespace {
 
 using ResultPair = std::pair<
-        NonBlockingFileDescriptor,
+        non_blocking_file_descriptor,
         variant<std::vector<char>, std::error_code>>;
 
 struct Reader {
 
     const ReaderApi &api;
-    NonBlockingFileDescriptor fd;
+    non_blocking_file_descriptor fd;
     std::vector<char> buffer;
 
     ResultPair operator()(std::size_t bytesRead) {
@@ -83,7 +83,7 @@ struct Reader {
 future<ResultPair> read(
         const ReaderApi &api,
         proactor &p,
-        NonBlockingFileDescriptor &&fd,
+        non_blocking_file_descriptor &&fd,
         std::vector<char>::size_type maxBytesToRead) {
     if (maxBytesToRead == 0)
         return make_future<ResultPair>(std::move(fd), std::vector<char>());

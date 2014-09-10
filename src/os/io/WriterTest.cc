@@ -35,8 +35,8 @@
 #include "os/event/trigger.hh"
 #include "os/event/writable_file_descriptor.hh"
 #include "os/io/file_descriptor.hh"
-#include "os/io/NonBlockingFileDescriptor.hh"
-#include "os/io/NonBlockingFileDescriptorTestHelper.hh"
+#include "os/io/non_blocking_file_descriptor.hh"
+#include "os/io/non_blocking_file_descriptor_test_helper.hh"
 #include "os/io/Writer.hh"
 #include "os/io/WriterApi.hh"
 
@@ -52,13 +52,13 @@ using sesh::common::trial;
 using sesh::os::event::proactor;
 using sesh::os::event::trigger;
 using sesh::os::event::writable_file_descriptor;
+using sesh::os::io::dummy_non_blocking_file_descriptor;
 using sesh::os::io::file_descriptor;
-using sesh::os::io::NonBlockingFileDescriptor;
+using sesh::os::io::non_blocking_file_descriptor;
 using sesh::os::io::WriterApi;
-using sesh::os::io::dummyNonBlockingFileDescriptor;
 using sesh::os::io::write;
 
-using ResultPair = std::pair<NonBlockingFileDescriptor, std::error_code>;
+using ResultPair = std::pair<non_blocking_file_descriptor, std::error_code>;
 
 class UncallableWriterApi : public WriterApi {
 
@@ -93,12 +93,15 @@ TEST_CASE("Write: empty") {
     UncallableWriterApi api;
     UncallableProactor p;
     future<ResultPair> f = write(
-            api, p, dummyNonBlockingFileDescriptor(FD), std::vector<char>());
+            api,
+            p,
+            dummy_non_blocking_file_descriptor(FD),
+            std::vector<char>());
 
     bool called = false;
     std::move(f).then([FD, &called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         CHECK(r->second.value() == 0);
         r->first.release().clear();
@@ -171,13 +174,13 @@ TEST_CASE_METHOD(WriteTestFixture, "Write: one byte") {
     future<ResultPair> f = sesh::os::io::write(
             *this,
             *this,
-            dummyNonBlockingFileDescriptor(FD),
+            dummy_non_blocking_file_descriptor(FD),
             std::vector<char>{C});
 
     bool called = false;
     std::move(f).then([&called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         CHECK(r->second.value() == 0);
         r->first.release().clear();
@@ -197,12 +200,12 @@ TEST_CASE_METHOD(WriteTestFixture, "Write: 25 bytes in three writes") {
     std::string chars = "0123456789abcdefghijklmno";
     std::vector<char> bytes(chars.begin(), chars.end());
     future<ResultPair> f = sesh::os::io::write(
-            *this, *this, dummyNonBlockingFileDescriptor(FD), copy(bytes));
+            *this, *this, dummy_non_blocking_file_descriptor(FD), copy(bytes));
 
     bool called = false;
     std::move(f).then([&called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         CHECK(r->second.value() == 0);
         r->first.release().clear();
@@ -245,12 +248,12 @@ TEST_CASE("Write: domain error in proactor") {
     UncallableWriterApi api;
     DomainErrorProactor p;
     future<ResultPair> f = write(
-            api, p, dummyNonBlockingFileDescriptor(FD), {'C'});
+            api, p, dummy_non_blocking_file_descriptor(FD), {'C'});
 
     bool called = false;
     std::move(f).then([FD, &called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         CHECK(r->second ==
                 std::make_error_code(std::errc::too_many_files_open));
@@ -278,12 +281,12 @@ TEST_CASE("Write: write error") {
     WriteErrorApi api;
     EchoingProactor proactor;
     future<ResultPair> f = sesh::os::io::write(
-            api, proactor, dummyNonBlockingFileDescriptor(FD), {'A'});
+            api, proactor, dummy_non_blocking_file_descriptor(FD), {'A'});
 
     bool called = false;
     std::move(f).then([FD, &called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         CHECK(r->second == std::make_error_code(std::errc::io_error));
         r->first.release().clear();

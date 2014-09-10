@@ -35,8 +35,8 @@
 #include "os/event/readable_file_descriptor.hh"
 #include "os/event/trigger.hh"
 #include "os/io/file_descriptor.hh"
-#include "os/io/NonBlockingFileDescriptor.hh"
-#include "os/io/NonBlockingFileDescriptorTestHelper.hh"
+#include "os/io/non_blocking_file_descriptor.hh"
+#include "os/io/non_blocking_file_descriptor_test_helper.hh"
 #include "os/io/Reader.hh"
 #include "os/io/ReaderApi.hh"
 
@@ -52,14 +52,14 @@ using sesh::common::variant;
 using sesh::os::event::proactor;
 using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::trigger;
+using sesh::os::io::dummy_non_blocking_file_descriptor;
 using sesh::os::io::file_descriptor;
-using sesh::os::io::NonBlockingFileDescriptor;
+using sesh::os::io::non_blocking_file_descriptor;
 using sesh::os::io::ReaderApi;
-using sesh::os::io::dummyNonBlockingFileDescriptor;
 using sesh::os::io::read;
 
 using ResultPair = std::pair<
-        NonBlockingFileDescriptor,
+        non_blocking_file_descriptor,
         variant<std::vector<char>, std::error_code>>;
 
 class UncallableReaderApi : public ReaderApi {
@@ -94,12 +94,13 @@ TEST_CASE("Read: empty") {
     const file_descriptor::value_type FD = 2;
     UncallableReaderApi api;
     UncallableProactor p;
-    future<ResultPair> f = read(api, p, dummyNonBlockingFileDescriptor(FD), 0);
+    future<ResultPair> f =
+            read(api, p, dummy_non_blocking_file_descriptor(FD), 0);
 
     bool called = false;
     std::move(f).then([FD, &called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
         CHECK(r->second.value<std::vector<char>>().empty());
@@ -175,12 +176,12 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than available") {
     readableBytes.assign(2, C);
 
     future<ResultPair> f = sesh::os::io::read(
-            *this, *this, dummyNonBlockingFileDescriptor(FD), 1);
+            *this, *this, dummy_non_blocking_file_descriptor(FD), 1);
 
     bool called = false;
     std::move(f).then([C, &called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
         REQUIRE(r->second.value<std::vector<char>>().size() == 1);
@@ -204,12 +205,12 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than buffer size") {
     readableBytes = bytes;
 
     future<ResultPair> f = sesh::os::io::read(
-            *this, *this, dummyNonBlockingFileDescriptor(FD), 11);
+            *this, *this, dummy_non_blocking_file_descriptor(FD), 11);
 
     bool called = false;
     std::move(f).then([&bytes, &called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
         CHECK(r->second.value<std::vector<char>>() == bytes);
@@ -243,12 +244,12 @@ TEST_CASE("Read: domain error in proactor") {
     UncallableReaderApi api;
     DomainErrorProactor p;
     future<ResultPair> f = read(
-            api, p, dummyNonBlockingFileDescriptor(FD), {'C'});
+            api, p, dummy_non_blocking_file_descriptor(FD), {'C'});
 
     bool called = false;
     std::move(f).then([FD, &called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::error_code>());
         CHECK(r->second.value<std::error_code>() ==
@@ -277,12 +278,12 @@ TEST_CASE("Read: read error") {
     ReadErrorApiStub api;
     EchoingProactor proactor;
     future<ResultPair> f = sesh::os::io::read(
-            api, proactor, dummyNonBlockingFileDescriptor(FD), {'A'});
+            api, proactor, dummy_non_blocking_file_descriptor(FD), {'A'});
 
     bool called = false;
     std::move(f).then([FD, &called](trial<ResultPair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
+        CHECK(r->first.is_valid());
         CHECK(r->first.value() == FD);
         REQUIRE(r->second.tag() == r->second.tag<std::error_code>());
         CHECK(r->second.value<std::error_code>() ==

@@ -26,7 +26,7 @@
 #include "async/future.hh"
 #include "common/variant.hh"
 #include "os/event/proactor.hh"
-#include "os/io/NonBlockingFileDescriptor.hh"
+#include "os/io/non_blocking_file_descriptor.hh"
 #include "os/io/ReaderApi.hh"
 
 namespace sesh {
@@ -56,10 +56,10 @@ namespace io {
 auto read(
         const ReaderApi &,
         event::proactor &,
-        NonBlockingFileDescriptor &&,
+        non_blocking_file_descriptor &&,
         std::vector<char>::size_type maxBytesToRead)
         -> async::future<std::pair<
-                NonBlockingFileDescriptor,
+                non_blocking_file_descriptor,
                 common::variant<std::vector<char>, std::error_code>>>;
 
 } // namespace io

@@ -41,13 +41,13 @@ namespace io {
 
 namespace {
 
-using ResultPair = std::pair<NonBlockingFileDescriptor, std::error_code>;
+using ResultPair = std::pair<non_blocking_file_descriptor, std::error_code>;
 
 struct Writer {
 
     const WriterApi &api;
     class proactor &proactor;
-    NonBlockingFileDescriptor fd;
+    non_blocking_file_descriptor fd;
     std::vector<char> bytes;
 
     future<ResultPair> operator()(std::size_t bytesWritten) {
@@ -84,7 +84,7 @@ struct Writer {
 future<ResultPair> write(
         const WriterApi &api,
         proactor &p,
-        NonBlockingFileDescriptor &&fd,
+        non_blocking_file_descriptor &&fd,
         std::vector<char> &&bytes) {
     if (bytes.empty())
         return make_future<ResultPair>(std::move(fd), std::error_code());

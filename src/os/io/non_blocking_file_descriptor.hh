@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_NonBlockingFileDescriptor_hh
-#define INCLUDED_os_io_NonBlockingFileDescriptor_hh
+#ifndef INCLUDED_os_io_non_blocking_file_descriptor_hh
+#define INCLUDED_os_io_non_blocking_file_descriptor_hh
 
 #include "buildconfig.h"
 
@@ -37,14 +37,14 @@ namespace io {
  * its non-blocking mode is set. When the non-blocking file descriptor is
  * {@link #release()}d, the non-blocking mode is reset.
  */
-class NonBlockingFileDescriptor {
+class non_blocking_file_descriptor {
 
 private:
 
-    const file_description_api &mApi;
+    const file_description_api &m_api;
 
-    file_descriptor mFileDescriptor;
-    std::unique_ptr<file_description_status> mOriginalStatus;
+    file_descriptor m_file_descriptor;
+    std::unique_ptr<file_description_status> m_original_status;
 
 public:
 
@@ -53,16 +53,16 @@ public:
      * The result is unspecified if this file descriptor is invalid.
      */
     file_descriptor::value_type value() const noexcept {
-        return mFileDescriptor.value();
+        return m_file_descriptor.value();
     }
 
     /** Checks if this file descriptor contains a valid value. */
-    bool isValid() const noexcept {
-        return mFileDescriptor.is_valid();
+    bool is_valid() const noexcept {
+        return m_file_descriptor.is_valid();
     }
 
     operator const file_descriptor &() const noexcept {
-        return mFileDescriptor;
+        return m_file_descriptor;
     }
 
     /**
@@ -77,11 +77,12 @@ public:
      * descriptor is destructed.
      * @param fd File descriptor whose non-blocking flag will be set.
      */
-    NonBlockingFileDescriptor(
+    non_blocking_file_descriptor(
             const file_description_api &api, file_descriptor &&fd);
 
     /** Move constructor. */
-    NonBlockingFileDescriptor(NonBlockingFileDescriptor &&) noexcept = default;
+    non_blocking_file_descriptor(non_blocking_file_descriptor &&) noexcept =
+            default;
 
     /**
      * Restores the non-blocking mode of the file descriptor to the original
@@ -102,14 +103,14 @@ public:
      * Destructs the non-blocking file descriptor instance. The file descriptor
      * must be invalid on destruction; otherwise the behavior is undefined.
      */
-    ~NonBlockingFileDescriptor() = default;
+    ~non_blocking_file_descriptor() = default;
 
-}; // class NonBlockingFileDescriptor
+}; // class non_blocking_file_descriptor
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_NonBlockingFileDescriptor_hh
+#endif // #ifndef INCLUDED_os_io_non_blocking_file_descriptor_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_NonBlockingFileDescriptorTestHelper_hh
-#define INCLUDED_os_io_NonBlockingFileDescriptorTestHelper_hh
+#ifndef INCLUDED_os_io_non_blocking_file_descriptor_test_helper_hh
+#define INCLUDED_os_io_non_blocking_file_descriptor_test_helper_hh
 
 #include "buildconfig.h"
 
@@ -24,27 +24,27 @@
 #include <utility>
 #include "os/io/file_description_api_test_helper.hh"
 #include "os/io/file_descriptor.hh"
-#include "os/io/NonBlockingFileDescriptor.hh"
+#include "os/io/non_blocking_file_descriptor.hh"
 
 namespace sesh {
 namespace os {
 namespace io {
 
-inline auto dummyNonBlockingFileDescriptor(file_descriptor &&fd)
-        -> NonBlockingFileDescriptor {
+inline auto dummy_non_blocking_file_descriptor(file_descriptor &&fd)
+        -> non_blocking_file_descriptor {
     static file_description_api_dummy api;
-    return NonBlockingFileDescriptor(api, std::move(fd));
+    return non_blocking_file_descriptor(api, std::move(fd));
 }
 
-inline auto dummyNonBlockingFileDescriptor(file_descriptor::value_type fd)
-        -> NonBlockingFileDescriptor {
-    return dummyNonBlockingFileDescriptor(file_descriptor(fd));
+inline auto dummy_non_blocking_file_descriptor(file_descriptor::value_type fd)
+        -> non_blocking_file_descriptor {
+    return dummy_non_blocking_file_descriptor(file_descriptor(fd));
 }
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_NonBlockingFileDescriptorTestHelper_hh
+#endif // #ifndef INCLUDED_os_io_non_blocking_file_descriptor_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -62,7 +62,7 @@ TESTPROGRAMS = \
 	src/os/event/awaiter_user_provided_trigger_test \
 	src/os/event/awaiter_writable_file_descriptor_test \
 	src/os/io/file_descriptor_test \
-	src/os/io/NonBlockingFileDescriptorTest \
+	src/os/io/non_blocking_file_descriptor_test \
 	src/os/io/ReaderTest \
 	src/os/io/WriterTest \
 	src/os/signaling/HandlerConfigurationTest
@@ -185,8 +185,8 @@ src_sesh_SOURCES = \
 	src/os/io/file_descriptor_open_mode.hh \
 	src/os/io/file_descriptor_set.hh \
 	src/os/io/file_mode.hh \
-	src/os/io/NonBlockingFileDescriptor.cc \
-	src/os/io/NonBlockingFileDescriptor.hh \
+	src/os/io/non_blocking_file_descriptor.cc \
+	src/os/io/non_blocking_file_descriptor.hh \
 	src/os/io/Reader.cc \
 	src/os/io/Reader.hh \
 	src/os/io/ReaderApi.hh \
@@ -371,15 +371,15 @@ src_os_event_awaiter_writable_file_descriptor_test_SOURCES = \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_io_file_descriptor_test_SOURCES = \
 	src/os/io/file_descriptor_test.cc
-src_os_io_NonBlockingFileDescriptorTest_SOURCES = \
-	src/os/io/NonBlockingFileDescriptor.cc \
-	src/os/io/NonBlockingFileDescriptorTest.cc
+src_os_io_non_blocking_file_descriptor_test_SOURCES = \
+	src/os/io/non_blocking_file_descriptor.cc \
+	src/os/io/non_blocking_file_descriptor_test.cc
 src_os_io_ReaderTest_SOURCES = \
-	src/os/io/NonBlockingFileDescriptor.cc \
+	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/Reader.cc \
 	src/os/io/ReaderTest.cc
 src_os_io_WriterTest_SOURCES = \
-	src/os/io/NonBlockingFileDescriptor.cc \
+	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/Writer.cc \
 	src/os/io/WriterTest.cc
 src_os_signaling_HandlerConfigurationTest_SOURCES = \
@@ -399,7 +399,7 @@ TESTHEADERS = \
 	src/os/event/pselect_api_test_helper.hh \
 	src/os/io/file_description_api_test_helper.hh \
 	src/os/io/file_descriptor_set_test_helper.hh \
-	src/os/io/NonBlockingFileDescriptorTestHelper.hh \
+	src/os/io/non_blocking_file_descriptor_test_helper.hh \
 	src/os/signaling/HandlerConfigurationApiTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh \
 	src/os/time_api_test_helper.hh

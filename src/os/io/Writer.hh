@@ -24,7 +24,7 @@
 #include <utility>
 #include "async/future.hh"
 #include "os/event/proactor.hh"
-#include "os/io/NonBlockingFileDescriptor.hh"
+#include "os/io/non_blocking_file_descriptor.hh"
 #include "os/io/WriterApi.hh"
 
 namespace sesh {
@@ -47,10 +47,10 @@ namespace io {
  * success, the error code is zero. A non-zero error code indicates an error,
  * but some bytes have been written before the error occurred.
  */
-async::future<std::pair<NonBlockingFileDescriptor, std::error_code>> write(
+async::future<std::pair<non_blocking_file_descriptor, std::error_code>> write(
         const WriterApi &,
         event::proactor &,
-        NonBlockingFileDescriptor &&,
+        non_blocking_file_descriptor &&,
         std::vector<char> &&);
 
 } // namespace io
