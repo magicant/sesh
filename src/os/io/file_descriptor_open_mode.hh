@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptorOpenMode_hh
-#define INCLUDED_os_io_FileDescriptorOpenMode_hh
+#ifndef INCLUDED_os_io_file_descriptor_open_mode_hh
+#define INCLUDED_os_io_file_descriptor_open_mode_hh
 
 #include "buildconfig.h"
 
@@ -28,15 +28,15 @@ namespace os {
 namespace io {
 
 /** This enum class defines the behavior of the file open API. */
-enum class FileDescriptorOpenMode {
-    CLOSE_ON_EXEC,
-    CREATE,
-    DIRECTORY,
-    EXCLUSIVE,
-    NO_CONTROLLING_TERMINAL,
-    NO_FOLLOW,
-    TRUNCATE,
-    TTY_INITIALIZE,
+enum class file_descriptor_open_mode {
+    close_on_exec,
+    create,
+    directory,
+    exclusive,
+    no_controlling_terminal,
+    no_follow,
+    truncate,
+    tty_initialize,
 };
 
 } // namespace io
@@ -45,16 +45,16 @@ enum class FileDescriptorOpenMode {
 namespace common {
 
 template<>
-class enum_traits<os::io::FileDescriptorOpenMode> {
+class enum_traits<os::io::file_descriptor_open_mode> {
 public:
-    constexpr static os::io::FileDescriptorOpenMode max =
-            os::io::FileDescriptorOpenMode::TTY_INITIALIZE;
+    constexpr static os::io::file_descriptor_open_mode max =
+            os::io::file_descriptor_open_mode::tty_initialize;
 };
 
 } // namespace common
 
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptorOpenMode_hh
+#endif // #ifndef INCLUDED_os_io_file_descriptor_open_mode_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -27,7 +27,7 @@
 #include "os/io/file_description_access_mode.hh"
 #include "os/io/file_description_attribute.hh"
 #include "os/io/file_descriptor.hh"
-#include "os/io/FileDescriptorOpenMode.hh"
+#include "os/io/file_descriptor_open_mode.hh"
 #include "os/io/FileMode.hh"
 
 namespace sesh {
@@ -49,7 +49,7 @@ public:
             const char *path,
             file_description_access_mode,
             common::enum_set<file_description_attribute>,
-            common::enum_set<FileDescriptorOpenMode>,
+            common::enum_set<file_descriptor_open_mode>,
             common::enum_set<FileMode>) const = 0;
 
     /**

@@ -35,7 +35,7 @@
 #include "os/io/file_description_attribute.hh"
 #include "os/io/file_description_status.hh"
 #include "os/io/file_descriptor.hh"
-#include "os/io/FileDescriptorOpenMode.hh"
+#include "os/io/file_descriptor_open_mode.hh"
 #include "os/io/FileDescriptorSet.hh"
 #include "os/io/FileMode.hh"
 #include "os/signaling/SignalNumber.hh"
@@ -50,7 +50,7 @@ using sesh::os::io::file_description_access_mode;
 using sesh::os::io::file_description_attribute;
 using sesh::os::io::file_description_status;
 using sesh::os::io::file_descriptor;
-using sesh::os::io::FileDescriptorOpenMode;
+using sesh::os::io::file_descriptor_open_mode;
 using sesh::os::io::FileDescriptorSet;
 using sesh::os::io::FileMode;
 using sesh::os::signaling::SignalNumber;
@@ -119,23 +119,23 @@ enum sesh_osapi_fcntl_file_attribute convert(file_description_attribute a)
     UNREACHABLE();
 }
 
-enum sesh_osapi_open_mode convert(FileDescriptorOpenMode mode) noexcept {
+enum sesh_osapi_open_mode convert(file_descriptor_open_mode mode) noexcept {
     switch (mode) {
-    case FileDescriptorOpenMode::CLOSE_ON_EXEC:
+    case file_descriptor_open_mode::close_on_exec:
         return SESH_OSAPI_O_CLOEXEC;
-    case FileDescriptorOpenMode::CREATE:
+    case file_descriptor_open_mode::create:
         return SESH_OSAPI_O_CREAT;
-    case FileDescriptorOpenMode::DIRECTORY:
+    case file_descriptor_open_mode::directory:
         return SESH_OSAPI_O_DIRECTORY;
-    case FileDescriptorOpenMode::EXCLUSIVE:
+    case file_descriptor_open_mode::exclusive:
         return SESH_OSAPI_O_EXCL;
-    case FileDescriptorOpenMode::NO_CONTROLLING_TERMINAL:
+    case file_descriptor_open_mode::no_controlling_terminal:
         return SESH_OSAPI_O_NOCTTY;
-    case FileDescriptorOpenMode::NO_FOLLOW:
+    case file_descriptor_open_mode::no_follow:
         return SESH_OSAPI_O_NOFOLLOW;
-    case FileDescriptorOpenMode::TRUNCATE:
+    case file_descriptor_open_mode::truncate:
         return SESH_OSAPI_O_TRUNC;
-    case FileDescriptorOpenMode::TTY_INITIALIZE:
+    case file_descriptor_open_mode::tty_initialize:
         return SESH_OSAPI_O_TTY_INIT;
     }
     UNREACHABLE();
@@ -145,7 +145,7 @@ int to_raw_flag(file_description_attribute a) {
     return sesh_osapi_fcntl_file_attribute_to_raw(convert(a));
 }
 
-int to_raw_flag(FileDescriptorOpenMode mode) {
+int to_raw_flag(file_descriptor_open_mode mode) {
     return sesh_osapi_open_mode_to_raw(convert(mode));
 }
 
@@ -153,7 +153,7 @@ int to_raw_flag(FileDescriptorOpenMode mode) {
 int to_raw_flags(
         file_description_access_mode access_mode,
         enum_set<file_description_attribute> attributes,
-        enum_set<FileDescriptorOpenMode> open_modes) {
+        enum_set<file_descriptor_open_mode> open_modes) {
     int raw_flags = to_raw_flag(access_mode);
     if (raw_flags == -1)
         return -1;
@@ -162,7 +162,7 @@ int to_raw_flags(
         if (attributes[a])
             raw_flags |= to_raw_flag(a);
 
-    for (auto m : enumerators<FileDescriptorOpenMode>())
+    for (auto m : enumerators<file_descriptor_open_mode>())
         if (open_modes[m])
             raw_flags |= to_raw_flag(m);
 
@@ -411,7 +411,7 @@ class api_impl : public api {
             const char *path,
             file_description_access_mode access_mode,
             enum_set<file_description_attribute> attributes,
-            enum_set<FileDescriptorOpenMode> open_modes,
+            enum_set<file_descriptor_open_mode> open_modes,
             enum_set<FileMode> file_modes) const final override {
         int flags = to_raw_flags(access_mode, attributes, open_modes);
         if (flags == -1)
