@@ -27,7 +27,7 @@
 #include "common/variant.hh"
 #include "os/event/proactor.hh"
 #include "os/io/non_blocking_file_descriptor.hh"
-#include "os/io/ReaderApi.hh"
+#include "os/io/reader_api.hh"
 
 namespace sesh {
 namespace os {
@@ -54,7 +54,7 @@ namespace io {
  * actual number of bytes returned may be smaller.
  */
 auto read(
-        const ReaderApi &,
+        const reader_api &,
         event::proactor &,
         non_blocking_file_descriptor &&,
         std::vector<char>::size_type max_bytes_to_read)

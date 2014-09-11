@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_ReaderApi_hh
-#define INCLUDED_os_io_ReaderApi_hh
+#ifndef INCLUDED_os_io_reader_api_hh
+#define INCLUDED_os_io_reader_api_hh
 
 #include "buildconfig.h"
 
@@ -30,11 +30,11 @@ namespace os {
 namespace io {
 
 /** Abstraction of POSIX API for reading. */
-class ReaderApi {
+class reader_api {
 
 public:
 
-    using ReadResult = common::variant<std::size_t, std::error_code>;
+    using read_result = common::variant<std::size_t, std::error_code>;
 
     /**
      * Reads bytes from the given file descriptor. This function may block on
@@ -43,15 +43,15 @@ public:
      * On success, the number of actually read bytes is returned. On failure, a
      * non-zero error code is returned.
      */
-    virtual ReadResult read(const file_descriptor &, void *, std::size_t) const
-            = 0;
+    virtual read_result read(const file_descriptor &, void *, std::size_t)
+            const = 0;
 
-}; // class ReaderApi
+}; // class reader_api
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_ReaderApi_hh
+#endif // #ifndef INCLUDED_os_io_reader_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -436,7 +436,7 @@ class api_impl : public api {
         return ec;
     }
 
-    ReadResult read(
+    read_result read(
             const file_descriptor &fd,
             void *buffer,
             std::size_t max_bytes_to_read)

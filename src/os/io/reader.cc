@@ -48,7 +48,7 @@ using result_pair = std::pair<
 
 struct reader {
 
-    const ReaderApi &api;
+    const reader_api &api;
     non_blocking_file_descriptor fd;
     std::vector<char> buffer;
 
@@ -81,7 +81,7 @@ struct reader {
 } // namespace
 
 future<result_pair> read(
-        const ReaderApi &api,
+        const reader_api &api,
         proactor &p,
         non_blocking_file_descriptor &&fd,
         std::vector<char>::size_type max_bytes_to_read) {

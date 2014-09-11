@@ -38,7 +38,7 @@
 #include "os/io/non_blocking_file_descriptor.hh"
 #include "os/io/non_blocking_file_descriptor_test_helper.hh"
 #include "os/io/reader.hh"
-#include "os/io/ReaderApi.hh"
+#include "os/io/reader_api.hh"
 
 namespace {
 
@@ -55,16 +55,16 @@ using sesh::os::event::trigger;
 using sesh::os::io::dummy_non_blocking_file_descriptor;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::non_blocking_file_descriptor;
-using sesh::os::io::ReaderApi;
 using sesh::os::io::read;
+using sesh::os::io::reader_api;
 
 using result_pair = std::pair<
         non_blocking_file_descriptor,
         variant<std::vector<char>, std::error_code>>;
 
-class uncallable_reader_api : public ReaderApi {
+class uncallable_reader_api : public reader_api {
 
-    ReadResult read(const file_descriptor &, void *, std::size_t) const
+    read_result read(const file_descriptor &, void *, std::size_t) const
             override {
         throw "unexpected read";
     }
@@ -116,7 +116,7 @@ namespace non_empty_read {
 
 constexpr static file_descriptor::value_type fd_value = 3;
 
-class read_test_fixture : public ReaderApi, public proactor {
+class read_test_fixture : public reader_api, public proactor {
 
 private:
 
@@ -138,7 +138,8 @@ public:
 
 private:
 
-    ReadResult read(const file_descriptor &fd, void *buffer, std::size_t count)
+    read_result read(
+            const file_descriptor &fd, void *buffer, std::size_t count)
             const override {
         CHECK(m_is_ready_to_read);
         m_is_ready_to_read = false;
@@ -265,9 +266,9 @@ TEST_CASE("Read: domain error in proactor") {
 
 namespace read_error {
 
-class read_error_api_stub : public ReaderApi {
+class read_error_api_stub : public reader_api {
 
-    ReadResult read(const file_descriptor &, void *, std::size_t) const
+    read_result read(const file_descriptor &, void *, std::size_t) const
             override {
         return std::make_error_code(std::errc::io_error);
     }

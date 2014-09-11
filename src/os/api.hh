@@ -23,7 +23,7 @@
 #include "os/event/pselect_api.hh"
 #include "os/io/file_description_api.hh"
 #include "os/io/file_descriptor_api.hh"
-#include "os/io/ReaderApi.hh"
+#include "os/io/reader_api.hh"
 #include "os/io/WriterApi.hh"
 #include "os/signaling/HandlerConfigurationApi.hh"
 
@@ -35,7 +35,7 @@ class api :
         public event::pselect_api,
         public io::file_description_api,
         public io::file_descriptor_api,
-        public io::ReaderApi,
+        public io::reader_api,
         public io::WriterApi,
         public signaling::HandlerConfigurationApi {
 
