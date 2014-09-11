@@ -64,7 +64,7 @@ TESTPROGRAMS = \
 	src/os/io/file_descriptor_test \
 	src/os/io/non_blocking_file_descriptor_test \
 	src/os/io/reader_test \
-	src/os/io/WriterTest \
+	src/os/io/writer_test \
 	src/os/signaling/HandlerConfigurationTest
 
 TESTSCRIPTS = \
@@ -190,8 +190,8 @@ src_sesh_SOURCES = \
 	src/os/io/reader.cc \
 	src/os/io/reader.hh \
 	src/os/io/reader_api.hh \
-	src/os/io/Writer.cc \
-	src/os/io/Writer.hh \
+	src/os/io/writer.cc \
+	src/os/io/writer.hh \
 	src/os/io/WriterApi.hh \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfiguration.hh \
@@ -378,10 +378,10 @@ src_os_io_reader_test_SOURCES = \
 	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/reader.cc \
 	src/os/io/reader_test.cc
-src_os_io_WriterTest_SOURCES = \
+src_os_io_writer_test_SOURCES = \
 	src/os/io/non_blocking_file_descriptor.cc \
-	src/os/io/Writer.cc \
-	src/os/io/WriterTest.cc
+	src/os/io/writer.cc \
+	src/os/io/writer_test.cc
 src_os_signaling_HandlerConfigurationTest_SOURCES = \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \

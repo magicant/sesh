@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_Writer_hh
-#define INCLUDED_os_io_Writer_hh
+#ifndef INCLUDED_os_io_writer_hh
+#define INCLUDED_os_io_writer_hh
 
 #include "buildconfig.h"
 
@@ -57,6 +57,6 @@ async::future<std::pair<non_blocking_file_descriptor, std::error_code>> write(
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_Writer_hh
+#endif // #ifndef INCLUDED_os_io_writer_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
