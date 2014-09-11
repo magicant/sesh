@@ -38,7 +38,7 @@
 #include "os/io/non_blocking_file_descriptor.hh"
 #include "os/io/non_blocking_file_descriptor_test_helper.hh"
 #include "os/io/writer.hh"
-#include "os/io/WriterApi.hh"
+#include "os/io/writer_api.hh"
 
 namespace {
 
@@ -55,15 +55,15 @@ using sesh::os::event::writable_file_descriptor;
 using sesh::os::io::dummy_non_blocking_file_descriptor;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::non_blocking_file_descriptor;
-using sesh::os::io::WriterApi;
 using sesh::os::io::write;
+using sesh::os::io::writer_api;
 
 using result_pair = std::pair<non_blocking_file_descriptor, std::error_code>;
 
-class uncallable_writer_api : public WriterApi {
+class uncallable_writer_api : public writer_api {
 
-    WriteResult write(const file_descriptor &, const void *, std::size_t) const
-            override {
+    write_result write(const file_descriptor &, const void *, std::size_t)
+            const override {
         throw "unexpected write";
     }
 
@@ -116,7 +116,7 @@ namespace non_empty_write {
 
 constexpr static file_descriptor::value_type fd_value = 3;
 
-class write_test_fixture : public WriterApi, public proactor {
+class write_test_fixture : public writer_api, public proactor {
 
 private:
 
@@ -138,7 +138,7 @@ public:
 
 private:
 
-    WriteResult write(
+    write_result write(
             const file_descriptor &fd, const void *bytes, std::size_t count)
             const override {
         CHECK(m_is_ready_to_write);
@@ -271,10 +271,10 @@ TEST_CASE("Write: domain error in proactor") {
 
 namespace write_error {
 
-class write_error_api : public WriterApi {
+class write_error_api : public writer_api {
 
-    WriteResult write(const file_descriptor &, const void *, std::size_t) const
-            override {
+    write_result write(const file_descriptor &, const void *, std::size_t)
+            const override {
         return std::make_error_code(std::errc::io_error);
     }
 

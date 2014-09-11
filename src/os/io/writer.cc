@@ -45,7 +45,7 @@ using result_pair = std::pair<non_blocking_file_descriptor, std::error_code>;
 
 struct writer {
 
-    const WriterApi &api;
+    const writer_api &api;
     class proactor &proactor;
     non_blocking_file_descriptor fd;
     std::vector<char> bytes;
@@ -82,7 +82,7 @@ struct writer {
 } // namespace
 
 future<result_pair> write(
-        const WriterApi &api,
+        const writer_api &api,
         proactor &p,
         non_blocking_file_descriptor &&fd,
         std::vector<char> &&bytes) {

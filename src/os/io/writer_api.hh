@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_WriterApi_hh
-#define INCLUDED_os_io_WriterApi_hh
+#ifndef INCLUDED_os_io_writer_api_hh
+#define INCLUDED_os_io_writer_api_hh
 
 #include "buildconfig.h"
 
@@ -30,11 +30,11 @@ namespace os {
 namespace io {
 
 /** Abstraction of POSIX API for writing. */
-class WriterApi {
+class writer_api {
 
 public:
 
-    using WriteResult = common::variant<std::size_t, std::error_code>;
+    using write_result = common::variant<std::size_t, std::error_code>;
 
     /**
      * Writes bytes to the given file descriptor. This function may block on
@@ -43,15 +43,15 @@ public:
      * On success, the number of actually written bytes is returned. On
      * failure, a non-zero error code is returned.
      */
-    virtual WriteResult write(
+    virtual write_result write(
             const file_descriptor &, const void *, std::size_t) const = 0;
 
-}; // class WriterApi
+}; // class writer_api
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_WriterApi_hh
+#endif // #ifndef INCLUDED_os_io_writer_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -192,7 +192,7 @@ src_sesh_SOURCES = \
 	src/os/io/reader_api.hh \
 	src/os/io/writer.cc \
 	src/os/io/writer.hh \
-	src/os/io/WriterApi.hh \
+	src/os/io/writer_api.hh \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfiguration.hh \
 	src/os/signaling/HandlerConfigurationApi.cc \

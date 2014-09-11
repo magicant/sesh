@@ -448,7 +448,7 @@ class api_impl : public api {
         return bytes_read;
     }
 
-    WriteResult write(
+    write_result write(
             const file_descriptor &fd,
             const void *bytes,
             std::size_t bytes_to_write)

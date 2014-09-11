@@ -25,7 +25,7 @@
 #include "async/future.hh"
 #include "os/event/proactor.hh"
 #include "os/io/non_blocking_file_descriptor.hh"
-#include "os/io/WriterApi.hh"
+#include "os/io/writer_api.hh"
 
 namespace sesh {
 namespace os {
@@ -48,7 +48,7 @@ namespace io {
  * but some bytes have been written before the error occurred.
  */
 async::future<std::pair<non_blocking_file_descriptor, std::error_code>> write(
-        const WriterApi &,
+        const writer_api &,
         event::proactor &,
         non_blocking_file_descriptor &&,
         std::vector<char> &&);

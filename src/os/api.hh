@@ -24,7 +24,7 @@
 #include "os/io/file_description_api.hh"
 #include "os/io/file_descriptor_api.hh"
 #include "os/io/reader_api.hh"
-#include "os/io/WriterApi.hh"
+#include "os/io/writer_api.hh"
 #include "os/signaling/HandlerConfigurationApi.hh"
 
 namespace sesh {
@@ -36,7 +36,7 @@ class api :
         public io::file_description_api,
         public io::file_descriptor_api,
         public io::reader_api,
-        public io::WriterApi,
+        public io::writer_api,
         public signaling::HandlerConfigurationApi {
 
 public:
