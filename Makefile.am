@@ -63,7 +63,7 @@ TESTPROGRAMS = \
 	src/os/event/awaiter_writable_file_descriptor_test \
 	src/os/io/file_descriptor_test \
 	src/os/io/non_blocking_file_descriptor_test \
-	src/os/io/ReaderTest \
+	src/os/io/reader_test \
 	src/os/io/WriterTest \
 	src/os/signaling/HandlerConfigurationTest
 
@@ -187,8 +187,8 @@ src_sesh_SOURCES = \
 	src/os/io/file_mode.hh \
 	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/non_blocking_file_descriptor.hh \
-	src/os/io/Reader.cc \
-	src/os/io/Reader.hh \
+	src/os/io/reader.cc \
+	src/os/io/reader.hh \
 	src/os/io/ReaderApi.hh \
 	src/os/io/Writer.cc \
 	src/os/io/Writer.hh \
@@ -374,10 +374,10 @@ src_os_io_file_descriptor_test_SOURCES = \
 src_os_io_non_blocking_file_descriptor_test_SOURCES = \
 	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/non_blocking_file_descriptor_test.cc
-src_os_io_ReaderTest_SOURCES = \
+src_os_io_reader_test_SOURCES = \
 	src/os/io/non_blocking_file_descriptor.cc \
-	src/os/io/Reader.cc \
-	src/os/io/ReaderTest.cc
+	src/os/io/reader.cc \
+	src/os/io/reader_test.cc
 src_os_io_WriterTest_SOURCES = \
 	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/Writer.cc \

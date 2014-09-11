@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_Reader_hh
-#define INCLUDED_os_io_Reader_hh
+#ifndef INCLUDED_os_io_reader_hh
+#define INCLUDED_os_io_reader_hh
 
 #include "buildconfig.h"
 
@@ -47,17 +47,17 @@ namespace io {
  *
  * The result is (a copy of) the argument file descriptor and either a vector
  * of bytes that were successfully read or a non-zero error code. The vector is
- * empty if and only if {@code maxBytesToRead} is zero or the file descriptor
- * is at the end of file.
+ * empty if and only if {@code max_bytes_to_read} is zero or the file
+ * descriptor is at the end of file.
  *
- * @param maxBytesToRead The maximum number of bytes to read. Note that the
+ * @param max_bytes_to_read The maximum number of bytes to read. Note that the
  * actual number of bytes returned may be smaller.
  */
 auto read(
         const ReaderApi &,
         event::proactor &,
         non_blocking_file_descriptor &&,
-        std::vector<char>::size_type maxBytesToRead)
+        std::vector<char>::size_type max_bytes_to_read)
         -> async::future<std::pair<
                 non_blocking_file_descriptor,
                 common::variant<std::vector<char>, std::error_code>>>;
@@ -66,6 +66,6 @@ auto read(
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_Reader_hh
+#endif // #ifndef INCLUDED_os_io_reader_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
