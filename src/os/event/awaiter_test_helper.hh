@@ -37,7 +37,7 @@ class awaiter_test_fixture : protected pselect_api_stub, protected Base {
 private:
 
     std::unique_ptr<awaiter> m_awaiter = create_awaiter(
-            *this, signaling::HandlerConfiguration::create(*this));
+            *this, signaling::handler_configuration::create(*this));
 
 protected:
 

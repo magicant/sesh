@@ -64,7 +64,7 @@ public:
  */
 std::unique_ptr<awaiter> create_awaiter(
         const pselect_api &api,
-        std::shared_ptr<signaling::HandlerConfiguration> &&hc);
+        std::shared_ptr<signaling::handler_configuration> &&hc);
 
 } // namespace event
 } // namespace os

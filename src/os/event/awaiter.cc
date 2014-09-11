@@ -52,7 +52,7 @@ using sesh::common::trial;
 using sesh::common::variant;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
-using sesh::os::signaling::HandlerConfiguration;
+using sesh::os::signaling::handler_configuration;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
@@ -76,7 +76,7 @@ private:
     class timeout m_timeout;
     std::vector<file_descriptor_trigger> m_triggers;
     promise<trigger> m_promise;
-    std::vector<HandlerConfiguration::Canceler> m_cancelers;
+    std::vector<handler_configuration::canceler_type> m_cancelers;
 
 public:
 
@@ -98,7 +98,7 @@ public:
     void fire(trigger &&);
     void fail_with_current_exception();
 
-    void add_canceler(HandlerConfiguration::Canceler &&c);
+    void add_canceler(handler_configuration::canceler_type &&c);
 
 };
 
@@ -169,7 +169,7 @@ public:
 private:
 
     const pselect_api &m_api;
-    std::shared_ptr<HandlerConfiguration> m_handler_configuration;
+    std::shared_ptr<handler_configuration> m_handler_configuration;
     std::multimap<time_limit, std::shared_ptr<pending_event>> m_pending_events;
 
     future<trigger> expect_impl(std::vector<trigger> &&triggers)
@@ -189,7 +189,7 @@ private:
 public:
 
     awaiter_impl(
-            const pselect_api &, std::shared_ptr<HandlerConfiguration> &&hc);
+            const pselect_api &, std::shared_ptr<handler_configuration> &&hc);
 
     void await_events() final override;
 
@@ -202,7 +202,7 @@ pending_event::pending_event(promise<trigger> p) :
         m_cancelers() { }
 
 pending_event::~pending_event() {
-    for (HandlerConfiguration::Canceler &c : m_cancelers)
+    for (handler_configuration::canceler_type &c : m_cancelers)
         (void) c();
 }
 
@@ -220,7 +220,7 @@ void pending_event::fail_with_current_exception() {
         std::move(m_promise).fail_with_current_exception();
 }
 
-void pending_event::add_canceler(HandlerConfiguration::Canceler &&c) {
+void pending_event::add_canceler(handler_configuration::canceler_type &&c) {
     m_cancelers.push_back(std::move(c));
 }
 
@@ -322,7 +322,7 @@ void pselect_argument::apply_result(pending_event &e) const {
 }
 
 awaiter_impl::awaiter_impl(
-        const pselect_api &api, std::shared_ptr<HandlerConfiguration> &&hc) :
+        const pselect_api &api, std::shared_ptr<handler_configuration> &&hc) :
         m_api(api),
         m_handler_configuration(std::move(hc)),
         m_pending_events() {
@@ -332,13 +332,13 @@ awaiter_impl::awaiter_impl(
 void register_signal_trigger(
         signal s,
         std::shared_ptr<pending_event> &e,
-        HandlerConfiguration &hc) {
-    auto result = hc.addHandler(
+        handler_configuration &hc) {
+    auto result = hc.add_handler(
             s.number(), shared_function<signal_handler>::create(e));
     switch (result.tag()) {
-    case decltype(result)::tag<HandlerConfiguration::Canceler>():
-        return e->add_canceler(
-                std::move(result.value<HandlerConfiguration::Canceler>()));
+    case decltype(result)::tag<handler_configuration::canceler_type>():
+        return e->add_canceler(std::move(
+                result.value<handler_configuration::canceler_type>()));
     case decltype(result)::tag<std::error_code>():
         throw std::system_error(result.value<std::error_code>());
     }
@@ -362,7 +362,7 @@ void register_user_provided_trigger(
 void register_trigger(
         trigger &&t,
         std::shared_ptr<pending_event> &e,
-        HandlerConfiguration &hc) {
+        handler_configuration &hc) {
     switch (t.tag()) {
     case trigger::tag<timeout>():
         e->timeout() = std::min(e->timeout(), t.value<timeout>());
@@ -474,10 +474,10 @@ void awaiter_impl::await_events() {
             continue;
 
         std::error_code e = argument.call(
-                m_api, m_handler_configuration->maskForPselect());
+                m_api, m_handler_configuration->mask_for_pselect());
         assert(e != std::errc::bad_file_descriptor);
 
-        m_handler_configuration->callHandlers();
+        m_handler_configuration->call_handlers();
 
         if (e)
             continue;
@@ -490,7 +490,7 @@ void awaiter_impl::await_events() {
 
 std::unique_ptr<awaiter> create_awaiter(
         const pselect_api &api,
-        std::shared_ptr<HandlerConfiguration> &&hc) {
+        std::shared_ptr<handler_configuration> &&hc) {
     return std::unique_ptr<awaiter>(new awaiter_impl(api, std::move(hc)));
 }
 

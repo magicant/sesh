@@ -39,16 +39,16 @@ namespace signaling {
  * For each signal number, you can set one trap action and any number of
  * handlers.
  */
-class HandlerConfiguration {
+class handler_configuration {
 
 protected:
 
-    HandlerConfiguration() = default;
-    HandlerConfiguration(const HandlerConfiguration &) = default;
-    HandlerConfiguration(HandlerConfiguration &&) = default;
-    HandlerConfiguration &operator=(const HandlerConfiguration &) = default;
-    HandlerConfiguration &operator=(HandlerConfiguration &&) = default;
-    virtual ~HandlerConfiguration() = default;
+    handler_configuration() = default;
+    handler_configuration(const handler_configuration &) = default;
+    handler_configuration(handler_configuration &&) = default;
+    handler_configuration &operator=(const handler_configuration &) = default;
+    handler_configuration &operator=(handler_configuration &&) = default;
+    virtual ~handler_configuration() = default;
 
 public:
 
@@ -59,14 +59,14 @@ public:
      * Signal handling functions must not throw anything because multiple
      * exceptions thrown cannot be caught in the right way.
      *
-     * Handler functions are called in the {@link #callHandlers} function,
+     * Handler functions are called in the {@link #call_handlers} function,
      * not when the process receives a signal.
      */
-    using Handler = std::function<void(SignalNumber)>;
+    using handler_type = std::function<void(SignalNumber)>;
 
-    using Canceler = std::function<std::error_code()>;
+    using canceler_type = std::function<std::error_code()>;
 
-    using AddHandlerResult = common::variant<Canceler, std::error_code>;
+    using add_handler_result = common::variant<canceler_type, std::error_code>;
 
     /**
      * Adds a handler for a signal.
@@ -82,33 +82,33 @@ public:
      * and blocking mask for the signal using the OS API. If the API call
      * fails, the error code is returned.
      */
-    virtual AddHandlerResult addHandler(SignalNumber, Handler &&) = 0;
+    virtual add_handler_result add_handler(SignalNumber, handler_type &&) = 0;
 
     /**
      * The type of trap action that resorts to the OS-dependent default action.
      */
-    class Default { };
+    class default_action { };
 
-    using TrapAction = common::variant<Default, Handler>;
+    using trap_action = common::variant<default_action, handler_type>;
 
-    /** Defines the condition in which {@link #setTrap} should fail. */
-    enum class SettingPolicy {
+    /** Defines the condition in which {@link #set_trap} should fail. */
+    enum class setting_policy {
 
         /** Overwrites any pre-defined action. */
-        FORCE,
+        force,
 
         /**
          * Fails if the initial action the current process inherited from the
          * original process was "ignore."
          */
-        FAIL_IF_IGNORED,
+        fail_if_ignored,
 
     };
 
      /**
       * Sets trap action for a signal.
       *
-      * If the setting policy argument is FAIL_IF_IGNORED and the initial
+      * If the setting policy argument is fail_if_ignored and the initial
       * action for the signal is "ignore," then this function fails with
       * {@link SignalErrorCode#INITIALLY_IGNORED}.
       *
@@ -116,8 +116,8 @@ public:
       * signal using the OS API. If the API call fails, the error code is
       * returned.
       */
-    virtual std::error_code setTrap(SignalNumber, TrapAction &&, SettingPolicy)
-            = 0;
+    virtual std::error_code set_trap(
+            SignalNumber, trap_action &&, setting_policy) = 0;
 
     /**
      * Returns a nullable pointer to the signal number set to call the
@@ -126,7 +126,7 @@ public:
      * The returned pointer is valid until any action or trap configuration is
      * modified or this instance is destroyed.
      */
-    virtual const SignalNumberSet *maskForPselect() const = 0;
+    virtual const SignalNumberSet *mask_for_pselect() const = 0;
 
     /**
      * Calls signal handling functions for signals that have been received by
@@ -135,7 +135,7 @@ public:
      * To receive signals, you must call the "pselect" OS API after setting
      * handlers and/or traps.
      */
-    virtual void callHandlers() = 0;
+    virtual void call_handlers() = 0;
 
     /**
      * Creates a new handler configuration that depends on the argument API.
@@ -146,10 +146,10 @@ public:
      * instances of this class. The native signal catching function will not
      * work with multiple coexisting instances.
      */
-    static std::shared_ptr<HandlerConfiguration> create(
+    static std::shared_ptr<handler_configuration> create(
             const HandlerConfigurationApi &);
 
-}; // class HandlerConfiguration
+}; // class handler_configuration
 
 } // namespace signaling
 } // namespace os
