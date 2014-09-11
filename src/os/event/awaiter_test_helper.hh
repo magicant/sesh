@@ -25,7 +25,7 @@
 #include <vector>
 #include "os/event/awaiter.hh"
 #include "os/event/pselect_api_test_helper.hh"
-#include "os/signaling/HandlerConfiguration.hh"
+#include "os/signaling/handler_configuration.hh"
 
 namespace sesh {
 namespace os {

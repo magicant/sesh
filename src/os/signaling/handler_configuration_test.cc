@@ -23,7 +23,7 @@
 #include <system_error>
 #include "common/nop.hh"
 #include "common/type_tag_test_helper.hh"
-#include "os/signaling/HandlerConfiguration.hh"
+#include "os/signaling/handler_configuration.hh"
 #include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalErrorCode.hh"
 #include "os/signaling/SignalNumber.hh"

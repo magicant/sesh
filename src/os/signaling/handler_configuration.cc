@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "HandlerConfiguration.hh"
+#include "handler_configuration.hh"
 
 #include <functional>
 #include <list>

@@ -65,7 +65,7 @@ TESTPROGRAMS = \
 	src/os/io/non_blocking_file_descriptor_test \
 	src/os/io/reader_test \
 	src/os/io/writer_test \
-	src/os/signaling/HandlerConfigurationTest
+	src/os/signaling/handler_configuration_test
 
 TESTSCRIPTS = \
 	src/checkheaderinclude.sh \
@@ -193,8 +193,8 @@ src_sesh_SOURCES = \
 	src/os/io/writer.cc \
 	src/os/io/writer.hh \
 	src/os/io/writer_api.hh \
-	src/os/signaling/HandlerConfiguration.cc \
-	src/os/signaling/HandlerConfiguration.hh \
+	src/os/signaling/handler_configuration.cc \
+	src/os/signaling/handler_configuration.hh \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/HandlerConfigurationApi.hh \
 	src/os/signaling/SignalErrorCategory.cc \
@@ -324,49 +324,49 @@ src_language_syntax_word_test_SOURCES = \
 src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_error_file_descriptor_test.cc \
-	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_awaiter_file_descriptor_test_SOURCES = \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_file_descriptor_test.cc \
-	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_awaiter_readable_file_descriptor_test_SOURCES = \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_readable_file_descriptor_test.cc \
-	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_awaiter_signal_test_SOURCES = \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_signal_test.cc \
-	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_awaiter_test_SOURCES = \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_test.cc \
-	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_awaiter_timeout_test_SOURCES = \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_timeout_test.cc \
-	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_awaiter_user_provided_trigger_test_SOURCES = \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_user_provided_trigger_test.cc \
-	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_event_awaiter_writable_file_descriptor_test_SOURCES = \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_writable_file_descriptor_test.cc \
-	src/os/signaling/HandlerConfiguration.cc \
+	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
 src_os_io_file_descriptor_test_SOURCES = \
@@ -382,10 +382,10 @@ src_os_io_writer_test_SOURCES = \
 	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/writer.cc \
 	src/os/io/writer_test.cc
-src_os_signaling_HandlerConfigurationTest_SOURCES = \
-	src/os/signaling/HandlerConfiguration.cc \
+src_os_signaling_handler_configuration_test_SOURCES = \
+	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
-	src/os/signaling/HandlerConfigurationTest.cc \
+	src/os/signaling/handler_configuration_test.cc \
 	src/os/signaling/SignalErrorCategory.cc
 
 TESTHEADERS = \
