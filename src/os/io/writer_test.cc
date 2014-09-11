@@ -34,11 +34,11 @@
 #include "os/event/proactor.hh"
 #include "os/event/trigger.hh"
 #include "os/event/writable_file_descriptor.hh"
-#include "os/io/FileDescriptor.hh"
-#include "os/io/NonBlockingFileDescriptor.hh"
-#include "os/io/NonBlockingFileDescriptorTestHelper.hh"
-#include "os/io/Writer.hh"
-#include "os/io/WriterApi.hh"
+#include "os/io/file_descriptor.hh"
+#include "os/io/non_blocking_file_descriptor.hh"
+#include "os/io/non_blocking_file_descriptor_test_helper.hh"
+#include "os/io/writer.hh"
+#include "os/io/writer_api.hh"
 
 namespace {
 
@@ -52,54 +52,57 @@ using sesh::common::trial;
 using sesh::os::event::proactor;
 using sesh::os::event::trigger;
 using sesh::os::event::writable_file_descriptor;
-using sesh::os::io::FileDescriptor;
-using sesh::os::io::NonBlockingFileDescriptor;
-using sesh::os::io::WriterApi;
-using sesh::os::io::dummyNonBlockingFileDescriptor;
+using sesh::os::io::dummy_non_blocking_file_descriptor;
+using sesh::os::io::file_descriptor;
+using sesh::os::io::non_blocking_file_descriptor;
 using sesh::os::io::write;
+using sesh::os::io::writer_api;
 
-using ResultPair = std::pair<NonBlockingFileDescriptor, std::error_code>;
+using result_pair = std::pair<non_blocking_file_descriptor, std::error_code>;
 
-class UncallableWriterApi : public WriterApi {
+class uncallable_writer_api : public writer_api {
 
-    WriteResult write(
-            const FileDescriptor &, const void *, std::size_t) const override {
+    write_result write(const file_descriptor &, const void *, std::size_t)
+            const override {
         throw "unexpected write";
     }
 
-}; // class UncallableWriterApi
+}; // class uncallable_writer_api
 
-class UncallableProactor : public proactor {
+class uncallable_proactor : public proactor {
 
     future<trigger> expect_impl(std::vector<trigger> &&) override {
         throw "unexpected expect";
     }
 
-}; // class UncallableProactor
+}; // class uncallable_proactor
 
-class EchoingProactor : public proactor {
+class echoing_proactor : public proactor {
 
     future<trigger> expect_impl(std::vector<trigger> &&triggers) override {
         REQUIRE(triggers.size() == 1);
         return make_future<trigger>(std::move(triggers.front()));
     }
 
-}; // class EchoingProactor
+}; // class echoing_proactor
 
 namespace empty_write {
 
 TEST_CASE("Write: empty") {
-    const FileDescriptor::Value FD = 2;
-    UncallableWriterApi api;
-    UncallableProactor p;
-    future<ResultPair> f = write(
-            api, p, dummyNonBlockingFileDescriptor(FD), std::vector<char>());
+    const file_descriptor::value_type fd = 2;
+    uncallable_writer_api api;
+    uncallable_proactor p;
+    future<result_pair> f = write(
+            api,
+            p,
+            dummy_non_blocking_file_descriptor(fd),
+            std::vector<char>());
 
     bool called = false;
-    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+    std::move(f).then([fd, &called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd);
         CHECK(r->second.value() == 0);
         r->first.release().clear();
         called = true;
@@ -111,44 +114,45 @@ TEST_CASE("Write: empty") {
 
 namespace non_empty_write {
 
-constexpr static FileDescriptor::Value FD = 3;
+constexpr static file_descriptor::value_type fd_value = 3;
 
-class WriteTestFixture : public WriterApi, public proactor {
+class write_test_fixture : public writer_api, public proactor {
 
 private:
 
-    mutable bool mIsReadyToWrite = false;
-    promise<trigger> mPromise;
+    mutable bool m_is_ready_to_write = false;
+    promise<trigger> m_promise;
 
 public:
 
-    mutable std::vector<char> writtenBytes;
+    mutable std::vector<char> written_bytes;
 
-    void setReadyToWrite() {
-        if (mIsReadyToWrite)
+    void set_ready_to_write() {
+        if (m_is_ready_to_write)
             return;
-        mIsReadyToWrite = true;
-        if (mPromise.is_valid())
-            std::move(mPromise).set_result(writable_file_descriptor(FD));
+        m_is_ready_to_write = true;
+        if (m_promise.is_valid())
+            std::move(m_promise).set_result(
+                    writable_file_descriptor(fd_value));
     }
 
 private:
 
-    WriteResult write(
-            const FileDescriptor &fd, const void *bytes, std::size_t count)
+    write_result write(
+            const file_descriptor &fd, const void *bytes, std::size_t count)
             const override {
-        CHECK(mIsReadyToWrite);
-        mIsReadyToWrite = false;
+        CHECK(m_is_ready_to_write);
+        m_is_ready_to_write = false;
 
-        CHECK(fd.value() == FD);
+        CHECK(fd.value() == fd_value);
         REQUIRE(bytes != nullptr);
         CHECK(count > 0);
 
         count = std::min(count, static_cast<std::size_t>(10));
 
-        const char *bytesBegin = static_cast<const char *>(bytes);
-        const char *bytesEnd = bytesBegin + count;
-        writtenBytes.insert(writtenBytes.end(), bytesBegin, bytesEnd);
+        const char *bytes_begin = static_cast<const char *>(bytes);
+        const char *bytes_end = bytes_begin + count;
+        written_bytes.insert(written_bytes.end(), bytes_begin, bytes_end);
 
         return count;
     }
@@ -157,101 +161,104 @@ private:
         REQUIRE(triggers.size() == 1);
         trigger &t = triggers.front();
         CHECK(t.tag() == t.tag<writable_file_descriptor>());
-        CHECK(t.value<writable_file_descriptor>().value() == FD);
+        CHECK(t.value<writable_file_descriptor>().value() == fd_value);
 
         auto pf = make_promise_future_pair<trigger>();
-        mPromise = std::move(pf.first);
+        m_promise = std::move(pf.first);
         return std::move(pf.second);
     }
 
-}; // class WriteTestFixture
+}; // class write_test_fixture
 
-TEST_CASE_METHOD(WriteTestFixture, "Write: one byte") {
-    const char C = '!';
-    future<ResultPair> f = sesh::os::io::write(
+TEST_CASE_METHOD(write_test_fixture, "Write: one byte") {
+    const char c = '!';
+    future<result_pair> f = sesh::os::io::write(
             *this,
             *this,
-            dummyNonBlockingFileDescriptor(FD),
-            std::vector<char>{C});
+            dummy_non_blocking_file_descriptor(fd_value),
+            std::vector<char>{c});
 
     bool called = false;
-    std::move(f).then([&called](trial<ResultPair> &&r) {
+    std::move(f).then([&called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd_value);
         CHECK(r->second.value() == 0);
         r->first.release().clear();
         called = true;
     });
     CHECK_FALSE(called);
-    CHECK(writtenBytes.empty());
+    CHECK(written_bytes.empty());
 
-    setReadyToWrite();
+    set_ready_to_write();
 
     CHECK(called);
-    CHECK(writtenBytes.size() == 1);
-    CHECK(writtenBytes.at(0) == C);
+    CHECK(written_bytes.size() == 1);
+    CHECK(written_bytes.at(0) == c);
 }
 
-TEST_CASE_METHOD(WriteTestFixture, "Write: 25 bytes in three writes") {
+TEST_CASE_METHOD(write_test_fixture, "Write: 25 bytes in three writes") {
     std::string chars = "0123456789abcdefghijklmno";
     std::vector<char> bytes(chars.begin(), chars.end());
-    future<ResultPair> f = sesh::os::io::write(
-            *this, *this, dummyNonBlockingFileDescriptor(FD), copy(bytes));
+    future<result_pair> f = sesh::os::io::write(
+            *this,
+            *this,
+            dummy_non_blocking_file_descriptor(fd_value),
+            copy(bytes));
 
     bool called = false;
-    std::move(f).then([&called](trial<ResultPair> &&r) {
+    std::move(f).then([&called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd_value);
         CHECK(r->second.value() == 0);
         r->first.release().clear();
         called = true;
     });
     CHECK_FALSE(called);
-    CHECK(writtenBytes.empty());
+    CHECK(written_bytes.empty());
 
-    setReadyToWrite();
-
-    CHECK_FALSE(called);
-    CHECK(writtenBytes.size() == 10);
-
-    setReadyToWrite();
+    set_ready_to_write();
 
     CHECK_FALSE(called);
-    CHECK(writtenBytes.size() == 20);
+    CHECK(written_bytes.size() == 10);
 
-    setReadyToWrite();
+    set_ready_to_write();
+
+    CHECK_FALSE(called);
+    CHECK(written_bytes.size() == 20);
+
+    set_ready_to_write();
 
     CHECK(called);
-    CHECK(writtenBytes == bytes);
+    CHECK(written_bytes == bytes);
 }
 
 } // namespace non_empty_write
 
 namespace domain_error {
 
-class DomainErrorProactor : public proactor {
+class domain_error_proactor : public proactor {
 
     future<trigger> expect_impl(std::vector<trigger> &&) override {
         return make_failed_future_of<trigger>(
                 std::domain_error("expected error"));
     }
 
-}; // class DomainErrorProactor
+}; // class domain_error_proactor
 
 TEST_CASE("Write: domain error in proactor") {
-    const FileDescriptor::Value FD = 2;
-    UncallableWriterApi api;
-    DomainErrorProactor p;
-    future<ResultPair> f = write(
-            api, p, dummyNonBlockingFileDescriptor(FD), {'C'});
+    const file_descriptor::value_type fd = 2;
+    uncallable_writer_api api;
+    domain_error_proactor p;
+    future<result_pair> f = write(
+            api, p, dummy_non_blocking_file_descriptor(fd), {'C'});
 
     bool called = false;
-    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+    std::move(f).then([fd, &called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd);
         CHECK(r->second ==
                 std::make_error_code(std::errc::too_many_files_open));
         r->first.release().clear();
@@ -264,27 +271,27 @@ TEST_CASE("Write: domain error in proactor") {
 
 namespace write_error {
 
-class WriteErrorApi : public WriterApi {
+class write_error_api : public writer_api {
 
-    WriteResult write(const FileDescriptor &, const void *, std::size_t) const
-            override {
+    write_result write(const file_descriptor &, const void *, std::size_t)
+            const override {
         return std::make_error_code(std::errc::io_error);
     }
 
-}; // class WriteErrorApi
+}; // class write_error_api
 
 TEST_CASE("Write: write error") {
-    const FileDescriptor::Value FD = 4;
-    WriteErrorApi api;
-    EchoingProactor proactor;
-    future<ResultPair> f = sesh::os::io::write(
-            api, proactor, dummyNonBlockingFileDescriptor(FD), {'A'});
+    const file_descriptor::value_type fd = 4;
+    write_error_api api;
+    echoing_proactor proactor;
+    future<result_pair> f = sesh::os::io::write(
+            api, proactor, dummy_non_blocking_file_descriptor(fd), {'A'});
 
     bool called = false;
-    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+    std::move(f).then([fd, &called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd);
         CHECK(r->second == std::make_error_code(std::errc::io_error));
         r->first.release().clear();
         called = true;

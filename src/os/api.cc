@@ -31,13 +31,13 @@
 #include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/capi.h"
-#include "os/io/FileDescriptionAccessMode.hh"
-#include "os/io/FileDescriptionAttribute.hh"
-#include "os/io/FileDescriptionStatus.hh"
-#include "os/io/FileDescriptor.hh"
-#include "os/io/FileDescriptorOpenMode.hh"
-#include "os/io/FileDescriptorSet.hh"
-#include "os/io/FileMode.hh"
+#include "os/io/file_description_access_mode.hh"
+#include "os/io/file_description_attribute.hh"
+#include "os/io/file_description_status.hh"
+#include "os/io/file_descriptor.hh"
+#include "os/io/file_descriptor_open_mode.hh"
+#include "os/io/file_descriptor_set.hh"
+#include "os/io/file_mode.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
@@ -46,13 +46,13 @@ using sesh::common::enumerators;
 using sesh::common::errno_code;
 using sesh::common::type_tag;
 using sesh::common::variant;
-using sesh::os::io::FileDescriptionAccessMode;
-using sesh::os::io::FileDescriptionAttribute;
-using sesh::os::io::FileDescriptionStatus;
-using sesh::os::io::FileDescriptor;
-using sesh::os::io::FileDescriptorOpenMode;
-using sesh::os::io::FileDescriptorSet;
-using sesh::os::io::FileMode;
+using sesh::os::io::file_description_access_mode;
+using sesh::os::io::file_description_attribute;
+using sesh::os::io::file_description_status;
+using sesh::os::io::file_descriptor;
+using sesh::os::io::file_descriptor_open_mode;
+using sesh::os::io::file_descriptor_set;
+using sesh::os::io::file_mode;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
@@ -63,113 +63,113 @@ namespace os {
 
 namespace {
 
-enum sesh_osapi_fcntl_file_access_mode convert(FileDescriptionAccessMode mode)
-        noexcept {
+enum sesh_osapi_fcntl_file_access_mode convert(
+        file_description_access_mode mode) noexcept {
     switch (mode) {
-    case FileDescriptionAccessMode::EXEC:
+    case file_description_access_mode::exec:
         return SESH_OSAPI_O_EXEC;
-    case FileDescriptionAccessMode::READ_ONLY:
+    case file_description_access_mode::read_only:
         return SESH_OSAPI_O_RDONLY;
-    case FileDescriptionAccessMode::READ_WRITE:
+    case file_description_access_mode::read_write:
         return SESH_OSAPI_O_RDWR;
-    case FileDescriptionAccessMode::SEARCH:
+    case file_description_access_mode::search:
         return SESH_OSAPI_O_SEARCH;
-    case FileDescriptionAccessMode::WRITE_ONLY:
+    case file_description_access_mode::write_only:
         return SESH_OSAPI_O_WRONLY;
     }
     UNREACHABLE();
 }
 
 /** @return -1 if not supported. */
-int to_raw_flag(FileDescriptionAccessMode mode) {
+int to_raw_flag(file_description_access_mode mode) {
     return sesh_osapi_fcntl_file_access_mode_to_raw(convert(mode));
 }
 
-FileDescriptionAccessMode convert(enum sesh_osapi_fcntl_file_access_mode mode)
-        noexcept {
+file_description_access_mode convert(
+        enum sesh_osapi_fcntl_file_access_mode mode) noexcept {
     switch (mode) {
     case SESH_OSAPI_O_EXEC:
-        return FileDescriptionAccessMode::EXEC;
+        return file_description_access_mode::exec;
     case SESH_OSAPI_O_RDONLY:
-        return FileDescriptionAccessMode::READ_ONLY;
+        return file_description_access_mode::read_only;
     case SESH_OSAPI_O_RDWR:
-        return FileDescriptionAccessMode::READ_WRITE;
+        return file_description_access_mode::read_write;
     case SESH_OSAPI_O_SEARCH:
-        return FileDescriptionAccessMode::SEARCH;
+        return file_description_access_mode::search;
     case SESH_OSAPI_O_WRONLY:
-        return FileDescriptionAccessMode::WRITE_ONLY;
+        return file_description_access_mode::write_only;
     }
     UNREACHABLE();
 }
 
-enum sesh_osapi_fcntl_file_attribute convert(FileDescriptionAttribute a)
+enum sesh_osapi_fcntl_file_attribute convert(file_description_attribute a)
         noexcept {
     switch (a) {
-    case FileDescriptionAttribute::APPEND:
+    case file_description_attribute::append:
         return SESH_OSAPI_O_APPEND;
-    case FileDescriptionAttribute::DATA_SYNC:
+    case file_description_attribute::data_sync:
         return SESH_OSAPI_O_DSYNC;
-    case FileDescriptionAttribute::NON_BLOCKING:
+    case file_description_attribute::non_blocking:
         return SESH_OSAPI_O_NONBLOCK;
-    case FileDescriptionAttribute::READ_SYNC:
+    case file_description_attribute::read_sync:
         return SESH_OSAPI_O_RSYNC;
-    case FileDescriptionAttribute::SYNC:
+    case file_description_attribute::sync:
         return SESH_OSAPI_O_SYNC;
     }
     UNREACHABLE();
 }
 
-enum sesh_osapi_open_mode convert(FileDescriptorOpenMode mode) noexcept {
+enum sesh_osapi_open_mode convert(file_descriptor_open_mode mode) noexcept {
     switch (mode) {
-    case FileDescriptorOpenMode::CLOSE_ON_EXEC:
+    case file_descriptor_open_mode::close_on_exec:
         return SESH_OSAPI_O_CLOEXEC;
-    case FileDescriptorOpenMode::CREATE:
+    case file_descriptor_open_mode::create:
         return SESH_OSAPI_O_CREAT;
-    case FileDescriptorOpenMode::DIRECTORY:
+    case file_descriptor_open_mode::directory:
         return SESH_OSAPI_O_DIRECTORY;
-    case FileDescriptorOpenMode::EXCLUSIVE:
+    case file_descriptor_open_mode::exclusive:
         return SESH_OSAPI_O_EXCL;
-    case FileDescriptorOpenMode::NO_CONTROLLING_TERMINAL:
+    case file_descriptor_open_mode::no_controlling_terminal:
         return SESH_OSAPI_O_NOCTTY;
-    case FileDescriptorOpenMode::NO_FOLLOW:
+    case file_descriptor_open_mode::no_follow:
         return SESH_OSAPI_O_NOFOLLOW;
-    case FileDescriptorOpenMode::TRUNCATE:
+    case file_descriptor_open_mode::truncate:
         return SESH_OSAPI_O_TRUNC;
-    case FileDescriptorOpenMode::TTY_INITIALIZE:
+    case file_descriptor_open_mode::tty_initialize:
         return SESH_OSAPI_O_TTY_INIT;
     }
     UNREACHABLE();
 }
 
-int to_raw_flag(FileDescriptionAttribute a) {
+int to_raw_flag(file_description_attribute a) {
     return sesh_osapi_fcntl_file_attribute_to_raw(convert(a));
 }
 
-int to_raw_flag(FileDescriptorOpenMode mode) {
+int to_raw_flag(file_descriptor_open_mode mode) {
     return sesh_osapi_open_mode_to_raw(convert(mode));
 }
 
 /** @return -1 if the access mode is not supported. */
 int to_raw_flags(
-        FileDescriptionAccessMode access_mode,
-        enum_set<FileDescriptionAttribute> attributes,
-        enum_set<FileDescriptorOpenMode> open_modes) {
+        file_description_access_mode access_mode,
+        enum_set<file_description_attribute> attributes,
+        enum_set<file_descriptor_open_mode> open_modes) {
     int raw_flags = to_raw_flag(access_mode);
     if (raw_flags == -1)
         return -1;
 
-    for (auto a : enumerators<FileDescriptionAttribute>())
+    for (auto a : enumerators<file_description_attribute>())
         if (attributes[a])
             raw_flags |= to_raw_flag(a);
 
-    for (auto m : enumerators<FileDescriptorOpenMode>())
+    for (auto m : enumerators<file_descriptor_open_mode>())
         if (open_modes[m])
             raw_flags |= to_raw_flag(m);
 
     return raw_flags;
 }
 
-int to_raw_modes(enum_set<FileMode> modes) {
+int to_raw_modes(enum_set<file_mode> modes) {
     return sesh_osapi_mode_to_raw(static_cast<int>(modes.to_ulong()));
 }
 
@@ -204,7 +204,7 @@ void convert(const struct sesh_osapi_signal_action &from, SignalAction &to) {
     }
 }
 
-class file_description_status_impl : public FileDescriptionStatus {
+class file_description_status_impl : public file_description_status {
 
 private:
 
@@ -217,16 +217,16 @@ public:
 
     int raw_flags() const noexcept { return m_raw_flags; }
 
-    FileDescriptionAccessMode accessMode() const noexcept final override {
+    file_description_access_mode access_mode() const noexcept final override {
         return convert(
                 sesh_osapi_fcntl_file_access_mode_from_raw(m_raw_flags));
     }
 
-    bool test(FileDescriptionAttribute a) const noexcept final override {
+    bool test(file_description_attribute a) const noexcept final override {
         return m_raw_flags & to_raw_flag(a);
     }
 
-    FileDescriptionStatus &set(FileDescriptionAttribute a, bool value)
+    file_description_status &set(file_description_attribute a, bool value)
             noexcept final override {
         int flag = to_raw_flag(a);
         if (value)
@@ -236,19 +236,19 @@ public:
         return *this;
     }
 
-    FileDescriptionStatus &resetAttributes() noexcept final override {
+    file_description_status &reset_attributes() noexcept final override {
         m_raw_flags &=
                 sesh_osapi_fcntl_file_attribute_to_raw(SESH_OSAPI_O_ACCMODE);
         return *this;
     }
 
-    std::unique_ptr<FileDescriptionStatus> clone() const final override {
-        return std::unique_ptr<FileDescriptionStatus>(new auto(*this));
+    std::unique_ptr<file_description_status> clone() const final override {
+        return std::unique_ptr<file_description_status>(new auto(*this));
     }
 
 }; // class file_description_status_impl
 
-class file_descriptor_set_impl : public FileDescriptorSet {
+class file_descriptor_set_impl : public file_descriptor_set {
 
 private:
 
@@ -264,18 +264,18 @@ private:
         sesh_osapi_fd_zero(m_set.get());
     }
 
-    void throw_if_out_of_domain(FileDescriptor::Value fd) {
+    void throw_if_out_of_domain(file_descriptor::value_type fd) {
         if (fd >= sesh_osapi_fd_setsize())
             throw std::domain_error("too large file descriptor");
     }
 
-    void set_impl(FileDescriptor::Value fd) {
+    void set_impl(file_descriptor::value_type fd) {
         throw_if_out_of_domain(fd);
         allocate_if_null();
         sesh_osapi_fd_set(fd, m_set.get());
     }
 
-    void reset_impl(FileDescriptor::Value fd) {
+    void reset_impl(file_descriptor::value_type fd) {
         throw_if_out_of_domain(fd);
         if (m_set != nullptr)
             sesh_osapi_fd_clr(fd, m_set.get());
@@ -283,7 +283,7 @@ private:
 
 public:
 
-    FileDescriptor::Value maxValue() const override {
+    file_descriptor::value_type max_value() const override {
         return sesh_osapi_fd_setsize() - 1;
     }
 
@@ -292,12 +292,13 @@ public:
         return m_set.get();
     }
 
-    bool test(FileDescriptor::Value fd) const override {
+    bool test(file_descriptor::value_type fd) const override {
         return fd < sesh_osapi_fd_setsize() &&
                 m_set != nullptr && sesh_osapi_fd_isset(fd, m_set.get());
     }
 
-    FileDescriptorSet &set(FileDescriptor::Value fd, bool value) override {
+    file_descriptor_set &set(file_descriptor::value_type fd, bool value)
+            override {
         if (value)
             set_impl(fd);
         else
@@ -305,7 +306,7 @@ public:
         return *this;
     }
 
-    FileDescriptorSet &reset() override {
+    file_descriptor_set &reset() override {
         if (m_set != nullptr)
             sesh_osapi_fd_zero(m_set.get());
         return *this;
@@ -386,18 +387,19 @@ class api_impl : public api {
                 steady_clock_time::clock::now());
     }
 
-    auto getFileDescriptionStatus(const FileDescriptor &fd) const
-            -> variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
+    auto get_file_description_status(const file_descriptor &fd) const
+            -> variant<
+                    std::unique_ptr<file_description_status>, std::error_code>
             final override {
         int flags = sesh_osapi_fcntl_getfl(fd.value());
         if (flags == -1)
             return errno_code();
-        return std::unique_ptr<FileDescriptionStatus>(
+        return std::unique_ptr<file_description_status>(
                 new file_description_status_impl(flags));
     }
 
-    std::error_code setFileDescriptionStatus(
-            const FileDescriptor &fd, const FileDescriptionStatus &s) const
+    std::error_code set_file_description_status(
+            const file_descriptor &fd, const file_description_status &s) const
             final override {
         const auto &i = static_cast<const file_description_status_impl &>(s);
         if (sesh_osapi_fcntl_setfl(fd.value(), i.raw_flags()) == -1)
@@ -405,12 +407,12 @@ class api_impl : public api {
         return std::error_code();
     }
 
-    variant<FileDescriptor, std::error_code> open(
+    variant<file_descriptor, std::error_code> open(
             const char *path,
-            FileDescriptionAccessMode access_mode,
-            enum_set<FileDescriptionAttribute> attributes,
-            enum_set<FileDescriptorOpenMode> open_modes,
-            enum_set<FileMode> file_modes) const final override {
+            file_description_access_mode access_mode,
+            enum_set<file_description_attribute> attributes,
+            enum_set<file_descriptor_open_mode> open_modes,
+            enum_set<file_mode> file_modes) const final override {
         int flags = to_raw_flags(access_mode, attributes, open_modes);
         if (flags == -1)
             return std::make_error_code(std::errc::invalid_argument);
@@ -419,10 +421,10 @@ class api_impl : public api {
         int fd = sesh_osapi_open(path, flags, modes);
         if (fd < 0)
             return errno_code();
-        return FileDescriptor(fd);
+        return file_descriptor(fd);
     }
 
-    std::error_code close(FileDescriptor &fd) const final override {
+    std::error_code close(file_descriptor &fd) const final override {
         if (sesh_osapi_close(fd.value()) == 0) {
             fd.clear();
             return std::error_code();
@@ -434,8 +436,8 @@ class api_impl : public api {
         return ec;
     }
 
-    ReadResult read(
-            const FileDescriptor &fd,
+    read_result read(
+            const file_descriptor &fd,
             void *buffer,
             std::size_t max_bytes_to_read)
             const final override {
@@ -446,8 +448,8 @@ class api_impl : public api {
         return bytes_read;
     }
 
-    WriteResult write(
-            const FileDescriptor &fd,
+    write_result write(
+            const file_descriptor &fd,
             const void *bytes,
             std::size_t bytes_to_write)
             const final override {
@@ -458,9 +460,9 @@ class api_impl : public api {
         return bytes_written;
     }
 
-    std::unique_ptr<FileDescriptorSet> create_file_descriptor_set() const
+    std::unique_ptr<file_descriptor_set> create_file_descriptor_set() const
             final override {
-        std::unique_ptr<FileDescriptorSet> set(new file_descriptor_set_impl);
+        std::unique_ptr<file_descriptor_set> set(new file_descriptor_set_impl);
         return set;
     }
 
@@ -471,10 +473,10 @@ class api_impl : public api {
     }
 
     std::error_code pselect(
-                FileDescriptor::Value fd_bound,
-                FileDescriptorSet *read_fds,
-                FileDescriptorSet *write_fds,
-                FileDescriptorSet *error_fds,
+                file_descriptor::value_type fd_bound,
+                file_descriptor_set *read_fds,
+                file_descriptor_set *write_fds,
+                file_descriptor_set *error_fds,
                 std::chrono::nanoseconds timeout,
                 const SignalNumberSet *signal_mask) const final override {
         file_descriptor_set_impl *read_fds_impl =

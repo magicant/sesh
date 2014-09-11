@@ -21,35 +21,35 @@
 #include "catch.hpp"
 
 #include <utility>
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace {
 
-using sesh::os::io::FileDescriptor;
+using sesh::os::io::file_descriptor;
 
 TEST_CASE("File descriptor, construction, invalid") {
-    FileDescriptor fd;
-    CHECK_FALSE(fd.isValid());
+    file_descriptor fd;
+    CHECK_FALSE(fd.is_valid());
 }
 
 TEST_CASE("File descriptor, construction and clear") {
-    FileDescriptor fd(42);
+    file_descriptor fd(42);
     CHECK(fd.value() == 42);
-    CHECK(fd.isValid());
+    CHECK(fd.is_valid());
     fd.clear();
-    CHECK_FALSE(fd.isValid());
+    CHECK_FALSE(fd.is_valid());
 }
 
 TEST_CASE("File descriptor, move construction") {
-    FileDescriptor fd1(0);
-    FileDescriptor fd2 = std::move(fd1);
-    CHECK_FALSE(fd1.isValid());
-    CHECK(fd2.isValid());
+    file_descriptor fd1(0);
+    file_descriptor fd2 = std::move(fd1);
+    CHECK_FALSE(fd1.is_valid());
+    CHECK(fd2.is_valid());
     fd2.clear();
 }
 
 TEST_CASE("File descriptor, swap, member") {
-    FileDescriptor fd1(3), fd2(9);
+    file_descriptor fd1(3), fd2(9);
     fd1.swap(fd2);
     CHECK(fd1.value() == 9);
     CHECK(fd2.value() == 3);
@@ -58,16 +58,16 @@ TEST_CASE("File descriptor, swap, member") {
 }
 
 TEST_CASE("File descriptor, move assignment") {
-    FileDescriptor fd1;
-    FileDescriptor fd2(0);
+    file_descriptor fd1;
+    file_descriptor fd2(0);
     fd1 = std::move(fd2);
-    CHECK(fd1.isValid());
-    CHECK_FALSE(fd2.isValid());
+    CHECK(fd1.is_valid());
+    CHECK_FALSE(fd2.is_valid());
     fd1.clear();
 }
 
 TEST_CASE("File descriptor, swap, non-member") {
-    FileDescriptor fd1(3), fd2(9);
+    file_descriptor fd1(3), fd2(9);
     swap(fd1, fd2);
     CHECK(fd1.value() == 9);
     CHECK(fd2.value() == 3);

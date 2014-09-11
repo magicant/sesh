@@ -15,22 +15,22 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptionApi_hh
-#define INCLUDED_os_io_FileDescriptionApi_hh
+#ifndef INCLUDED_os_io_file_description_api_hh
+#define INCLUDED_os_io_file_description_api_hh
 
 #include "buildconfig.h"
 
 #include <memory>
 #include <system_error>
 #include "common/variant.hh"
-#include "os/io/FileDescriptionStatus.hh"
-#include "os/io/FileDescriptor.hh"
+#include "os/io/file_description_status.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
 namespace os {
 namespace io {
 
-class FileDescriptionApi {
+class file_description_api {
 
 public:
 
@@ -42,8 +42,8 @@ public:
      * instance or a non-zero system error code.
      */
     virtual
-    common::variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
-    getFileDescriptionStatus(const FileDescriptor &) const = 0;
+    common::variant<std::unique_ptr<file_description_status>, std::error_code>
+    get_file_description_status(const file_descriptor &) const = 0;
 
     /**
      * Modifies the status of the open file description associated with the
@@ -54,17 +54,19 @@ public:
      * function.
      *
      * The argument status instance must be obtained from the {@link
-     * #getFileDescriptionStatus} function called for the same {@code *this}.
+     * #get_file_description_status} function called for the same {@code
+     * *this}.
      */
-    virtual std::error_code setFileDescriptionStatus(
-            const FileDescriptor &, const FileDescriptionStatus &) const = 0;
+    virtual std::error_code set_file_description_status(
+            const file_descriptor &, const file_description_status &) const
+            = 0;
 
-}; // class FileDescriptionApi
+}; // class file_description_api
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptionApi_hh
+#endif // #ifndef INCLUDED_os_io_file_description_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

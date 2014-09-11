@@ -15,36 +15,50 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_NonBlockingFileDescriptorTestHelper_hh
-#define INCLUDED_os_io_NonBlockingFileDescriptorTestHelper_hh
+#ifndef INCLUDED_os_io_file_mode_hh
+#define INCLUDED_os_io_file_mode_hh
 
 #include "buildconfig.h"
 
-#include <system_error>
-#include <utility>
-#include "os/io/FileDescriptionApiTestHelper.hh"
-#include "os/io/FileDescriptor.hh"
-#include "os/io/NonBlockingFileDescriptor.hh"
+#include "common/enum_traits.hh"
 
 namespace sesh {
+
 namespace os {
 namespace io {
 
-inline auto dummyNonBlockingFileDescriptor(FileDescriptor &&fd)
-        -> NonBlockingFileDescriptor {
-    static FileDescriptionApiDummy api;
-    return NonBlockingFileDescriptor(api, std::move(fd));
-}
-
-inline auto dummyNonBlockingFileDescriptor(FileDescriptor::Value fd)
-        -> NonBlockingFileDescriptor {
-    return dummyNonBlockingFileDescriptor(FileDescriptor(fd));
-}
+/** Defines file permission bits. */
+enum class file_mode {
+    // ordered by the bit position, starting from the least significant bit.
+    others_execute,
+    others_write,
+    others_read,
+    group_execute,
+    group_write,
+    group_read,
+    owner_execute,
+    owner_write,
+    owner_read,
+    sticky,
+    set_group_id,
+    set_user_id,
+};
 
 } // namespace io
 } // namespace os
+
+namespace common {
+
+template<>
+class enum_traits<os::io::file_mode> {
+public:
+    constexpr static os::io::file_mode max = os::io::file_mode::set_user_id;
+};
+
+} // namespace common
+
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_NonBlockingFileDescriptorTestHelper_hh
+#endif // #ifndef INCLUDED_os_io_file_mode_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

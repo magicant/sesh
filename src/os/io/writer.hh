@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_Writer_hh
-#define INCLUDED_os_io_Writer_hh
+#ifndef INCLUDED_os_io_writer_hh
+#define INCLUDED_os_io_writer_hh
 
 #include "buildconfig.h"
 
@@ -24,8 +24,8 @@
 #include <utility>
 #include "async/future.hh"
 #include "os/event/proactor.hh"
-#include "os/io/NonBlockingFileDescriptor.hh"
-#include "os/io/WriterApi.hh"
+#include "os/io/non_blocking_file_descriptor.hh"
+#include "os/io/writer_api.hh"
 
 namespace sesh {
 namespace os {
@@ -47,16 +47,16 @@ namespace io {
  * success, the error code is zero. A non-zero error code indicates an error,
  * but some bytes have been written before the error occurred.
  */
-async::future<std::pair<NonBlockingFileDescriptor, std::error_code>> write(
-        const WriterApi &,
+async::future<std::pair<non_blocking_file_descriptor, std::error_code>> write(
+        const writer_api &,
         event::proactor &,
-        NonBlockingFileDescriptor &&,
+        non_blocking_file_descriptor &&,
         std::vector<char> &&);
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_Writer_hh
+#endif // #ifndef INCLUDED_os_io_writer_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

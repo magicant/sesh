@@ -34,11 +34,11 @@
 #include "os/event/proactor.hh"
 #include "os/event/readable_file_descriptor.hh"
 #include "os/event/trigger.hh"
-#include "os/io/FileDescriptor.hh"
-#include "os/io/NonBlockingFileDescriptor.hh"
-#include "os/io/NonBlockingFileDescriptorTestHelper.hh"
-#include "os/io/Reader.hh"
-#include "os/io/ReaderApi.hh"
+#include "os/io/file_descriptor.hh"
+#include "os/io/non_blocking_file_descriptor.hh"
+#include "os/io/non_blocking_file_descriptor_test_helper.hh"
+#include "os/io/reader.hh"
+#include "os/io/reader_api.hh"
 
 namespace {
 
@@ -52,55 +52,56 @@ using sesh::common::variant;
 using sesh::os::event::proactor;
 using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::trigger;
-using sesh::os::io::FileDescriptor;
-using sesh::os::io::NonBlockingFileDescriptor;
-using sesh::os::io::ReaderApi;
-using sesh::os::io::dummyNonBlockingFileDescriptor;
+using sesh::os::io::dummy_non_blocking_file_descriptor;
+using sesh::os::io::file_descriptor;
+using sesh::os::io::non_blocking_file_descriptor;
 using sesh::os::io::read;
+using sesh::os::io::reader_api;
 
-using ResultPair = std::pair<
-        NonBlockingFileDescriptor,
+using result_pair = std::pair<
+        non_blocking_file_descriptor,
         variant<std::vector<char>, std::error_code>>;
 
-class UncallableReaderApi : public ReaderApi {
+class uncallable_reader_api : public reader_api {
 
-    ReadResult read(const FileDescriptor &, void *, std::size_t) const
+    read_result read(const file_descriptor &, void *, std::size_t) const
             override {
         throw "unexpected read";
     }
 
-}; // class UncallableReaderApi
+}; // class uncallable_reader_api
 
-class UncallableProactor : public proactor {
+class uncallable_proactor : public proactor {
 
     future<trigger> expect_impl(std::vector<trigger> &&) override {
         throw "unexpected expect";
     }
 
-}; // class UncallableProactor
+}; // class uncallable_proactor
 
-class EchoingProactor : public proactor {
+class echoing_proactor : public proactor {
 
     future<trigger> expect_impl(std::vector<trigger> &&triggers) override {
         REQUIRE_FALSE(triggers.empty());
         return make_future<trigger>(std::move(triggers.front()));
     }
 
-}; // class EchoingProactor
+}; // class echoing_proactor
 
 namespace empty_read {
 
 TEST_CASE("Read: empty") {
-    const FileDescriptor::Value FD = 2;
-    UncallableReaderApi api;
-    UncallableProactor p;
-    future<ResultPair> f = read(api, p, dummyNonBlockingFileDescriptor(FD), 0);
+    const file_descriptor::value_type fd = 2;
+    uncallable_reader_api api;
+    uncallable_proactor p;
+    future<result_pair> f =
+            read(api, p, dummy_non_blocking_file_descriptor(fd), 0);
 
     bool called = false;
-    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+    std::move(f).then([fd, &called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
         CHECK(r->second.value<std::vector<char>>().empty());
         r->first.release().clear();
@@ -113,46 +114,48 @@ TEST_CASE("Read: empty") {
 
 namespace non_empty_read {
 
-constexpr static FileDescriptor::Value FD = 3;
+constexpr static file_descriptor::value_type fd_value = 3;
 
-class ReadTestFixture : public ReaderApi, public proactor {
+class read_test_fixture : public reader_api, public proactor {
 
 private:
 
-    mutable bool mIsReadyToRead = false;
-    promise<trigger> mPromise;
+    mutable bool m_is_ready_to_read = false;
+    promise<trigger> m_promise;
 
 public:
 
-    mutable std::vector<char> readableBytes;
+    mutable std::vector<char> readable_bytes;
 
-    void setReadyToRead() {
-        if (mIsReadyToRead)
+    void set_ready_to_read() {
+        if (m_is_ready_to_read)
             return;
-        mIsReadyToRead = true;
-        if (mPromise.is_valid())
-            std::move(mPromise).set_result(readable_file_descriptor(FD));
+        m_is_ready_to_read = true;
+        if (m_promise.is_valid())
+            std::move(m_promise).set_result(
+                    readable_file_descriptor(fd_value));
     }
 
 private:
 
-    ReadResult read(const FileDescriptor &fd, void *buffer, std::size_t count)
+    read_result read(
+            const file_descriptor &fd, void *buffer, std::size_t count)
             const override {
-        CHECK(mIsReadyToRead);
-        mIsReadyToRead = false;
+        CHECK(m_is_ready_to_read);
+        m_is_ready_to_read = false;
 
-        CHECK(fd.isValid());
-        CHECK(fd.value() == FD);
+        CHECK(fd.is_valid());
+        CHECK(fd.value() == fd_value);
         REQUIRE(buffer != nullptr);
         CHECK(count > 0);
 
-        if (count > static_cast<std::size_t>(readableBytes.size()))
-            count = static_cast<std::size_t>(readableBytes.size());
+        if (count > static_cast<std::size_t>(readable_bytes.size()))
+            count = static_cast<std::size_t>(readable_bytes.size());
 
-        auto begin = readableBytes.begin();
+        auto begin = readable_bytes.begin();
         auto end = begin + count;
         std::copy(begin, end, static_cast<char *>(buffer));
-        readableBytes.erase(begin, end);
+        readable_bytes.erase(begin, end);
 
         return count;
     }
@@ -161,27 +164,27 @@ private:
         REQUIRE(triggers.size() == 1);
         trigger &t = triggers.front();
         CHECK(t.tag() == t.tag<readable_file_descriptor>());
-        CHECK(t.value<readable_file_descriptor>().value() == FD);
+        CHECK(t.value<readable_file_descriptor>().value() == fd_value);
 
         auto pf = make_promise_future_pair<trigger>();
-        mPromise = std::move(pf.first);
+        m_promise = std::move(pf.first);
         return std::move(pf.second);
     }
 
-}; // class ReadTestFixture
+}; // class read_test_fixture
 
-TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than available") {
+TEST_CASE_METHOD(read_test_fixture, "Read: reading less than available") {
     const char C = '&';
-    readableBytes.assign(2, C);
+    readable_bytes.assign(2, C);
 
-    future<ResultPair> f = sesh::os::io::read(
-            *this, *this, dummyNonBlockingFileDescriptor(FD), 1);
+    future<result_pair> f = sesh::os::io::read(
+            *this, *this, dummy_non_blocking_file_descriptor(fd_value), 1);
 
     bool called = false;
-    std::move(f).then([C, &called](trial<ResultPair> &&r) {
+    std::move(f).then([C, &called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd_value);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
         REQUIRE(r->second.value<std::vector<char>>().size() == 1);
         CHECK(r->second.value<std::vector<char>>().at(0) == C);
@@ -189,67 +192,67 @@ TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than available") {
         called = true;
     });
     CHECK_FALSE(called);
-    CHECK(readableBytes.size() == 2);
+    CHECK(readable_bytes.size() == 2);
 
-    setReadyToRead();
+    set_ready_to_read();
 
     CHECK(called);
-    CHECK(readableBytes.size() == 1);
+    CHECK(readable_bytes.size() == 1);
 }
 
-TEST_CASE_METHOD(ReadTestFixture, "Read: reading less than buffer size") {
+TEST_CASE_METHOD(read_test_fixture, "Read: reading less than buffer size") {
     std::string chars = "0123456789";
     std::vector<char> bytes(chars.begin(), chars.end());
 
-    readableBytes = bytes;
+    readable_bytes = bytes;
 
-    future<ResultPair> f = sesh::os::io::read(
-            *this, *this, dummyNonBlockingFileDescriptor(FD), 11);
+    future<result_pair> f = sesh::os::io::read(
+            *this, *this, dummy_non_blocking_file_descriptor(fd_value), 11);
 
     bool called = false;
-    std::move(f).then([&bytes, &called](trial<ResultPair> &&r) {
+    std::move(f).then([&bytes, &called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd_value);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
         CHECK(r->second.value<std::vector<char>>() == bytes);
         r->first.release().clear();
         called = true;
     });
     CHECK_FALSE(called);
-    CHECK(readableBytes.size() == bytes.size());
+    CHECK(readable_bytes.size() == bytes.size());
 
-    setReadyToRead();
+    set_ready_to_read();
 
     CHECK(called);
-    CHECK(readableBytes.empty());
+    CHECK(readable_bytes.empty());
 }
 
 } // namespace non_empty_read
 
 namespace domain_error {
 
-class DomainErrorProactor : public proactor {
+class domain_error_proactor : public proactor {
 
     future<trigger> expect_impl(std::vector<trigger> &&) override {
         return make_failed_future_of<trigger>(
                 std::domain_error("expected error"));
     }
 
-}; // class DomainErrorProactor
+}; // class domain_error_proactor
 
 TEST_CASE("Read: domain error in proactor") {
-    const FileDescriptor::Value FD = 2;
-    UncallableReaderApi api;
-    DomainErrorProactor p;
-    future<ResultPair> f = read(
-            api, p, dummyNonBlockingFileDescriptor(FD), {'C'});
+    const file_descriptor::value_type fd = 2;
+    uncallable_reader_api api;
+    domain_error_proactor p;
+    future<result_pair> f = read(
+            api, p, dummy_non_blocking_file_descriptor(fd), {'C'});
 
     bool called = false;
-    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+    std::move(f).then([fd, &called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd);
         REQUIRE(r->second.tag() == r->second.tag<std::error_code>());
         CHECK(r->second.value<std::error_code>() ==
                 std::make_error_code(std::errc::too_many_files_open));
@@ -263,27 +266,27 @@ TEST_CASE("Read: domain error in proactor") {
 
 namespace read_error {
 
-class ReadErrorApiStub : public ReaderApi {
+class read_error_api_stub : public reader_api {
 
-    ReadResult read(const FileDescriptor &, void *, std::size_t) const
+    read_result read(const file_descriptor &, void *, std::size_t) const
             override {
         return std::make_error_code(std::errc::io_error);
     }
 
-}; // class ReadErrorApiStub
+}; // class read_error_api_stub
 
 TEST_CASE("Read: read error") {
-    const FileDescriptor::Value FD = 4;
-    ReadErrorApiStub api;
-    EchoingProactor proactor;
-    future<ResultPair> f = sesh::os::io::read(
-            api, proactor, dummyNonBlockingFileDescriptor(FD), {'A'});
+    const file_descriptor::value_type fd = 4;
+    read_error_api_stub api;
+    echoing_proactor proactor;
+    future<result_pair> f = sesh::os::io::read(
+            api, proactor, dummy_non_blocking_file_descriptor(fd), {'A'});
 
     bool called = false;
-    std::move(f).then([FD, &called](trial<ResultPair> &&r) {
+    std::move(f).then([fd, &called](trial<result_pair> &&r) {
         REQUIRE(r.has_value());
-        CHECK(r->first.isValid());
-        CHECK(r->first.value() == FD);
+        CHECK(r->first.is_valid());
+        CHECK(r->first.value() == fd);
         REQUIRE(r->second.tag() == r->second.tag<std::error_code>());
         CHECK(r->second.value<std::error_code>() ==
                 std::make_error_code(std::errc::io_error));

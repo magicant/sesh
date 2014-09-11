@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Writer.hh"
+#include "writer.hh"
 
 #include <cassert>
 #include <stdexcept>
@@ -41,26 +41,26 @@ namespace io {
 
 namespace {
 
-using ResultPair = std::pair<NonBlockingFileDescriptor, std::error_code>;
+using result_pair = std::pair<non_blocking_file_descriptor, std::error_code>;
 
-struct Writer {
+struct writer {
 
-    const WriterApi &api;
+    const writer_api &api;
     class proactor &proactor;
-    NonBlockingFileDescriptor fd;
+    non_blocking_file_descriptor fd;
     std::vector<char> bytes;
 
-    future<ResultPair> operator()(std::size_t bytesWritten) {
+    future<result_pair> operator()(std::size_t bytes_written) {
         auto i = bytes.begin();
-        bytes.erase(i, i + bytesWritten);
+        bytes.erase(i, i + bytes_written);
         return write(api, proactor, std::move(fd), std::move(bytes));
     }
 
-    future<ResultPair> operator()(std::error_code e) {
-        return make_future<ResultPair>(std::move(fd), e);
+    future<result_pair> operator()(std::error_code e) {
+        return make_future<result_pair>(std::move(fd), e);
     }
 
-    future<ResultPair> operator()(trial<trigger> &&t) {
+    future<result_pair> operator()(trial<trigger> &&t) {
         try {
             *t;
         } catch (std::domain_error &e) {
@@ -77,21 +77,21 @@ struct Writer {
         return std::move(r).apply(*this);
     }
 
-}; // struct Writer
+}; // struct writer
 
 } // namespace
 
-future<ResultPair> write(
-        const WriterApi &api,
+future<result_pair> write(
+        const writer_api &api,
         proactor &p,
-        NonBlockingFileDescriptor &&fd,
+        non_blocking_file_descriptor &&fd,
         std::vector<char> &&bytes) {
     if (bytes.empty())
-        return make_future<ResultPair>(std::move(fd), std::error_code());
+        return make_future<result_pair>(std::move(fd), std::error_code());
 
     auto trigger = writable_file_descriptor(fd.value());
-    auto writer = Writer{api, p, std::move(fd), std::move(bytes)};
-    return p.expect(trigger).then(std::move(writer)).unwrap();
+    auto w = writer{api, p, std::move(fd), std::move(bytes)};
+    return p.expect(trigger).then(std::move(w)).unwrap();
 }
 
 } // namespace io

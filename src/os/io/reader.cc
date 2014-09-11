@@ -16,7 +16,7 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "Reader.hh"
+#include "reader.hh"
 
 #include <cassert>
 #include <cstdint>
@@ -42,26 +42,26 @@ namespace io {
 
 namespace {
 
-using ResultPair = std::pair<
-        NonBlockingFileDescriptor,
+using result_pair = std::pair<
+        non_blocking_file_descriptor,
         variant<std::vector<char>, std::error_code>>;
 
-struct Reader {
+struct reader {
 
-    const ReaderApi &api;
-    NonBlockingFileDescriptor fd;
+    const reader_api &api;
+    non_blocking_file_descriptor fd;
     std::vector<char> buffer;
 
-    ResultPair operator()(std::size_t bytesRead) {
-        buffer.resize(static_cast<std::vector<char>::size_type>(bytesRead));
-        return ResultPair(std::move(fd), std::move(buffer));
+    result_pair operator()(std::size_t bytes_read) {
+        buffer.resize(static_cast<std::vector<char>::size_type>(bytes_read));
+        return result_pair(std::move(fd), std::move(buffer));
     }
 
-    ResultPair operator()(std::error_code e) {
-        return ResultPair(std::move(fd), std::move(e));
+    result_pair operator()(std::error_code e) {
+        return result_pair(std::move(fd), std::move(e));
     }
 
-    ResultPair operator()(trial<trigger> &&t) {
+    result_pair operator()(trial<trigger> &&t) {
         try {
             *t;
         } catch (std::domain_error &) {
@@ -71,29 +71,29 @@ struct Reader {
 
         assert(t->value<readable_file_descriptor>().value() == fd.value());
 
-        auto bufferBody = static_cast<void *>(buffer.data());
+        auto buffer_body = static_cast<void *>(buffer.data());
         auto size = static_cast<std::size_t>(buffer.size());
-        return api.read(fd, bufferBody, size).apply(*this);
+        return api.read(fd, buffer_body, size).apply(*this);
     }
 
-}; // struct Reader
+}; // struct reader
 
 } // namespace
 
-future<ResultPair> read(
-        const ReaderApi &api,
+future<result_pair> read(
+        const reader_api &api,
         proactor &p,
-        NonBlockingFileDescriptor &&fd,
-        std::vector<char>::size_type maxBytesToRead) {
-    if (maxBytesToRead == 0)
-        return make_future<ResultPair>(std::move(fd), std::vector<char>());
+        non_blocking_file_descriptor &&fd,
+        std::vector<char>::size_type max_bytes_to_read) {
+    if (max_bytes_to_read == 0)
+        return make_future<result_pair>(std::move(fd), std::vector<char>());
 
-    if (maxBytesToRead > SIZE_MAX)
-        maxBytesToRead = SIZE_MAX;
+    if (max_bytes_to_read > SIZE_MAX)
+        max_bytes_to_read = SIZE_MAX;
 
     auto trigger = readable_file_descriptor(fd.value());
     return p.expect(trigger).then(
-            Reader{api, std::move(fd), std::vector<char>(maxBytesToRead)});
+            reader{api, std::move(fd), std::vector<char>(max_bytes_to_read)});
 }
 
 } // namespace io

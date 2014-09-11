@@ -15,43 +15,43 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_ReaderApi_hh
-#define INCLUDED_os_io_ReaderApi_hh
+#ifndef INCLUDED_os_io_file_description_attribute_hh
+#define INCLUDED_os_io_file_description_attribute_hh
 
 #include "buildconfig.h"
 
-#include <cstddef>
-#include <system_error>
-#include "common/variant.hh"
-#include "os/io/FileDescriptor.hh"
+#include "common/enum_traits.hh"
 
 namespace sesh {
+
 namespace os {
 namespace io {
 
-/** Abstraction of POSIX API for reading. */
-class ReaderApi {
-
-public:
-
-    using ReadResult = common::variant<std::size_t, std::error_code>;
-
-    /**
-     * Reads bytes from the given file descriptor. This function may block on
-     * some conditions; refer to the POSIX standard for details.
-     *
-     * On success, the number of actually read bytes is returned. On failure, a
-     * non-zero error code is returned.
-     */
-    virtual ReadResult read(const FileDescriptor &, void *, std::size_t) const
-            = 0;
-
-}; // class ReaderApi
+/** This enum class defines attributes an open file description can have. */
+enum class file_description_attribute {
+    append,
+    data_sync,
+    non_blocking,
+    read_sync,
+    sync,
+};
 
 } // namespace io
 } // namespace os
+
+namespace common {
+
+template<>
+class enum_traits<os::io::file_description_attribute> {
+public:
+    constexpr static os::io::file_description_attribute max =
+            os::io::file_description_attribute::sync;
+};
+
+} // namespace common
+
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_ReaderApi_hh
+#endif // #ifndef INCLUDED_os_io_file_description_attribute_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

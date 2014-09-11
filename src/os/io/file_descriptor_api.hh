@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptorApi_hh
-#define INCLUDED_os_io_FileDescriptorApi_hh
+#ifndef INCLUDED_os_io_file_descriptor_api_hh
+#define INCLUDED_os_io_file_descriptor_api_hh
 
 #include "buildconfig.h"
 
@@ -24,17 +24,17 @@
 #include <system_error>
 #include "common/enum_set.hh"
 #include "common/variant.hh"
-#include "os/io/FileDescriptionAccessMode.hh"
-#include "os/io/FileDescriptionAttribute.hh"
-#include "os/io/FileDescriptor.hh"
-#include "os/io/FileDescriptorOpenMode.hh"
-#include "os/io/FileMode.hh"
+#include "os/io/file_description_access_mode.hh"
+#include "os/io/file_description_attribute.hh"
+#include "os/io/file_descriptor.hh"
+#include "os/io/file_descriptor_open_mode.hh"
+#include "os/io/file_mode.hh"
 
 namespace sesh {
 namespace os {
 namespace io {
 
-class FileDescriptorApi {
+class file_descriptor_api {
 
 public:
 
@@ -45,12 +45,12 @@ public:
      * The file mode set argument is ignored unless the CREATE flag is included
      * in the file descriptor open mode set argument.
      */
-    virtual common::variant<FileDescriptor, std::error_code> open(
+    virtual common::variant<file_descriptor, std::error_code> open(
             const char *path,
-            FileDescriptionAccessMode,
-            common::enum_set<FileDescriptionAttribute>,
-            common::enum_set<FileDescriptorOpenMode>,
-            common::enum_set<FileMode>) const = 0;
+            file_description_access_mode,
+            common::enum_set<file_description_attribute>,
+            common::enum_set<file_descriptor_open_mode>,
+            common::enum_set<file_mode>) const = 0;
 
     /**
      * Closes the given file descriptor. This function may block on some
@@ -61,14 +61,14 @@ public:
      *
      * On failure, the file descriptor may be left still valid.
      */
-    virtual std::error_code close(FileDescriptor &) const = 0;
+    virtual std::error_code close(file_descriptor &) const = 0;
 
-}; // class FileDescriptorApi
+}; // class file_descriptor_api
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptorApi_hh
+#endif // #ifndef INCLUDED_os_io_file_descriptor_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

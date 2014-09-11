@@ -15,50 +15,43 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileMode_hh
-#define INCLUDED_os_io_FileMode_hh
+#ifndef INCLUDED_os_io_writer_api_hh
+#define INCLUDED_os_io_writer_api_hh
 
 #include "buildconfig.h"
 
-#include "common/enum_traits.hh"
+#include <cstddef>
+#include <system_error>
+#include "common/variant.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
-
 namespace os {
 namespace io {
 
-/** Defines file permission bits. */
-enum class FileMode {
-    // ordered by the bit position, starting from the least significant bit.
-    OTHERS_EXECUTE,
-    OTHERS_WRITE,
-    OTHERS_READ,
-    GROUP_EXECUTE,
-    GROUP_WRITE,
-    GROUP_READ,
-    OWNER_EXECUTE,
-    OWNER_WRITE,
-    OWNER_READ,
-    STICKY,
-    SET_GROUP_ID,
-    SET_USER_ID,
-};
+/** Abstraction of POSIX API for writing. */
+class writer_api {
+
+public:
+
+    using write_result = common::variant<std::size_t, std::error_code>;
+
+    /**
+     * Writes bytes to the given file descriptor. This function may block on
+     * some conditions; refer to the POSIX standard for details.
+     *
+     * On success, the number of actually written bytes is returned. On
+     * failure, a non-zero error code is returned.
+     */
+    virtual write_result write(
+            const file_descriptor &, const void *, std::size_t) const = 0;
+
+}; // class writer_api
 
 } // namespace io
 } // namespace os
-
-namespace common {
-
-template<>
-class enum_traits<os::io::FileMode> {
-public:
-    constexpr static os::io::FileMode max = os::io::FileMode::SET_USER_ID;
-};
-
-} // namespace common
-
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileMode_hh
+#endif // #ifndef INCLUDED_os_io_writer_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

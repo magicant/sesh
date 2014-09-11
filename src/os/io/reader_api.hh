@@ -15,37 +15,43 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptionApiTestHelper_hh
-#define INCLUDED_os_io_FileDescriptionApiTestHelper_hh
+#ifndef INCLUDED_os_io_reader_api_hh
+#define INCLUDED_os_io_reader_api_hh
 
 #include "buildconfig.h"
 
+#include <cstddef>
 #include <system_error>
-#include "os/io/FileDescriptionApi.hh"
+#include "common/variant.hh"
+#include "os/io/file_descriptor.hh"
 
 namespace sesh {
 namespace os {
 namespace io {
 
-class FileDescriptionApiDummy : public FileDescriptionApi {
+/** Abstraction of POSIX API for reading. */
+class reader_api {
 
-    common::variant<std::unique_ptr<FileDescriptionStatus>, std::error_code>
-    getFileDescriptionStatus(const FileDescriptor &) const override {
-        return std::error_code();
-    }
+public:
 
-    std::error_code setFileDescriptionStatus(
-            const FileDescriptor &, const FileDescriptionStatus &) const
-            override {
-        return std::error_code();
-    }
+    using read_result = common::variant<std::size_t, std::error_code>;
 
-};
+    /**
+     * Reads bytes from the given file descriptor. This function may block on
+     * some conditions; refer to the POSIX standard for details.
+     *
+     * On success, the number of actually read bytes is returned. On failure, a
+     * non-zero error code is returned.
+     */
+    virtual read_result read(const file_descriptor &, void *, std::size_t)
+            const = 0;
+
+}; // class reader_api
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptionApiTestHelper_hh
+#endif // #ifndef INCLUDED_os_io_reader_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

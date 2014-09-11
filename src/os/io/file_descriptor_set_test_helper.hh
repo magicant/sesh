@@ -15,43 +15,45 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_FileDescriptorSetTestHelper_hh
-#define INCLUDED_os_io_FileDescriptorSetTestHelper_hh
+#ifndef INCLUDED_os_io_file_descriptor_set_test_helper_hh
+#define INCLUDED_os_io_file_descriptor_set_test_helper_hh
 
 #include "buildconfig.h"
 
 #include <set>
 #include <stdexcept>
 #include "common/container_helper.hh"
-#include "os/io/FileDescriptor.hh"
-#include "os/io/FileDescriptorSet.hh"
+#include "os/io/file_descriptor.hh"
+#include "os/io/file_descriptor_set.hh"
 
 namespace sesh {
 namespace os {
 namespace io {
 
-class FileDescriptorSetFake :
-        public FileDescriptorSet, public std::set<FileDescriptor::Value> {
+class file_descriptor_set_fake :
+        public file_descriptor_set,
+        public std::set<file_descriptor::value_type> {
 
 public:
 
-    constexpr static FileDescriptor::Value MAX_VALUE = 20;
+    constexpr static file_descriptor::value_type MAX_VALUE = 20;
 
-    FileDescriptor::Value maxValue() const override {
+    file_descriptor::value_type max_value() const override {
         return MAX_VALUE;
     }
 
-    bool test(FileDescriptor::Value fd) const override {
+    bool test(file_descriptor::value_type fd) const override {
         return common::contains(*this, fd);
     }
 
-    std::pair<iterator, bool> insert(FileDescriptor::Value fd) {
+    std::pair<iterator, bool> insert(file_descriptor::value_type fd) {
         if (fd > MAX_VALUE)
             throw std::domain_error("too large file descriptor");
-        return std::set<FileDescriptor::Value>::insert(fd);
+        return std::set<file_descriptor::value_type>::insert(fd);
     }
 
-    FileDescriptorSet &set(FileDescriptor::Value fd, bool v = true) override {
+    file_descriptor_set &set(file_descriptor::value_type fd, bool v = true)
+            override {
         if (v)
             insert(fd);
         else
@@ -59,21 +61,21 @@ public:
         return *this;
     }
 
-    FileDescriptorSet &reset() override {
+    file_descriptor_set &reset() override {
         clear();
         return *this;
     }
 
-    FileDescriptor::Value bound() const {
+    file_descriptor::value_type bound() const {
         return empty() ? 0 : *rbegin() + 1;
     }
 
-}; // class FileDescriptorSetFake
+}; // class file_descriptor_set_fake
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_FileDescriptorSetTestHelper_hh
+#endif // #ifndef INCLUDED_os_io_file_descriptor_set_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

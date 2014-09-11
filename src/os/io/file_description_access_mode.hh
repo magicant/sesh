@@ -15,43 +15,28 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_io_WriterApi_hh
-#define INCLUDED_os_io_WriterApi_hh
+#ifndef INCLUDED_os_io_file_description_access_mode_hh
+#define INCLUDED_os_io_file_description_access_mode_hh
 
 #include "buildconfig.h"
-
-#include <cstddef>
-#include <system_error>
-#include "common/variant.hh"
-#include "os/io/FileDescriptor.hh"
 
 namespace sesh {
 namespace os {
 namespace io {
 
-/** Abstraction of POSIX API for writing. */
-class WriterApi {
-
-public:
-
-    using WriteResult = common::variant<std::size_t, std::error_code>;
-
-    /**
-     * Writes bytes to the given file descriptor. This function may block on
-     * some conditions; refer to the POSIX standard for details.
-     *
-     * On success, the number of actually written bytes is returned. On
-     * failure, a non-zero error code is returned.
-     */
-    virtual WriteResult write(
-            const FileDescriptor &, const void *, std::size_t) const = 0;
-
-}; // class WriterApi
+/** This enum class defines file access modes of open file descriptions. */
+enum class file_description_access_mode {
+    read_only,
+    write_only,
+    read_write,
+    exec,
+    search,
+};
 
 } // namespace io
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_io_WriterApi_hh
+#endif // #ifndef INCLUDED_os_io_file_description_access_mode_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

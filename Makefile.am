@@ -61,10 +61,10 @@ TESTPROGRAMS = \
 	src/os/event/awaiter_timeout_test \
 	src/os/event/awaiter_user_provided_trigger_test \
 	src/os/event/awaiter_writable_file_descriptor_test \
-	src/os/io/FileDescriptorTest \
-	src/os/io/NonBlockingFileDescriptorTest \
-	src/os/io/ReaderTest \
-	src/os/io/WriterTest \
+	src/os/io/file_descriptor_test \
+	src/os/io/non_blocking_file_descriptor_test \
+	src/os/io/reader_test \
+	src/os/io/writer_test \
 	src/os/signaling/HandlerConfigurationTest
 
 TESTSCRIPTS = \
@@ -176,23 +176,23 @@ src_sesh_SOURCES = \
 	src/os/event/trigger.hh \
 	src/os/event/user_provided_trigger.hh \
 	src/os/event/writable_file_descriptor.hh \
-	src/os/io/FileDescriptionAccessMode.hh \
-	src/os/io/FileDescriptionApi.hh \
-	src/os/io/FileDescriptionAttribute.hh \
-	src/os/io/FileDescriptionStatus.hh \
-	src/os/io/FileDescriptor.hh \
-	src/os/io/FileDescriptorApi.hh \
-	src/os/io/FileDescriptorOpenMode.hh \
-	src/os/io/FileDescriptorSet.hh \
-	src/os/io/FileMode.hh \
-	src/os/io/NonBlockingFileDescriptor.cc \
-	src/os/io/NonBlockingFileDescriptor.hh \
-	src/os/io/Reader.cc \
-	src/os/io/Reader.hh \
-	src/os/io/ReaderApi.hh \
-	src/os/io/Writer.cc \
-	src/os/io/Writer.hh \
-	src/os/io/WriterApi.hh \
+	src/os/io/file_description_access_mode.hh \
+	src/os/io/file_description_api.hh \
+	src/os/io/file_description_attribute.hh \
+	src/os/io/file_description_status.hh \
+	src/os/io/file_descriptor.hh \
+	src/os/io/file_descriptor_api.hh \
+	src/os/io/file_descriptor_open_mode.hh \
+	src/os/io/file_descriptor_set.hh \
+	src/os/io/file_mode.hh \
+	src/os/io/non_blocking_file_descriptor.cc \
+	src/os/io/non_blocking_file_descriptor.hh \
+	src/os/io/reader.cc \
+	src/os/io/reader.hh \
+	src/os/io/reader_api.hh \
+	src/os/io/writer.cc \
+	src/os/io/writer.hh \
+	src/os/io/writer_api.hh \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfiguration.hh \
 	src/os/signaling/HandlerConfigurationApi.cc \
@@ -369,19 +369,19 @@ src_os_event_awaiter_writable_file_descriptor_test_SOURCES = \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
 	src/os/signaling/SignalErrorCategory.cc
-src_os_io_FileDescriptorTest_SOURCES = \
-	src/os/io/FileDescriptorTest.cc
-src_os_io_NonBlockingFileDescriptorTest_SOURCES = \
-	src/os/io/NonBlockingFileDescriptor.cc \
-	src/os/io/NonBlockingFileDescriptorTest.cc
-src_os_io_ReaderTest_SOURCES = \
-	src/os/io/NonBlockingFileDescriptor.cc \
-	src/os/io/Reader.cc \
-	src/os/io/ReaderTest.cc
-src_os_io_WriterTest_SOURCES = \
-	src/os/io/NonBlockingFileDescriptor.cc \
-	src/os/io/Writer.cc \
-	src/os/io/WriterTest.cc
+src_os_io_file_descriptor_test_SOURCES = \
+	src/os/io/file_descriptor_test.cc
+src_os_io_non_blocking_file_descriptor_test_SOURCES = \
+	src/os/io/non_blocking_file_descriptor.cc \
+	src/os/io/non_blocking_file_descriptor_test.cc
+src_os_io_reader_test_SOURCES = \
+	src/os/io/non_blocking_file_descriptor.cc \
+	src/os/io/reader.cc \
+	src/os/io/reader_test.cc
+src_os_io_writer_test_SOURCES = \
+	src/os/io/non_blocking_file_descriptor.cc \
+	src/os/io/writer.cc \
+	src/os/io/writer_test.cc
 src_os_signaling_HandlerConfigurationTest_SOURCES = \
 	src/os/signaling/HandlerConfiguration.cc \
 	src/os/signaling/HandlerConfigurationApi.cc \
@@ -397,9 +397,9 @@ TESTHEADERS = \
 	src/language/syntax/printer_test_helper.hh \
 	src/os/event/awaiter_test_helper.hh \
 	src/os/event/pselect_api_test_helper.hh \
-	src/os/io/FileDescriptionApiTestHelper.hh \
-	src/os/io/FileDescriptorSetTestHelper.hh \
-	src/os/io/NonBlockingFileDescriptorTestHelper.hh \
+	src/os/io/file_description_api_test_helper.hh \
+	src/os/io/file_descriptor_set_test_helper.hh \
+	src/os/io/non_blocking_file_descriptor_test_helper.hh \
 	src/os/signaling/HandlerConfigurationApiTestHelper.hh \
 	src/os/signaling/SignalNumberSetTestHelper.hh \
 	src/os/time_api_test_helper.hh

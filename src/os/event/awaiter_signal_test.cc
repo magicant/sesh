@@ -32,8 +32,8 @@
 #include "os/event/pselect_api.hh"
 #include "os/event/signal.hh"
 #include "os/event/trigger.hh"
-#include "os/io/FileDescriptor.hh"
-#include "os/io/FileDescriptorSet.hh"
+#include "os/io/file_descriptor.hh"
+#include "os/io/file_descriptor_set.hh"
 #include "os/signaling/HandlerConfigurationApiTestHelper.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
@@ -45,8 +45,8 @@ using sesh::common::trial;
 using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::signal;
 using sesh::os::event::trigger;
-using sesh::os::io::FileDescriptor;
-using sesh::os::io::FileDescriptorSet;
+using sesh::os::io::file_descriptor;
+using sesh::os::io::file_descriptor_set;
 using sesh::os::signaling::HandlerConfigurationApiFake;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
@@ -68,10 +68,10 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
-            FileDescriptorSet *read_fds,
-            FileDescriptorSet *write_fds,
-            FileDescriptorSet *error_fds,
+            file_descriptor::value_type fd_bound,
+            file_descriptor_set *read_fds,
+            file_descriptor_set *write_fds,
+            file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds");
@@ -103,10 +103,10 @@ TEST_CASE_METHOD(
     signalMask().set(5);
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value,
-            FileDescriptorSet *,
-            FileDescriptorSet *,
-            FileDescriptorSet *,
+            file_descriptor::value_type,
+            file_descriptor_set *,
+            file_descriptor_set *,
+            file_descriptor_set *,
             std::chrono::nanoseconds,
             const SignalNumberSet *mask_while_awaiting) -> std::error_code {
         if (mask_while_awaiting != nullptr)
@@ -139,10 +139,10 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
-            FileDescriptorSet *read_fds,
-            FileDescriptorSet *write_fds,
-            FileDescriptorSet *error_fds,
+            file_descriptor::value_type fd_bound,
+            file_descriptor_set *read_fds,
+            file_descriptor_set *write_fds,
+            file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds");
@@ -186,10 +186,10 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value fd_bound,
-            FileDescriptorSet *read_fds,
-            FileDescriptorSet *write_fds,
-            FileDescriptorSet *error_fds,
+            file_descriptor::value_type fd_bound,
+            file_descriptor_set *read_fds,
+            file_descriptor_set *write_fds,
+            file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
             const SignalNumberSet *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds");
@@ -228,10 +228,10 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value,
-            FileDescriptorSet *,
-            FileDescriptorSet *,
-            FileDescriptorSet *,
+            file_descriptor::value_type,
+            file_descriptor_set *,
+            file_descriptor_set *,
+            file_descriptor_set *,
             std::chrono::nanoseconds,
             const SignalNumberSet *signal_mask) -> std::error_code {
         if (signal_mask != nullptr) {
@@ -273,10 +273,10 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value,
-            FileDescriptorSet *,
-            FileDescriptorSet *,
-            FileDescriptorSet *,
+            file_descriptor::value_type,
+            file_descriptor_set *,
+            file_descriptor_set *,
+            file_descriptor_set *,
             std::chrono::nanoseconds,
             const SignalNumberSet *signal_mask) -> std::error_code {
         if (signal_mask != nullptr) {
@@ -291,10 +291,10 @@ TEST_CASE_METHOD(
         mutable_steady_clock_now() += std::chrono::seconds(3);
         implementation() = [this](
                 const pselect_api_stub &,
-                FileDescriptor::Value,
-                FileDescriptorSet *,
-                FileDescriptorSet *,
-                FileDescriptorSet *,
+                file_descriptor::value_type,
+                file_descriptor_set *,
+                file_descriptor_set *,
+                file_descriptor_set *,
                 std::chrono::nanoseconds,
                 const SignalNumberSet *signal_mask) -> std::error_code {
             if (signal_mask != nullptr)
@@ -322,10 +322,10 @@ TEST_CASE_METHOD(
 
     implementation() = [this](
             const pselect_api_stub &,
-            FileDescriptor::Value,
-            FileDescriptorSet *,
-            FileDescriptorSet *,
-            FileDescriptorSet *,
+            file_descriptor::value_type,
+            file_descriptor_set *,
+            file_descriptor_set *,
+            file_descriptor_set *,
             std::chrono::nanoseconds,
             const SignalNumberSet *) -> std::error_code {
         Action &a = actions().at(1);

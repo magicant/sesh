@@ -21,10 +21,10 @@
 #include "buildconfig.h"
 
 #include "os/event/pselect_api.hh"
-#include "os/io/FileDescriptionApi.hh"
-#include "os/io/FileDescriptorApi.hh"
-#include "os/io/ReaderApi.hh"
-#include "os/io/WriterApi.hh"
+#include "os/io/file_description_api.hh"
+#include "os/io/file_descriptor_api.hh"
+#include "os/io/reader_api.hh"
+#include "os/io/writer_api.hh"
 #include "os/signaling/HandlerConfigurationApi.hh"
 
 namespace sesh {
@@ -33,10 +33,10 @@ namespace os {
 /** Abstraction of POSIX API. */
 class api :
         public event::pselect_api,
-        public io::FileDescriptionApi,
-        public io::FileDescriptorApi,
-        public io::ReaderApi,
-        public io::WriterApi,
+        public io::file_description_api,
+        public io::file_descriptor_api,
+        public io::reader_api,
+        public io::writer_api,
         public signaling::HandlerConfigurationApi {
 
 public:
