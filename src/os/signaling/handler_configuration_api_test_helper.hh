@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_signaling_HandlerConfigurationApiTestHelper_hh
-#define INCLUDED_os_signaling_HandlerConfigurationApiTestHelper_hh
+#ifndef INCLUDED_os_signaling_handler_configuration_api_test_helper_hh
+#define INCLUDED_os_signaling_handler_configuration_api_test_helper_hh
 
 #include "buildconfig.h"
 
@@ -24,7 +24,7 @@
 #include <map>
 #include <memory>
 #include <system_error>
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include "os/signaling/handler_configuration_api.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSetTestHelper.hh"
 
@@ -139,6 +139,6 @@ public:
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_signaling_HandlerConfigurationApiTestHelper_hh
+#endif // #ifndef INCLUDED_os_signaling_handler_configuration_api_test_helper_h
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

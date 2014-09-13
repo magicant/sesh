@@ -25,7 +25,7 @@
 #include "os/io/file_descriptor_api.hh"
 #include "os/io/reader_api.hh"
 #include "os/io/writer_api.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include "os/signaling/handler_configuration_api.hh"
 
 namespace sesh {
 namespace os {

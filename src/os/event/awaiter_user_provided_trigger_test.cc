@@ -30,7 +30,7 @@
 #include "os/event/pselect_api.hh"
 #include "os/event/trigger.hh"
 #include "os/event/user_provided_trigger.hh"
-#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
+#include "os/signaling/handler_configuration_api_test_helper.hh"
 
 namespace {
 

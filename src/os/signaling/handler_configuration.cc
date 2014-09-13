@@ -26,7 +26,7 @@
 #include "common/maybe.hh"
 #include "common/shared_function.hh"
 #include "helpermacros.h"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include "os/signaling/handler_configuration_api.hh"
 #include "os/signaling/SignalErrorCode.hh"
 #include "os/signaling/SignalNumberSet.hh"
 

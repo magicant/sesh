@@ -33,7 +33,7 @@
 #include "os/event/trigger.hh"
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_set.hh"
-#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
+#include "os/signaling/handler_configuration_api_test_helper.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 /*

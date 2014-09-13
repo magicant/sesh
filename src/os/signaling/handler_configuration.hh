@@ -24,7 +24,7 @@
 #include <memory>
 #include <system_error>
 #include "common/variant.hh"
-#include "os/signaling/HandlerConfigurationApi.hh"
+#include "os/signaling/handler_configuration_api.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
