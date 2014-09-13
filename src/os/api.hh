@@ -37,7 +37,7 @@ class api :
         public io::file_descriptor_api,
         public io::reader_api,
         public io::writer_api,
-        public signaling::HandlerConfigurationApi {
+        public signaling::handler_configuration_api {
 
 public:
 

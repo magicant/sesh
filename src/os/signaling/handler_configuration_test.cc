@@ -33,8 +33,8 @@ namespace {
 
 using sesh::common::nop;
 using sesh::os::signaling::handler_configuration;
-using sesh::os::signaling::HandlerConfigurationApiDummy;
-using sesh::os::signaling::HandlerConfigurationApiFake;
+using sesh::os::signaling::handler_configuration_api_dummy;
+using sesh::os::signaling::handler_configuration_api_fake;
 using sesh::os::signaling::SignalErrorCode;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
@@ -52,33 +52,33 @@ protected:
 }; // template<typename Api> class fixture
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiDummy>,
+        fixture<handler_configuration_api_dummy>,
         "Handler configuration: construction") {
     CHECK(c != nullptr);
     CHECK(c.use_count() == 1);
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiDummy>,
+        fixture<handler_configuration_api_dummy>,
         "Handler configuration: empty configuration calls no handlers") {
     CHECK_NOTHROW(c->call_handlers());
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiDummy>,
+        fixture<handler_configuration_api_dummy>,
         "Handler configuration: empty configuration calls null mask") {
     CHECK(c->mask_for_pselect() == nullptr);
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: simple handler and action") {
     SignalNumber v = 0;
     auto result = c->add_handler(5, [&v](SignalNumber n) { v += n; });
     CHECK(v == 0);
 
-    Action &a = actions().at(5);
-    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+    signal_action &a = actions().at(5);
+    REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     CHECK(v == 0);
@@ -93,14 +93,14 @@ TEST_CASE_METHOD(
     REQUIRE(result.tag() == result.tag<canceler_type>());
     CHECK(result.value<canceler_type>()().value() == 0);
     CHECK(result.value<canceler_type>()().value() == 0);
-    CHECK(a.tag() == Action::tag<Default>());
+    CHECK(a.tag() == signal_action::tag<default_action>());
 
     c->call_handlers();
     CHECK(v == 15);
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: many handlers and actions") {
     unsigned v1 = 0, v2 = 0, v3 = 0;
 
@@ -108,8 +108,8 @@ TEST_CASE_METHOD(
     auto result2 = c->add_handler(5, [&v2](SignalNumber) { ++v2; });
     auto result3 = c->add_handler(5, [&v3](SignalNumber) { ++v3; });
 
-    Action &a = actions().at(5);
-    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+    signal_action &a = actions().at(5);
+    REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
     a.value<sesh_osapi_signal_handler *>()(5);
     c->call_handlers();
 
@@ -120,7 +120,7 @@ TEST_CASE_METHOD(
     result1.value<canceler_type>()();
     result2.value<canceler_type>()();
 
-    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+    REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
     a.value<sesh_osapi_signal_handler *>()(5);
     c->call_handlers();
 
@@ -129,11 +129,11 @@ TEST_CASE_METHOD(
     CHECK(v3 == 2);
 
     result3.value<canceler_type>()();
-    CHECK(a.tag() == Action::tag<Default>());
+    CHECK(a.tag() == signal_action::tag<default_action>());
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: handlers and actions for many signals") {
     SignalNumber s1 = 0, s2 = 0, s3 = 0;
     auto result1 = c->add_handler(1, [&s1](SignalNumber n) { s1 = n; });
@@ -150,49 +150,49 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: signal is blocked when handler is set") {
     auto result = c->add_handler(1, nop());
-    CHECK(signalMask().test(1));
+    CHECK(signal_mask().test(1));
 
     result.value<canceler_type>()();
-    CHECK_FALSE(signalMask().test(1));
+    CHECK_FALSE(signal_mask().test(1));
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: mask is restored when handler is unset") {
-    signalMask().set(1);
+    signal_mask().set(1);
 
     auto result = c->add_handler(1, nop());
-    CHECK(signalMask().test(1));
+    CHECK(signal_mask().test(1));
 
     result.value<canceler_type>()();
-    CHECK(signalMask().test(1));
+    CHECK(signal_mask().test(1));
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: handler for invalid signal") {
     auto result = c->add_handler(
-            INVALID_SIGNAL_NUMBER, [](SignalNumber) { FAIL(); });
+            invalid_signal_number, [](SignalNumber) { FAIL(); });
     REQUIRE(result.tag() == result.tag<std::error_code>());
     CHECK(result.value<std::error_code>() == std::errc::invalid_argument);
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: trap to default w/o handler") {
     std::error_code e = c->set_trap(
             5,
             handler_configuration::default_action(),
             handler_configuration::setting_policy::force);
     CHECK(e.value() == 0);
-    CHECK(actions().at(5).tag() == Action::tag<Default>());
+    CHECK(actions().at(5).tag() == signal_action::tag<default_action>());
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: trap to default and add handler") {
     c->set_trap(
             5,
@@ -206,11 +206,11 @@ TEST_CASE_METHOD(
     CHECK(v == 5);
 
     handler_result.value<canceler_type>()();
-    CHECK(actions().at(5).tag() == Action::tag<Default>());
+    CHECK(actions().at(5).tag() == signal_action::tag<default_action>());
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: add handler and trap to default") {
     SignalNumber v = 0;
     auto handlerResult = c->add_handler(5, [&v](SignalNumber n) { v += n; });
@@ -221,8 +221,8 @@ TEST_CASE_METHOD(
 
     CHECK(e.value() == 0);
 
-    Action &a = actions().at(5);
-    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+    signal_action &a = actions().at(5);
+    REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->call_handlers();
@@ -230,20 +230,20 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: successful ignore w/o handler") {
     std::error_code e = c->set_trap(
             5,
             handler_configuration::handler_type(),
             handler_configuration::setting_policy::fail_if_ignored);
     CHECK(e.value() == 0);
-    CHECK(actions().at(5).tag() == Action::tag<Ignore>());
+    CHECK(actions().at(5).tag() == signal_action::tag<ignore>());
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: failed ignore w/o handler") {
-    actions().emplace(5, Ignore());
+    actions().emplace(5, ignore());
 
     std::error_code e = c->set_trap(
             5,
@@ -253,9 +253,9 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: failed ignore w/ handler") {
-    actions().emplace(5, Ignore());
+    actions().emplace(5, ignore());
     c->add_handler(5, nop());
 
     std::error_code e = c->set_trap(
@@ -266,20 +266,20 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: forced ignore w/o handler") {
-    actions().emplace(5, Ignore());
+    actions().emplace(5, ignore());
 
     std::error_code e = c->set_trap(
             5,
             handler_configuration::handler_type(),
             handler_configuration::setting_policy::force);
     CHECK(e.value() == 0);
-    CHECK(actions().at(5).tag() == Action::tag<Ignore>());
+    CHECK(actions().at(5).tag() == signal_action::tag<ignore>());
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: ignore and add handler") {
     c->set_trap(
             5,
@@ -288,31 +288,31 @@ TEST_CASE_METHOD(
     SignalNumber v = 0;
     auto handler_result = c->add_handler(5, [&v](SignalNumber n) { v = n; });
 
-    Action &a = actions().at(5);
-    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+    signal_action &a = actions().at(5);
+    REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->call_handlers();
     CHECK(v == 5);
 
     handler_result.value<canceler_type>()();
-    CHECK(a.tag() == Action::tag<Ignore>());
+    CHECK(a.tag() == signal_action::tag<ignore>());
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: add handler and ignore") {
     c->add_handler(5, nop());
     c->set_trap(
             5,
             handler_configuration::handler_type(),
             handler_configuration::setting_policy::force);
-    Action &a = actions().at(5);
-    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+    signal_action &a = actions().at(5);
+    REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: trap w/o handler") {
     SignalNumber v = 0;
     handler_configuration::handler_type h = [&v](SignalNumber n) { v = n; };
@@ -320,8 +320,8 @@ TEST_CASE_METHOD(
             5, std::move(h), handler_configuration::setting_policy::force);
     CHECK(e.value() == 0);
 
-    Action &a = actions().at(5);
-    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+    signal_action &a = actions().at(5);
+    REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->call_handlers();
@@ -332,19 +332,19 @@ TEST_CASE_METHOD(
             handler_configuration::default_action(),
             handler_configuration::setting_policy::force);
     CHECK(e.value() == 0);
-    CHECK(a.tag() == Action::tag<Default>());
+    CHECK(a.tag() == signal_action::tag<default_action>());
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: trap and add another handler") {
     SignalNumber v1 = 0, v2 = 0;
     handler_configuration::handler_type h = [&v1](SignalNumber n) { v1 = n; };
     c->set_trap(5, std::move(h), handler_configuration::setting_policy::force);
     c->add_handler(5, [&v2](SignalNumber n) { v2 = n; });
 
-    Action &a = actions().at(5);
-    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+    signal_action &a = actions().at(5);
+    REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->call_handlers();
@@ -353,15 +353,15 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: add handler and trap") {
     SignalNumber v1 = 0, v2 = 0;
     handler_configuration::handler_type h = [&v1](SignalNumber n) { v1 = n; };
     c->add_handler(5, [&v2](SignalNumber n) { v2 = n; });
     c->set_trap(5, std::move(h), handler_configuration::setting_policy::force);
 
-    Action &a = actions().at(5);
-    REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+    signal_action &a = actions().at(5);
+    REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 
     a.value<sesh_osapi_signal_handler *>()(5);
     c->call_handlers();
@@ -370,54 +370,54 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: signal is blocked when trap is set") {
     c->set_trap(
             5,
             handler_configuration::handler_type(nop()),
             handler_configuration::setting_policy::force);
-    CHECK(signalMask().test(5));
+    CHECK(signal_mask().test(5));
 
     c->set_trap(
             5,
             handler_configuration::default_action(),
             handler_configuration::setting_policy::force);
-    CHECK_FALSE(signalMask().test(5));
+    CHECK_FALSE(signal_mask().test(5));
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: signal is restored when trap is unset") {
-    signalMask().set(5);
+    signal_mask().set(5);
 
     c->set_trap(
             5,
             handler_configuration::handler_type(nop()),
             handler_configuration::setting_policy::force);
-    CHECK(signalMask().test(5));
+    CHECK(signal_mask().test(5));
 
     c->set_trap(
             5,
             handler_configuration::default_action(),
             handler_configuration::setting_policy::force);
-    CHECK(signalMask().test(5));
+    CHECK(signal_mask().test(5));
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: trapping invalid signal") {
     std::error_code e = c->set_trap(
-            INVALID_SIGNAL_NUMBER,
+            invalid_signal_number,
             handler_configuration::handler_type(),
             handler_configuration::setting_policy::force);
     CHECK(e == std::errc::invalid_argument);
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: mask for pselect with handlers") {
-    signalMask().set(1);
-    signalMask().set(2);
+    signal_mask().set(1);
+    signal_mask().set(2);
     auto action_result2 = c->add_handler(2, nop());
     auto action_result3 = c->add_handler(3, nop());
 
@@ -438,10 +438,10 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        fixture<HandlerConfigurationApiFake>,
+        fixture<handler_configuration_api_fake>,
         "Handler configuration: mask for pselect with ignore") {
-    signalMask().set(1);
-    signalMask().set(2);
+    signal_mask().set(1);
+    signal_mask().set(2);
     c->set_trap(
             2,
             handler_configuration::handler_type(),

@@ -69,20 +69,20 @@ using sesh::os::event::timeout;
 using sesh::os::event::trigger;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
-using sesh::os::signaling::HandlerConfigurationApiDummy;
-using sesh::os::signaling::HandlerConfigurationApiFake;
+using sesh::os::signaling::handler_configuration_api_dummy;
+using sesh::os::signaling::handler_configuration_api_fake;
 using sesh::os::signaling::SignalNumberSet;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: doesn't wait if no events are pending") {
     a.await_events();
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: does nothing for empty trigger set") {
     future<trigger> f = a.expect();
     std::move(f).then([](trial<trigger> &&) { FAIL("callback called"); });
@@ -90,7 +90,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: timeout with FD trigger in same set") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -127,7 +127,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: FD trigger with timeout in same set") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -163,7 +163,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<handler_configuration_api_fake>,
         "Awaiter: signal handler is reset after event fired (with timeout)") {
     a.expect(timeout(std::chrono::seconds(1)), signal(1));
 
@@ -175,8 +175,8 @@ TEST_CASE_METHOD(
             file_descriptor_set *,
             std::chrono::nanoseconds,
             const SignalNumberSet *) -> std::error_code {
-        Action &a = actions().at(1);
-        CHECK(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a = actions().at(1);
+        CHECK(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 
         mutable_steady_clock_now() += std::chrono::seconds(1);
         implementation() = nullptr;
@@ -184,12 +184,12 @@ TEST_CASE_METHOD(
     };
     a.await_events();
 
-    Action &a = actions().at(1);
-    CHECK(a.tag() == Action::tag<Default>());
+    signal_action &a = actions().at(1);
+    CHECK(a.tag() == signal_action::tag<default_action>());
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: setting timeout from domain error") {
     auto fd =
             readable_file_descriptor(file_descriptor_set_impl::MAX_VALUE + 1);
@@ -204,7 +204,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<handler_configuration_api_fake>,
         "Awaiter: ignores FD set if pselect failed") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -228,8 +228,8 @@ TEST_CASE_METHOD(
             file_descriptor_set *,
             std::chrono::nanoseconds,
             const SignalNumberSet *) -> std::error_code {
-        Action &a = actions().at(1);
-        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a = actions().at(1);
+        REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
         implementation() = [this](

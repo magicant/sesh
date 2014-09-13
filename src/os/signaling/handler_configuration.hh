@@ -147,7 +147,7 @@ public:
      * work with multiple coexisting instances.
      */
     static std::shared_ptr<handler_configuration> create(
-            const HandlerConfigurationApi &);
+            const handler_configuration_api &);
 
 }; // class handler_configuration
 

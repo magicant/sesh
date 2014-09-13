@@ -54,7 +54,7 @@ using sesh::os::event::user_provided_trigger;
 using sesh::os::event::writable_file_descriptor;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
-using sesh::os::signaling::HandlerConfigurationApiDummy;
+using sesh::os::signaling::handler_configuration_api_dummy;
 using sesh::os::signaling::SignalNumberSet;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
@@ -64,7 +64,7 @@ using TriggerFileDescriptor = variant<
         error_file_descriptor>;
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: one trigger set containing readable and writable FDs") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -113,7 +113,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: one trigger set containing readable and error FDs") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -162,7 +162,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: one trigger set containing writable and error FDs") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -211,7 +211,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: two trigger sets containing readable and writable FDs") {
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;
@@ -251,7 +251,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: two trigger sets containing writable and error FDs") {
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;
@@ -291,7 +291,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: two trigger sets containing readable and error FDs") {
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;
@@ -331,7 +331,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: awaiting max readable FD") {
     auto max = file_descriptor_set_impl::MAX_VALUE;
     bool callback_called = false;
@@ -358,7 +358,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: domain error from FD set") {
     auto max = file_descriptor_set_impl::MAX_VALUE;
     bool callback_called = false;

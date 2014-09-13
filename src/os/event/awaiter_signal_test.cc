@@ -47,14 +47,14 @@ using sesh::os::event::signal;
 using sesh::os::event::trigger;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
-using sesh::os::signaling::HandlerConfigurationApiFake;
+using sesh::os::signaling::handler_configuration_api_fake;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<handler_configuration_api_fake>,
         "Awaiter: one signal in one trigger set") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -81,8 +81,8 @@ TEST_CASE_METHOD(
         if (signal_mask != nullptr)
             CHECK_FALSE(signal_mask->test(3));
 
-        Action &a = actions().at(3);
-        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a = actions().at(3);
+        REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(3);
 
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -95,12 +95,12 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<handler_configuration_api_fake>,
         "Awaiter: irrelevant signals are masked") {
     a.expect(signal(3));
 
-    signalMask().set(2);
-    signalMask().set(5);
+    signal_mask().set(2);
+    signal_mask().set(5);
     implementation() = [this](
             const pselect_api_stub &,
             file_descriptor::value_type,
@@ -111,11 +111,11 @@ TEST_CASE_METHOD(
             const SignalNumberSet *mask_while_awaiting) -> std::error_code {
         if (mask_while_awaiting != nullptr)
             CHECK_FALSE(mask_while_awaiting->test(3));
-        CHECK(signalMask().test(2));
-        CHECK(signalMask().test(5));
+        CHECK(signal_mask().test(2));
+        CHECK(signal_mask().test(5));
 
-        Action &a = actions().at(3);
-        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a = actions().at(3);
+        REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(3);
 
         implementation() = nullptr;
@@ -125,7 +125,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<handler_configuration_api_fake>,
         "Awaiter: two signals in one trigger set") {
     auto start_time = time_point(std::chrono::seconds(100));
     mutable_steady_clock_now() = start_time;
@@ -154,11 +154,11 @@ TEST_CASE_METHOD(
             CHECK_FALSE(signal_mask->test(6));
         }
 
-        Action &a2 = actions().at(2);
-        REQUIRE(a2.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a2 = actions().at(2);
+        REQUIRE(a2.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 
-        Action &a6 = actions().at(6);
-        REQUIRE(a6.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a6 = actions().at(6);
+        REQUIRE(a6.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a6.value<sesh_osapi_signal_handler *>()(6);
 
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -171,7 +171,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<handler_configuration_api_fake>,
         "Awaiter: same signal in two trigger sets") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -199,8 +199,8 @@ TEST_CASE_METHOD(
         if (signal_mask != nullptr)
             CHECK_FALSE(signal_mask->test(1));
 
-        Action &a = actions().at(1);
-        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a = actions().at(1);
+        REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -213,7 +213,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<handler_configuration_api_fake>,
         "Awaiter: different signals in two trigger sets: fired at a time") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -239,12 +239,12 @@ TEST_CASE_METHOD(
             CHECK_FALSE(signal_mask->test(2));
         }
 
-        Action &a1 = actions().at(1);
-        REQUIRE(a1.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a1 = actions().at(1);
+        REQUIRE(a1.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a1.value<sesh_osapi_signal_handler *>()(1);
 
-        Action &a2 = actions().at(2);
-        REQUIRE(a2.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a2 = actions().at(2);
+        REQUIRE(a2.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a2.value<sesh_osapi_signal_handler *>()(2);
 
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -257,7 +257,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<handler_configuration_api_fake>,
         "Awaiter: different signals in two trigger sets: "
         "fired intermittently") {
     auto start_time = time_point(std::chrono::seconds(0));
@@ -284,8 +284,8 @@ TEST_CASE_METHOD(
             CHECK_FALSE(signal_mask->test(2));
         }
 
-        Action &a = actions().at(1);
-        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a = actions().at(1);
+        REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
         mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -300,8 +300,9 @@ TEST_CASE_METHOD(
             if (signal_mask != nullptr)
                 CHECK_FALSE(signal_mask->test(2));
 
-            Action &a = actions().at(2);
-            REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+            signal_action &a = actions().at(2);
+            REQUIRE(a.tag() ==
+                    signal_action::tag<sesh_osapi_signal_handler *>());
             a.value<sesh_osapi_signal_handler *>()(2);
 
             mutable_steady_clock_now() += std::chrono::seconds(3);
@@ -316,7 +317,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiFake>,
+        awaiter_test_fixture<handler_configuration_api_fake>,
         "Awaiter: signal handler is reset after event fired") {
     a.expect(signal(1));
 
@@ -328,8 +329,8 @@ TEST_CASE_METHOD(
             file_descriptor_set *,
             std::chrono::nanoseconds,
             const SignalNumberSet *) -> std::error_code {
-        Action &a = actions().at(1);
-        REQUIRE(a.tag() == Action::tag<sesh_osapi_signal_handler *>());
+        signal_action &a = actions().at(1);
+        REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
 
         implementation() = nullptr;
@@ -337,8 +338,8 @@ TEST_CASE_METHOD(
     };
     a.await_events();
 
-    Action &a = actions().at(1);
-    CHECK(a.tag() == Action::tag<Default>());
+    signal_action &a = actions().at(1);
+    CHECK(a.tag() == signal_action::tag<default_action>());
 }
 
 } // namespace

@@ -32,14 +32,15 @@ namespace sesh {
 namespace os {
 namespace signaling {
 
-class HandlerConfigurationApiDummy : public HandlerConfigurationApi {
+class handler_configuration_api_dummy : public handler_configuration_api {
 
-    std::unique_ptr<SignalNumberSet> createSignalNumberSet() const override {
-        throw "unexpected createSignalNumberSet";
+    std::unique_ptr<SignalNumberSet> create_signal_number_set() const
+            override {
+        throw "unexpected create_signal_number_set";
     }
 
     std::error_code sigprocmask(
-            MaskChangeHow,
+            mask_change_how,
             const SignalNumberSet *,
             SignalNumberSet *) const override {
         throw "unexpected sigprocmask";
@@ -47,63 +48,62 @@ class HandlerConfigurationApiDummy : public HandlerConfigurationApi {
 
     std::error_code sigaction(
             SignalNumber,
-            const SignalAction *,
-            SignalAction *) const override {
+            const signal_action *,
+            signal_action *) const override {
         throw "unexpected sigaction";
     }
 
-}; // class HandlerConfigurationApiDummy
+}; // class handler_configuration_api_dummy
 
-class HandlerConfigurationApiFake : public HandlerConfigurationApi {
+class handler_configuration_api_fake : public handler_configuration_api {
 
 public:
 
-    using Action = SignalAction;
-
-    constexpr static SignalNumber INVALID_SIGNAL_NUMBER = 0;
+    constexpr static SignalNumber invalid_signal_number = 0;
 
 private:
 
-    mutable SignalNumberSetFake mMask;
-    mutable std::map<SignalNumber, Action> mActions;
+    mutable SignalNumberSetFake m_mask;
+    mutable std::map<SignalNumber, signal_action> m_actions;
 
 public:
 
-    SignalNumberSetFake &signalMask() noexcept { return mMask; }
-    const SignalNumberSetFake &signalMask() const noexcept { return mMask; }
+    SignalNumberSetFake &signal_mask() noexcept { return m_mask; }
+    const SignalNumberSetFake &signal_mask() const noexcept { return m_mask; }
 
-    std::unique_ptr<SignalNumberSet> createSignalNumberSet() const override {
+    std::unique_ptr<SignalNumberSet> create_signal_number_set() const
+            override {
         return std::unique_ptr<SignalNumberSet>(new SignalNumberSetFake);
     }
 
     std::error_code sigprocmask(
-            MaskChangeHow how,
-            const SignalNumberSet *newMask,
-            SignalNumberSet *oldMask) const override {
-        const SignalNumberSetFake *fakeNewMask =
-                dynamic_cast<const SignalNumberSetFake *>(newMask);
-        SignalNumberSetFake *fakeOldMask =
-                dynamic_cast<SignalNumberSetFake *>(oldMask);
+            mask_change_how how,
+            const SignalNumberSet *new_mask,
+            SignalNumberSet *old_mask) const override {
+        const SignalNumberSetFake *fake_new_mask =
+                dynamic_cast<const SignalNumberSetFake *>(new_mask);
+        SignalNumberSetFake *fake_old_mask =
+                dynamic_cast<SignalNumberSetFake *>(old_mask);
 
-        assert((newMask != nullptr) == (fakeNewMask != nullptr));
-        assert((oldMask != nullptr) == (fakeOldMask != nullptr));
+        assert((new_mask != nullptr) == (fake_new_mask != nullptr));
+        assert((old_mask != nullptr) == (fake_old_mask != nullptr));
 
-        if (fakeNewMask == fakeOldMask)
+        if (fake_new_mask == fake_old_mask)
             return std::error_code();
 
-        if (fakeOldMask != nullptr)
-            *fakeOldMask = mMask;
+        if (fake_old_mask != nullptr)
+            *fake_old_mask = m_mask;
 
-        if (fakeNewMask != nullptr) {
+        if (fake_new_mask != nullptr) {
             switch (how) {
-            case MaskChangeHow::BLOCK:
-                mMask.insertAll(*fakeNewMask);
+            case mask_change_how::block:
+                m_mask.insertAll(*fake_new_mask);
                 break;
-            case MaskChangeHow::UNBLOCK:
-                mMask.eraseAll(*fakeNewMask);
+            case mask_change_how::unblock:
+                m_mask.eraseAll(*fake_new_mask);
                 break;
-            case MaskChangeHow::SET_MASK:
-                mMask = *fakeNewMask;
+            case mask_change_how::set_mask:
+                m_mask = *fake_new_mask;
                 break;
             }
         }
@@ -111,29 +111,30 @@ public:
         return std::error_code();
     }
 
-    std::map<SignalNumber, Action> &actions() noexcept {
-        return mActions;
+    std::map<SignalNumber, signal_action> &actions() noexcept {
+        return m_actions;
     }
-    const std::map<SignalNumber, Action> &actions() const noexcept {
-        return mActions;
+    const std::map<SignalNumber, signal_action> &actions() const noexcept {
+        return m_actions;
     }
 
     std::error_code sigaction(
             SignalNumber n,
-            const SignalAction *newAction,
-            SignalAction *oldAction) const override {
-        if (n == INVALID_SIGNAL_NUMBER)
+            const signal_action *new_action,
+            signal_action *old_action) const override {
+        if (n == invalid_signal_number)
             return std::make_error_code(std::errc::invalid_argument);
 
-        Action &a = mActions.emplace(n, Default()).first->second;
-        if (oldAction != nullptr)
-            *oldAction = a;
-        if (newAction != nullptr)
-            a = *newAction;
+        signal_action &a =
+                m_actions.emplace(n, default_action()).first->second;
+        if (old_action != nullptr)
+            *old_action = a;
+        if (new_action != nullptr)
+            a = *new_action;
         return std::error_code();
     }
 
-}; // class HandlerConfigurationApiFake
+}; // class handler_configuration_api_fake
 
 } // namespace signaling
 } // namespace os

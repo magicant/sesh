@@ -42,8 +42,8 @@ namespace {
 
 using canceler_type = handler_configuration::canceler_type;
 using handler_type = handler_configuration::handler_type;
-using MaskChangeHow = HandlerConfigurationApi::MaskChangeHow;
-using SignalAction = HandlerConfigurationApi::SignalAction;
+using mask_change_how = handler_configuration_api::mask_change_how;
+using signal_action = handler_configuration_api::signal_action;
 
 enum class action_type {
     default_action, ignore, handler,
@@ -126,12 +126,12 @@ public:
 
 extern "C" void native_catch_signal(int);
 
-SignalAction action_for_type(action_type type) {
+signal_action action_for_type(action_type type) {
     switch (type) {
     case action_type::default_action:
-        return HandlerConfigurationApi::Default();
+        return handler_configuration_api::default_action();
     case action_type::ignore:
-        return HandlerConfigurationApi::Ignore();
+        return handler_configuration_api::ignore();
     case action_type::handler:
         return native_catch_signal;
     }
@@ -142,7 +142,7 @@ class signal_data {
 
 private:
 
-    maybe<SignalAction> m_initial_action;
+    maybe<signal_action> m_initial_action;
 
 public:
 
@@ -159,10 +159,10 @@ public:
      * call.
      */
     std::error_code sigaction(
-            const HandlerConfigurationApi &api,
+            const handler_configuration_api &api,
             SignalNumber n,
-            const SignalAction *new_action) {
-        SignalAction old_action = HandlerConfigurationApi::Default();
+            const signal_action *new_action) {
+        signal_action old_action = handler_configuration_api::default_action();
         std::error_code e = api.sigaction(n, new_action, &old_action);
         if (!m_initial_action.has_value())
             m_initial_action.emplace(std::move(old_action));
@@ -170,13 +170,13 @@ public:
     }
 
     std::error_code get_initial_action_if_unknown(
-            const HandlerConfigurationApi &api, SignalNumber n) {
+            const handler_configuration_api &api, SignalNumber n) {
         if (m_initial_action.has_value())
             return std::error_code();
         return sigaction(api, n, nullptr);
     }
 
-    const maybe<SignalAction> &initial_action() const noexcept {
+    const maybe<signal_action> &initial_action() const noexcept {
         return m_initial_action;
     }
 
@@ -189,7 +189,7 @@ class handler_configuration_impl :
 
 private:
 
-    const HandlerConfigurationApi &m_api;
+    const handler_configuration_api &m_api;
 
     std::map<SignalNumber, signal_data> m_data;
 
@@ -207,9 +207,9 @@ private:
         if (m_mask_for_pselect != nullptr)
             return std::error_code();
 
-        m_initial_mask = m_api.createSignalNumberSet();
+        m_initial_mask = m_api.create_signal_number_set();
         if (std::error_code e = m_api.sigprocmask(
-                MaskChangeHow::BLOCK, nullptr, m_initial_mask.get()))
+                mask_change_how::block, nullptr, m_initial_mask.get()))
             return e;
 
         m_mask_for_pselect = m_initial_mask->clone();
@@ -237,15 +237,15 @@ private:
             return std::error_code(); // no change, just return
 
         if (needs_blocking(new_type))
-            if (std::error_code e = m_api.sigprocmaskBlock(n))
+            if (std::error_code e = m_api.sigprocmask_block(n))
                 return e;
 
-        SignalAction a = action_for_type(new_type);
+        signal_action a = action_for_type(new_type);
         if (std::error_code e = data.sigaction(m_api, n, &a))
             return e;
 
         if (!needs_blocking(new_type) && !m_initial_mask->test(n))
-            if (std::error_code e = m_api.sigprocmaskUnblock(n))
+            if (std::error_code e = m_api.sigprocmask_unblock(n))
                 return e;
 
         m_mask_for_pselect->set(n, mask_for_pselect(n, new_type));
@@ -289,7 +289,7 @@ private:
 
 public:
 
-    explicit handler_configuration_impl(const HandlerConfigurationApi &api)
+    explicit handler_configuration_impl(const handler_configuration_api &api)
             noexcept :
             m_api(api) { }
 
@@ -316,7 +316,7 @@ public:
             if (auto e = data.get_initial_action_if_unknown(m_api, n))
                 return e;
             if (data.initial_action()->tag() ==
-                    SignalAction::tag<HandlerConfigurationApi::Ignore>())
+                    signal_action::tag<handler_configuration_api::ignore>())
                 return SignalErrorCode::INITIALLY_IGNORED;
             // Fall through
         case setting_policy::force:
@@ -358,7 +358,7 @@ void native_catch_signal(int signal_number) {
 
 } // namespace
 
-auto handler_configuration::create(const HandlerConfigurationApi &api)
+auto handler_configuration::create(const handler_configuration_api &api)
         -> std::shared_ptr<handler_configuration> {
     auto shared_instance = std::make_shared<handler_configuration_impl>(api);
     instance = shared_instance;

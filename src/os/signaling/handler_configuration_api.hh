@@ -32,37 +32,38 @@ namespace os {
 namespace signaling {
 
 /** Abstraction of POSIX API that manipulates signal mask and handlers. */
-class HandlerConfigurationApi {
+class handler_configuration_api {
 
 public:
 
     /** Returns a unique pointer to a new empty signal number set. */
-    virtual std::unique_ptr<SignalNumberSet> createSignalNumberSet() const = 0;
+    virtual std::unique_ptr<SignalNumberSet> create_signal_number_set() const =
+            0;
 
-    enum class MaskChangeHow { BLOCK, UNBLOCK, SET_MASK };
+    enum class mask_change_how { block, unblock, set_mask };
 
     /**
      * Changes the signal blocking mask.
      *
      * The pointer arguments to signal number sets may be null. Non-null
      * pointers passed to this function must be obtained from the {@link
-     * #createSignalNumberSet} functions called for the same {@code *this}.
+     * #create_signal_number_set} functions called for the same {@code *this}.
      */
     virtual std::error_code sigprocmask(
-            MaskChangeHow,
-            const SignalNumberSet *newMask,
-            SignalNumberSet *oldMask) const = 0;
+            mask_change_how,
+            const SignalNumberSet *new_mask,
+            SignalNumberSet *old_mask) const = 0;
 
     /** Convenience wrapper for {@link #sigprocmask}. */
-    std::error_code sigprocmaskBlock(SignalNumber) const;
+    std::error_code sigprocmask_block(SignalNumber) const;
     /** Convenience wrapper for {@link #sigprocmask}. */
-    std::error_code sigprocmaskUnblock(SignalNumber) const;
+    std::error_code sigprocmask_unblock(SignalNumber) const;
 
-    class Default { };
-    class Ignore { };
+    class default_action { };
+    class ignore { };
 
-    using SignalAction =
-            common::variant<Default, Ignore, sesh_osapi_signal_handler *>;
+    using signal_action = common::variant<
+            default_action, ignore, sesh_osapi_signal_handler *>;
 
     /**
      * Changes and/or queries the signal handler setting for a signal.
@@ -72,10 +73,10 @@ public:
      */
     virtual std::error_code sigaction(
             SignalNumber,
-            const SignalAction *newAction,
-            SignalAction *oldAction) const = 0;
+            const signal_action *new_action,
+            signal_action *old_action) const = 0;
 
-}; // class HandlerConfigurationApi
+}; // class handler_configuration_api
 
 } // namespace signaling
 } // namespace os

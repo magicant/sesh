@@ -46,13 +46,13 @@ using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::trigger;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
-using sesh::os::signaling::HandlerConfigurationApiDummy;
+using sesh::os::signaling::handler_configuration_api_dummy;
 using sesh::os::signaling::SignalNumberSet;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: awaiting single readable FD") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -88,7 +88,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: one trigger set containing different readable FDs: "
         "pselect returning single FD") {
     auto start_time = time_point(std::chrono::seconds(0));
@@ -127,7 +127,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: one trigger set containing different readable FDs: "
         "pselect returning all FDs") {
     auto start_time = time_point(std::chrono::seconds(0));
@@ -167,7 +167,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: two trigger sets containing different readable FDs") {
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;
@@ -229,7 +229,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: two trigger sets containing same readable FD") {
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;

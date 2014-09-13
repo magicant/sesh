@@ -25,18 +25,18 @@ namespace sesh {
 namespace os {
 namespace signaling {
 
-std::error_code HandlerConfigurationApi::sigprocmaskBlock(SignalNumber n) const
-{
-    std::unique_ptr<SignalNumberSet> set = createSignalNumberSet();
+std::error_code handler_configuration_api::sigprocmask_block(SignalNumber n)
+        const {
+    std::unique_ptr<SignalNumberSet> set = create_signal_number_set();
     set->set(n);
-    return sigprocmask(MaskChangeHow::BLOCK, set.get(), nullptr);
+    return sigprocmask(mask_change_how::block, set.get(), nullptr);
 }
 
-std::error_code HandlerConfigurationApi::sigprocmaskUnblock(SignalNumber n)
+std::error_code handler_configuration_api::sigprocmask_unblock(SignalNumber n)
         const {
-    std::unique_ptr<SignalNumberSet> set = createSignalNumberSet();
+    std::unique_ptr<SignalNumberSet> set = create_signal_number_set();
     set->set(n);
-    return sigprocmask(MaskChangeHow::UNBLOCK, set.get(), nullptr);
+    return sigprocmask(mask_change_how::unblock, set.get(), nullptr);
 }
 
 } // namespace signaling
