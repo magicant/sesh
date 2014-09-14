@@ -77,9 +77,12 @@ TESTS = $(TESTPROGRAMS) $(TESTSCRIPTS)
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(SHELL)
 
-src/checkheaderinclude.log: src/checkheaderinclude.sh $(SOURCES)
-src/checkincludebuildconfig.log: src/checkincludebuildconfig.sh $(SOURCES)
-src/checklinelength.log: src/checklinelength.sh $(SOURCES) $(TESTSCRIPTS)
+src/checkheaderinclude.log: src/checkheaderinclude.sh \
+	$(SOURCES) $(TESTHEADERS)
+src/checkincludebuildconfig.log: src/checkincludebuildconfig.sh \
+	$(SOURCES) $(TESTHEADERS)
+src/checklinelength.log: src/checklinelength.sh \
+	$(SOURCES) $(TESTHEADERS) $(TESTSCRIPTS)
 
 ### Source files
 
