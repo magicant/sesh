@@ -22,7 +22,7 @@
 
 #include <system_error>
 #include <type_traits>
-#include "os/signaling/SignalErrorCategory.hh"
+#include "os/signaling/signal_error_category.hh"
 
 namespace sesh {
 namespace os {
@@ -40,7 +40,7 @@ enum class SignalErrorCode {
 }; // enum class SignalErrorCode
 
 inline std::error_code make_error_code(SignalErrorCode c) noexcept {
-    return std::error_code(static_cast<int>(c), SIGNAL_ERROR_CATEGORY);
+    return std::error_code(static_cast<int>(c), signal_error_category);
 }
 
 } // namespace signaling

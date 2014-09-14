@@ -15,36 +15,24 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "buildconfig.h"
-#include "SignalErrorCategory.hh"
+#ifndef INCLUDED_os_signaling_signal_error_category_hh
+#define INCLUDED_os_signaling_signal_error_category_hh
 
-#include <string>
+#include "buildconfig.h"
+
 #include <system_error>
 
 namespace sesh {
 namespace os {
 namespace signaling {
 
-class SignalErrorCategory : public std::error_category {
-
-public:
-
-    const char *name() const noexcept final override {
-        return "signal";
-    }
-
-    /** Always returns "?". */
-    std::string message(int) const final override {
-        return "?";
-    }
-
-}; // class SignalErrorCategory
-
-const std::error_category &SIGNAL_ERROR_CATEGORY =
-        SignalErrorCategory();
+/** The error category for {@link SignalErrorCode}. */
+extern const std::error_category &signal_error_category;
 
 } // namespace signaling
 } // namespace os
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_os_signaling_signal_error_category_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
