@@ -17,13 +17,11 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
+#include "catch.hpp"
 #include "common/container_helper.hh"
 #include "common/xstring.hh" // for test of overloading
 

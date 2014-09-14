@@ -17,12 +17,10 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <utility>
 #include "async/delay.hh"
 #include "async/promise.hh"
+#include "catch.hpp"
 #include "common/trial.hh"
 
 namespace {

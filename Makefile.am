@@ -206,67 +206,90 @@ src_sesh_SOURCES = \
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_delay_holder_test_SOURCES = \
-	src/async/delay_holder_test.cc
+	src/async/delay_holder_test.cc \
+	src/catch_main.cc
 src_async_delay_test_SOURCES = \
-	src/async/delay_test.cc
+	src/async/delay_test.cc \
+	src/catch_main.cc
 src_async_future_test_SOURCES = \
-	src/async/future_test.cc
+	src/async/future_test.cc \
+	src/catch_main.cc
 src_async_promise_test_SOURCES = \
-	src/async/promise_test.cc
+	src/async/promise_test.cc \
+	src/catch_main.cc
 src_async_shared_future_test_SOURCES = \
-	src/async/shared_future_test.cc
+	src/async/shared_future_test.cc \
+	src/catch_main.cc
 src_common_container_helper_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/container_helper_test.cc
 src_common_enum_iterator_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/enum_iterator_test.cc
 src_common_enum_set_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/enum_set_test.cc
 src_common_function_helper_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/function_helper_test.cc
 src_common_maybe_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/maybe_test.cc
 src_common_message_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/message.cc \
 	src/common/message_test.cc
 src_common_reference_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/reference_test.cc
 src_common_shared_function_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/shared_function_test.cc
 src_common_trial_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/trial_test.cc
 src_common_trie_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/trie_test.cc
 src_common_type_tag_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/type_tag.hh \
 	src/common/type_tag_test.cc
 src_common_variant_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/variant_test.cc
 src_language_source_buffer_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/message.cc \
 	src/language/source/buffer.cc \
 	src/language/source/buffer_test.cc \
 	src/language/source/source.cc
 src_language_source_line_appended_source_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/message.cc \
 	src/language/source/line_appended_source.cc \
 	src/language/source/line_appended_source_test.cc \
 	src/language/source/location.cc \
 	src/language/source/source.cc
 src_language_source_line_continued_source_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/message.cc \
 	src/language/source/line_continued_source.cc \
 	src/language/source/line_continued_source_test.cc \
 	src/language/source/location.cc \
 	src/language/source/source.cc
 src_language_source_location_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/message.cc \
 	src/language/source/location.cc \
 	src/language/source/location_test.cc
 src_language_source_source_test_SOURCES = \
+	src/catch_main.cc \
 	src/common/message.cc \
 	src/language/source/source.cc \
 	src/language/source/source_test.cc
 src_language_syntax_and_or_list_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/source/location.cc \
 	src/language/syntax/and_or_list.cc \
 	src/language/syntax/and_or_list_test.cc \
@@ -274,33 +297,40 @@ src_language_syntax_and_or_list_test_SOURCES = \
 	src/language/syntax/pipeline.cc \
 	src/language/syntax/printer.cc
 src_language_syntax_assignment_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/syntax/assignment.cc \
 	src/language/syntax/assignment_test.cc \
 	src/language/syntax/printer.cc \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/word.cc
 src_language_syntax_command_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/source/location.cc \
 	src/language/syntax/command_test.cc
 src_language_syntax_conditional_pipeline_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/source/location.cc \
 	src/language/syntax/conditional_pipeline.cc \
 	src/language/syntax/conditional_pipeline_test.cc \
 	src/language/syntax/pipeline.cc \
 	src/language/syntax/printer.cc
 src_language_syntax_pipeline_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/source/location.cc \
 	src/language/syntax/pipeline.cc \
 	src/language/syntax/pipeline_test.cc \
 	src/language/syntax/printer.cc
 src_language_syntax_printer_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/syntax/printer.cc \
 	src/language/syntax/printer_test.cc
 src_language_syntax_raw_string_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/syntax/printer.cc \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/raw_string_test.cc
 src_language_syntax_sequence_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/source/location.cc \
 	src/language/syntax/and_or_list.cc \
 	src/language/syntax/conditional_pipeline.cc \
@@ -309,6 +339,7 @@ src_language_syntax_sequence_test_SOURCES = \
 	src/language/syntax/sequence.cc \
 	src/language/syntax/sequence_test.cc
 src_language_syntax_simple_command_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/source/location.cc \
 	src/language/syntax/assignment.cc \
 	src/language/syntax/printer.cc \
@@ -317,72 +348,86 @@ src_language_syntax_simple_command_test_SOURCES = \
 	src/language/syntax/simple_command_test.cc \
 	src/language/syntax/word.cc
 src_language_syntax_word_test_SOURCES = \
+	src/catch_main.cc \
 	src/language/syntax/printer.cc \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/word.cc \
 	src/language/syntax/word_test.cc
 src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_error_file_descriptor_test.cc \
 	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/signal_error_category.cc
 src_os_event_awaiter_file_descriptor_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_file_descriptor_test.cc \
 	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/signal_error_category.cc
 src_os_event_awaiter_readable_file_descriptor_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_readable_file_descriptor_test.cc \
 	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/signal_error_category.cc
 src_os_event_awaiter_signal_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_signal_test.cc \
 	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/signal_error_category.cc
 src_os_event_awaiter_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_test.cc \
 	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/signal_error_category.cc
 src_os_event_awaiter_timeout_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_timeout_test.cc \
 	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/signal_error_category.cc
 src_os_event_awaiter_user_provided_trigger_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_user_provided_trigger_test.cc \
 	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/signal_error_category.cc
 src_os_event_awaiter_writable_file_descriptor_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/event/awaiter.cc \
 	src/os/event/awaiter_writable_file_descriptor_test.cc \
 	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/signal_error_category.cc
 src_os_io_file_descriptor_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/io/file_descriptor_test.cc
 src_os_io_non_blocking_file_descriptor_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/non_blocking_file_descriptor_test.cc
 src_os_io_reader_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/reader.cc \
 	src/os/io/reader_test.cc
 src_os_io_writer_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/io/non_blocking_file_descriptor.cc \
 	src/os/io/writer.cc \
 	src/os/io/writer_test.cc
 src_os_signaling_handler_configuration_test_SOURCES = \
+	src/catch_main.cc \
 	src/os/signaling/handler_configuration.cc \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/handler_configuration_test.cc \

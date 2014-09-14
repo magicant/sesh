@@ -17,10 +17,8 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <functional>
+#include "catch.hpp"
 #include "common/xchar.hh"
 #include "language/syntax/printer.hh"
 #include "language/syntax/printer_test_helper.hh"

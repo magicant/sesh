@@ -17,10 +17,8 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <system_error>
+#include "catch.hpp"
 #include "common/nop.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/signaling/handler_configuration.hh"

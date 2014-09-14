@@ -17,13 +17,11 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <exception>
 #include <memory>
 #include <tuple>
 #include "async/delay.hh"
+#include "catch.hpp"
 #include "common/copy.hh"
 #include "common/trial.hh"
 #include "common/type_tag.hh"

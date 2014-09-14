@@ -17,11 +17,9 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <functional>
 #include <memory>
+#include "catch.hpp"
 #include "common/direct_initialize.hh"
 #include "common/shared_function.hh"
 

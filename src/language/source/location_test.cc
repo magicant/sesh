@@ -17,12 +17,10 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <memory>
 #include <stdexcept>
 #include <utility>
+#include "catch.hpp"
 #include "language/source/location.hh"
 #include "language/source/location_test_helper.hh"
 #include "language/source/origin_test_helper.hh"

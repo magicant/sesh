@@ -17,9 +17,6 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <algorithm>
 #include <initializer_list>
 #include <stdexcept>
@@ -28,6 +25,7 @@
 #include <vector>
 #include "async/future.hh"
 #include "async/promise.hh"
+#include "catch.hpp"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "common/variant.hh"

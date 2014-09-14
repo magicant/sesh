@@ -17,10 +17,8 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <utility>
+#include "catch.hpp"
 #include "common/xchar.hh"
 #include "language/source/line_appended_source.hh"
 #include "language/source/location_test_helper.hh"
