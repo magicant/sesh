@@ -32,30 +32,30 @@ namespace sesh {
 namespace os {
 namespace signaling {
 
-class SignalNumberSetFake : public signal_number_set {
+class signal_number_set_fake : public signal_number_set {
 
 private:
 
-    std::set<signal_number> mSet;
-    bool mIsPositive = true;
+    std::set<signal_number> m_set;
+    bool m_is_positive = true;
 
-    signal_number_set &reinitialize(bool isPositive) {
-        mIsPositive = isPositive;
-        mSet.clear();
+    signal_number_set &reinitialize(bool is_positive) {
+        m_is_positive = is_positive;
+        m_set.clear();
         return *this;
     }
 
 public:
 
     bool test(signal_number n) const override {
-        return common::contains(mSet, n) == mIsPositive;
+        return common::contains(m_set, n) == m_is_positive;
     }
 
     signal_number_set &set(signal_number n, bool v = true) override {
-        if (v == mIsPositive)
-            mSet.insert(n);
+        if (v == m_is_positive)
+            m_set.insert(n);
         else
-            mSet.erase(n);
+            m_set.erase(n);
         return *this;
     }
 
@@ -71,52 +71,52 @@ public:
         return std::unique_ptr<signal_number_set>(new auto(*this));
     }
 
-    void insertAll(const SignalNumberSetFake &that) {
-        SignalNumberSetFake result;
+    void insert_all(const signal_number_set_fake &that) {
+        signal_number_set_fake result;
 
-        result.mIsPositive = this->mIsPositive & that.mIsPositive;
+        result.m_is_positive = this->m_is_positive & that.m_is_positive;
 
-        if (this->mIsPositive)
-            if (that.mIsPositive)
+        if (this->m_is_positive)
+            if (that.m_is_positive)
                 std::set_union(
-                        this->mSet.begin(),
-                        this->mSet.end(),
-                        that.mSet.begin(),
-                        that.mSet.end(),
-                        std::inserter(result.mSet, result.mSet.end()));
+                        this->m_set.begin(),
+                        this->m_set.end(),
+                        that.m_set.begin(),
+                        that.m_set.end(),
+                        std::inserter(result.m_set, result.m_set.end()));
             else
                 std::set_difference(
-                        this->mSet.begin(),
-                        this->mSet.end(),
-                        that.mSet.begin(),
-                        that.mSet.end(),
-                        std::inserter(result.mSet, result.mSet.end()));
+                        this->m_set.begin(),
+                        this->m_set.end(),
+                        that.m_set.begin(),
+                        that.m_set.end(),
+                        std::inserter(result.m_set, result.m_set.end()));
         else
-            if (that.mIsPositive)
+            if (that.m_is_positive)
                 std::set_difference(
-                        that.mSet.begin(),
-                        that.mSet.end(),
-                        this->mSet.begin(),
-                        this->mSet.end(),
-                        std::inserter(result.mSet, result.mSet.end()));
+                        that.m_set.begin(),
+                        that.m_set.end(),
+                        this->m_set.begin(),
+                        this->m_set.end(),
+                        std::inserter(result.m_set, result.m_set.end()));
             else
                 std::set_intersection(
-                        this->mSet.begin(),
-                        this->mSet.end(),
-                        that.mSet.begin(),
-                        that.mSet.end(),
-                        std::inserter(result.mSet, result.mSet.end()));
+                        this->m_set.begin(),
+                        this->m_set.end(),
+                        that.m_set.begin(),
+                        that.m_set.end(),
+                        std::inserter(result.m_set, result.m_set.end()));
 
         *this = std::move(result);
     }
 
-    void eraseAll(const SignalNumberSetFake &that) {
-        mIsPositive = !mIsPositive;
-        insertAll(that);
-        mIsPositive = !mIsPositive;
+    void erase_all(const signal_number_set_fake &that) {
+        m_is_positive = !m_is_positive;
+        insert_all(that);
+        m_is_positive = !m_is_positive;
     }
 
-}; // class SignalNumberSetFake
+}; // class signal_number_set_fake
 
 } // namespace signaling
 } // namespace os

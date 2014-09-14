@@ -63,27 +63,31 @@ public:
 
 private:
 
-    mutable SignalNumberSetFake m_mask;
+    mutable signal_number_set_fake m_mask;
     mutable std::map<signal_number, signal_action> m_actions;
 
 public:
 
-    SignalNumberSetFake &signal_mask() noexcept { return m_mask; }
-    const SignalNumberSetFake &signal_mask() const noexcept { return m_mask; }
+    signal_number_set_fake &signal_mask() noexcept {
+        return m_mask;
+    }
+    const signal_number_set_fake &signal_mask() const noexcept {
+        return m_mask;
+    }
 
     std::unique_ptr<signal_number_set> create_signal_number_set() const
             override {
-        return std::unique_ptr<signal_number_set>(new SignalNumberSetFake);
+        return std::unique_ptr<signal_number_set>(new signal_number_set_fake);
     }
 
     std::error_code sigprocmask(
             mask_change_how how,
             const signal_number_set *new_mask,
             signal_number_set *old_mask) const override {
-        const SignalNumberSetFake *fake_new_mask =
-                dynamic_cast<const SignalNumberSetFake *>(new_mask);
-        SignalNumberSetFake *fake_old_mask =
-                dynamic_cast<SignalNumberSetFake *>(old_mask);
+        const signal_number_set_fake *fake_new_mask =
+                dynamic_cast<const signal_number_set_fake *>(new_mask);
+        signal_number_set_fake *fake_old_mask =
+                dynamic_cast<signal_number_set_fake *>(old_mask);
 
         assert((new_mask != nullptr) == (fake_new_mask != nullptr));
         assert((old_mask != nullptr) == (fake_old_mask != nullptr));
@@ -97,10 +101,10 @@ public:
         if (fake_new_mask != nullptr) {
             switch (how) {
             case mask_change_how::block:
-                m_mask.insertAll(*fake_new_mask);
+                m_mask.insert_all(*fake_new_mask);
                 break;
             case mask_change_how::unblock:
-                m_mask.eraseAll(*fake_new_mask);
+                m_mask.erase_all(*fake_new_mask);
                 break;
             case mask_change_how::set_mask:
                 m_mask = *fake_new_mask;
