@@ -39,7 +39,7 @@
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_set.hh"
 #include "os/signaling/handler_configuration.hh"
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 #include "os/signaling/SignalNumberSet.hh"
 #include "os/time_api.hh"
 
@@ -53,7 +53,7 @@ using sesh::common::variant;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
 using sesh::os::signaling::handler_configuration;
-using sesh::os::signaling::SignalNumber;
+using sesh::os::signaling::signal_number;
 using sesh::os::signaling::SignalNumberSet;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
@@ -112,7 +112,7 @@ public:
 
     signal_handler(const std::shared_ptr<pending_event> &) noexcept;
 
-    void operator()(SignalNumber);
+    void operator()(signal_number);
 
 }; // class signal_handler
 
@@ -228,7 +228,7 @@ signal_handler::signal_handler(const std::shared_ptr<pending_event> &e)
         noexcept :
         m_event(e) { }
 
-void signal_handler::operator()(SignalNumber n) {
+void signal_handler::operator()(signal_number n) {
     if (std::shared_ptr<pending_event> e = m_event.lock())
         e->fire(signal(n));
 }

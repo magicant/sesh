@@ -18,21 +18,21 @@
 #include "buildconfig.h"
 #include "handler_configuration_api.hh"
 
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 namespace sesh {
 namespace os {
 namespace signaling {
 
-std::error_code handler_configuration_api::sigprocmask_block(SignalNumber n)
+std::error_code handler_configuration_api::sigprocmask_block(signal_number n)
         const {
     std::unique_ptr<SignalNumberSet> set = create_signal_number_set();
     set->set(n);
     return sigprocmask(mask_change_how::block, set.get(), nullptr);
 }
 
-std::error_code handler_configuration_api::sigprocmask_unblock(SignalNumber n)
+std::error_code handler_configuration_api::sigprocmask_unblock(signal_number n)
         const {
     std::unique_ptr<SignalNumberSet> set = create_signal_number_set();
     set->set(n);

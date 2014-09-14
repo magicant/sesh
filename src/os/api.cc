@@ -38,7 +38,7 @@
 #include "os/io/file_descriptor_open_mode.hh"
 #include "os/io/file_descriptor_set.hh"
 #include "os/io/file_mode.hh"
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 using sesh::common::enum_set;
@@ -53,7 +53,7 @@ using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_open_mode;
 using sesh::os::io::file_descriptor_set;
 using sesh::os::io::file_mode;
-using sesh::os::signaling::SignalNumber;
+using sesh::os::signaling::signal_number;
 using sesh::os::signaling::SignalNumberSet;
 
 using signal_action = sesh::os::api::signal_action;
@@ -347,11 +347,11 @@ public:
         return m_set.get();
     }
 
-    bool test(SignalNumber n) const override {
+    bool test(signal_number n) const override {
         return sesh_osapi_sigismember(m_set.get(), n);
     }
 
-    SignalNumberSet &set(SignalNumber n, bool value) override {
+    SignalNumberSet &set(signal_number n, bool value) override {
         if (value)
             sesh_osapi_sigaddset(m_set.get(), n);
         else
@@ -533,7 +533,7 @@ class api_impl : public api {
     }
 
     std::error_code sigaction(
-            signaling::SignalNumber n,
+            signaling::signal_number n,
             const signal_action *new_action,
             signal_action *old_action) const final override {
         struct sesh_osapi_signal_action new_action_impl, old_action_impl;

@@ -25,7 +25,7 @@
 #include <system_error>
 #include "common/variant.hh"
 #include "os/signaling/handler_configuration_api.hh"
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 namespace sesh {
@@ -62,7 +62,7 @@ public:
      * Handler functions are called in the {@link #call_handlers} function,
      * not when the process receives a signal.
      */
-    using handler_type = std::function<void(SignalNumber)>;
+    using handler_type = std::function<void(signal_number)>;
 
     using canceler_type = std::function<std::error_code()>;
 
@@ -82,7 +82,7 @@ public:
      * and blocking mask for the signal using the OS API. If the API call
      * fails, the error code is returned.
      */
-    virtual add_handler_result add_handler(SignalNumber, handler_type &&) = 0;
+    virtual add_handler_result add_handler(signal_number, handler_type &&) = 0;
 
     /**
      * The type of trap action that resorts to the OS-dependent default action.
@@ -117,7 +117,7 @@ public:
       * returned.
       */
     virtual std::error_code set_trap(
-            SignalNumber, trap_action &&, setting_policy) = 0;
+            signal_number, trap_action &&, setting_policy) = 0;
 
     /**
      * Returns a nullable pointer to the signal number set to call the

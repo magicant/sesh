@@ -20,7 +20,7 @@
 
 #include "buildconfig.h"
 
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 
 namespace sesh {
 namespace os {
@@ -35,14 +35,14 @@ class signal {
 
 private:
 
-    signaling::SignalNumber m_number;
+    signaling::signal_number m_number;
 
 public:
 
-    constexpr explicit signal(signaling::SignalNumber n) noexcept :
+    constexpr explicit signal(signaling::signal_number n) noexcept :
             m_number(n) { }
 
-    constexpr signaling::SignalNumber number() const noexcept {
+    constexpr signaling::signal_number number() const noexcept {
         return m_number;
     }
 

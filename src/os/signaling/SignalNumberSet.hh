@@ -21,7 +21,7 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 
 namespace sesh {
 namespace os {
@@ -40,13 +40,13 @@ public:
     virtual ~SignalNumberSet() = default;
 
     /** Checks if the given signal number is included in this set. */
-    virtual bool test(signaling::SignalNumber) const = 0;
+    virtual bool test(signal_number) const = 0;
 
     /** Adds/removes a signal number to/from this set. */
-    virtual SignalNumberSet &set(signaling::SignalNumber, bool = true) = 0;
+    virtual SignalNumberSet &set(signal_number, bool = true) = 0;
 
     /** Removes a signal number from this set. */
-    SignalNumberSet &reset(signaling::SignalNumber n) {
+    SignalNumberSet &reset(signal_number n) {
         return set(n, false);
     }
 
@@ -65,11 +65,11 @@ public:
     private:
 
         SignalNumberSet &mSet;
-        SignalNumber mNumber;
+        signal_number mNumber;
 
     public:
 
-        Reference(SignalNumberSet &set, SignalNumber n) noexcept :
+        Reference(SignalNumberSet &set, signal_number n) noexcept :
                 mSet(set), mNumber(n) { }
 
         Reference &operator=(bool value) {
@@ -88,7 +88,7 @@ public:
     }; // class Reference
 
     /** Returns a reference to the specified entry of this set. */
-    Reference operator[](SignalNumber n) noexcept {
+    Reference operator[](signal_number n) noexcept {
         return Reference(*this, n);
     }
 

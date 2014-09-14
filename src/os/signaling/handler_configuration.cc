@@ -92,7 +92,7 @@ public:
         m_trap_action = std::move(a);
     }
 
-    void call_handlers(SignalNumber n) {
+    void call_handlers(signal_number n) {
         for (const handler_type &h : m_handlers)
             h(n);
 
@@ -160,7 +160,7 @@ public:
      */
     std::error_code sigaction(
             const handler_configuration_api &api,
-            SignalNumber n,
+            signal_number n,
             const signal_action *new_action) {
         signal_action old_action = handler_configuration_api::default_action();
         std::error_code e = api.sigaction(n, new_action, &old_action);
@@ -170,7 +170,7 @@ public:
     }
 
     std::error_code get_initial_action_if_unknown(
-            const handler_configuration_api &api, SignalNumber n) {
+            const handler_configuration_api &api, signal_number n) {
         if (m_initial_action.has_value())
             return std::error_code();
         return sigaction(api, n, nullptr);
@@ -191,7 +191,7 @@ private:
 
     const handler_configuration_api &m_api;
 
-    std::map<SignalNumber, signal_data> m_data;
+    std::map<signal_number, signal_data> m_data;
 
     /** Null until {@code #initialize_masks()} is called. */
     std::unique_ptr<SignalNumberSet> m_initial_mask;
@@ -199,7 +199,7 @@ private:
     std::unique_ptr<SignalNumberSet> m_mask_for_pselect;
 
     /** Gets (or creates) the configuration for the argument signal number. */
-    signal_configuration &configuration(SignalNumber n) {
+    signal_configuration &configuration(signal_number n) {
         return m_data[n].configuration;
     }
 
@@ -216,7 +216,7 @@ private:
         return std::error_code();
     }
 
-    bool mask_for_pselect(SignalNumber n, action_type a) {
+    bool mask_for_pselect(signal_number n, action_type a) {
         switch (a) {
         case action_type::default_action:
             return m_initial_mask->test(n);
@@ -227,7 +227,7 @@ private:
         UNREACHABLE();
     }
 
-    std::error_code update_configuration(SignalNumber n, signal_data &data) {
+    std::error_code update_configuration(signal_number n, signal_data &data) {
         if (std::error_code e = initialize_masks())
             return e;
 
@@ -258,7 +258,7 @@ private:
 
     private:
 
-        SignalNumber m_number;
+        signal_number m_number;
         std::shared_ptr<handler_configuration_impl> m_configuration;
         std::function<void()> m_canceler;
         bool m_has_canceled;
@@ -266,7 +266,7 @@ private:
     public:
 
         handler_canceler(
-                SignalNumber n,
+                signal_number n,
                 handler_configuration_impl &c,
                 std::function<void()> &&canceler) :
                 m_number(n),
@@ -293,7 +293,7 @@ public:
             noexcept :
             m_api(api) { }
 
-    add_handler_result add_handler(SignalNumber n, handler_type &&h)
+    add_handler_result add_handler(signal_number n, handler_type &&h)
             final override {
         signal_data &data = m_data[n];
         auto canceler = data.configuration.add_handler(std::move(h));
@@ -307,7 +307,8 @@ public:
                         n, *this, std::move(canceler)));
     }
 
-    std::error_code set_trap(SignalNumber n, trap_action &&a, setting_policy p)
+    std::error_code set_trap(
+            signal_number n, trap_action &&a, setting_policy p)
             final override {
         signal_data &data = m_data[n];
 
@@ -333,7 +334,7 @@ public:
 
     void call_handlers() final override {
         for (auto &pair : m_data) {
-            const SignalNumber &n = pair.first;
+            const signal_number &n = pair.first;
             signal_data &data = pair.second;
 
             while (data.catch_count > 0) {
@@ -343,7 +344,7 @@ public:
         }
     }
 
-    void increase_catch_count(SignalNumber n) {
+    void increase_catch_count(signal_number n) {
         ++m_data[n].catch_count;
     }
 

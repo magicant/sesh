@@ -24,7 +24,7 @@
 #include <system_error>
 #include "common/variant.hh"
 #include "os/capitypes.h"
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 namespace sesh {
@@ -55,9 +55,9 @@ public:
             SignalNumberSet *old_mask) const = 0;
 
     /** Convenience wrapper for {@link #sigprocmask}. */
-    std::error_code sigprocmask_block(SignalNumber) const;
+    std::error_code sigprocmask_block(signal_number) const;
     /** Convenience wrapper for {@link #sigprocmask}. */
-    std::error_code sigprocmask_unblock(SignalNumber) const;
+    std::error_code sigprocmask_unblock(signal_number) const;
 
     class default_action { };
     class ignore { };
@@ -72,7 +72,7 @@ public:
      * The {@code sa_mask} set and {@code sa_flags} are considered empty.
      */
     virtual std::error_code sigaction(
-            SignalNumber,
+            signal_number,
             const signal_action *new_action,
             signal_action *old_action) const = 0;
 

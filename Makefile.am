@@ -200,7 +200,7 @@ src_sesh_SOURCES = \
 	src/os/signaling/signal_error_category.cc \
 	src/os/signaling/signal_error_category.hh \
 	src/os/signaling/signal_error_code.hh \
-	src/os/signaling/SignalNumber.hh \
+	src/os/signaling/signal_number.hh \
 	src/os/signaling/SignalNumberSet.hh \
 	src/os/time_api.hh
 

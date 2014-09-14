@@ -35,7 +35,7 @@
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_set.hh"
 #include "os/signaling/handler_configuration_api_test_helper.hh"
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 namespace {
@@ -48,7 +48,7 @@ using sesh::os::event::trigger;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
 using sesh::os::signaling::handler_configuration_api_fake;
-using sesh::os::signaling::SignalNumber;
+using sesh::os::signaling::signal_number;
 using sesh::os::signaling::SignalNumberSet;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
@@ -217,7 +217,7 @@ TEST_CASE_METHOD(
         "Awaiter: different signals in two trigger sets: fired at a time") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    for (SignalNumber sn : {1, 2}) {
+    for (signal_number sn : {1, 2}) {
         a.expect(signal(sn)).then([this, sn](trial<trigger> &&t) {
             REQUIRE(t.has_value());
             REQUIRE(t->tag() == trigger::tag<signal>());
@@ -262,7 +262,7 @@ TEST_CASE_METHOD(
         "fired intermittently") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    for (SignalNumber sn : {1, 2}) {
+    for (signal_number sn : {1, 2}) {
         a.expect(signal(sn)).then([this, sn](trial<trigger> &&t) {
             REQUIRE(t.has_value());
             REQUIRE(t->tag() == trigger::tag<signal>());

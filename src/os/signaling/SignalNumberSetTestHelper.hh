@@ -25,7 +25,7 @@
 #include <set>
 #include <utility>
 #include "common/container_helper.hh"
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 namespace sesh {
@@ -36,7 +36,7 @@ class SignalNumberSetFake : public SignalNumberSet {
 
 private:
 
-    std::set<SignalNumber> mSet;
+    std::set<signal_number> mSet;
     bool mIsPositive = true;
 
     SignalNumberSet &reinitialize(bool isPositive) {
@@ -47,11 +47,11 @@ private:
 
 public:
 
-    bool test(SignalNumber n) const override {
+    bool test(signal_number n) const override {
         return common::contains(mSet, n) == mIsPositive;
     }
 
-    SignalNumberSet &set(SignalNumber n, bool v = true) override {
+    SignalNumberSet &set(signal_number n, bool v = true) override {
         if (v == mIsPositive)
             mSet.insert(n);
         else

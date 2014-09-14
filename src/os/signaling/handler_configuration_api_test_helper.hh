@@ -25,7 +25,7 @@
 #include <memory>
 #include <system_error>
 #include "os/signaling/handler_configuration_api.hh"
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 #include "os/signaling/SignalNumberSetTestHelper.hh"
 
 namespace sesh {
@@ -47,7 +47,7 @@ class handler_configuration_api_dummy : public handler_configuration_api {
     }
 
     std::error_code sigaction(
-            SignalNumber,
+            signal_number,
             const signal_action *,
             signal_action *) const override {
         throw "unexpected sigaction";
@@ -59,12 +59,12 @@ class handler_configuration_api_fake : public handler_configuration_api {
 
 public:
 
-    constexpr static SignalNumber invalid_signal_number = 0;
+    constexpr static signal_number invalid_signal_number = 0;
 
 private:
 
     mutable SignalNumberSetFake m_mask;
-    mutable std::map<SignalNumber, signal_action> m_actions;
+    mutable std::map<signal_number, signal_action> m_actions;
 
 public:
 
@@ -111,15 +111,15 @@ public:
         return std::error_code();
     }
 
-    std::map<SignalNumber, signal_action> &actions() noexcept {
+    std::map<signal_number, signal_action> &actions() noexcept {
         return m_actions;
     }
-    const std::map<SignalNumber, signal_action> &actions() const noexcept {
+    const std::map<signal_number, signal_action> &actions() const noexcept {
         return m_actions;
     }
 
     std::error_code sigaction(
-            SignalNumber n,
+            signal_number n,
             const signal_action *new_action,
             signal_action *old_action) const override {
         if (n == invalid_signal_number)

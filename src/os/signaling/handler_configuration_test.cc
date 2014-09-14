@@ -26,7 +26,7 @@
 #include "os/signaling/handler_configuration.hh"
 #include "os/signaling/handler_configuration_api_test_helper.hh"
 #include "os/signaling/signal_error_code.hh"
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 namespace {
@@ -36,7 +36,7 @@ using sesh::os::signaling::handler_configuration;
 using sesh::os::signaling::handler_configuration_api_dummy;
 using sesh::os::signaling::handler_configuration_api_fake;
 using sesh::os::signaling::signal_error_code;
-using sesh::os::signaling::SignalNumber;
+using sesh::os::signaling::signal_number;
 using sesh::os::signaling::SignalNumberSet;
 
 using canceler_type = handler_configuration::canceler_type;
@@ -73,8 +73,8 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         fixture<handler_configuration_api_fake>,
         "Handler configuration: simple handler and action") {
-    SignalNumber v = 0;
-    auto result = c->add_handler(5, [&v](SignalNumber n) { v += n; });
+    signal_number v = 0;
+    auto result = c->add_handler(5, [&v](signal_number n) { v += n; });
     CHECK(v == 0);
 
     signal_action &a = actions().at(5);
@@ -104,9 +104,9 @@ TEST_CASE_METHOD(
         "Handler configuration: many handlers and actions") {
     unsigned v1 = 0, v2 = 0, v3 = 0;
 
-    auto result1 = c->add_handler(5, [&v1](SignalNumber) { ++v1; });
-    auto result2 = c->add_handler(5, [&v2](SignalNumber) { ++v2; });
-    auto result3 = c->add_handler(5, [&v3](SignalNumber) { ++v3; });
+    auto result1 = c->add_handler(5, [&v1](signal_number) { ++v1; });
+    auto result2 = c->add_handler(5, [&v2](signal_number) { ++v2; });
+    auto result3 = c->add_handler(5, [&v3](signal_number) { ++v3; });
 
     signal_action &a = actions().at(5);
     REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
@@ -135,10 +135,10 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         fixture<handler_configuration_api_fake>,
         "Handler configuration: handlers and actions for many signals") {
-    SignalNumber s1 = 0, s2 = 0, s3 = 0;
-    auto result1 = c->add_handler(1, [&s1](SignalNumber n) { s1 = n; });
-    auto result2 = c->add_handler(2, [&s2](SignalNumber n) { s2 = n; });
-    auto result3 = c->add_handler(3, [&s3](SignalNumber n) { s3 = n; });
+    signal_number s1 = 0, s2 = 0, s3 = 0;
+    auto result1 = c->add_handler(1, [&s1](signal_number n) { s1 = n; });
+    auto result2 = c->add_handler(2, [&s2](signal_number n) { s2 = n; });
+    auto result3 = c->add_handler(3, [&s3](signal_number n) { s3 = n; });
 
     actions().at(1).value<sesh_osapi_signal_handler *>()(1);
     actions().at(2).value<sesh_osapi_signal_handler *>()(2);
@@ -175,7 +175,7 @@ TEST_CASE_METHOD(
         fixture<handler_configuration_api_fake>,
         "Handler configuration: handler for invalid signal") {
     auto result = c->add_handler(
-            invalid_signal_number, [](SignalNumber) { FAIL(); });
+            invalid_signal_number, [](signal_number) { FAIL(); });
     REQUIRE(result.tag() == result.tag<std::error_code>());
     CHECK(result.value<std::error_code>() == std::errc::invalid_argument);
 }
@@ -198,8 +198,8 @@ TEST_CASE_METHOD(
             5,
             handler_configuration::default_action(),
             handler_configuration::setting_policy::force);
-    SignalNumber v = 0;
-    auto handler_result = c->add_handler(5, [&v](SignalNumber n) { v = n; });
+    signal_number v = 0;
+    auto handler_result = c->add_handler(5, [&v](signal_number n) { v = n; });
 
     actions().at(5).value<sesh_osapi_signal_handler *>()(5);
     c->call_handlers();
@@ -212,8 +212,8 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         fixture<handler_configuration_api_fake>,
         "Handler configuration: add handler and trap to default") {
-    SignalNumber v = 0;
-    auto handlerResult = c->add_handler(5, [&v](SignalNumber n) { v += n; });
+    signal_number v = 0;
+    auto handlerResult = c->add_handler(5, [&v](signal_number n) { v += n; });
     std::error_code e = c->set_trap(
             5,
             handler_configuration::default_action(),
@@ -285,8 +285,8 @@ TEST_CASE_METHOD(
             5,
             handler_configuration::handler_type(),
             handler_configuration::setting_policy::force);
-    SignalNumber v = 0;
-    auto handler_result = c->add_handler(5, [&v](SignalNumber n) { v = n; });
+    signal_number v = 0;
+    auto handler_result = c->add_handler(5, [&v](signal_number n) { v = n; });
 
     signal_action &a = actions().at(5);
     REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
@@ -314,8 +314,8 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         fixture<handler_configuration_api_fake>,
         "Handler configuration: trap w/o handler") {
-    SignalNumber v = 0;
-    handler_configuration::handler_type h = [&v](SignalNumber n) { v = n; };
+    signal_number v = 0;
+    handler_configuration::handler_type h = [&v](signal_number n) { v = n; };
     std::error_code e = c->set_trap(
             5, std::move(h), handler_configuration::setting_policy::force);
     CHECK(e.value() == 0);
@@ -338,10 +338,10 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         fixture<handler_configuration_api_fake>,
         "Handler configuration: trap and add another handler") {
-    SignalNumber v1 = 0, v2 = 0;
-    handler_configuration::handler_type h = [&v1](SignalNumber n) { v1 = n; };
+    signal_number v1 = 0, v2 = 0;
+    handler_configuration::handler_type h = [&v1](signal_number n) { v1 = n; };
     c->set_trap(5, std::move(h), handler_configuration::setting_policy::force);
-    c->add_handler(5, [&v2](SignalNumber n) { v2 = n; });
+    c->add_handler(5, [&v2](signal_number n) { v2 = n; });
 
     signal_action &a = actions().at(5);
     REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
@@ -355,9 +355,9 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         fixture<handler_configuration_api_fake>,
         "Handler configuration: add handler and trap") {
-    SignalNumber v1 = 0, v2 = 0;
-    handler_configuration::handler_type h = [&v1](SignalNumber n) { v1 = n; };
-    c->add_handler(5, [&v2](SignalNumber n) { v2 = n; });
+    signal_number v1 = 0, v2 = 0;
+    handler_configuration::handler_type h = [&v1](signal_number n) { v1 = n; };
+    c->add_handler(5, [&v2](signal_number n) { v2 = n; });
     c->set_trap(5, std::move(h), handler_configuration::setting_policy::force);
 
     signal_action &a = actions().at(5);
