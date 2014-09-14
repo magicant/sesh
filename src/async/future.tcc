@@ -23,6 +23,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
