@@ -22,7 +22,6 @@ Makefile.in
 *.o
 *.log
 *.trs
-*Test
 *_test
 
 TAGS
