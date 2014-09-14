@@ -37,8 +37,8 @@ class handler_configuration_api {
 public:
 
     /** Returns a unique pointer to a new empty signal number set. */
-    virtual std::unique_ptr<SignalNumberSet> create_signal_number_set() const =
-            0;
+    virtual std::unique_ptr<signal_number_set> create_signal_number_set() const
+            = 0;
 
     enum class mask_change_how { block, unblock, set_mask };
 
@@ -51,8 +51,8 @@ public:
      */
     virtual std::error_code sigprocmask(
             mask_change_how,
-            const SignalNumberSet *new_mask,
-            SignalNumberSet *old_mask) const = 0;
+            const signal_number_set *new_mask,
+            signal_number_set *old_mask) const = 0;
 
     /** Convenience wrapper for {@link #sigprocmask}. */
     std::error_code sigprocmask_block(signal_number) const;

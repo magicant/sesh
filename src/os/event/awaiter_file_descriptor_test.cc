@@ -55,7 +55,7 @@ using sesh::os::event::writable_file_descriptor;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
 using sesh::os::signaling::handler_configuration_api_dummy;
-using sesh::os::signaling::SignalNumberSet;
+using sesh::os::signaling::signal_number_set;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
 using TriggerFileDescriptor = variant<
@@ -97,7 +97,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_equal(read_fds, {3}, fd_bound, "read_fds");
         check_equal(write_fds, {3}, fd_bound, "write_fds");
         check_empty(error_fds, fd_bound, "error_fds");
@@ -146,7 +146,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_equal(read_fds, {3}, fd_bound, "read_fds");
         check_empty(write_fds, fd_bound, "write_fds");
         check_equal(error_fds, {3}, fd_bound, "error_fds");
@@ -195,7 +195,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds");
         check_equal(write_fds, {3}, fd_bound, "write_fds");
         check_equal(error_fds, {3}, fd_bound, "error_fds");
@@ -241,7 +241,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *,
             file_descriptor_set *,
             std::chrono::nanoseconds,
-            const SignalNumberSet *) -> std::error_code {
+            const signal_number_set *) -> std::error_code {
         mutable_steady_clock_now() = start_time + std::chrono::seconds(10);
         return std::error_code();
     };
@@ -281,7 +281,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *,
             file_descriptor_set *,
             std::chrono::nanoseconds,
-            const SignalNumberSet *) -> std::error_code {
+            const signal_number_set *) -> std::error_code {
         mutable_steady_clock_now() = start_time + std::chrono::seconds(10);
         return std::error_code();
     };
@@ -321,7 +321,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *,
             file_descriptor_set *,
             std::chrono::nanoseconds,
-            const SignalNumberSet *) -> std::error_code {
+            const signal_number_set *) -> std::error_code {
         mutable_steady_clock_now() = start_time + std::chrono::seconds(10);
         return std::error_code();
     };
@@ -350,7 +350,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *,
             file_descriptor_set *,
             std::chrono::nanoseconds,
-            const SignalNumberSet *) -> std::error_code {
+            const signal_number_set *) -> std::error_code {
         return std::error_code();
     };
     a.await_events();

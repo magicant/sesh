@@ -54,7 +54,7 @@ using sesh::os::io::file_descriptor_open_mode;
 using sesh::os::io::file_descriptor_set;
 using sesh::os::io::file_mode;
 using sesh::os::signaling::signal_number;
-using sesh::os::signaling::SignalNumberSet;
+using sesh::os::signaling::signal_number_set;
 
 using signal_action = sesh::os::api::signal_action;
 
@@ -314,7 +314,7 @@ public:
 
 }; // class file_descriptor_set_impl
 
-class signal_number_set_impl : public SignalNumberSet {
+class signal_number_set_impl : public signal_number_set {
 
 private:
 
@@ -324,14 +324,14 @@ private:
 public:
 
     signal_number_set_impl() :
-            SignalNumberSet(), m_set(sesh_osapi_sigset_new()) {
+            signal_number_set(), m_set(sesh_osapi_sigset_new()) {
         if (m_set == nullptr)
             throw std::bad_alloc();
         sesh_osapi_sigemptyset(m_set.get());
     }
 
     signal_number_set_impl(const signal_number_set_impl &other) :
-            SignalNumberSet(other), m_set(sesh_osapi_sigset_new()) {
+            signal_number_set(other), m_set(sesh_osapi_sigset_new()) {
         if (m_set == nullptr)
             throw std::bad_alloc();
         sesh_osapi_sigcopyset(m_set.get(), other.get());
@@ -351,7 +351,7 @@ public:
         return sesh_osapi_sigismember(m_set.get(), n);
     }
 
-    SignalNumberSet &set(signal_number n, bool value) override {
+    signal_number_set &set(signal_number n, bool value) override {
         if (value)
             sesh_osapi_sigaddset(m_set.get(), n);
         else
@@ -359,18 +359,18 @@ public:
         return *this;
     }
 
-    SignalNumberSet &set() override {
+    signal_number_set &set() override {
         sesh_osapi_sigfillset(m_set.get());
         return *this;
     }
 
-    SignalNumberSet &reset() override {
+    signal_number_set &reset() override {
         sesh_osapi_sigemptyset(m_set.get());
         return *this;
     }
 
-    std::unique_ptr<SignalNumberSet> clone() const override {
-        return std::unique_ptr<SignalNumberSet>(new auto(*this));
+    std::unique_ptr<signal_number_set> clone() const override {
+        return std::unique_ptr<signal_number_set>(new auto(*this));
     }
 
 }; // class signal_number_set_impl
@@ -466,9 +466,9 @@ class api_impl : public api {
         return set;
     }
 
-    std::unique_ptr<SignalNumberSet> create_signal_number_set() const
+    std::unique_ptr<signal_number_set> create_signal_number_set() const
             final override {
-        std::unique_ptr<SignalNumberSet> set(new signal_number_set_impl);
+        std::unique_ptr<signal_number_set> set(new signal_number_set_impl);
         return set;
     }
 
@@ -478,7 +478,7 @@ class api_impl : public api {
                 file_descriptor_set *write_fds,
                 file_descriptor_set *error_fds,
                 std::chrono::nanoseconds timeout,
-                const SignalNumberSet *signal_mask) const final override {
+                const signal_number_set *signal_mask) const final override {
         file_descriptor_set_impl *read_fds_impl =
                 static_cast<file_descriptor_set_impl *>(read_fds);
         file_descriptor_set_impl *write_fds_impl =
@@ -502,8 +502,8 @@ class api_impl : public api {
 
     std::error_code sigprocmask(
             mask_change_how how,
-            const signaling::SignalNumberSet *new_mask,
-            signaling::SignalNumberSet *old_mask) const final override {
+            const signaling::signal_number_set *new_mask,
+            signaling::signal_number_set *old_mask) const final override {
         enum sesh_osapi_sigprocmask_how how_impl;
 
         switch (how) {

@@ -71,7 +71,7 @@ using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
 using sesh::os::signaling::handler_configuration_api_dummy;
 using sesh::os::signaling::handler_configuration_api_fake;
-using sesh::os::signaling::SignalNumberSet;
+using sesh::os::signaling::signal_number_set;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
@@ -110,7 +110,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_equal(read_fds, {3}, fd_bound, "read_fds");
         check_empty(write_fds, fd_bound, "write_fds");
         check_empty(error_fds, fd_bound, "error_fds");
@@ -147,7 +147,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_equal(read_fds, {3}, fd_bound, "read_fds");
         check_empty(write_fds, fd_bound, "write_fds");
         check_empty(error_fds, fd_bound, "error_fds");
@@ -174,7 +174,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *,
             file_descriptor_set *,
             std::chrono::nanoseconds,
-            const SignalNumberSet *) -> std::error_code {
+            const signal_number_set *) -> std::error_code {
         signal_action &a = actions().at(1);
         CHECK(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
 
@@ -227,7 +227,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *,
             file_descriptor_set *,
             std::chrono::nanoseconds,
-            const SignalNumberSet *) -> std::error_code {
+            const signal_number_set *) -> std::error_code {
         signal_action &a = actions().at(1);
         REQUIRE(a.tag() == signal_action::tag<sesh_osapi_signal_handler *>());
         a.value<sesh_osapi_signal_handler *>()(1);
@@ -239,7 +239,7 @@ TEST_CASE_METHOD(
                 file_descriptor_set *,
                 file_descriptor_set *,
                 std::chrono::nanoseconds,
-                const SignalNumberSet *) -> std::error_code {
+                const signal_number_set *) -> std::error_code {
             if (read_fds != nullptr)
                 read_fds->reset();
             mutable_steady_clock_now() += std::chrono::seconds(1);

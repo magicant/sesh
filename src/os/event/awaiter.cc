@@ -54,7 +54,7 @@ using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
 using sesh::os::signaling::handler_configuration;
 using sesh::os::signaling::signal_number;
-using sesh::os::signaling::SignalNumberSet;
+using sesh::os::signaling::signal_number_set;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
@@ -146,7 +146,7 @@ public:
     void add_or_fire(pending_event &, const pselect_api &);
 
     /** Calls the p-select API function with this argument. */
-    std::error_code call(const pselect_api &api, const SignalNumberSet *);
+    std::error_code call(const pselect_api &api, const signal_number_set *);
 
     /** Tests if this p-select call result matches the given trigger. */
     bool matches(const file_descriptor_trigger &) const;
@@ -280,7 +280,7 @@ void pselect_argument::add_or_fire(pending_event &e, const pselect_api &api) {
 }
 
 std::error_code pselect_argument::call(
-        const pselect_api &api, const SignalNumberSet *signal_mask) {
+        const pselect_api &api, const signal_number_set *signal_mask) {
     return api.pselect(
             m_fd_bound,
             m_read_fds.get(),

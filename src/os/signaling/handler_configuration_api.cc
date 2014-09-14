@@ -27,14 +27,14 @@ namespace signaling {
 
 std::error_code handler_configuration_api::sigprocmask_block(signal_number n)
         const {
-    std::unique_ptr<SignalNumberSet> set = create_signal_number_set();
+    std::unique_ptr<signal_number_set> set = create_signal_number_set();
     set->set(n);
     return sigprocmask(mask_change_how::block, set.get(), nullptr);
 }
 
 std::error_code handler_configuration_api::sigprocmask_unblock(signal_number n)
         const {
-    std::unique_ptr<SignalNumberSet> set = create_signal_number_set();
+    std::unique_ptr<signal_number_set> set = create_signal_number_set();
     set->set(n);
     return sigprocmask(mask_change_how::unblock, set.get(), nullptr);
 }

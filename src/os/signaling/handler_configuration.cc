@@ -194,9 +194,9 @@ private:
     std::map<signal_number, signal_data> m_data;
 
     /** Null until {@code #initialize_masks()} is called. */
-    std::unique_ptr<SignalNumberSet> m_initial_mask;
+    std::unique_ptr<signal_number_set> m_initial_mask;
     /** Null until {@code #initialize_masks()} is called. */
-    std::unique_ptr<SignalNumberSet> m_mask_for_pselect;
+    std::unique_ptr<signal_number_set> m_mask_for_pselect;
 
     /** Gets (or creates) the configuration for the argument signal number. */
     signal_configuration &configuration(signal_number n) {
@@ -328,7 +328,7 @@ public:
         return update_configuration(n, data);
     }
 
-    const SignalNumberSet *mask_for_pselect() const final override {
+    const signal_number_set *mask_for_pselect() const final override {
         return m_mask_for_pselect.get();
     }
 

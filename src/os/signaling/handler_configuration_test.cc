@@ -37,7 +37,7 @@ using sesh::os::signaling::handler_configuration_api_dummy;
 using sesh::os::signaling::handler_configuration_api_fake;
 using sesh::os::signaling::signal_error_code;
 using sesh::os::signaling::signal_number;
-using sesh::os::signaling::SignalNumberSet;
+using sesh::os::signaling::signal_number_set;
 
 using canceler_type = handler_configuration::canceler_type;
 
@@ -421,7 +421,7 @@ TEST_CASE_METHOD(
     auto action_result2 = c->add_handler(2, nop());
     auto action_result3 = c->add_handler(3, nop());
 
-    const SignalNumberSet *set = c->mask_for_pselect();
+    const signal_number_set *set = c->mask_for_pselect();
     REQUIRE(set != nullptr);
     CHECK(set->test(1));
     CHECK_FALSE(set->test(2));
@@ -451,7 +451,7 @@ TEST_CASE_METHOD(
             handler_configuration::handler_type(),
             handler_configuration::setting_policy::force);
 
-    const SignalNumberSet *set = c->mask_for_pselect();
+    const signal_number_set *set = c->mask_for_pselect();
     REQUIRE(set != nullptr);
     CHECK(set->test(1));
     CHECK_FALSE(set->test(2));

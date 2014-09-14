@@ -126,7 +126,7 @@ public:
      * The returned pointer is valid until any action or trap configuration is
      * modified or this instance is destroyed.
      */
-    virtual const SignalNumberSet *mask_for_pselect() const = 0;
+    virtual const signal_number_set *mask_for_pselect() const = 0;
 
     /**
      * Calls signal handling functions for signals that have been received by

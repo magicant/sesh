@@ -32,14 +32,14 @@ namespace sesh {
 namespace os {
 namespace signaling {
 
-class SignalNumberSetFake : public SignalNumberSet {
+class SignalNumberSetFake : public signal_number_set {
 
 private:
 
     std::set<signal_number> mSet;
     bool mIsPositive = true;
 
-    SignalNumberSet &reinitialize(bool isPositive) {
+    signal_number_set &reinitialize(bool isPositive) {
         mIsPositive = isPositive;
         mSet.clear();
         return *this;
@@ -51,7 +51,7 @@ public:
         return common::contains(mSet, n) == mIsPositive;
     }
 
-    SignalNumberSet &set(signal_number n, bool v = true) override {
+    signal_number_set &set(signal_number n, bool v = true) override {
         if (v == mIsPositive)
             mSet.insert(n);
         else
@@ -59,16 +59,16 @@ public:
         return *this;
     }
 
-    SignalNumberSet &set() override {
+    signal_number_set &set() override {
         return reinitialize(false);
     }
 
-    SignalNumberSet &reset() override {
+    signal_number_set &reset() override {
         return reinitialize(true);
     }
 
-    std::unique_ptr<SignalNumberSet> clone() const override {
-        return std::unique_ptr<SignalNumberSet>(new auto(*this));
+    std::unique_ptr<signal_number_set> clone() const override {
+        return std::unique_ptr<signal_number_set>(new auto(*this));
     }
 
     void insertAll(const SignalNumberSetFake &that) {

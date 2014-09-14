@@ -34,15 +34,15 @@ namespace signaling {
 
 class handler_configuration_api_dummy : public handler_configuration_api {
 
-    std::unique_ptr<SignalNumberSet> create_signal_number_set() const
+    std::unique_ptr<signal_number_set> create_signal_number_set() const
             override {
         throw "unexpected create_signal_number_set";
     }
 
     std::error_code sigprocmask(
             mask_change_how,
-            const SignalNumberSet *,
-            SignalNumberSet *) const override {
+            const signal_number_set *,
+            signal_number_set *) const override {
         throw "unexpected sigprocmask";
     }
 
@@ -71,15 +71,15 @@ public:
     SignalNumberSetFake &signal_mask() noexcept { return m_mask; }
     const SignalNumberSetFake &signal_mask() const noexcept { return m_mask; }
 
-    std::unique_ptr<SignalNumberSet> create_signal_number_set() const
+    std::unique_ptr<signal_number_set> create_signal_number_set() const
             override {
-        return std::unique_ptr<SignalNumberSet>(new SignalNumberSetFake);
+        return std::unique_ptr<signal_number_set>(new SignalNumberSetFake);
     }
 
     std::error_code sigprocmask(
             mask_change_how how,
-            const SignalNumberSet *new_mask,
-            SignalNumberSet *old_mask) const override {
+            const signal_number_set *new_mask,
+            signal_number_set *old_mask) const override {
         const SignalNumberSetFake *fake_new_mask =
                 dynamic_cast<const SignalNumberSetFake *>(new_mask);
         SignalNumberSetFake *fake_old_mask =
