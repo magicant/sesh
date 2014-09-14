@@ -26,7 +26,7 @@
 #include <system_error>
 #include "os/signaling/handler_configuration_api.hh"
 #include "os/signaling/signal_number.hh"
-#include "os/signaling/SignalNumberSetTestHelper.hh"
+#include "os/signaling/signal_number_set_test_helper.hh"
 
 namespace sesh {
 namespace os {

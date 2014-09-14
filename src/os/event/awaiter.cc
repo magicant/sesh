@@ -40,7 +40,7 @@
 #include "os/io/file_descriptor_set.hh"
 #include "os/signaling/handler_configuration.hh"
 #include "os/signaling/signal_number.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number_set.hh"
 #include "os/time_api.hh"
 
 using sesh::async::future;

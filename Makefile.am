@@ -201,7 +201,7 @@ src_sesh_SOURCES = \
 	src/os/signaling/signal_error_category.hh \
 	src/os/signaling/signal_error_code.hh \
 	src/os/signaling/signal_number.hh \
-	src/os/signaling/SignalNumberSet.hh \
+	src/os/signaling/signal_number_set.hh \
 	src/os/time_api.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
@@ -401,7 +401,7 @@ TESTHEADERS = \
 	src/os/io/file_descriptor_set_test_helper.hh \
 	src/os/io/non_blocking_file_descriptor_test_helper.hh \
 	src/os/signaling/handler_configuration_api_test_helper.hh \
-	src/os/signaling/SignalNumberSetTestHelper.hh \
+	src/os/signaling/signal_number_set_test_helper.hh \
 	src/os/time_api_test_helper.hh
 
 ### Documentation

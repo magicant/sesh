@@ -39,7 +39,7 @@
 #include "os/io/file_descriptor_set.hh"
 #include "os/io/file_mode.hh"
 #include "os/signaling/signal_number.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number_set.hh"
 
 using sesh::common::enum_set;
 using sesh::common::enumerators;

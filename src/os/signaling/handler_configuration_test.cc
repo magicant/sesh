@@ -27,7 +27,7 @@
 #include "os/signaling/handler_configuration_api_test_helper.hh"
 #include "os/signaling/signal_error_code.hh"
 #include "os/signaling/signal_number.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number_set.hh"
 
 namespace {
 

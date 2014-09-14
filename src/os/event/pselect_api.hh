@@ -25,7 +25,7 @@
 #include <system_error>
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_set.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number_set.hh"
 #include "os/time_api.hh"
 
 namespace sesh {

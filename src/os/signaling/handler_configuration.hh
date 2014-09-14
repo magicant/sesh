@@ -26,7 +26,7 @@
 #include "common/variant.hh"
 #include "os/signaling/handler_configuration_api.hh"
 #include "os/signaling/signal_number.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number_set.hh"
 
 namespace sesh {
 namespace os {

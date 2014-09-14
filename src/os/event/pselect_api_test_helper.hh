@@ -29,7 +29,7 @@
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_set.hh"
 #include "os/io/file_descriptor_set_test_helper.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number_set.hh"
 #include "os/time_api_test_helper.hh"
 
 /*

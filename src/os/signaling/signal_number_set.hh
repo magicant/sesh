@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_signaling_SignalNumberSet_hh
-#define INCLUDED_os_signaling_SignalNumberSet_hh
+#ifndef INCLUDED_os_signaling_signal_number_set_hh
+#define INCLUDED_os_signaling_signal_number_set_hh
 
 #include "buildconfig.h"
 
@@ -98,6 +98,6 @@ public:
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_signaling_SignalNumberSet_hh
+#endif // #ifndef INCLUDED_os_signaling_signal_number_set_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
