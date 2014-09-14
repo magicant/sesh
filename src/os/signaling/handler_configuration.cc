@@ -27,7 +27,7 @@
 #include "common/shared_function.hh"
 #include "helpermacros.h"
 #include "os/signaling/handler_configuration_api.hh"
-#include "os/signaling/SignalErrorCode.hh"
+#include "os/signaling/signal_error_code.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
 using sesh::common::make_maybe_of;
@@ -317,7 +317,7 @@ public:
                 return e;
             if (data.initial_action()->tag() ==
                     signal_action::tag<handler_configuration_api::ignore>())
-                return SignalErrorCode::INITIALLY_IGNORED;
+                return signal_error_code::initially_ignored;
             // Fall through
         case setting_policy::force:
             break;

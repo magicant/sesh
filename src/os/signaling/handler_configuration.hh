@@ -110,7 +110,7 @@ public:
       *
       * If the setting policy argument is fail_if_ignored and the initial
       * action for the signal is "ignore," then this function fails with
-      * {@link SignalErrorCode#INITIALLY_IGNORED}.
+      * {@link signal_error_code#initially_ignored}.
       *
       * This function may change the signal handler and blocking mask for the
       * signal using the OS API. If the API call fails, the error code is

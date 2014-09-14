@@ -26,7 +26,7 @@ namespace sesh {
 namespace os {
 namespace signaling {
 
-/** The error category for {@link SignalErrorCode}. */
+/** The error category for {@link signal_error_code}. */
 extern const std::error_category &signal_error_category;
 
 } // namespace signaling

@@ -25,7 +25,7 @@
 #include "common/type_tag_test_helper.hh"
 #include "os/signaling/handler_configuration.hh"
 #include "os/signaling/handler_configuration_api_test_helper.hh"
-#include "os/signaling/SignalErrorCode.hh"
+#include "os/signaling/signal_error_code.hh"
 #include "os/signaling/SignalNumber.hh"
 #include "os/signaling/SignalNumberSet.hh"
 
@@ -35,7 +35,7 @@ using sesh::common::nop;
 using sesh::os::signaling::handler_configuration;
 using sesh::os::signaling::handler_configuration_api_dummy;
 using sesh::os::signaling::handler_configuration_api_fake;
-using sesh::os::signaling::SignalErrorCode;
+using sesh::os::signaling::signal_error_code;
 using sesh::os::signaling::SignalNumber;
 using sesh::os::signaling::SignalNumberSet;
 
@@ -249,7 +249,7 @@ TEST_CASE_METHOD(
             5,
             handler_configuration::handler_type(),
             handler_configuration::setting_policy::fail_if_ignored);
-    CHECK(e == SignalErrorCode::INITIALLY_IGNORED);
+    CHECK(e == signal_error_code::initially_ignored);
 }
 
 TEST_CASE_METHOD(
@@ -262,7 +262,7 @@ TEST_CASE_METHOD(
             5,
             handler_configuration::handler_type(),
             handler_configuration::setting_policy::fail_if_ignored);
-    CHECK(e == SignalErrorCode::INITIALLY_IGNORED);
+    CHECK(e == signal_error_code::initially_ignored);
 }
 
 TEST_CASE_METHOD(
