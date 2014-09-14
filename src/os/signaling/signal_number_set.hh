@@ -15,89 +15,89 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_signaling_SignalNumberSet_hh
-#define INCLUDED_os_signaling_SignalNumberSet_hh
+#ifndef INCLUDED_os_signaling_signal_number_set_hh
+#define INCLUDED_os_signaling_signal_number_set_hh
 
 #include "buildconfig.h"
 
 #include <memory>
-#include "os/signaling/SignalNumber.hh"
+#include "os/signaling/signal_number.hh"
 
 namespace sesh {
 namespace os {
 namespace signaling {
 
 /** A signal number set contains zero or more signal numbers. */
-class SignalNumberSet {
+class signal_number_set {
 
 public:
 
-    SignalNumberSet() = default;
-    SignalNumberSet(const SignalNumberSet &) = default;
-    SignalNumberSet(SignalNumberSet &&) = default;
-    SignalNumberSet &operator=(const SignalNumberSet &) = default;
-    SignalNumberSet &operator=(SignalNumberSet &&) = default;
-    virtual ~SignalNumberSet() = default;
+    signal_number_set() = default;
+    signal_number_set(const signal_number_set &) = default;
+    signal_number_set(signal_number_set &&) = default;
+    signal_number_set &operator=(const signal_number_set &) = default;
+    signal_number_set &operator=(signal_number_set &&) = default;
+    virtual ~signal_number_set() = default;
 
     /** Checks if the given signal number is included in this set. */
-    virtual bool test(signaling::SignalNumber) const = 0;
+    virtual bool test(signal_number) const = 0;
 
     /** Adds/removes a signal number to/from this set. */
-    virtual SignalNumberSet &set(signaling::SignalNumber, bool = true) = 0;
+    virtual signal_number_set &set(signal_number, bool = true) = 0;
 
     /** Removes a signal number from this set. */
-    SignalNumberSet &reset(signaling::SignalNumber n) {
+    signal_number_set &reset(signal_number n) {
         return set(n, false);
     }
 
     /** Adds all signal numbers to this set. */
-    virtual SignalNumberSet &set() = 0;
+    virtual signal_number_set &set() = 0;
 
     /** Clears this set. */
-    virtual SignalNumberSet &reset() = 0;
+    virtual signal_number_set &reset() = 0;
 
     /** Creates a copy of this instance. */
-    virtual std::unique_ptr<SignalNumberSet> clone() const = 0;
+    virtual std::unique_ptr<signal_number_set> clone() const = 0;
 
     /** Reference to a single entry of a set. */
-    class Reference {
+    class reference {
 
     private:
 
-        SignalNumberSet &mSet;
-        SignalNumber mNumber;
+        signal_number_set &m_set;
+        signal_number m_number;
 
     public:
 
-        Reference(SignalNumberSet &set, SignalNumber n) noexcept :
-                mSet(set), mNumber(n) { }
+        reference(signal_number_set &set, signal_number n) noexcept :
+                m_set(set), m_number(n) { }
 
-        Reference &operator=(bool value) {
-            mSet.set(mNumber, value);
+        reference &operator=(bool value) {
+            m_set.set(m_number, value);
             return *this;
         }
 
         operator bool() {
-            return mSet.test(mNumber);
+            return m_set.test(m_number);
         }
 
         bool operator~() {
             return !*this;
         }
 
-    }; // class Reference
+    }; // class reference
 
     /** Returns a reference to the specified entry of this set. */
-    Reference operator[](SignalNumber n) noexcept {
-        return Reference(*this, n);
+    reference operator[](signal_number n) noexcept {
+        return reference(*this, n);
     }
 
-}; // class SignalNumberSet
+}; // class signal_number_set
 
 } // namespace signaling
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_signaling_SignalNumberSet_hh
+#endif // #ifndef INCLUDED_os_signaling_signal_number_set_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

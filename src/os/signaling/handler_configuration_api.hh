@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_signaling_HandlerConfigurationApi_hh
-#define INCLUDED_os_signaling_HandlerConfigurationApi_hh
+#ifndef INCLUDED_os_signaling_handler_configuration_api_hh
+#define INCLUDED_os_signaling_handler_configuration_api_hh
 
 #include "buildconfig.h"
 
@@ -24,45 +24,46 @@
 #include <system_error>
 #include "common/variant.hh"
 #include "os/capitypes.h"
-#include "os/signaling/SignalNumber.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number.hh"
+#include "os/signaling/signal_number_set.hh"
 
 namespace sesh {
 namespace os {
 namespace signaling {
 
 /** Abstraction of POSIX API that manipulates signal mask and handlers. */
-class HandlerConfigurationApi {
+class handler_configuration_api {
 
 public:
 
     /** Returns a unique pointer to a new empty signal number set. */
-    virtual std::unique_ptr<SignalNumberSet> createSignalNumberSet() const = 0;
+    virtual std::unique_ptr<signal_number_set> create_signal_number_set() const
+            = 0;
 
-    enum class MaskChangeHow { BLOCK, UNBLOCK, SET_MASK };
+    enum class mask_change_how { block, unblock, set_mask };
 
     /**
      * Changes the signal blocking mask.
      *
      * The pointer arguments to signal number sets may be null. Non-null
      * pointers passed to this function must be obtained from the {@link
-     * #createSignalNumberSet} functions called for the same {@code *this}.
+     * #create_signal_number_set} functions called for the same {@code *this}.
      */
     virtual std::error_code sigprocmask(
-            MaskChangeHow,
-            const SignalNumberSet *newMask,
-            SignalNumberSet *oldMask) const = 0;
+            mask_change_how,
+            const signal_number_set *new_mask,
+            signal_number_set *old_mask) const = 0;
 
     /** Convenience wrapper for {@link #sigprocmask}. */
-    std::error_code sigprocmaskBlock(SignalNumber) const;
+    std::error_code sigprocmask_block(signal_number) const;
     /** Convenience wrapper for {@link #sigprocmask}. */
-    std::error_code sigprocmaskUnblock(SignalNumber) const;
+    std::error_code sigprocmask_unblock(signal_number) const;
 
-    class Default { };
-    class Ignore { };
+    class default_action { };
+    class ignore { };
 
-    using SignalAction =
-            common::variant<Default, Ignore, sesh_osapi_signal_handler *>;
+    using signal_action = common::variant<
+            default_action, ignore, sesh_osapi_signal_handler *>;
 
     /**
      * Changes and/or queries the signal handler setting for a signal.
@@ -71,16 +72,16 @@ public:
      * The {@code sa_mask} set and {@code sa_flags} are considered empty.
      */
     virtual std::error_code sigaction(
-            SignalNumber,
-            const SignalAction *newAction,
-            SignalAction *oldAction) const = 0;
+            signal_number,
+            const signal_action *new_action,
+            signal_action *old_action) const = 0;
 
-}; // class HandlerConfigurationApi
+}; // class handler_configuration_api
 
 } // namespace signaling
 } // namespace os
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_os_signaling_HandlerConfigurationApi_hh
+#endif // #ifndef INCLUDED_os_signaling_handler_configuration_api_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

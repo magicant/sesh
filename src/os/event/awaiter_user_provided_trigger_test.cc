@@ -30,7 +30,7 @@
 #include "os/event/pselect_api.hh"
 #include "os/event/trigger.hh"
 #include "os/event/user_provided_trigger.hh"
-#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
+#include "os/signaling/handler_configuration_api_test_helper.hh"
 
 namespace {
 
@@ -42,12 +42,12 @@ using sesh::common::trial;
 using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::trigger;
 using sesh::os::event::user_provided_trigger;
-using sesh::os::signaling::HandlerConfigurationApiDummy;
+using sesh::os::signaling::handler_configuration_api_dummy;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: one user-provided trigger (successful future)") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -68,7 +68,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: one user-provided trigger (failed future)") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -90,7 +90,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: two user-provided triggers in one trigger set") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -113,7 +113,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: two user-provided triggers in two trigger sets") {
     std::shared_ptr<void> expected = std::make_shared<int>(0);
     auto f1 = a.expect(user_provided_trigger(make_future_of(expected)));

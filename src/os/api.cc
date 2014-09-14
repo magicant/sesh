@@ -38,8 +38,8 @@
 #include "os/io/file_descriptor_open_mode.hh"
 #include "os/io/file_descriptor_set.hh"
 #include "os/io/file_mode.hh"
-#include "os/signaling/SignalNumber.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number.hh"
+#include "os/signaling/signal_number_set.hh"
 
 using sesh::common::enum_set;
 using sesh::common::enumerators;
@@ -53,10 +53,10 @@ using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_open_mode;
 using sesh::os::io::file_descriptor_set;
 using sesh::os::io::file_mode;
-using sesh::os::signaling::SignalNumber;
-using sesh::os::signaling::SignalNumberSet;
+using sesh::os::signaling::signal_number;
+using sesh::os::signaling::signal_number_set;
 
-using SignalAction = sesh::os::api::SignalAction;
+using signal_action = sesh::os::api::signal_action;
 
 namespace sesh {
 namespace os {
@@ -173,30 +173,30 @@ int to_raw_modes(enum_set<file_mode> modes) {
     return sesh_osapi_mode_to_raw(static_cast<int>(modes.to_ulong()));
 }
 
-void convert(const SignalAction &from, struct sesh_osapi_signal_action &to) {
+void convert(const signal_action &from, struct sesh_osapi_signal_action &to) {
     switch (from.tag()) {
-    case SignalAction::tag<api::Default>():
+    case signal_action::tag<api::default_action>():
         to.type = SESH_OSAPI_SIG_DFL;
         to.handler = nullptr;
         break;
-    case SignalAction::tag<api::Ignore>():
+    case signal_action::tag<api::ignore>():
         to.type = SESH_OSAPI_SIG_IGN;
         to.handler = nullptr;
         break;
-    case SignalAction::tag<sesh_osapi_signal_handler *>():
+    case signal_action::tag<sesh_osapi_signal_handler *>():
         to.type = SESH_OSAPI_SIG_HANDLER;
         to.handler = from.value<sesh_osapi_signal_handler *>();
         break;
     }
 }
 
-void convert(const struct sesh_osapi_signal_action &from, SignalAction &to) {
+void convert(const struct sesh_osapi_signal_action &from, signal_action &to) {
     switch (from.type) {
     case SESH_OSAPI_SIG_DFL:
-        to.emplace(type_tag<api::Default>());
+        to.emplace(type_tag<api::default_action>());
         break;
     case SESH_OSAPI_SIG_IGN:
-        to.emplace(type_tag<api::Ignore>());
+        to.emplace(type_tag<api::ignore>());
         break;
     case SESH_OSAPI_SIG_HANDLER:
         to.emplace(type_tag<sesh_osapi_signal_handler *>(), from.handler);
@@ -314,7 +314,7 @@ public:
 
 }; // class file_descriptor_set_impl
 
-class signal_number_set_impl : public SignalNumberSet {
+class signal_number_set_impl : public signal_number_set {
 
 private:
 
@@ -324,14 +324,14 @@ private:
 public:
 
     signal_number_set_impl() :
-            SignalNumberSet(), m_set(sesh_osapi_sigset_new()) {
+            signal_number_set(), m_set(sesh_osapi_sigset_new()) {
         if (m_set == nullptr)
             throw std::bad_alloc();
         sesh_osapi_sigemptyset(m_set.get());
     }
 
     signal_number_set_impl(const signal_number_set_impl &other) :
-            SignalNumberSet(other), m_set(sesh_osapi_sigset_new()) {
+            signal_number_set(other), m_set(sesh_osapi_sigset_new()) {
         if (m_set == nullptr)
             throw std::bad_alloc();
         sesh_osapi_sigcopyset(m_set.get(), other.get());
@@ -347,11 +347,11 @@ public:
         return m_set.get();
     }
 
-    bool test(SignalNumber n) const override {
+    bool test(signal_number n) const override {
         return sesh_osapi_sigismember(m_set.get(), n);
     }
 
-    SignalNumberSet &set(SignalNumber n, bool value) override {
+    signal_number_set &set(signal_number n, bool value) override {
         if (value)
             sesh_osapi_sigaddset(m_set.get(), n);
         else
@@ -359,18 +359,18 @@ public:
         return *this;
     }
 
-    SignalNumberSet &set() override {
+    signal_number_set &set() override {
         sesh_osapi_sigfillset(m_set.get());
         return *this;
     }
 
-    SignalNumberSet &reset() override {
+    signal_number_set &reset() override {
         sesh_osapi_sigemptyset(m_set.get());
         return *this;
     }
 
-    std::unique_ptr<SignalNumberSet> clone() const override {
-        return std::unique_ptr<SignalNumberSet>(new auto(*this));
+    std::unique_ptr<signal_number_set> clone() const override {
+        return std::unique_ptr<signal_number_set>(new auto(*this));
     }
 
 }; // class signal_number_set_impl
@@ -466,9 +466,9 @@ class api_impl : public api {
         return set;
     }
 
-    std::unique_ptr<SignalNumberSet> createSignalNumberSet() const
+    std::unique_ptr<signal_number_set> create_signal_number_set() const
             final override {
-        std::unique_ptr<SignalNumberSet> set(new signal_number_set_impl);
+        std::unique_ptr<signal_number_set> set(new signal_number_set_impl);
         return set;
     }
 
@@ -478,7 +478,7 @@ class api_impl : public api {
                 file_descriptor_set *write_fds,
                 file_descriptor_set *error_fds,
                 std::chrono::nanoseconds timeout,
-                const SignalNumberSet *signal_mask) const final override {
+                const signal_number_set *signal_mask) const final override {
         file_descriptor_set_impl *read_fds_impl =
                 static_cast<file_descriptor_set_impl *>(read_fds);
         file_descriptor_set_impl *write_fds_impl =
@@ -501,19 +501,19 @@ class api_impl : public api {
     }
 
     std::error_code sigprocmask(
-            MaskChangeHow how,
-            const signaling::SignalNumberSet *new_mask,
-            signaling::SignalNumberSet *old_mask) const final override {
+            mask_change_how how,
+            const signaling::signal_number_set *new_mask,
+            signaling::signal_number_set *old_mask) const final override {
         enum sesh_osapi_sigprocmask_how how_impl;
 
         switch (how) {
-        case MaskChangeHow::BLOCK:
+        case mask_change_how::block:
             how_impl = SESH_OSAPI_SIG_BLOCK;
             break;
-        case MaskChangeHow::UNBLOCK:
+        case mask_change_how::unblock:
             how_impl = SESH_OSAPI_SIG_UNBLOCK;
             break;
-        case MaskChangeHow::SET_MASK:
+        case mask_change_how::set_mask:
             how_impl = SESH_OSAPI_SIG_SETMASK;
             break;
         }
@@ -533,9 +533,9 @@ class api_impl : public api {
     }
 
     std::error_code sigaction(
-            signaling::SignalNumber n,
-            const SignalAction *new_action,
-            SignalAction *old_action) const final override {
+            signaling::signal_number n,
+            const signal_action *new_action,
+            signal_action *old_action) const final override {
         struct sesh_osapi_signal_action new_action_impl, old_action_impl;
 
         if (new_action != nullptr)

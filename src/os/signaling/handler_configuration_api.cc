@@ -16,32 +16,28 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "SignalErrorCategory.hh"
+#include "handler_configuration_api.hh"
 
-#include <string>
-#include <system_error>
+#include "os/signaling/signal_number.hh"
+#include "os/signaling/signal_number_set.hh"
 
 namespace sesh {
 namespace os {
 namespace signaling {
 
-class SignalErrorCategory : public std::error_category {
+std::error_code handler_configuration_api::sigprocmask_block(signal_number n)
+        const {
+    std::unique_ptr<signal_number_set> set = create_signal_number_set();
+    set->set(n);
+    return sigprocmask(mask_change_how::block, set.get(), nullptr);
+}
 
-public:
-
-    const char *name() const noexcept final override {
-        return "signal";
-    }
-
-    /** Always returns "?". */
-    std::string message(int) const final override {
-        return "?";
-    }
-
-}; // class SignalErrorCategory
-
-const std::error_category &SIGNAL_ERROR_CATEGORY =
-        SignalErrorCategory();
+std::error_code handler_configuration_api::sigprocmask_unblock(signal_number n)
+        const {
+    std::unique_ptr<signal_number_set> set = create_signal_number_set();
+    set->set(n);
+    return sigprocmask(mask_change_how::unblock, set.get(), nullptr);
+}
 
 } // namespace signaling
 } // namespace os

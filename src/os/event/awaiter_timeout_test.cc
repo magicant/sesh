@@ -33,8 +33,8 @@
 #include "os/event/trigger.hh"
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_set.hh"
-#include "os/signaling/HandlerConfigurationApiTestHelper.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/handler_configuration_api_test_helper.hh"
+#include "os/signaling/signal_number_set.hh"
 
 /*
 namespace std {
@@ -65,14 +65,14 @@ using sesh::os::event::timeout;
 using sesh::os::event::trigger;
 using sesh::os::io::file_descriptor;
 using sesh::os::io::file_descriptor_set;
-using sesh::os::signaling::HandlerConfigurationApiDummy;
-using sesh::os::signaling::SignalNumberSet;
+using sesh::os::signaling::handler_configuration_api_dummy;
+using sesh::os::signaling::signal_number_set;
 
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 template<int DurationInSecondsInt>
 class TimeoutTest :
-        protected awaiter_test_fixture<HandlerConfigurationApiDummy> {
+        protected awaiter_test_fixture<handler_configuration_api_dummy> {
 
 protected:
 
@@ -87,7 +87,7 @@ public:
 }; // class TimeoutTest
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: timeout 0") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -110,7 +110,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds");
         check_empty(write_fds, fd_bound, "write_fds");
         check_empty(error_fds, fd_bound, "error_fds");
@@ -149,7 +149,7 @@ TimeoutTest<DurationInSecondsInt>::TimeoutTest() {
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds");
         check_empty(write_fds, fd_bound, "write_fds");
         check_empty(error_fds, fd_bound, "error_fds");
@@ -170,7 +170,7 @@ TEST_CASE_METHOD(TimeoutTest<1>, "Awaiter: timeout 1") { }
 TEST_CASE_METHOD(TimeoutTest<2>, "Awaiter: timeout 2") { }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: negative timeout") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -193,7 +193,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds");
         check_empty(write_fds, fd_bound, "write_fds");
         check_empty(error_fds, fd_bound, "error_fds");
@@ -209,7 +209,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: duplicate timeouts in one trigger set") {
     auto start_time = time_point(std::chrono::seconds(-100));
     mutable_steady_clock_now() = start_time;
@@ -235,7 +235,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds");
         check_empty(write_fds, fd_bound, "write_fds");
         check_empty(error_fds, fd_bound, "error_fds");
@@ -251,7 +251,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: two simultaneous timeouts") {
     auto start_time = time_point(std::chrono::seconds(1000));
     mutable_steady_clock_now() = start_time;
@@ -287,7 +287,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds 1");
         check_empty(write_fds, fd_bound, "write_fds 1");
         check_empty(error_fds, fd_bound, "error_fds 1");
@@ -302,7 +302,7 @@ TEST_CASE_METHOD(
                 file_descriptor_set *write_fds,
                 file_descriptor_set *error_fds,
                 std::chrono::nanoseconds timeout,
-                const SignalNumberSet *signal_mask) -> std::error_code {
+                const signal_number_set *signal_mask) -> std::error_code {
             check_empty(read_fds, fd_bound, "read_fds 2");
             check_empty(write_fds, fd_bound, "write_fds 2");
             check_empty(error_fds, fd_bound, "error_fds 2");
@@ -321,7 +321,7 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(
-        awaiter_test_fixture<HandlerConfigurationApiDummy>,
+        awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: two successive timeouts") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
@@ -352,7 +352,7 @@ TEST_CASE_METHOD(
             file_descriptor_set *write_fds,
             file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const SignalNumberSet *signal_mask) -> std::error_code {
+            const signal_number_set *signal_mask) -> std::error_code {
         check_empty(read_fds, fd_bound, "read_fds 1");
         check_empty(write_fds, fd_bound, "write_fds 1");
         check_empty(error_fds, fd_bound, "error_fds 1");
@@ -367,7 +367,7 @@ TEST_CASE_METHOD(
                 file_descriptor_set *write_fds,
                 file_descriptor_set *error_fds,
                 std::chrono::nanoseconds timeout,
-                const SignalNumberSet *signal_mask) -> std::error_code {
+                const signal_number_set *signal_mask) -> std::error_code {
             check_empty(read_fds, fd_bound, "read_fds 2");
             check_empty(write_fds, fd_bound, "write_fds 2");
             check_empty(error_fds, fd_bound, "error_fds 2");

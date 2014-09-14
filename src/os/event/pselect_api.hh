@@ -25,7 +25,7 @@
 #include <system_error>
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_set.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number_set.hh"
 #include "os/time_api.hh"
 
 namespace sesh {
@@ -57,7 +57,7 @@ public:
             io::file_descriptor_set *write_fds,
             io::file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const signaling::SignalNumberSet *signal_mask) const = 0;
+            const signaling::signal_number_set *signal_mask) const = 0;
 
 }; // class pselect_api
 

@@ -29,7 +29,7 @@
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_set.hh"
 #include "os/io/file_descriptor_set_test_helper.hh"
-#include "os/signaling/SignalNumberSet.hh"
+#include "os/signaling/signal_number_set.hh"
 #include "os/time_api_test_helper.hh"
 
 /*
@@ -67,7 +67,7 @@ public:
             io::file_descriptor_set *,
             io::file_descriptor_set *,
             std::chrono::nanoseconds,
-            const signaling::SignalNumberSet *)>;
+            const signaling::signal_number_set *)>;
 
 private:
 
@@ -118,7 +118,7 @@ public:
             io::file_descriptor_set *write_fds,
             io::file_descriptor_set *error_fds,
             std::chrono::nanoseconds timeout,
-            const signaling::SignalNumberSet *signal_mask) const override {
+            const signaling::signal_number_set *signal_mask) const override {
         return m_implementation(
                 *this,
                 fd_bound,

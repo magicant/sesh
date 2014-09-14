@@ -23,7 +23,7 @@
 #include <memory>
 #include "os/event/proactor.hh"
 #include "os/event/pselect_api.hh"
-#include "os/signaling/HandlerConfiguration.hh"
+#include "os/signaling/handler_configuration.hh"
 
 namespace sesh {
 namespace os {
@@ -64,7 +64,7 @@ public:
  */
 std::unique_ptr<awaiter> create_awaiter(
         const pselect_api &api,
-        std::shared_ptr<signaling::HandlerConfiguration> &&hc);
+        std::shared_ptr<signaling::handler_configuration> &&hc);
 
 } // namespace event
 } // namespace os

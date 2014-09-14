@@ -19,34 +19,107 @@
 # subdirectories) and checks if include guards in header files are correctly
 # written.
 
-set -eu
+set -Ceu
 
 cd -- "$(dirname -- "${0}")"
 
-checkdirectives() {
-    set -- $(grep '^[[:space:]]*#.*INCLUDED_' "${headerfile}")
-    macrofilename="$(printf '%s\n' "${headerfile}" | sed 's/[^[:alnum:]]/_/g')"
-    macroname="INCLUDED_${macrofilename}"
-    [ "${#}" -eq 3 ] || return
-    [ "${1}" = "#ifndef ${macroname}" ] || return
-    [ "${2}" = "#define ${macroname}" ] || return
-    [ "${3}" = "#endif // #ifndef ${macroname}" ] || return
+# $1 = line
+is_directive() {
+    case "${1}" in
+        (\#*)
+            true
+            ;;
+        (*#*)
+            printf '%s\n' "${1}" | grep -q '^[[:space:]]*#'
+            ;;
+        (*)
+            false
+            ;;
+    esac
+}
+
+# $1 = error message
+# requires: $header_file, $line_number, $errors
+# modifies: $errors
+err() {
+    errors=$((errors+1))
+    printf 'src/%s:%d: %s\n' "${header_file}" "${line_number}" "${1}" >&2
+}
+
+# $1 = prefix
+# requires: $header_file, $line, $line_number, $macro_name, $errors
+# modifies: $errors
+check_line() {
+    expected_line="${1} ${macro_name}"
+    if [ "${line}" = "${expected_line}" ]
+    then
+        return
+    fi
+
+    expected_line="$(printf '%s\n' "${expected_line}" | cut -c 1-79)"
+    if [ "${line}" = "${expected_line}" ]
+    then
+        return
+    fi
+
+    err "include guard ill-formed
+expected:
+${expected_line}"
+}
+
+# requires: $header_file, $errors
+# modifies: $errors
+check_directives() {
+    macro_filename="$(
+            printf '%s\n' "${header_file}" | sed 's/[^[:alnum:]]/_/g')"
+    macro_name="INCLUDED_${macro_filename}"
+
+    state=expecting_ifndef
+    line_number=0
+    last_directive=
+    last_directive_line_number=0
+    while read -r line
+    do
+        line_number=$((line_number+1))
+
+        if ! is_directive "${line}"
+        then
+            continue
+        fi
+        last_directive="${line}"
+        last_directive_line_number="${line_number}"
+
+        case "${state}" in
+            (expecting_ifndef)
+                check_line '#ifndef'
+                state=expecting_define
+                ;;
+            (expecting_define)
+                check_line '#define'
+                state=reading_rest
+                ;;
+            (reading_rest)
+                ;;
+        esac
+    done <"${header_file}"
+
+    if [ "${last_directive_line_number}" -eq 0 ]
+    then
+        err 'include guard missing'
+    else
+        line="${last_directive}"
+        line_number="${last_directive_line_number}"
+        check_line '#endif // #ifndef'
+    fi
 }
 
 find . -name '*.h' -o -name '*.hh' -o -name '*.tcc' |
 {
-    IFS='
-'
     errors=0
-    while read -r headerfile
+    while read -r header_file
     do
-        headerfile="${headerfile#./}"
-
-        if ! checkdirectives
-        then
-            printf '%s: include guard ill-formed\n' "${headerfile}" >&2
-            errors=$((errors+1))
-        fi
+        header_file="${header_file#./}"
+        check_directives "${header_file}"
     done
     [ "${errors}" -eq 0 ]
 }

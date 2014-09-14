@@ -15,32 +15,32 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_os_signaling_SignalErrorCode_hh
-#define INCLUDED_os_signaling_SignalErrorCode_hh
+#ifndef INCLUDED_os_signaling_signal_error_code_hh
+#define INCLUDED_os_signaling_signal_error_code_hh
 
 #include "buildconfig.h"
 
 #include <system_error>
 #include <type_traits>
-#include "os/signaling/SignalErrorCategory.hh"
+#include "os/signaling/signal_error_category.hh"
 
 namespace sesh {
 namespace os {
 namespace signaling {
 
 /** Error codes for the signal error category. */
-enum class SignalErrorCode {
+enum class signal_error_code {
 
     /**
      * Reports that the trap action could not be changed because the initial
      * action was set to "ignore."
      */
-    INITIALLY_IGNORED = 1,
+    initially_ignored = 1,
 
-}; // enum class SignalErrorCode
+}; // enum class signal_error_code
 
-inline std::error_code make_error_code(SignalErrorCode c) noexcept {
-    return std::error_code(static_cast<int>(c), SIGNAL_ERROR_CATEGORY);
+inline std::error_code make_error_code(signal_error_code c) noexcept {
+    return std::error_code(static_cast<int>(c), signal_error_category);
 }
 
 } // namespace signaling
@@ -50,12 +50,12 @@ inline std::error_code make_error_code(SignalErrorCode c) noexcept {
 namespace std {
 
 template<>
-struct is_error_code_enum<sesh::os::signaling::SignalErrorCode> :
+struct is_error_code_enum<sesh::os::signaling::signal_error_code> :
         public true_type {
 };
 
 } // namespace std
 
-#endif // #ifndef INCLUDED_os_signaling_SignalErrorCode_hh
+#endif // #ifndef INCLUDED_os_signaling_signal_error_code_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
