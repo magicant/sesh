@@ -28,7 +28,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "common/common_result.hh"
+#include "common/function_helper.hh"
 #include "common/functional_initialize.hh"
 #include "common/logic_helper.hh"
 #include "common/type_tag.hh"

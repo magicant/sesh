@@ -331,7 +331,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: awaiting max readable FD") {
-    auto max = file_descriptor_set_impl::MAX_VALUE;
+    auto max = file_descriptor_set_impl::max;
     bool callback_called = false;
     a.expect(readable_file_descriptor(max)).then(
             [this, max, &callback_called](trial<trigger> &&t) {
@@ -358,7 +358,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: domain error from FD set") {
-    auto max = file_descriptor_set_impl::MAX_VALUE;
+    auto max = file_descriptor_set_impl::max;
     bool callback_called = false;
     a.expect(readable_file_descriptor(max + 1)).then(
             [this, &callback_called](trial<trigger> &&t) {

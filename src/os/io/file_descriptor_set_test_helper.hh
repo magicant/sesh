@@ -36,10 +36,10 @@ class file_descriptor_set_fake :
 
 public:
 
-    constexpr static file_descriptor::value_type MAX_VALUE = 20;
+    constexpr static file_descriptor::value_type max = 20;
 
     file_descriptor::value_type max_value() const override {
-        return MAX_VALUE;
+        return max;
     }
 
     bool test(file_descriptor::value_type fd) const override {
@@ -47,7 +47,7 @@ public:
     }
 
     std::pair<iterator, bool> insert(file_descriptor::value_type fd) {
-        if (fd > MAX_VALUE)
+        if (fd > max)
             throw std::domain_error("too large file descriptor");
         return std::set<file_descriptor::value_type>::insert(fd);
     }

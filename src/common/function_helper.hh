@@ -23,6 +23,7 @@
 #include <type_traits>
 #include <utility>
 #include "common/empty.hh"
+#include "common/logic_helper.hh"
 
 namespace sesh {
 namespace common {
@@ -71,6 +72,10 @@ public:
             std::declval<Callable>(), std::declval<Argument>()...));
 }; // template<typename Callable, typename... Argument> class result_of
 
+template<typename Function, typename... Argument>
+class common_result :
+        public same_type<typename result_of<Function, Argument>::type...> { };
+
 } // namespace function_helper_impl
 
 template<typename>
@@ -110,6 +115,28 @@ class result_of<Callable(Argument...)> :
 
 template<typename T>
 using result_of_t = typename result_of<T>::type;
+
+/**
+ * A specialization of this class template will have the "type" member type
+ * alias which is the return type of function calls with the parameter function
+ * and argument types.
+ *
+ * If the function call returns the same return type for all given argument
+ * types, the common result class template has the member type alias "type"
+ * which is the return type. If the return type differs, or the function is not
+ * callable with some of the arguments, or no argument types are given, then
+ * the member type alias is not defined.
+ *
+ * @tparam Function A function object type.
+ * @tparam Argument Argument types that are passed to the function.
+ */
+template<typename Function, typename... Argument>
+class common_result :
+        public std::conditional<
+                for_all<is_callable<Function(Argument)>::value...>::value,
+                function_helper_impl::common_result<Function, Argument...>,
+                empty
+        >::type { };
 
 } // namespace common
 } // namespace sesh
