@@ -17,15 +17,13 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <exception>
 #include <utility>
 #include "async/delay.hh"
 #include "async/future.hh"
 #include "async/promise.hh"
 #include "async/shared_future.hh"
+#include "catch.hpp"
 #include "common/nop.hh"
 #include "common/trial.hh"
 

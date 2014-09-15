@@ -17,10 +17,8 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <type_traits>
+#include "catch.hpp"
 #include "common/type_tag.hh"
 
 namespace {

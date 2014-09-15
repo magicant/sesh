@@ -17,10 +17,8 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <utility>
+#include "catch.hpp"
 #include "language/source/buffer.hh"
 #include "language/source/source.hh"
 #include "language/source/source_test_helper.hh"

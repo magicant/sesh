@@ -17,10 +17,8 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <utility>
+#include "catch.hpp"
 #include "os/io/file_descriptor.hh"
 
 namespace {

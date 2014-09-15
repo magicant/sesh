@@ -17,15 +17,13 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <memory>
 #include <initializer_list>
 #include <iterator>
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include "catch.hpp"
 #include "common/trie.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"

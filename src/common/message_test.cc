@@ -17,11 +17,9 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <utility>
 #include "boost/format.hpp"
+#include "catch.hpp"
 #include "common/message.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"

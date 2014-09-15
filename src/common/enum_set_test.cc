@@ -17,9 +17,7 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-
 #include "common/enum_set.hh"
 #include "common/enum_traits.hh"
 

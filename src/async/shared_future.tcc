@@ -22,7 +22,11 @@
 #include "shared_future.hh"
 
 #include <exception>
+#include <functional>
+#include <memory>
+#include <type_traits>
 #include <utility>
+#include <vector>
 #include "async/future.tcc"
 #include "common/identity.hh"
 #include "common/maybe.hh"

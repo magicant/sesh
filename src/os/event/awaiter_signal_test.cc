@@ -17,14 +17,12 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <chrono>
 #include <system_error>
 #include <utility>
 #include <vector>
 #include "async/future.hh"
+#include "catch.hpp"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter.hh"

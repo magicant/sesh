@@ -17,13 +17,11 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <algorithm>
 #include <exception>
 #include <string>
 #include <utility>
+#include "catch.hpp"
 #include "common/container_helper.hh"
 #include "common/maybe.hh"
 #include "common/type_tag.hh"

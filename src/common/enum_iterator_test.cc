@@ -17,11 +17,9 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <type_traits>
 #include <vector>
+#include "catch.hpp"
 #include "common/enum_iterator.hh"
 #include "common/enum_traits.hh"
 

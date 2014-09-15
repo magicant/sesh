@@ -17,11 +17,9 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <memory>
 #include <system_error>
+#include "catch.hpp"
 #include "common/variant.hh"
 #include "os/io/file_description_access_mode.hh"
 #include "os/io/file_description_api.hh"

@@ -17,11 +17,9 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <stdexcept>
 #include "async/future.hh"
+#include "catch.hpp"
 #include "common/trial.hh"
 #include "common/type_tag_test_helper.hh"
 #include "common/variant.hh"

@@ -17,10 +17,8 @@
 
 #include "buildconfig.h"
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <exception>
+#include "catch.hpp"
 #include "common/trial.hh"
 #include "common/type_tag.hh"
 
