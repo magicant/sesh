@@ -189,8 +189,7 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(
         awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: setting timeout from domain error") {
-    auto fd =
-            readable_file_descriptor(file_descriptor_set_impl::MAX_VALUE + 1);
+    auto fd = readable_file_descriptor(file_descriptor_set_impl::max + 1);
     bool called = false;
     a.expect(fd).wrap().recover([this](std::exception_ptr) {
         return a.expect(timeout(std::chrono::seconds(0)));
