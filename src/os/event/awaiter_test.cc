@@ -95,7 +95,7 @@ TEST_CASE_METHOD(
     future<trigger> f = a.expect(
             timeout(std::chrono::seconds(5)), readable_file_descriptor(3));
     std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         REQUIRE(t->tag() == t->tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(2);
@@ -132,7 +132,7 @@ TEST_CASE_METHOD(
     future<trigger> f = a.expect(
             timeout(std::chrono::seconds(10)), readable_file_descriptor(3));
     std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         REQUIRE(t->tag() == t->tag<readable_file_descriptor>());
         CHECK(t->value<readable_file_descriptor>().value() == 3);
         mutable_steady_clock_now() += std::chrono::seconds(4);
@@ -210,7 +210,7 @@ TEST_CASE_METHOD(
     auto f = a.expect(
             timeout(std::chrono::seconds(1)), readable_file_descriptor(0));
     std::move(f).then([&called](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == t->tag<timeout>());
         called = true;
     });

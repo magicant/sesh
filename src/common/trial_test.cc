@@ -33,13 +33,6 @@ TEST_CASE("Trial, construction") {
     (void) r1, (void) r2;
 }
 
-TEST_CASE("Trial, has value") {
-    trial<int> r1(type_tag<int>(), 5);
-    trial<int> r2((type_tag<std::exception_ptr>()));
-    CHECK(r1.has_value());
-    CHECK_FALSE(r2.has_value());
-}
-
 TEST_CASE("Trial, conversion to bool") {
     trial<int> r1(type_tag<int>(), 5);
     trial<int> r2((type_tag<std::exception_ptr>()));

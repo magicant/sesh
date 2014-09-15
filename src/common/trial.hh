@@ -40,7 +40,7 @@ public:
     using common::variant<T, std::exception_ptr>::variant;
 
     /** Checks if this value has an actual result rather than an exception. */
-    bool has_value() const noexcept {
+    explicit operator bool() const noexcept {
         switch (this->tag()) {
         case trial::template tag<T>():
             return true;
@@ -48,10 +48,6 @@ public:
             return false;
         }
         UNREACHABLE();
-    }
-
-    explicit operator bool() const noexcept {
-        return has_value();
     }
 
     /** Returns a reference to the result value or throws the exception. */

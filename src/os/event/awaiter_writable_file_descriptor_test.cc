@@ -56,7 +56,7 @@ TEST_CASE_METHOD(
     mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(writable_file_descriptor(4));
     std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<writable_file_descriptor>());
         CHECK(t->value<writable_file_descriptor>().value() == 4);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
@@ -94,7 +94,7 @@ TEST_CASE_METHOD(
     future<trigger> f = a.expect(
             writable_file_descriptor(2), writable_file_descriptor(0));
     std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<writable_file_descriptor>());
         CHECK(t->value<writable_file_descriptor>().value() == 0);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
@@ -133,7 +133,7 @@ TEST_CASE_METHOD(
     future<trigger> f = a.expect(
             writable_file_descriptor(2), writable_file_descriptor(0));
     std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<writable_file_descriptor>());
         auto fd = t->value<writable_file_descriptor>().value();
         if (fd != 0)
@@ -172,7 +172,7 @@ TEST_CASE_METHOD(
 
     a.expect(writable_file_descriptor(1)).then(
             [this, start_time](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<writable_file_descriptor>());
         CHECK(t->value<writable_file_descriptor>().value() == 1);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(9));
@@ -180,7 +180,7 @@ TEST_CASE_METHOD(
     });
     a.expect(writable_file_descriptor(3)).then(
             [this, start_time](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<writable_file_descriptor>());
         CHECK(t->value<writable_file_descriptor>().value() == 3);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(28));
@@ -233,7 +233,7 @@ TEST_CASE_METHOD(
     mutable_steady_clock_now() = start_time;
 
     auto callback = [this, start_time](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<writable_file_descriptor>());
         CHECK(t->value<writable_file_descriptor>().value() == 7);
         mutable_steady_clock_now() += std::chrono::seconds(1);

@@ -98,7 +98,7 @@ TEST_CASE("Write: empty") {
 
     bool called = false;
     std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd);
         CHECK(r->second.value() == 0);
@@ -178,7 +178,7 @@ TEST_CASE_METHOD(write_test_fixture, "Write: one byte") {
 
     bool called = false;
     std::move(f).then([&called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd_value);
         CHECK(r->second.value() == 0);
@@ -206,7 +206,7 @@ TEST_CASE_METHOD(write_test_fixture, "Write: 25 bytes in three writes") {
 
     bool called = false;
     std::move(f).then([&called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd_value);
         CHECK(r->second.value() == 0);
@@ -254,7 +254,7 @@ TEST_CASE("Write: domain error in proactor") {
 
     bool called = false;
     std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd);
         CHECK(r->second ==
@@ -287,7 +287,7 @@ TEST_CASE("Write: write error") {
 
     bool called = false;
     std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd);
         CHECK(r->second == std::make_error_code(std::errc::io_error));

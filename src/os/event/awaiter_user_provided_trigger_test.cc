@@ -54,7 +54,7 @@ TEST_CASE_METHOD(
     future<trigger> f =
             a.expect(user_provided_trigger(make_future_of(result)));
     std::move(f).then([this, &result](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         REQUIRE(t->tag() == trigger::tag<user_provided_trigger>());
         CHECK(t->value<user_provided_trigger>().result() == result);
         mutable_steady_clock_now() += std::chrono::seconds(2);
@@ -99,7 +99,7 @@ TEST_CASE_METHOD(
             UPT(make_promise_future_pair<UPT::result_type>().second),
             UPT(make_future_of(result)));
     std::move(f).then([this, &result](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         REQUIRE(t->tag() == trigger::tag<user_provided_trigger>());
         CHECK(t->value<user_provided_trigger>().result() == result);
         mutable_steady_clock_now() += std::chrono::seconds(2);
@@ -122,7 +122,7 @@ TEST_CASE_METHOD(
     auto f3 = a.expect(user_provided_trigger(std::move(f2)));
     std::shared_ptr<void> actual;
     std::move(f3).then([&actual](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         REQUIRE(t->tag() == trigger::tag<user_provided_trigger>());
         actual = t->value<user_provided_trigger>().result();
     });

@@ -344,7 +344,7 @@ TEST_CASE("Shared future: wrap, throwing copy constructor") {
 
     int i = 0;
     f.wrap().then([&i](trial<future<throwing_copyable>> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         std::move(*t).then([&i](trial<throwing_copyable> &&t) {
             try {
                 *t;
@@ -410,7 +410,7 @@ TEST_CASE("Shared future: wrap shared, throwing copy constructor") {
 
     int i = 0;
     f.wrap_shared().then([&i](trial<shared_future<throwing_copyable>> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         t->then([&i](const trial<throwing_copyable> &t) {
             try {
                 *t;
