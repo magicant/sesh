@@ -152,7 +152,7 @@ private:
 public:
 
     /** Checks if this node has a value. */
-    bool has_value() const noexcept { return m_value.has_value(); }
+    bool has_value() const noexcept { return !!m_value; }
 
     /**
      * Returns a reference to the value of this node. The behavior is undefined

@@ -73,7 +73,7 @@ void shared_future_base<T>::impl::set_result(common::trial<T> &&t) {
 
 template<typename T>
 void shared_future_base<T>::impl::add_callback(callback &&c) {
-    if (m_result.has_value())
+    if (m_result)
         return c(*m_result);
     m_callbacks.push_back(std::move(c));
 }
@@ -222,7 +222,7 @@ public:
             m_receiver(std::move(receiver)) { }
 
     void operator()(const common::trial<shared_future<T>> &r) {
-        if (r.has_value())
+        if (r)
             return r->forward(std::move(m_receiver));
 
         std::move(m_receiver).fail(r.template value<std::exception_ptr>());

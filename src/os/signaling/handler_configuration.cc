@@ -164,14 +164,14 @@ public:
             const signal_action *new_action) {
         signal_action old_action = handler_configuration_api::default_action();
         std::error_code e = api.sigaction(n, new_action, &old_action);
-        if (!m_initial_action.has_value())
+        if (!m_initial_action)
             m_initial_action.emplace(std::move(old_action));
         return e;
     }
 
     std::error_code get_initial_action_if_unknown(
             const handler_configuration_api &api, signal_number n) {
-        if (m_initial_action.has_value())
+        if (m_initial_action)
             return std::error_code();
         return sigaction(api, n, nullptr);
     }

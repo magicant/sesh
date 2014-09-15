@@ -125,12 +125,9 @@ public:
     }
 
     /** Returns true if and only if this maybe object is non-empty. */
-    bool has_value() const noexcept {
+    explicit operator bool() const noexcept {
         return m_value.tag() != m_value.template tag<nil>();
     }
-
-    /** Same as {@link #has_value()}. */
-    explicit operator bool() const noexcept { return has_value(); }
 
     /**
      * Returns a reference to the contained object. The maybe object must not
@@ -175,7 +172,7 @@ public:
      * maybe object is empty.
      */
     T &value_or(T &alternative) noexcept {
-        return has_value() ? value() : alternative;
+        return *this ? value() : alternative;
     }
 
     /**
@@ -185,7 +182,7 @@ public:
      * maybe object is empty.
      */
     const T &value_or(const T &alternative) const noexcept {
-        return has_value() ? value() : alternative;
+        return *this ? value() : alternative;
     }
 
     /**
@@ -206,7 +203,7 @@ public:
     maybe &operator=(U &&v)
             noexcept(std::is_nothrow_constructible<T, U &&>::value &&
                     std::is_nothrow_assignable<T &, U &&>::value) {
-        if (has_value())
+        if (*this)
             value() = std::forward<U>(v);
         else
             emplace(std::forward<U>(v));
@@ -227,8 +224,8 @@ public:
     void swap(maybe &other)
             noexcept(decltype(m_value)::is_nothrow_swappable &&
                     decltype(m_value)::is_nothrow_move_constructible) {
-        if (this->has_value()) {
-            if (other.has_value()) {
+        if (*this) {
+            if (other) {
                 using std::swap;
                 swap(this->value(), other.value());
             } else {
@@ -236,7 +233,7 @@ public:
                 this->clear();
             }
         } else {
-            if (other.has_value()) {
+            if (other) {
                 this->emplace(std::move(other.value()));
                 other.clear();
             } else {
@@ -274,10 +271,10 @@ void swap(maybe<T> &a, maybe<T> &b) noexcept(noexcept(a.swap(b))) {
 template<typename T>
 bool operator==(const maybe<T> &a, const maybe<T> &b)
         noexcept(noexcept(a.value() == b.value())) {
-    if (a.has_value())
-        return b.has_value() && a.value() == b.value();
+    if (a)
+        return b && a.value() == b.value();
     else
-        return !b.has_value();
+        return !b;
 }
 
 /**
@@ -293,7 +290,7 @@ bool operator==(const maybe<T> &a, const maybe<T> &b)
 template<typename T>
 bool operator<(const maybe<T> &a, const maybe<T> &b)
         noexcept(noexcept(a.value() < b.value())) {
-    return b.has_value() && (!a.has_value() || a.value() < b.value());
+    return b && (!a || a.value() < b.value());
 }
 
 /**

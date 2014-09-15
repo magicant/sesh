@@ -61,7 +61,7 @@ maybe<xstring> word::compute_maybe_constant_value() const {
 }
 
 const maybe<xstring> &word::maybe_constant_value() const {
-    if (!m_maybe_constant_value_cache.has_value())
+    if (!m_maybe_constant_value_cache)
         m_maybe_constant_value_cache.emplace(compute_maybe_constant_value());
     return m_maybe_constant_value_cache.value();
 }
