@@ -197,11 +197,11 @@ TEST_CASE("Maybe value or") {
 TEST_CASE("Maybe emplacement") {
     maybe<std::string> m;
 
-    m.emplace("test");
+    m.try_emplace("test");
     REQUIRE(m);
     CHECK(m.value() == "test");
 
-    m.emplace(3, '!');
+    m.try_emplace(3, '!');
     REQUIRE(m);
     CHECK(m.value() == "!!!");
 }
@@ -210,22 +210,22 @@ TEST_CASE("Maybe emplacement with exception from constructor") {
     maybe<default_throws> m;
 
     CHECK_FALSE(m);
-    CHECK_THROWS_AS(m.emplace(), exception);
+    CHECK_THROWS_AS(m.try_emplace(), exception);
     CHECK_FALSE(m);
 
-    CHECK_NOTHROW(m.emplace(0));
+    CHECK_NOTHROW(m.try_emplace(0));
     CHECK(m);
-    CHECK_THROWS_AS(m.emplace(), exception);
+    CHECK_THROWS_AS(m.try_emplace(), exception);
     CHECK_FALSE(m);
 }
 
 TEST_CASE("Maybe emplacement with exception from destructor") {
     maybe<destructor_throws> m;
 
-    CHECK_NOTHROW(m.emplace());
+    CHECK_NOTHROW(m.try_emplace());
     CHECK(m);
 
-    CHECK_THROWS_AS(m.emplace(), exception);
+    CHECK_THROWS_AS(m.try_emplace(), exception);
     CHECK_FALSE(m);
 }
 
@@ -240,7 +240,7 @@ TEST_CASE("Maybe clear") {
 TEST_CASE("Maybe clear with exception from destructor") {
     maybe<destructor_throws> m;
 
-    CHECK_NOTHROW(m.emplace());
+    CHECK_NOTHROW(m.try_emplace());
     CHECK(m);
 
     CHECK_THROWS_AS(m.clear(), exception);

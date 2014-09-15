@@ -192,7 +192,7 @@ public:
         if (has_value())
             return std::pair<Value &, bool>(value(), false);
 
-        m_value.emplace(std::forward<Arg>(arg)...);
+        m_value.try_emplace(std::forward<Arg>(arg)...);
         increment_size();
         return std::pair<Value &, bool>(value(), true);
     }

@@ -165,7 +165,7 @@ public:
         signal_action old_action = handler_configuration_api::default_action();
         std::error_code e = api.sigaction(n, new_action, &old_action);
         if (!m_initial_action)
-            m_initial_action.emplace(std::move(old_action));
+            m_initial_action.try_emplace(std::move(old_action));
         return e;
     }
 

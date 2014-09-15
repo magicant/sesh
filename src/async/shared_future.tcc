@@ -61,9 +61,9 @@ public:
 template<typename T>
 void shared_future_base<T>::impl::set_result(common::trial<T> &&t) {
     try {
-        m_result.emplace(std::move(t));
+        m_result.try_emplace(std::move(t));
     } catch (...) {
-        m_result.emplace(std::current_exception());
+        m_result.try_emplace(std::current_exception());
     }
 
     for (callback &c : m_callbacks)

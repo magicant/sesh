@@ -108,7 +108,7 @@ public:
      * @param arg arguments to the contained object's constructor.
      */
     template<typename... Arg>
-    void emplace(Arg &&... arg)
+    void try_emplace(Arg &&... arg)
             noexcept(std::is_nothrow_destructible<T>::value &&
                     std::is_nothrow_constructible<T, Arg...>::value) {
         m_value.template emplace_with_fallback<nil>(
@@ -206,7 +206,7 @@ public:
         if (*this)
             value() = std::forward<U>(v);
         else
-            emplace(std::forward<U>(v));
+            try_emplace(std::forward<U>(v));
         return *this;
     }
 
@@ -229,12 +229,12 @@ public:
                 using std::swap;
                 swap(this->value(), other.value());
             } else {
-                other.emplace(std::move(this->value()));
+                other.try_emplace(std::move(this->value()));
                 this->clear();
             }
         } else {
             if (other) {
-                this->emplace(std::move(other.value()));
+                this->try_emplace(std::move(other.value()));
                 other.clear();
             } else {
                 // Nothing to do.
