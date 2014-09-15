@@ -23,7 +23,7 @@
 #include <map>
 #include <memory>
 #include <utility>
-#include "common/maybe.hh"
+#include "common/either.hh"
 #include "common/shared_function.hh"
 #include "helpermacros.h"
 #include "os/signaling/handler_configuration_api.hh"

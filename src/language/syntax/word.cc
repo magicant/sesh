@@ -23,7 +23,7 @@
 #include <iterator>
 #include <utility>
 #include <vector>
-#include "common/maybe.hh"
+#include "common/either.hh"
 #include "common/xstring.hh"
 
 using sesh::common::make_maybe_of;

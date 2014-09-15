@@ -28,8 +28,8 @@
 #include <utility>
 #include <vector>
 #include "async/future.tcc"
+#include "common/either.hh"
 #include "common/identity.hh"
-#include "common/maybe.hh"
 #include "common/trial.hh"
 
 namespace sesh {

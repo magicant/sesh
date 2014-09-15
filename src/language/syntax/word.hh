@@ -23,7 +23,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include "common/maybe.hh"
+#include "common/either.hh"
 #include "common/xstring.hh"
 #include "language/syntax/printable.hh"
 #include "language/syntax/word_component.hh"

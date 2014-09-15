@@ -31,7 +31,6 @@ TESTPROGRAMS = \
 	src/common/enum_iterator_test \
 	src/common/enum_set_test \
 	src/common/function_helper_test \
-	src/common/maybe_test \
 	src/common/message_test \
 	src/common/reference_test \
 	src/common/shared_function_test \
@@ -111,7 +110,6 @@ src_sesh_SOURCES = \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
 	src/common/logic_helper.hh \
-	src/common/maybe.hh \
 	src/common/message.cc \
 	src/common/message.hh \
 	src/common/nop.hh \
@@ -239,9 +237,6 @@ src_common_enum_set_test_SOURCES = \
 src_common_function_helper_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/function_helper_test.cc
-src_common_maybe_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/maybe_test.cc
 src_common_message_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/message.cc \

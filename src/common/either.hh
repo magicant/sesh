@@ -253,6 +253,43 @@ public:
 
 }; // template<typename L, typename R> class either
 
+template<typename T>
+using maybe = either<empty, T>;
+
+/**
+ * Creates a new maybe object that contains the argument. The contained object
+ * is directly constructed by calling its constructor.
+ *
+ * Propagates any exception thrown by the constructor.
+ *
+ * @tparam T the type of the new contained object.
+ * @tparam Arg constructor argument types
+ * @param arg arguments to the contained object's constructor.
+ */
+template<typename T, typename... Arg>
+maybe<T> make_maybe(Arg &&... arg)
+        noexcept(std::is_nothrow_constructible<T, Arg &&...>::value) {
+    return maybe<T>(type_tag<T>(), std::forward<Arg>(arg)...);
+}
+
+/**
+ * Creates a new maybe object that contains the argument. This is a
+ * single-argument version of {@link make_maybe} that allows inference of the
+ * contained type.
+ *
+ * Propagates any exception thrown by the constructor.
+ *
+ * @tparam T the (usually inferred) type of the argument.
+ * @tparam U the actual type of the new contained object.
+ * @param v a reference to the original value.
+ */
+template<typename T, typename U = typename std::decay<T>::type>
+maybe<U> make_maybe_of(T &&v)
+        noexcept(std::is_nothrow_constructible<maybe<U>, type_tag<U>, T &&>::
+                value) {
+    return maybe<U>(type_tag<U>(), std::forward<T>(v));
+}
+
 } // namespace common
 } // namespace sesh
 
