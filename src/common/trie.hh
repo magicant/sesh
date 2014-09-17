@@ -158,12 +158,12 @@ public:
      * Returns a reference to the value of this node. The behavior is undefined
      * if this node has no value.
      */
-    Value &value() { return m_value.value(); }
+    Value &value() { return *m_value; }
     /**
      * Returns a reference to the value of this node. The behavior is undefined
      * if this node has no value.
      */
-    const Value &value() const { return m_value.value(); }
+    const Value &value() const { return *m_value; }
 
     /**
      * Returns a reference to the maybe object that may contain the value of

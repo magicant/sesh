@@ -116,7 +116,7 @@ TEST_CASE("Trie, node value") {
     CHECK(e1.second);
     CHECK(t.maybe_value());
     CHECK(t.has_value());
-    CHECK(std::addressof(e1.first) == std::addressof(t.maybe_value().value()));
+    CHECK(std::addressof(e1.first) == std::addressof(*t.maybe_value()));
     CHECK(std::addressof(e1.first) == std::addressof(t.value()));
 
     // emplace_value has no effect because the value already exists
@@ -126,15 +126,14 @@ TEST_CASE("Trie, node value") {
     CHECK_FALSE(e2.second);
     CHECK(t.maybe_value());
     CHECK(t.has_value());
-    CHECK(std::addressof(e2.first) == std::addressof(t.maybe_value().value()));
+    CHECK(std::addressof(e2.first) == std::addressof(*t.maybe_value()));
     CHECK(std::addressof(e2.first) == std::addressof(t.value()));
 
     auto &int_pair1 = t.get_or_create_value(); // no effect again
     CHECK(int_pair1.first == 1);
     CHECK(int_pair1.second == 2);
     CHECK(t.has_value());
-    CHECK(std::addressof(int_pair1) ==
-            std::addressof(t.maybe_value().value()));
+    CHECK(std::addressof(int_pair1) == std::addressof(*t.maybe_value()));
     CHECK(std::addressof(int_pair1) == std::addressof(t.value()));
 
     t.erase_value();
@@ -149,8 +148,7 @@ TEST_CASE("Trie, node value") {
     CHECK(int_pair2.first == 0);
     CHECK(int_pair2.second == 0);
     CHECK(t.has_value());
-    CHECK(std::addressof(int_pair2) ==
-            std::addressof(t.maybe_value().value()));
+    CHECK(std::addressof(int_pair2) == std::addressof(*t.maybe_value()));
     CHECK(std::addressof(int_pair2) == std::addressof(t.value()));
 }
 

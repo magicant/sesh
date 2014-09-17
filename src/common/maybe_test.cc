@@ -143,19 +143,6 @@ TEST_CASE("Maybe Boolean conversion") {
     CHECK(m2);
 }
 
-TEST_CASE("Maybe value") {
-    maybe<int> m1(123);
-    CHECK(m1.value() == 123);
-    m1.value() = 456;
-
-    const maybe<int> m2(m1);
-    CHECK(m2.value() == 456);
-
-    maybe<std::string> m3(type_tag<std::string>(), 5, '*');
-    maybe<std::string> m4(std::move(m3));
-    CHECK(m4.value() == "*****");
-}
-
 TEST_CASE("Maybe *") {
     maybe<std::string> m1("");
     CHECK_NOTHROW((*m1).assign(3, '*'));
@@ -187,7 +174,7 @@ TEST_CASE("Maybe value or") {
     maybe<int> m2(456);
     CHECK(m2.value_or(123) == 456);
     m2.value_or(i) = 789;
-    CHECK(m2.value() == 789);
+    CHECK(*m2 == 789);
     CHECK(i == 456);
 
     const maybe<int> m2c(m2);
@@ -199,11 +186,11 @@ TEST_CASE("Maybe emplacement") {
 
     m.try_emplace("test");
     REQUIRE(m);
-    CHECK(m.value() == "test");
+    CHECK(*m == "test");
 
     m.try_emplace(3, '!');
     REQUIRE(m);
-    CHECK(m.value() == "!!!");
+    CHECK(*m == "!!!");
 }
 
 TEST_CASE("Maybe emplacement with exception from constructor") {
@@ -256,18 +243,18 @@ TEST_CASE("Maybe assignment") {
 
     m1 = m2;
     REQUIRE(m1);
-    CHECK(m1.value() == 123L);
+    CHECK(*m1 == 123L);
 
     m1 = maybe<long>(456L);
     REQUIRE(m1);
-    CHECK(m1.value() == 456L);
+    CHECK(*m1 == 456L);
 
     m1 = maybe<long>();
     CHECK_FALSE(m1);
 
     m1 = 789;
     REQUIRE(m1);
-    CHECK(m1.value() == 789L);
+    CHECK(*m1 == 789L);
 }
 
 TEST_CASE("Maybe assignment optimization") {
@@ -301,14 +288,14 @@ TEST_CASE("Maybe swap, both non-empty") {
     swap(m1, m2);
     REQUIRE(m1);
     REQUIRE(m2);
-    CHECK(m1.value() == "XYZ");
-    CHECK(m2.value() == "ABC");
+    CHECK(*m1 == "XYZ");
+    CHECK(*m2 == "ABC");
 
     m2.swap(m1);
     REQUIRE(m1);
     REQUIRE(m2);
-    CHECK(m1.value() == "ABC");
-    CHECK(m2.value() == "XYZ");
+    CHECK(*m1 == "ABC");
+    CHECK(*m2 == "XYZ");
 }
 
 TEST_CASE("Maybe swap, empty and non-empty") {
@@ -377,11 +364,11 @@ TEST_CASE("Maybe, create maybe") {
 
     maybe<int> m1 = make_maybe<int>(123);
     REQUIRE(m1);
-    CHECK(m1.value() == 123);
+    CHECK(*m1 == 123);
 
     maybe<std::string> m2 = make_maybe<std::string>("ABC", 2);
     REQUIRE(m2);
-    CHECK(m2.value() == "AB");
+    CHECK(*m2 == "AB");
 
     auto m3 = make_maybe<move_only>();
     CHECK(m3);
@@ -407,11 +394,11 @@ TEST_CASE("Maybe, create maybe of") {
 
     maybe<int> m1 = make_maybe_of(123);
     REQUIRE(m1);
-    CHECK(m1.value() == 123);
+    CHECK(*m1 == 123);
 
     maybe<std::string> m2 = make_maybe_of<std::string>("ABC");
     REQUIRE(m2);
-    CHECK(m2.value() == "ABC");
+    CHECK(*m2 == "ABC");
 
     auto m3 = make_maybe_of(move_only());
     CHECK(m3);

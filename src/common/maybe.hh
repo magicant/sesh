@@ -133,56 +133,44 @@ public:
      * Returns a reference to the contained object. The maybe object must not
      * be empty.
      */
-    T &value() noexcept { return m_value.template value<T>(); }
+    T &operator*() noexcept { return m_value.template value<T>(); }
 
     /**
      * Returns a reference to the contained object. The maybe object must not
      * be empty.
      */
-    const T &value() const noexcept { return m_value.template value<T>(); }
-
-    /**
-     * Returns a reference to the contained object. The maybe object must not
-     * be empty.
-     */
-    T &operator*() noexcept { return value(); }
-
-    /**
-     * Returns a reference to the contained object. The maybe object must not
-     * be empty.
-     */
-    const T &operator*() const noexcept { return value(); }
+    const T &operator*() const noexcept { return m_value.template value<T>(); }
 
     /**
      * Returns a pointer to the contained object. The maybe object must not be
      * empty.
      */
-    T *operator->() noexcept { return std::addressof(value()); }
+    T *operator->() noexcept { return std::addressof(**this); }
 
     /**
      * Returns a pointer to the contained object. The maybe object must not be
      * empty.
      */
-    const T *operator->() const noexcept { return std::addressof(value()); }
+    const T *operator->() const noexcept { return std::addressof(**this); }
 
     /**
-     * Returns {@link #value()} if non-empty. Otherwise, returns a reference to
+     * Returns the value if non-empty. Otherwise, returns a reference to
      * the argument.
      * @param alternative an object to which reference is returned if this
      * maybe object is empty.
      */
     T &value_or(T &alternative) noexcept {
-        return *this ? value() : alternative;
+        return *this ? **this : alternative;
     }
 
     /**
-     * Returns {@link #value()} if non-empty. Otherwise, returns a reference to
+     * Returns the value if non-empty. Otherwise, returns a reference to
      * the argument.
      * @param alternative an object to which reference is returned if this
      * maybe object is empty.
      */
     const T &value_or(const T &alternative) const noexcept {
-        return *this ? value() : alternative;
+        return *this ? **this : alternative;
     }
 
     /**
@@ -204,7 +192,7 @@ public:
             noexcept(std::is_nothrow_constructible<T, U &&>::value &&
                     std::is_nothrow_assignable<T &, U &&>::value) {
         if (*this)
-            value() = std::forward<U>(v);
+            **this = std::forward<U>(v);
         else
             try_emplace(std::forward<U>(v));
         return *this;
@@ -227,14 +215,14 @@ public:
         if (*this) {
             if (other) {
                 using std::swap;
-                swap(this->value(), other.value());
+                swap(**this, *other);
             } else {
-                other.try_emplace(std::move(this->value()));
+                other.try_emplace(std::move(**this));
                 this->clear();
             }
         } else {
             if (other) {
-                this->try_emplace(std::move(other.value()));
+                this->try_emplace(std::move(*other));
                 other.clear();
             } else {
                 // Nothing to do.
@@ -270,9 +258,9 @@ void swap(maybe<T> &a, maybe<T> &b) noexcept(noexcept(a.swap(b))) {
  */
 template<typename T>
 bool operator==(const maybe<T> &a, const maybe<T> &b)
-        noexcept(noexcept(a.value() == b.value())) {
+        noexcept(noexcept(*a == *b)) {
     if (a)
-        return b && a.value() == b.value();
+        return b && *a == *b;
     else
         return !b;
 }
@@ -289,8 +277,8 @@ bool operator==(const maybe<T> &a, const maybe<T> &b)
  */
 template<typename T>
 bool operator<(const maybe<T> &a, const maybe<T> &b)
-        noexcept(noexcept(a.value() < b.value())) {
-    return b && (!a || a.value() < b.value());
+        noexcept(noexcept(*a < *b)) {
+    return b && (!a || *a < *b);
 }
 
 /**

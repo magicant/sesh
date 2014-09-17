@@ -45,15 +45,15 @@ class non_constant : public word_component {
 TEST_CASE("Word, constant value") {
     word w1, w2;
     REQUIRE(w1.maybe_constant_value());
-    CHECK(w1.maybe_constant_value().value() == xstring());
+    CHECK(*w1.maybe_constant_value() == xstring());
 
     w1.add_component(word::component_pointer(new raw_string(L("ABC"))));
     REQUIRE(w1.maybe_constant_value());
-    CHECK(w1.maybe_constant_value().value() == L("ABC"));
+    CHECK(*w1.maybe_constant_value() == L("ABC"));
 
     w1.add_component(word::component_pointer(new raw_string(L("123"))));
     REQUIRE(w1.maybe_constant_value());
-    CHECK(w1.maybe_constant_value().value() == L("ABC123"));
+    CHECK(*w1.maybe_constant_value() == L("ABC123"));
 
     w1.add_component(word::component_pointer(new non_constant));
     CHECK_FALSE(w1.maybe_constant_value());
@@ -62,7 +62,7 @@ TEST_CASE("Word, constant value") {
     w2.append(std::move(w1));
     CHECK_FALSE(w2.maybe_constant_value());
     REQUIRE(w1.maybe_constant_value());
-    CHECK(w1.maybe_constant_value().value() == xstring());
+    CHECK(*w1.maybe_constant_value() == xstring());
 }
 
 TEST_CASE("Word, is raw string") {
