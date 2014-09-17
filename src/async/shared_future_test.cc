@@ -364,14 +364,14 @@ TEST_CASE("Shared future: wrap shared, success") {
 
     int i = 0;
     std::move(pf2.second).then([&i](trial<shared_future<int>> &&r) {
-        r->then([&i](const trial<int> &r) {
+        r.get().then([&i](const trial<int> &r) {
             i = r.get();
         });
     });
     CHECK(i == 123);
 
     f1.wrap_shared().then([&i](trial<shared_future<int>> &&r) {
-        r->then([&i](const trial<int> &r) {
+        r.get().then([&i](const trial<int> &r) {
             i = 2 * r.get();
         });
     });

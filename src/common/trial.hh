@@ -87,14 +87,20 @@ public:
         return this->template value<T>();
     }
 
-    /** Returns a pointer to the result value or throws the exception. */
+    /**
+     * Returns a pointer to the result value. This function can be called
+     * only when this trial has a valid result value.
+     */
     T *operator->() {
-        return std::addressof(get());
+        return std::addressof(**this);
     }
 
-    /** Returns a pointer to the result value or throws the exception. */
+    /**
+     * Returns a pointer to the result value. This function can be called
+     * only when this trial has a valid result value.
+     */
     const T *operator->() const {
-        return std::addressof(get());
+        return std::addressof(**this);
     }
 
 }; // template<typename T> class trial
