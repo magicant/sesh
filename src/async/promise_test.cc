@@ -56,7 +56,7 @@ TEST_CASE("Promise, setting result by construction, value") {
 
     int i = 0;
     double d = 0.0;
-    dly->set_callback([&i, &d](trial<P> &&r) { std::tie(i, d) = *r; });
+    dly->set_callback([&i, &d](trial<P> &&r) { std::tie(i, d) = r.get(); });
     CHECK(i == 1);
     CHECK(d == 2.0);
 }
@@ -74,7 +74,7 @@ TEST_CASE("Promise, setting result by function, value") {
     std::move(p).set_result_from([] { return 1; });
 
     int i = 0;
-    d->set_callback([&i](trial<int> &&r) { i = *r; });
+    d->set_callback([&i](trial<int> &&r) { i = r.get(); });
     CHECK(i == 1);
 }
 
@@ -93,7 +93,7 @@ TEST_CASE("Promise, setting result to exception, value") {
     char c = '\0';
     d->set_callback([&c](trial<int> &&r) {
         try {
-            *r;
+            r.get();
         } catch (char c2) {
             c = c2;
         }
@@ -120,7 +120,7 @@ TEST_CASE("Promise, setting result to current exception, value") {
     char c = '\0';
     d->set_callback([&c](trial<int> &&r) {
         try {
-            *r;
+            r.get();
         } catch (char c2) {
             c = c2;
         }

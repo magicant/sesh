@@ -75,7 +75,7 @@ TEST_CASE_METHOD(
                 make_failed_future_of<std::shared_ptr<void>>(7)));
     std::move(f).then([this](trial<trigger> &&t) {
         try {
-            *t;
+            t.get();
         } catch (int i) {
             CHECK(i == 7);
             mutable_steady_clock_now() += std::chrono::seconds(2);

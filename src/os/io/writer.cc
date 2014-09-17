@@ -62,7 +62,7 @@ struct writer {
 
     future<result_pair> operator()(trial<trigger> &&t) {
         try {
-            *t;
+            t.get();
         } catch (std::domain_error &e) {
             return operator()(
                     std::make_error_code(std::errc::too_many_files_open));

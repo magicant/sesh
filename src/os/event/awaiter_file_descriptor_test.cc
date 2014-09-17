@@ -363,7 +363,7 @@ TEST_CASE_METHOD(
     a.expect(readable_file_descriptor(max + 1)).then(
             [this, &callback_called](trial<trigger> &&t) {
         try {
-            *t;
+            t.get();
         } catch (std::domain_error &) {
             callback_called = true;
         }

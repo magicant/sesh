@@ -42,26 +42,16 @@ TEST_CASE("Trial, conversion to bool") {
 
 TEST_CASE("Trial, operator*, value") {
     trial<int> r(type_tag<int>(), 42);
-    CHECK(*r == 42);
-    CHECK_NOTHROW(*r = 123);
-    CHECK(*const_cast<const trial<int> &>(r) == 123);
+    CHECK(r.get() == 42);
+    CHECK_NOTHROW(r.get() = 123);
+    CHECK(const_cast<const trial<int> &>(r).get() == 123);
 }
 
 TEST_CASE("Trial, operator*, exception") {
     class E {};
     trial<int> r(type_tag<std::exception_ptr>(), std::make_exception_ptr(E()));
-    CHECK_THROWS_AS(*r, E);
-    CHECK_THROWS_AS(*const_cast<const trial<int> &>(r), E);
-}
-
-TEST_CASE("Trial, operator->, value") {
-    struct V {
-        int get() noexcept { return 1; }
-        int get() const noexcept { return 2; }
-    };
-    trial<V> r((type_tag<V>()));
-    CHECK(r->get() == 1);
-    CHECK(const_cast<const trial<V> &>(r)->get() == 2);
+    CHECK_THROWS_AS(r.get(), E);
+    CHECK_THROWS_AS(const_cast<const trial<int> &>(r).get(), E);
 }
 
 } // namespace

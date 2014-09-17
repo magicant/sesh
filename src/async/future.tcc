@@ -105,14 +105,15 @@ public:
     mapper(F &&function) : m_function(std::forward<F>(function)) { }
 
     template<typename From>
-    auto operator()(const common::trial<From> &r) -> decltype(m_function(*r)) {
-        return m_function(*r);
+    auto operator()(const common::trial<From> &r)
+            -> decltype(m_function(r.get())) {
+        return m_function(r.get());
     }
 
     template<typename From>
     auto operator()(common::trial<From> &&r)
-            -> decltype(m_function(std::move(*r))) {
-        return m_function(std::move(*r));
+            -> decltype(m_function(std::move(r.get()))) {
+        return m_function(std::move(r.get()));
     }
 
 };

@@ -51,7 +51,7 @@ public:
     }
 
     /** Returns a reference to the result value or throws the exception. */
-    T &operator*() {
+    T &get() {
         switch (this->tag()) {
         case trial::template tag<T>():
             return this->template value<T>();
@@ -62,7 +62,7 @@ public:
     }
 
     /** Returns a reference to the result value or throws the exception. */
-    const T &operator*() const {
+    const T &get() const {
         switch (this->tag()) {
         case trial::template tag<T>():
             return this->template value<T>();
@@ -72,14 +72,29 @@ public:
         UNREACHABLE();
     }
 
+    /**
+     * Returns a reference to the result value. This function can be called
+     * only when this trial has a valid result value.
+     */
+    T &operator*() {
+        return this->template value<T>();
+    }
+    /**
+     * Returns a reference to the result value. This function can be called
+     * only when this trial has a valid result value.
+     */
+    const T &operator*() const {
+        return this->template value<T>();
+    }
+
     /** Returns a pointer to the result value or throws the exception. */
     T *operator->() {
-        return std::addressof(**this);
+        return std::addressof(get());
     }
 
     /** Returns a pointer to the result value or throws the exception. */
     const T *operator->() const {
-        return std::addressof(**this);
+        return std::addressof(get());
     }
 
 }; // template<typename T> class trial

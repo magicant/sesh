@@ -69,7 +69,7 @@ TEST_CASE("Future, setting callback") {
     future<int> f(d);
 
     int i = 0;
-    std::move(f).then([&i](trial<int> &&r) { i = *r; });
+    std::move(f).then([&i](trial<int> &&r) { i = r.get(); });
 
     CHECK(i == 0);
     d->set_result(1);
@@ -89,7 +89,7 @@ TEST_CASE("Create promise/future pair") {
     std::move(pf.first).set_result(123);
 
     int i = 0;
-    std::move(pf.second).then([&i](trial<int> &&r) { i = *r; });
+    std::move(pf.second).then([&i](trial<int> &&r) { i = r.get(); });
     CHECK(i == 123);
 }
 
@@ -100,11 +100,11 @@ TEST_CASE("Future, then, to promise, success") {
             make_promise_future_pair<double>();
 
     int i = 0;
-    const auto f = [&i](trial<int> &&v) -> double { i = *v; return 2.0; };
+    const auto f = [&i](trial<int> &&v) -> double { i = v.get(); return 2.0; };
     std::move(f1).then(f, std::move(pf2.first));
 
     double d = 0.0;
-    std::move(pf2.second).then([&d](trial<double> &&r) { d = *r; });
+    std::move(pf2.second).then([&d](trial<double> &&r) { d = r.get(); });
 
     CHECK(i == 0);
     CHECK(d == 0.0);
@@ -118,11 +118,11 @@ TEST_CASE("Future, then, returning future, success") {
     future<int> f1(dly);
 
     int i = 0;
-    const auto f = [&i](trial<int> &&v) -> double { i = *v; return 2.0; };
+    const auto f = [&i](trial<int> &&v) -> double { i = v.get(); return 2.0; };
     future<double> f2 = std::move(f1).then(f);
 
     double d = 0.0;
-    std::move(f2).then([&d](trial<double> &&r) { d = *r; });
+    std::move(f2).then([&d](trial<double> &&r) { d = r.get(); });
 
     CHECK(i == 0);
     CHECK(d == 0.0);
@@ -141,7 +141,7 @@ TEST_CASE("Future, then, returning future, failure") {
     double d = 0.0;
     std::move(f2).then([&d](trial<char> &&r) {
         try {
-            *r;
+            r.get();
         } catch (double v) {
             d = v;
         }
@@ -163,7 +163,7 @@ TEST_CASE("Future, map, to promise, success") {
     std::move(f1).map(f, std::move(pf2.first));
 
     double d = 0.0;
-    std::move(pf2.second).then([&d](trial<double> &&r) { d = *r; });
+    std::move(pf2.second).then([&d](trial<double> &&r) { d = r.get(); });
 
     CHECK(i == 0);
     CHECK(d == 0.0);
@@ -192,7 +192,7 @@ TEST_CASE("Future, map, returning future, success, movable function") {
     future<double> f2 = std::move(f1).map(movable_function(i));
 
     double d = 0.0;
-    std::move(f2).then([&d](trial<double> &&r) { d = *r; });
+    std::move(f2).then([&d](trial<double> &&r) { d = r.get(); });
 
     CHECK(i == 0);
     CHECK(d == 0.0);
@@ -211,7 +211,7 @@ TEST_CASE(
     future<double> f2 = std::move(f1).map(f);
 
     double d = 0.0;
-    std::move(f2).then([&d](trial<double> &&r) { d = *r; });
+    std::move(f2).then([&d](trial<double> &&r) { d = r.get(); });
 
     CHECK(i == 0);
     CHECK(d == 0.0);
@@ -230,7 +230,7 @@ TEST_CASE("Future, map, returning future, failure propagation") {
     double d = 0.0;
     std::move(f2).then([&d](trial<char> &&r) {
         try {
-            *r;
+            r.get();
         } catch (double v) {
             d = v;
         }
@@ -252,7 +252,7 @@ TEST_CASE("Future, map, failure in callback") {
     double d = 0.0;
     std::move(f2).then([&d](trial<char> &&r) {
         try {
-            *r;
+            r.get();
         } catch (double v) {
             d = v;
         }
@@ -277,7 +277,7 @@ TEST_CASE("Future, recover, to promise, success") {
     std::move(f1).recover(f, std::move(pf2.first));
 
     int i = 0;
-    std::move(pf2.second).then([&i](trial<int> &&r) { i = *r; });
+    std::move(pf2.second).then([&i](trial<int> &&r) { i = r.get(); });
 
     CHECK(i == 0);
     d->set_result(1);
@@ -300,7 +300,7 @@ TEST_CASE("Future, recover, returning future, success, movable function") {
     future<int> f2 = std::move(f1).recover(movable_function());
 
     int i = 0;
-    std::move(f2).then([&i](trial<int> &&r) { i = *r; });
+    std::move(f2).then([&i](trial<int> &&r) { i = r.get(); });
 
     CHECK(i == 0);
     d->set_result(1);
@@ -319,7 +319,7 @@ TEST_CASE(
     future<int> f2 = std::move(f1).recover(f);
 
     int i = 0;
-    std::move(f2).then([&i](trial<int> &&r) { i = *r; });
+    std::move(f2).then([&i](trial<int> &&r) { i = r.get(); });
 
     CHECK(i == 0);
     d->set_result(1);
@@ -340,7 +340,7 @@ TEST_CASE("Future, recover from exception") {
     future<int> f2 = std::move(f1).recover(f);
 
     int i = 0;
-    std::move(f2).then([&i](trial<int> &&r) { i = *r; });
+    std::move(f2).then([&i](trial<int> &&r) { i = r.get(); });
 
     CHECK(i == 0);
     d->set_result(std::make_exception_ptr(1.0));
@@ -356,7 +356,7 @@ TEST_CASE("Future, recovery failure") {
     int i = 0;
     std::move(f2).then([&i](trial<int> &&r) {
         try {
-            *r;
+            r.get();
         } catch (double d) {
             CHECK(d == 2.0);
             i = 1;
@@ -371,7 +371,7 @@ TEST_CASE("Future, recovery failure") {
 TEST_CASE("Future, create from function") {
     int i = 0;
     future<int> f = make_future_from([] { return 42; });
-    std::move(f).then([&i](trial<int> &&r) { i = *r; });
+    std::move(f).then([&i](trial<int> &&r) { i = r.get(); });
     CHECK(i == 42);
 }
 
@@ -382,7 +382,7 @@ TEST_CASE("Future, create by result construction, l-value") {
     char c = '0';
     double d = 0.0;
     std::move(f).then([&i, &c, &d](trial<T> &&r) {
-        std::tie(i, c, d) = *r;
+        std::tie(i, c, d) = r.get();
     });
     CHECK(i == 1);
     CHECK(c == 'a');
@@ -396,7 +396,7 @@ TEST_CASE("Future, create by result construction, r-value") {
 TEST_CASE("Future, create from existing value") {
     bool called = false;
     make_future_of(move_only()).then([&called](trial<move_only> &&r) {
-        CHECK_NOTHROW(*r);
+        CHECK_NOTHROW(r.get());
         called = true;
     });
     CHECK(called);
@@ -406,7 +406,7 @@ TEST_CASE("Future, create from exception") {
     bool called = false;
     make_failed_future_of<int>(1.0).then([&called](trial<int> &&r) {
         try {
-            *r;
+            r.get();
         } catch (double d) {
             CHECK(d == 1.0);
             called = true;
@@ -422,7 +422,7 @@ TEST_CASE("Future, forward, success, int") {
     std::move(pf1.second).forward(std::move(pf2.first));
 
     int i = 0;
-    std::move(pf2.second).then([&i](trial<int> &&r) { i = *r; });
+    std::move(pf2.second).then([&i](trial<int> &&r) { i = r.get(); });
     CHECK(i == 123);
 }
 
@@ -448,7 +448,7 @@ TEST_CASE("Future, forward, failure") {
     double d = 0.0;
     std::move(pf2.second).then([&d](trial<int> &&r) {
         try {
-            *r;
+            r.get();
         } catch (double v) {
             d = v;
         }
@@ -462,8 +462,8 @@ TEST_CASE("Future, wrap, to promise, success") {
     make_future_of(123).wrap(std::move(pf.first));
     int i = 0;
     std::move(pf.second).then([&i](trial<future<int>> &&r) {
-        std::move(*r).then([&i](trial<int> &&r) {
-            i = *r;
+        std::move(r.get()).then([&i](trial<int> &&r) {
+            i = r.get();
         });
     });
     CHECK(i == 123);
@@ -472,8 +472,8 @@ TEST_CASE("Future, wrap, to promise, success") {
 TEST_CASE("Future, wrap, returning value, success") {
     int i = 0;
     make_future_of(123).wrap().then([&i](trial<future<int>> &&r) {
-        std::move(*r).then([&i](trial<int> &&r) {
-            i = *r;
+        std::move(r.get()).then([&i](trial<int> &&r) {
+            i = r.get();
         });
     });
     CHECK(i == 123);
@@ -484,7 +484,7 @@ TEST_CASE("Future, wrap, returning value, failure in original future") {
     double d = 0.0;
     std::move(f).then([&d](trial<future<int>> &&r) {
         try {
-            *r;
+            r.get();
         } catch (double v) {
             d = v;
         }
@@ -496,14 +496,14 @@ TEST_CASE("Future, unwrap, to promise, success") {
     std::pair<promise<int>, future<int>> pf = make_promise_future_pair<int>();
     make_future_of(make_future_of(123)).unwrap(std::move(pf.first));
     int i = 0;
-    std::move(pf.second).then([&i](trial<int> &&r) { i = *r; });
+    std::move(pf.second).then([&i](trial<int> &&r) { i = r.get(); });
     CHECK(i == 123);
 }
 
 TEST_CASE("Future, unwrap, returning future, success") {
     future<int> f = make_future_of(make_future_of(123)).unwrap();
     int i = 0;
-    std::move(f).then([&i](trial<int> &&r) { i = *r; });
+    std::move(f).then([&i](trial<int> &&r) { i = r.get(); });
     CHECK(i == 123);
 }
 
@@ -512,7 +512,7 @@ TEST_CASE("Future, unwrap, failure in first") {
     double d = 0.0;
     std::move(f).then([&d](trial<int> &&r) {
         try {
-            *r;
+            r.get();
         } catch (double v) {
             d = v;
         }
@@ -526,7 +526,7 @@ TEST_CASE("Future, unwrap, failure in second") {
         throw 1.0;
     }).unwrap().then([&d](trial<int> &&r) {
         try {
-            *r;
+            r.get();
         } catch (double v) {
             d = v;
         }
