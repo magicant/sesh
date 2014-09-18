@@ -26,7 +26,7 @@
 #include "async/future.hh"
 #include "async/promise.hh"
 #include "catch.hpp"
-#include "common/trial.hh"
+#include "common/either.hh"
 #include "common/type_tag_test_helper.hh"
 #include "common/variant.hh"
 #include "os/event/proactor.hh"

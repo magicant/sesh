@@ -30,7 +30,6 @@
 #include "async/future.tcc"
 #include "common/either.hh"
 #include "common/identity.hh"
-#include "common/trial.hh"
 
 namespace sesh {
 namespace async {

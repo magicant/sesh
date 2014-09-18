@@ -28,7 +28,7 @@
 #include <utility>
 #include "async/delay_holder.hh"
 #include "async/promise.hh"
-#include "common/trial.hh"
+#include "common/either.hh"
 
 namespace sesh {
 namespace async {

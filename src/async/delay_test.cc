@@ -23,7 +23,7 @@
 #include "async/delay.hh"
 #include "catch.hpp"
 #include "common/copy.hh"
-#include "common/trial.hh"
+#include "common/either.hh"
 #include "common/type_tag.hh"
 
 namespace {

@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <utility>
 #include "async/future.hh"
-#include "common/trial.hh"
+#include "common/either.hh"
 #include "common/variant.hh"
 #include "os/event/proactor.hh"
 #include "os/event/readable_file_descriptor.hh"

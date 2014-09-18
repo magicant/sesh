@@ -27,7 +27,6 @@
 #include <utility>
 #include "common/either.hh"
 #include "common/empty.hh"
-#include "common/trial.hh"
 #include "common/type_tag.hh"
 
 namespace sesh {

@@ -24,8 +24,8 @@
 #include "async/future.hh"
 #include "async/promise.hh"
 #include "catch.hpp"
+#include "common/either.hh"
 #include "common/nop.hh"
-#include "common/trial.hh"
 
 namespace {
 

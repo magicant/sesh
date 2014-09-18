@@ -24,7 +24,7 @@
 #include <utility>
 #include "async/future.hh"
 #include "catch.hpp"
-#include "common/trial.hh"
+#include "common/either.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/pselect_api.hh"

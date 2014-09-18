@@ -21,7 +21,7 @@
 #include "async/delay.hh"
 #include "async/promise.hh"
 #include "catch.hpp"
-#include "common/trial.hh"
+#include "common/either.hh"
 
 namespace {
 

@@ -290,6 +290,9 @@ maybe<U> make_maybe_of(T &&v)
     return maybe<U>(type_tag<U>(), std::forward<T>(v));
 }
 
+template<typename T>
+using trial = either<std::exception_ptr, T>;
+
 } // namespace common
 } // namespace sesh
 
