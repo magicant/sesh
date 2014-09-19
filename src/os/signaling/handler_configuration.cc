@@ -23,7 +23,7 @@
 #include <map>
 #include <memory>
 #include <utility>
-#include "common/maybe.hh"
+#include "common/either.hh"
 #include "common/shared_function.hh"
 #include "helpermacros.h"
 #include "os/signaling/handler_configuration_api.hh"
@@ -164,14 +164,14 @@ public:
             const signal_action *new_action) {
         signal_action old_action = handler_configuration_api::default_action();
         std::error_code e = api.sigaction(n, new_action, &old_action);
-        if (!m_initial_action.has_value())
-            m_initial_action.emplace(std::move(old_action));
+        if (!m_initial_action)
+            m_initial_action.try_emplace(std::move(old_action));
         return e;
     }
 
     std::error_code get_initial_action_if_unknown(
             const handler_configuration_api &api, signal_number n) {
-        if (m_initial_action.has_value())
+        if (m_initial_action)
             return std::error_code();
         return sigaction(api, n, nullptr);
     }

@@ -26,7 +26,7 @@
 #include "async/future.hh"
 #include "async/promise.hh"
 #include "catch.hpp"
-#include "common/trial.hh"
+#include "common/either.hh"
 #include "common/type_tag_test_helper.hh"
 #include "common/variant.hh"
 #include "os/event/proactor.hh"
@@ -97,7 +97,7 @@ TEST_CASE("Read: empty") {
 
     bool called = false;
     std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
@@ -180,7 +180,7 @@ TEST_CASE_METHOD(read_test_fixture, "Read: reading less than available") {
 
     bool called = false;
     std::move(f).then([C, &called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd_value);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
@@ -209,7 +209,7 @@ TEST_CASE_METHOD(read_test_fixture, "Read: reading less than buffer size") {
 
     bool called = false;
     std::move(f).then([&bytes, &called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd_value);
         REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
@@ -248,7 +248,7 @@ TEST_CASE("Read: domain error in proactor") {
 
     bool called = false;
     std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd);
         REQUIRE(r->second.tag() == r->second.tag<std::error_code>());
@@ -282,7 +282,7 @@ TEST_CASE("Read: read error") {
 
     bool called = false;
     std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r.has_value());
+        REQUIRE(r);
         CHECK(r->first.is_valid());
         CHECK(r->first.value() == fd);
         REQUIRE(r->second.tag() == r->second.tag<std::error_code>());

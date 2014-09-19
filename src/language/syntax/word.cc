@@ -23,7 +23,7 @@
 #include <iterator>
 #include <utility>
 #include <vector>
-#include "common/maybe.hh"
+#include "common/either.hh"
 #include "common/xstring.hh"
 
 using sesh::common::make_maybe_of;
@@ -61,9 +61,10 @@ maybe<xstring> word::compute_maybe_constant_value() const {
 }
 
 const maybe<xstring> &word::maybe_constant_value() const {
-    if (!m_maybe_constant_value_cache.has_value())
-        m_maybe_constant_value_cache.emplace(compute_maybe_constant_value());
-    return m_maybe_constant_value_cache.value();
+    if (!m_maybe_constant_value_cache)
+        m_maybe_constant_value_cache.try_emplace(
+                compute_maybe_constant_value());
+    return *m_maybe_constant_value_cache;
 }
 
 bool word::is_raw_string() const {

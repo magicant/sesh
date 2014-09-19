@@ -30,6 +30,16 @@ namespace common {
 class empty {
 };
 
+/** Empties always compare equal. */
+constexpr bool operator==(empty, empty) noexcept {
+    return true;
+}
+
+/** Empties always compare equal. */
+constexpr bool operator<(empty, empty) noexcept {
+    return false;
+}
+
 } // namespace common
 } // namespace sesh
 

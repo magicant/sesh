@@ -30,8 +30,8 @@
 #include "async/future.hh"
 #include "async/promise.hh"
 #include "common/container_helper.hh"
+#include "common/either.hh"
 #include "common/shared_function.hh"
-#include "common/trial.hh"
 #include "common/variant.hh"
 #include "helpermacros.h"
 #include "os/event/pselect_api.hh"
@@ -351,7 +351,7 @@ void register_user_provided_trigger(
     std::move(t.future()).then([w](trial<result> &&t) {
         if (std::shared_ptr<pending_event> e = w.lock()) {
             try {
-                e->fire(user_provided_trigger(std::move(*t)));
+                e->fire(user_provided_trigger(std::move(t.get())));
             } catch (...) {
                 e->fail_with_current_exception();
             }

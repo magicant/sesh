@@ -23,7 +23,7 @@
 #include <vector>
 #include "async/future.hh"
 #include "catch.hpp"
-#include "common/trial.hh"
+#include "common/either.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter.hh"
 #include "os/event/awaiter_test_helper.hh"
@@ -58,7 +58,7 @@ TEST_CASE_METHOD(
     mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(signal(3));
     std::move(f).then([this](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         REQUIRE(t->tag() == trigger::tag<signal>());
         CHECK(t->value<signal>().number() == 3);
         mutable_steady_clock_now() += std::chrono::seconds(2);
@@ -129,7 +129,7 @@ TEST_CASE_METHOD(
     mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(signal(2), signal(6));
     std::move(f).then([this](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         REQUIRE(t->tag() == trigger::tag<signal>());
         CHECK(t->value<signal>().number() == 6);
         mutable_steady_clock_now() += std::chrono::seconds(2);
@@ -175,7 +175,7 @@ TEST_CASE_METHOD(
     mutable_steady_clock_now() = start_time;
     for (unsigned i = 0; i < 2; ++i) {
         a.expect(signal(1)).then([this](trial<trigger> &&t) {
-            REQUIRE(t.has_value());
+            REQUIRE(t);
             REQUIRE(t->tag() == trigger::tag<signal>());
             CHECK(t->value<signal>().number() == 1);
             mutable_steady_clock_now() += std::chrono::seconds(1);
@@ -217,7 +217,7 @@ TEST_CASE_METHOD(
     mutable_steady_clock_now() = start_time;
     for (signal_number sn : {1, 2}) {
         a.expect(signal(sn)).then([this, sn](trial<trigger> &&t) {
-            REQUIRE(t.has_value());
+            REQUIRE(t);
             REQUIRE(t->tag() == trigger::tag<signal>());
             CHECK(t->value<signal>().number() == sn);
             mutable_steady_clock_now() += std::chrono::seconds(1);
@@ -262,7 +262,7 @@ TEST_CASE_METHOD(
     mutable_steady_clock_now() = start_time;
     for (signal_number sn : {1, 2}) {
         a.expect(signal(sn)).then([this, sn](trial<trigger> &&t) {
-            REQUIRE(t.has_value());
+            REQUIRE(t);
             REQUIRE(t->tag() == trigger::tag<signal>());
             CHECK(t->value<signal>().number() == sn);
             mutable_steady_clock_now() += std::chrono::seconds(1);

@@ -25,9 +25,8 @@
 #include <functional>
 #include <memory>
 #include <utility>
+#include "common/either.hh"
 #include "common/empty.hh"
-#include "common/maybe.hh"
-#include "common/trial.hh"
 #include "common/type_tag.hh"
 
 namespace sesh {

@@ -31,7 +31,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "common/maybe.hh"
+#include "common/either.hh"
 
 namespace sesh {
 namespace common {
@@ -152,18 +152,18 @@ private:
 public:
 
     /** Checks if this node has a value. */
-    bool has_value() const noexcept { return m_value.has_value(); }
+    bool has_value() const noexcept { return !!m_value; }
 
     /**
      * Returns a reference to the value of this node. The behavior is undefined
      * if this node has no value.
      */
-    Value &value() { return m_value.value(); }
+    Value &value() { return *m_value; }
     /**
      * Returns a reference to the value of this node. The behavior is undefined
      * if this node has no value.
      */
-    const Value &value() const { return m_value.value(); }
+    const Value &value() const { return *m_value; }
 
     /**
      * Returns a reference to the maybe object that may contain the value of
@@ -192,7 +192,7 @@ public:
         if (has_value())
             return std::pair<Value &, bool>(value(), false);
 
-        m_value.emplace(std::forward<Arg>(arg)...);
+        m_value.try_emplace(std::forward<Arg>(arg)...);
         increment_size();
         return std::pair<Value &, bool>(value(), true);
     }

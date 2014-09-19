@@ -23,7 +23,7 @@
 #include <system_error>
 #include <utility>
 #include "async/future.hh"
-#include "common/trial.hh"
+#include "common/either.hh"
 #include "os/event/proactor.hh"
 #include "os/event/trigger.hh"
 #include "os/event/writable_file_descriptor.hh"
@@ -62,7 +62,7 @@ struct writer {
 
     future<result_pair> operator()(trial<trigger> &&t) {
         try {
-            *t;
+            t.get();
         } catch (std::domain_error &e) {
             return operator()(
                     std::make_error_code(std::errc::too_many_files_open));

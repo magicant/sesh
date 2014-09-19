@@ -27,14 +27,13 @@ TESTPROGRAMS = \
 	src/async/promise_test \
 	src/async/shared_future_test \
 	src/common/container_helper_test \
+	src/common/either_test \
 	src/common/enum_iterator_test \
 	src/common/enum_set_test \
 	src/common/function_helper_test \
-	src/common/maybe_test \
 	src/common/message_test \
 	src/common/reference_test \
 	src/common/shared_function_test \
-	src/common/trial_test \
 	src/common/trie_test \
 	src/common/type_tag_test \
 	src/common/variant_test \
@@ -98,6 +97,7 @@ src_sesh_SOURCES = \
 	src/common/container_helper.hh \
 	src/common/copy.hh \
 	src/common/direct_initialize.hh \
+	src/common/either.hh \
 	src/common/empty.hh \
 	src/common/enum_iterator.hh \
 	src/common/enum_set.hh \
@@ -109,14 +109,12 @@ src_sesh_SOURCES = \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
 	src/common/logic_helper.hh \
-	src/common/maybe.hh \
 	src/common/message.cc \
 	src/common/message.hh \
 	src/common/nop.hh \
 	src/common/reference.hh \
 	src/common/shared_function.hh \
 	src/common/static_cast_function.hh \
-	src/common/trial.hh \
 	src/common/trie.hh \
 	src/common/type_tag.hh \
 	src/common/variant.hh \
@@ -225,6 +223,9 @@ src_async_shared_future_test_SOURCES = \
 src_common_container_helper_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/container_helper_test.cc
+src_common_either_test_SOURCES = \
+	src/catch_main.cc \
+	src/common/either_test.cc
 src_common_enum_iterator_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/enum_iterator_test.cc
@@ -234,9 +235,6 @@ src_common_enum_set_test_SOURCES = \
 src_common_function_helper_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/function_helper_test.cc
-src_common_maybe_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/maybe_test.cc
 src_common_message_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/message.cc \
@@ -247,9 +245,6 @@ src_common_reference_test_SOURCES = \
 src_common_shared_function_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/shared_function_test.cc
-src_common_trial_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/trial_test.cc
 src_common_trie_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/trie_test.cc

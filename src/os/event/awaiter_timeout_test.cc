@@ -23,7 +23,7 @@
 #include <utility>
 #include "async/future.hh"
 #include "catch.hpp"
-#include "common/trial.hh"
+#include "common/either.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/pselect_api.hh"
@@ -93,7 +93,7 @@ TEST_CASE_METHOD(
     bool callback_called = false;
     std::move(f).then(
             [this, start_time, &callback_called](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(0));
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(1));
@@ -132,7 +132,7 @@ TimeoutTest<DurationInSecondsInt>::TimeoutTest() {
     bool callback_called = false;
     std::move(f).then([
             this, start_time, &callback_called](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == duration());
         CHECK(steady_clock_now() == start_time + duration());
@@ -176,7 +176,7 @@ TEST_CASE_METHOD(
     bool callback_called = false;
     std::move(f).then([
             this, start_time, &callback_called](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(-10));
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(1));
@@ -218,7 +218,7 @@ TEST_CASE_METHOD(
     bool callback_called = false;
     std::move(f).then([
             this, start_time, &callback_called](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(5));
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
@@ -257,7 +257,7 @@ TEST_CASE_METHOD(
     bool callback1Called = false;
     std::move(f1).then(
             [this, start_time, &callback1Called](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(10));
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(11));
@@ -270,7 +270,7 @@ TEST_CASE_METHOD(
     bool callback2Called = false;
     std::move(f2).then(
             [this, start_time, &callback2Called](trial<trigger> &&t) {
-        REQUIRE(t.has_value());
+        REQUIRE(t);
         CHECK(t->tag() == trigger::tag<timeout>());
         CHECK(t->value<timeout>().interval() == std::chrono::seconds(29));
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(32));

@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <utility>
 #include "async/future.hh"
-#include "common/trial.hh"
+#include "common/either.hh"
 #include "common/variant.hh"
 #include "os/event/proactor.hh"
 #include "os/event/readable_file_descriptor.hh"
@@ -63,7 +63,7 @@ struct reader {
 
     result_pair operator()(trial<trigger> &&t) {
         try {
-            *t;
+            t.get();
         } catch (std::domain_error &) {
             return operator()(
                     std::make_error_code(std::errc::too_many_files_open));
