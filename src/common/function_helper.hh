@@ -129,6 +129,8 @@ using result_of_t = typename result_of<T>::type;
  *
  * @tparam Function A function object type.
  * @tparam Argument Argument types that are passed to the function.
+ *
+ * @see partial_common_result
  */
 template<typename Function, typename... Argument>
 class common_result :
@@ -137,6 +139,49 @@ class common_result :
                 function_helper_impl::common_result<Function, Argument...>,
                 empty
         >::type { };
+
+namespace function_helper_impl {
+
+template<typename CommonResult, typename... Argument>
+class partial_common_result;
+
+template<typename CommonResult>
+class partial_common_result<CommonResult> : public CommonResult { };
+
+template<typename F, typename AH, typename... AT, typename... AR>
+class partial_common_result<common::common_result<F, AR...>, AH, AT...> :
+        public std::conditional<
+                common::is_callable<F(AH)>::value,
+                partial_common_result<
+                        common::common_result<F, AR..., AH>, AT...>,
+                partial_common_result<
+                        common::common_result<F, AR...>, AT...>
+        >::type { };
+
+} // namespace function_helper_impl
+
+/**
+ * A specialization of this class template will have the "type" member type
+ * alias which is the return type of function calls with the parameter function
+ * and argument types.
+ *
+ * If the function call returns the same return type for all given argument
+ * types, the partial common result class template has the member type alias
+ * "type" which is the return type. Argument types that cannot be passed to the
+ * function are ignored in computing the return type. If the return type
+ * differs for two or more callable argument types or the function is not
+ * callable with any of the argument types, then the member type alias is not
+ * defined.
+ *
+ * @tparam Function A function object type.
+ * @tparam Argument Argument types that are passed to the function.
+ *
+ * @see common_result
+ */
+template<typename Function, typename... Argument>
+class partial_common_result :
+        public function_helper_impl::partial_common_result<
+                common_result<Function>, Argument...> { };
 
 } // namespace common
 } // namespace sesh
