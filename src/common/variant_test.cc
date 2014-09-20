@@ -286,9 +286,8 @@ TEST_CASE("Double variant copy initialization") {
     variant<int, type_tag<int>> vi = 0;
     CHECK(vi.tag() == vi.tag<int>());
 
-    // Implicit conversion from type_tag is disabled to disambiguate overloads.
-//    variant<int, type_tag<int>> vt = type_tag<int>();
-//    CHECK(vt.tag() == vt.tag<type_tag<int>>());
+    variant<int, type_tag<int>> vt = type_tag<int>();
+    CHECK(vt.tag() == vt.tag<type_tag<int>>());
 }
 
 TEST_CASE("Double variant direct initialization") {

@@ -47,12 +47,6 @@ namespace variant_impl {
 template<typename T, typename... U>
 class is_any_of : public for_any<std::is_same<T, U>::value...> { };
 
-template<typename T>
-class is_type_tag : public std::false_type { };
-
-template<typename T>
-class is_type_tag<type_tag<T>> : public std::true_type { };
-
 class move_if_noexcept { };
 
 /** Contains the value of a variant. */
@@ -484,16 +478,14 @@ public:
      *
      * @tparam U the argument type.
      * @tparam V the type of the new contained value to be constructed.
-     *     Inferred from the argument type. If V is a specialization of
-     *     type_tag, this constructor overload cannot be used.
+     *     Inferred from the argument type.
      * @param v the argument forwarded to the constructor.
      */
     template<
             typename U,
             typename V = typename std::decay<U>::type,
             typename =
-                    typename std::enable_if<is_any_of<V, T...>::value>::type,
-            typename = typename std::enable_if<!is_type_tag<V>::value>::type>
+                    typename std::enable_if<is_any_of<V, T...>::value>::type>
     variant_base(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
             variant_base(
