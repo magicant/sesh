@@ -100,6 +100,11 @@ auto is_callable(Callable &&c, Argument &&... a)
 std::false_type is_callable(...);
 
 template<typename Callable, typename... Argument>
+class is_nothrow_callable :
+        public std::integral_constant<bool, noexcept(invoke(
+                std::declval<Callable>(), std::declval<Argument>()...))> { };
+
+template<typename Callable, typename... Argument>
 class result_of {
 public:
     using type = decltype(invoke(
@@ -127,6 +132,26 @@ template<typename Callable, typename... Argument>
 class is_callable<Callable(Argument...)> :
         public decltype(function_helper_impl::is_callable(
                 std::declval<Callable>(), std::declval<Argument>()...)) { };
+
+template<typename>
+class is_nothrow_callable;
+
+/**
+ * If a function call specified by the template parameters is well-typed and
+ * non-throwing, this class is a subclass of std::true_type. Otherwise, this is
+ * a subclass of std::false_type.
+ *
+ * @tparam Callable a callable type that is called.
+ * @tparam Argument types of arguments that are passed to the callable.
+ */
+template<typename Callable, typename... Argument>
+class is_nothrow_callable<Callable(Argument...)> :
+        public std::conditional<
+                is_callable<Callable(Argument...)>::value,
+                function_helper_impl::is_nothrow_callable<
+                        Callable, Argument...>,
+                std::false_type
+        >::type { };
 
 template<typename>
 class result_of;

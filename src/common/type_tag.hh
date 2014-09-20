@@ -218,8 +218,7 @@ public:
      */
     template<typename F>
     constexpr auto apply(F &&f) const
-            noexcept(noexcept(
-                    invoke(std::forward<F>(f), std::declval<type_tag>())))
+            noexcept(is_nothrow_callable<F(type_tag)>::value)
             -> typename result_of<F(type_tag)>::type {
         return invoke(std::forward<F>(f), type_tag());
     }
