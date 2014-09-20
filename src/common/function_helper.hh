@@ -28,34 +28,68 @@
 namespace sesh {
 namespace common {
 
-namespace function_helper_impl {
+/**
+ * Performs the INVOKE operation as defined by C++11 20.8.2/1 for a normal
+ * function object.
+ */
+template<typename F, typename... A>
+inline auto invoke(F &&f, A &&... a)
+        noexcept(noexcept(std::forward<F>(f)(std::forward<A>(a)...)))
+        -> decltype(std::forward<F>(f)(std::forward<A>(a)...)) {
+    return std::forward<F>(f)(std::forward<A>(a)...);
+}
 
-// normal function
-template<typename Function, typename... Argument>
-auto invoke(Function &&f, Argument &&... a)
-    -> decltype(std::forward<Function>(f)(std::forward<Argument>(a)...));
-
-// data member pointer with reference
+/**
+ * Performs the INVOKE operation as defined by C++11 20.8.2/1 for a data member
+ * pointer and a reference to the object.
+ */
 template<typename M, typename B, typename D>
-auto invoke(M B::*&& p, D &&d)
-    -> decltype(std::forward<D>(d).*std::forward<M B::*>(p));
+inline auto invoke(M B::*&& p, D &&d)
+        noexcept(noexcept(std::forward<D>(d).*std::forward<M B::*>(p)))
+        -> decltype(std::forward<D>(d).*std::forward<M B::*>(p)) {
+    return std::forward<D>(d).*std::forward<M B::*>(p);
+}
 
-// data member pointer with pointer
+/**
+ * Performs the INVOKE operation as defined by C++11 20.8.2/1 for a data member
+ * pointer and a pointer to the object.
+ */
 template<typename M, typename D>
-auto invoke(M&& m, D &&d)
-    -> decltype((*std::forward<D>(d)).*std::forward<M>(m));
+inline auto invoke(M&& m, D &&d)
+        noexcept(noexcept((*std::forward<D>(d)).*std::forward<M>(m)))
+        -> decltype((*std::forward<D>(d)).*std::forward<M>(m)) {
+    return (*std::forward<D>(d)).*std::forward<M>(m);
+}
 
-// member function pointer with reference
+/**
+ * Performs the INVOKE operation as defined by C++11 20.8.2/1 for a member
+ * function pointer and a reference to the object.
+ */
 template<typename F, typename B, typename D, typename... Arg>
-auto invoke(F B::*&& p, D &&d, Arg &&... arg)
-    -> decltype((std::forward<D>(d).*std::forward<F B::*>(p))(
-                std::forward<Arg>(arg)...));
+inline auto invoke(F B::*&& p, D &&d, Arg &&... arg)
+        noexcept(noexcept((std::forward<D>(d).*std::forward<F B::*>(p))(
+                std::forward<Arg>(arg)...)))
+        -> decltype((std::forward<D>(d).*std::forward<F B::*>(p))(
+                std::forward<Arg>(arg)...)) {
+    return (std::forward<D>(d).*std::forward<F B::*>(p))(
+            std::forward<Arg>(arg)...);
+}
 
-// member function pointer with pointer
+/**
+ * Performs the INVOKE operation as defined by C++11 20.8.2/1 for a member
+ * function pointer and a pointer to the object.
+ */
 template<typename F, typename D, typename... Arg>
-auto invoke(F&& f, D &&d, Arg &&... arg)
-    -> decltype(((*std::forward<D>(d)).*std::forward<F>(f))(
-                std::forward<Arg>(arg)...));
+inline auto invoke(F&& f, D &&d, Arg &&... arg)
+        noexcept(noexcept(((*std::forward<D>(d)).*std::forward<F>(f))(
+                std::forward<Arg>(arg)...)))
+        -> decltype(((*std::forward<D>(d)).*std::forward<F>(f))(
+                std::forward<Arg>(arg)...)) {
+    return ((*std::forward<D>(d)).*std::forward<F>(f))(
+            std::forward<Arg>(arg)...);
+}
+
+namespace function_helper_impl {
 
 template<typename Callable, typename... Argument>
 auto is_callable(Callable &&c, Argument &&... a)
