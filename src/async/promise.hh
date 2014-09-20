@@ -24,6 +24,7 @@
 #include <functional>
 #include <utility>
 #include "async/delay_holder.hh"
+#include "common/direct_initialize.hh"
 #include "common/functional_initialize.hh"
 #include "common/type_tag.hh"
 
@@ -65,7 +66,9 @@ public:
     void set_result(Arg &&... arg) && {
         promise copy = std::move(*this);
         copy.delay().set_result(
-                common::type_tag<T>(), std::forward<Arg>(arg)...);
+                common::direct_initialize(),
+                common::type_tag<T>(),
+                std::forward<Arg>(arg)...);
     }
 
     /**

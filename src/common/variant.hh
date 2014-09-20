@@ -28,6 +28,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "common/direct_initialize.hh"
 #include "common/function_helper.hh"
 #include "common/functional_initialize.hh"
 #include "common/logic_helper.hh"
@@ -471,7 +472,7 @@ public:
      * @param arg the arguments forwarded to the constructor.
      */
     template<typename U, typename... Arg>
-    explicit variant_base(type_tag<U> tag, Arg &&... arg)
+    explicit variant_base(direct_initialize, type_tag<U> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
             tag_type(tag), m_value(tag, std::forward<Arg>(arg)...) { }
 
@@ -495,7 +496,8 @@ public:
             typename = typename std::enable_if<!is_type_tag<V>::value>::type>
     variant_base(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
-            variant_base(type_tag<V>(), std::forward<U>(v)) { }
+            variant_base(
+                    direct_initialize(), type_tag<V>(), std::forward<U>(v)) { }
 
     /**
      * Creates a new variant by move-constructing its contained value from the
@@ -792,7 +794,8 @@ public:
             this->~variant_base();
             new (this) variant_base(std::forward<Arg>(arg)...);
         } catch (...) {
-            reconstruct_or_terminate(this, type_tag<Fallback>());
+            reconstruct_or_terminate(
+                    this, direct_initialize(), type_tag<Fallback>());
             throw;
         }
     }
@@ -862,7 +865,7 @@ public:
      */
     template<typename U, typename V = typename std::decay<U>::type>
     void reset(U &&v) noexcept {
-        emplace(type_tag<V>(), std::forward<U>(v));
+        emplace(direct_initialize(), type_tag<V>(), std::forward<U>(v));
     }
 
     /**
@@ -1230,7 +1233,8 @@ public:
     static variant create(Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value &&
                     std::is_nothrow_destructible<U>::value) {
-        return variant(type_tag<U>(), std::forward<Arg>(arg)...);
+        return variant(
+                direct_initialize(), type_tag<U>(), std::forward<Arg>(arg)...);
     }
 
     /**
@@ -1257,7 +1261,11 @@ public:
                 std::is_nothrow_constructible<
                     U, std::initializer_list<ListArg> &, Arg &&...>::value &&
                 std::is_nothrow_destructible<U>::value) {
-        return variant(type_tag<U>(), list, std::forward<Arg>(arg)...);
+        return variant(
+                direct_initialize(),
+                type_tag<U>(),
+                list,
+                std::forward<Arg>(arg)...);
     }
 
     /**

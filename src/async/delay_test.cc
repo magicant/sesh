@@ -23,6 +23,7 @@
 #include "async/delay.hh"
 #include "catch.hpp"
 #include "common/copy.hh"
+#include "common/direct_initialize.hh"
 #include "common/either.hh"
 #include "common/type_tag.hh"
 
@@ -30,6 +31,7 @@ namespace {
 
 using sesh::async::delay;
 using sesh::common::copy;
+using sesh::common::direct_initialize;
 using sesh::common::trial;
 using sesh::common::type_tag;
 
@@ -37,7 +39,7 @@ TEST_CASE("Delay: set result and callback") {
     using T = std::tuple<int, float, char>;
     delay<T> s;
 
-    s.set_result(type_tag<T>(), 42, 3.0f, 'a');
+    s.set_result(direct_initialize(), type_tag<T>(), 42, 3.0f, 'a');
 
     unsigned call_count = 0;
     s.set_callback([&call_count](trial<T> &&r) {

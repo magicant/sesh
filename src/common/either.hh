@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
+#include "common/direct_initialize.hh"
 #include "common/empty.hh"
 #include "common/type_tag.hh"
 #include "common/variant.hh"
@@ -108,7 +109,7 @@ public:
     constexpr either()
             noexcept(
                     std::is_nothrow_default_constructible<error_type>::value) :
-            variant<L, R>(type_tag<error_type>()) { }
+            variant<L, R>(direct_initialize(), type_tag<error_type>()) { }
 
     /**
      * Tests if this is a successful result.
@@ -208,7 +209,9 @@ public:
     template<typename... Arg>
     /* constexpr */ void try_emplace(Arg &&... arg) {
         this->template emplace_with_fallback<error_type>(
-                type_tag<value_type>(), std::forward<Arg>(arg)...);
+                direct_initialize(),
+                type_tag<value_type>(),
+                std::forward<Arg>(arg)...);
     }
     // XXX support initializer_list?
 
@@ -218,7 +221,7 @@ public:
      * error_type throws, the program is {@code std::terminate}d.
      */
     /* constexpr */ void clear() noexcept {
-        this->emplace(type_tag<error_type>());
+        this->emplace(direct_initialize(), type_tag<error_type>());
     }
 
     /**
@@ -269,7 +272,8 @@ using maybe = either<empty, T>;
 template<typename T, typename... Arg>
 maybe<T> make_maybe(Arg &&... arg)
         noexcept(std::is_nothrow_constructible<T, Arg &&...>::value) {
-    return maybe<T>(type_tag<T>(), std::forward<Arg>(arg)...);
+    return maybe<T>(
+            direct_initialize(), type_tag<T>(), std::forward<Arg>(arg)...);
 }
 
 /**
@@ -285,9 +289,9 @@ maybe<T> make_maybe(Arg &&... arg)
  */
 template<typename T, typename U = typename std::decay<T>::type>
 maybe<U> make_maybe_of(T &&v)
-        noexcept(std::is_nothrow_constructible<maybe<U>, type_tag<U>, T &&>::
-                value) {
-    return maybe<U>(type_tag<U>(), std::forward<T>(v));
+        noexcept(std::is_nothrow_constructible<
+                maybe<U>, direct_initialize, type_tag<U>, T &&>::value) {
+    return maybe<U>(direct_initialize(), type_tag<U>(), std::forward<T>(v));
 }
 
 template<typename T>
