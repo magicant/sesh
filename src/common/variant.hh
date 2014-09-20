@@ -202,9 +202,10 @@ public:
 
     template<typename T, typename R = copy_reference<Union, T>>
     constexpr auto operator()(type_tag<T>) const
-            noexcept(noexcept(std::declval<Visitor>()(std::declval<R>())))
+            noexcept(noexcept(
+                    invoke(std::declval<Visitor>(), std::declval<R>())))
             -> typename std::result_of<Visitor(R)>::type {
-        return std::forward<Visitor>(m_visitor)(
+        return invoke(std::forward<Visitor>(m_visitor),
                 std::forward<Union>(m_target).template value<T>());
     }
 

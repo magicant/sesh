@@ -29,6 +29,7 @@
 #include <vector>
 #include "async/future.tcc"
 #include "common/either.hh"
+#include "common/function_helper.hh"
 #include "common/identity.hh"
 
 namespace sesh {
@@ -66,14 +67,14 @@ void shared_future_base<T>::impl::set_result(common::trial<T> &&t) {
     }
 
     for (callback &c : m_callbacks)
-        c(*m_result);
+        common::invoke(c, *m_result);
     m_callbacks.clear();
 }
 
 template<typename T>
 void shared_future_base<T>::impl::add_callback(callback &&c) {
     if (m_result)
-        return c(*m_result);
+        return common::invoke(c, *m_result);
     m_callbacks.push_back(std::move(c));
 }
 
