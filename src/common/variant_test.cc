@@ -136,6 +136,16 @@ struct non_move_assignable {
 struct non_destructible {
     ~non_destructible() noexcept(false) { }
 };
+struct move_only_int {
+    int value;
+    move_only_int(int i) noexcept : value(i) { }
+    move_only_int(move_only_int &&) = default;
+};
+struct move_only_double {
+    double value;
+    move_only_double(double d) noexcept : value(d) { }
+    move_only_double(move_only_double &&) = default;
+};
 
 static_assert(
         sizeof(variant<>) > 0,
@@ -524,16 +534,6 @@ TEST_CASE("Double variant deleted move constructor") {
 }
 
 TEST_CASE("Double/quad variant move construction to supertype") {
-    struct move_only_int {
-        int value;
-        move_only_int(int i) noexcept : value(i) { }
-        move_only_int(move_only_int &&) = default;
-    };
-    struct move_only_double {
-        double value;
-        move_only_double(double d) noexcept : value(d) { }
-        move_only_double(move_only_double &&) = default;
-    };
     const int I = 3;
     const double D = -7.0;
 
@@ -1101,6 +1101,68 @@ TEST_CASE("Double variant swapping with different type") {
             !variant<int, copy_may_throw>::is_nothrow_swappable,
             "copy_may_throw swap may throw");
 //}
+
+TEST_CASE("Double variant flat map for matching constant value") {
+    struct A { };
+    struct B { operator int() const { return 1; } };
+
+    const variant<A, B> v = A();
+    int called = 0;
+    int i = v.flat_map([&called](A) -> int {
+        ++called;
+        return 2;
+    });
+    CHECK(called == 1);
+    CHECK(i == 2);
+}
+
+TEST_CASE("Double variant flat map for unmatched constant value") {
+    struct A { operator int() const { return 1; } };
+    struct B { };
+    const variant<A, B> v = A();
+    int i = v.flat_map([](B) -> int { FAIL(); return 0; });
+    CHECK(i == 1);
+}
+
+TEST_CASE("Double variant flat map for matching move-only value") {
+    variant<move_only_int, move_only_double> v = move_only_double(1.0);
+    int called = 0;
+    auto f = [&called](move_only_double d) -> move_only_int {
+        CHECK(d.value == 1.0);
+        ++called;
+        return move_only_int(2);
+    };
+    move_only_int i = std::move(v).flat_map(f);
+    CHECK(called == 1);
+    CHECK(i.value == 2);
+}
+
+TEST_CASE("Double variant flat map for unmatched move-only value") {
+    variant<move_only_int, move_only_double> v = move_only_int(1);
+    auto f = [](move_only_double) -> move_only_int {
+        FAIL();
+        return move_only_int(0);
+    };
+    move_only_int i = std::move(v).flat_map(f);
+    CHECK(i.value == 1);
+}
+
+TEST_CASE("Double variant flat map with overloaded function") {
+    struct A { };
+    struct B { };
+    struct F {
+        int operator()(const A &) { return 1; }
+        int operator()(const B &) { return 2; }
+        int operator()(A &&) { return 3; }
+        int operator()(B &&) { return 4; }
+    };
+
+    const variant<A, B> ca = A(), cb = B();
+    CHECK(ca.flat_map(F()) == 1);
+    CHECK(cb.flat_map(F()) == 2);
+    CHECK((variant<A, B>(A()).flat_map(F())) == 3);
+    CHECK((variant<A, B>(B()).flat_map(F())) == 4);
+}
 
 TEST_CASE("Double variant operator==") {
     variant<int, double> i1 = 42;

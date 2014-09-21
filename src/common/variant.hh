@@ -388,6 +388,37 @@ public:
 
 } // namespace swap_impl
 
+template<typename F, typename O>
+class mapper {
+
+private:
+
+    F &&m_function;
+
+public:
+
+    constexpr explicit mapper(F &&f) noexcept :
+            m_function(std::forward<F>(f)) { }
+
+    template<typename T>
+    constexpr
+    typename std::enable_if<is_callable<F(T &&)>::value, O>::type
+    operator()(T &&t) const {
+        return invoke(std::forward<F>(m_function), std::forward<T>(t));
+    }
+
+    template<typename T>
+    constexpr
+    typename std::enable_if<
+            !is_callable<F(T &&)>::value &&
+                    std::is_convertible<T &&, O>::value,
+            O>::type
+    operator()(T &&t) const {
+        return std::forward<T>(t);
+    }
+
+}; // template<typename F, typename O> class mapper
+
 /** Fundamental implementation of variant. */
 template<typename... T>
 class variant_base : private type_tag<T...> {
@@ -1209,6 +1240,38 @@ public:
         variant<T...> temporary(std::move(*this));
         this->emplace(std::move(other));
         other.emplace(std::move(temporary));
+    }
+
+    /**
+     * Converts the value of this variant to another value, which is typically
+     * another variant.
+     *
+     * The argument is expected to be of a callable type. If it is callable
+     * with the currently contained value of this variant, it is called.
+     * Otherwise, the result is just the contained value. In either case, the
+     * result is implicitly converted to {@code R} before returned.
+     */
+    template<
+            typename F,
+            typename R = typename partial_common_result<F, const T &...>::type>
+    constexpr R flat_map(F &&f) const & {
+        return this->apply(mapper<F, R>(std::forward<F>(f)));
+    }
+
+    /**
+     * Converts the value of this variant to another value, which is typically
+     * another variant.
+     *
+     * The argument is expected to be of a callable type. If it is callable
+     * with the currently contained value of this variant, it is called.
+     * Otherwise, the result is just the contained value. In either case, the
+     * result is implicitly converted to {@code R} before returned.
+     */
+    template<
+            typename F,
+            typename R = typename partial_common_result<F, T &&...>::type>
+    /* constexpr */ R flat_map(F &&f) && {
+        return std::move(*this).apply(mapper<F, R>(std::forward<F>(f)));
     }
 
     /**
