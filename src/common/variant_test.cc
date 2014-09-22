@@ -147,6 +147,13 @@ struct move_only_double {
     move_only_double(move_only_double &&) = default;
 };
 
+bool operator==(const move_only_int &l, const move_only_int &r) {
+    return l.value == r.value;
+}
+bool operator==(const move_only_double &l, const move_only_double &r) {
+    return l.value == r.value;
+}
+
 static_assert(
         sizeof(variant<>) > 0,
         "Empty variant is a valid type, even if not constructible");
@@ -1162,6 +1169,46 @@ TEST_CASE("Double variant flat map with overloaded function") {
     CHECK(cb.flat_map(F()) == 2);
     CHECK((variant<A, B>(A()).flat_map(F())) == 3);
     CHECK((variant<A, B>(B()).flat_map(F())) == 4);
+}
+
+TEST_CASE("Double variant map with uncallable function") {
+    struct F { };
+    using V = variant<int, double>;
+    using MV = variant<move_only_int, move_only_double>;
+    const V i = 1, d = 2.0;
+    CHECK(i.map(F()) == V(1));
+    CHECK(d.map(F()) == V(2.0));
+    CHECK(MV(move_only_int(3)).map(F()) == MV(move_only_int(3)));
+    CHECK(MV(move_only_double(4.0)).map(F()) == MV(move_only_double(4.0)));
+}
+
+TEST_CASE("Double variant map with function accepting one contained type") {
+    struct X { };
+    struct Y { };
+    struct F {
+        Y operator()(X) { return Y(); }
+        int operator()(move_only_int i) { return i.value; }
+    };
+    using V = variant<X, Y>;
+    using MV = variant<move_only_int, move_only_double>;
+    using MV2 = variant<int, move_only_double>;
+    const V x = X(), y = Y();
+    CHECK(x.map(F()).tag() == type_tag<Y>());
+    CHECK(y.map(F()).tag() == type_tag<Y>());
+    CHECK(MV(move_only_int(1)).map(F()) == MV2(1));
+    CHECK(MV(move_only_double(2.0)).map(F()) == MV2(move_only_double(2.0)));
+}
+
+class add1 {
+public:
+    template<typename T>
+    T operator()(T t) const { return t + 1; }
+};
+
+TEST_CASE("Double variant map converting all values") {
+    using V = variant<int, double>;
+    CHECK(V(1).map(add1()) == V(2));
+    CHECK(V(3.0).map(add1()) == V(4.0));
 }
 
 TEST_CASE("Double variant operator==") {

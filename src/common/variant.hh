@@ -419,6 +419,21 @@ public:
 
 }; // template<typename F, typename O> class mapper
 
+template<typename F>
+class map_result {
+
+public:
+
+    template<typename T>
+    auto operator()(T &&) const
+            -> typename result_of<F(T &&)>::type;
+
+    template<typename T>
+    auto operator()(T &&) const
+            -> typename std::enable_if<!is_callable<F(T &&)>::value, T>::type;
+
+}; // template<typename F> class map_result
+
 /** Fundamental implementation of variant. */
 template<typename... T>
 class variant_base : private type_tag<T...> {
@@ -1273,6 +1288,40 @@ public:
             typename F,
             typename R = typename partial_common_result<F, T &&...>::type>
     /* constexpr */ R flat_map(F &&f) && {
+        return std::move(*this).apply(mapper<F, R>(std::forward<F>(f)));
+    }
+
+    /**
+     * Converts the value of this variant by applying the argument function to
+     * produce another variant with possibly different contained types.
+     *
+     * The argument is expected to be of a callable type. If it is callable
+     * with the currently contained value of this variant, it is called.
+     * Otherwise, the result is just the contained value. In either case, the
+     * result is implicitly converted to {@code R} before returned.
+     */
+    template<
+            typename F,
+            typename R = variant<typename std::decay<typename std::result_of<
+                    map_result<F>(const T &)>::type>::type...>>
+    constexpr R map(F &&f) const & {
+        return this->apply(mapper<F, R>(std::forward<F>(f)));
+    }
+
+    /**
+     * Converts the value of this variant by applying the argument function to
+     * produce another variant with possibly different contained types.
+     *
+     * The argument is expected to be of a callable type. If it is callable
+     * with the currently contained value of this variant, it is called.
+     * Otherwise, the result is just the contained value. In either case, the
+     * result is implicitly converted to {@code R} before returned.
+     */
+    template<
+            typename F,
+            typename R = variant<typename std::decay<typename std::result_of<
+                    map_result<F>(T &&)>::type>::type...>>
+    /* constexpr */ R map(F &&f) && {
         return std::move(*this).apply(mapper<F, R>(std::forward<F>(f)));
     }
 
