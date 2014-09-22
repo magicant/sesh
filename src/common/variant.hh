@@ -515,8 +515,10 @@ public:
     template<
             typename U,
             typename V = typename std::decay<U>::type,
-            typename =
-                    typename std::enable_if<is_any_of<V, T...>::value>::type>
+            typename = typename std::enable_if<
+                    std::is_constructible<V, U>::value>::type,
+            typename = typename std::enable_if<
+                    is_any_of<V, T...>::value>::type>
     variant_base(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
             variant_base(
