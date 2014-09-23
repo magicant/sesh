@@ -28,6 +28,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "common/direct_initialize.hh"
 #include "common/function_helper.hh"
 #include "common/functional_initialize.hh"
 #include "common/logic_helper.hh"
@@ -45,12 +46,6 @@ namespace variant_impl {
  */
 template<typename T, typename... U>
 class is_any_of : public for_any<std::is_same<T, U>::value...> { };
-
-template<typename T>
-class is_type_tag : public std::false_type { };
-
-template<typename T>
-class is_type_tag<type_tag<T>> : public std::true_type { };
 
 class move_if_noexcept { };
 
@@ -207,9 +202,9 @@ public:
 
     template<typename T, typename R = copy_reference<Union, T>>
     constexpr auto operator()(type_tag<T>) const
-            noexcept(noexcept(std::declval<Visitor>()(std::declval<R>())))
+            noexcept(is_nothrow_callable<Visitor(R)>::value)
             -> typename std::result_of<Visitor(R)>::type {
-        return std::forward<Visitor>(m_visitor)(
+        return invoke(std::forward<Visitor>(m_visitor),
                 std::forward<Union>(m_target).template value<T>());
     }
 
@@ -393,6 +388,52 @@ public:
 
 } // namespace swap_impl
 
+template<typename F, typename O>
+class mapper {
+
+private:
+
+    F &&m_function;
+
+public:
+
+    constexpr explicit mapper(F &&f) noexcept :
+            m_function(std::forward<F>(f)) { }
+
+    template<typename T>
+    constexpr
+    typename std::enable_if<is_callable<F(T &&)>::value, O>::type
+    operator()(T &&t) const {
+        return invoke(std::forward<F>(m_function), std::forward<T>(t));
+    }
+
+    template<typename T>
+    constexpr
+    typename std::enable_if<
+            !is_callable<F(T &&)>::value &&
+                    std::is_convertible<T &&, O>::value,
+            O>::type
+    operator()(T &&t) const {
+        return std::forward<T>(t);
+    }
+
+}; // template<typename F, typename O> class mapper
+
+template<typename F>
+class map_result {
+
+public:
+
+    template<typename T>
+    auto operator()(T &&) const
+            -> typename result_of<F(T &&)>::type;
+
+    template<typename T>
+    auto operator()(T &&) const
+            -> typename std::enable_if<!is_callable<F(T &&)>::value, T>::type;
+
+}; // template<typename F> class map_result
+
 /** Fundamental implementation of variant. */
 template<typename... T>
 class variant_base : private type_tag<T...> {
@@ -471,7 +512,7 @@ public:
      * @param arg the arguments forwarded to the constructor.
      */
     template<typename U, typename... Arg>
-    explicit variant_base(type_tag<U> tag, Arg &&... arg)
+    explicit variant_base(direct_initialize, type_tag<U> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
             tag_type(tag), m_value(tag, std::forward<Arg>(arg)...) { }
 
@@ -483,19 +524,20 @@ public:
      *
      * @tparam U the argument type.
      * @tparam V the type of the new contained value to be constructed.
-     *     Inferred from the argument type. If V is a specialization of
-     *     type_tag, this constructor overload cannot be used.
+     *     Inferred from the argument type.
      * @param v the argument forwarded to the constructor.
      */
     template<
             typename U,
             typename V = typename std::decay<U>::type,
-            typename =
-                    typename std::enable_if<is_any_of<V, T...>::value>::type,
-            typename = typename std::enable_if<!is_type_tag<V>::value>::type>
+            typename = typename std::enable_if<
+                    std::is_constructible<V, U>::value>::type,
+            typename = typename std::enable_if<
+                    is_any_of<V, T...>::value>::type>
     variant_base(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
-            variant_base(type_tag<V>(), std::forward<U>(v)) { }
+            variant_base(
+                    direct_initialize(), type_tag<V>(), std::forward<U>(v)) { }
 
     /**
      * Creates a new variant by move-constructing its contained value from the
@@ -792,7 +834,8 @@ public:
             this->~variant_base();
             new (this) variant_base(std::forward<Arg>(arg)...);
         } catch (...) {
-            reconstruct_or_terminate(this, type_tag<Fallback>());
+            reconstruct_or_terminate(
+                    this, direct_initialize(), type_tag<Fallback>());
             throw;
         }
     }
@@ -862,7 +905,7 @@ public:
      */
     template<typename U, typename V = typename std::decay<U>::type>
     void reset(U &&v) noexcept {
-        emplace(type_tag<V>(), std::forward<U>(v));
+        emplace(direct_initialize(), type_tag<V>(), std::forward<U>(v));
     }
 
     /**
@@ -1217,6 +1260,72 @@ public:
     }
 
     /**
+     * Converts the value of this variant to another value, which is typically
+     * another variant.
+     *
+     * The argument is expected to be of a callable type. If it is callable
+     * with the currently contained value of this variant, it is called.
+     * Otherwise, the result is just the contained value. In either case, the
+     * result is implicitly converted to {@code R} before returned.
+     */
+    template<
+            typename F,
+            typename R = typename partial_common_result<F, const T &...>::type>
+    constexpr R flat_map(F &&f) const & {
+        return this->apply(mapper<F, R>(std::forward<F>(f)));
+    }
+
+    /**
+     * Converts the value of this variant to another value, which is typically
+     * another variant.
+     *
+     * The argument is expected to be of a callable type. If it is callable
+     * with the currently contained value of this variant, it is called.
+     * Otherwise, the result is just the contained value. In either case, the
+     * result is implicitly converted to {@code R} before returned.
+     */
+    template<
+            typename F,
+            typename R = typename partial_common_result<F, T &&...>::type>
+    /* constexpr */ R flat_map(F &&f) && {
+        return std::move(*this).apply(mapper<F, R>(std::forward<F>(f)));
+    }
+
+    /**
+     * Converts the value of this variant by applying the argument function to
+     * produce another variant with possibly different contained types.
+     *
+     * The argument is expected to be of a callable type. If it is callable
+     * with the currently contained value of this variant, it is called.
+     * Otherwise, the result is just the contained value. In either case, the
+     * result is implicitly converted to {@code R} before returned.
+     */
+    template<
+            typename F,
+            typename R = variant<typename std::decay<typename std::result_of<
+                    map_result<F>(const T &)>::type>::type...>>
+    constexpr R map(F &&f) const & {
+        return this->apply(mapper<F, R>(std::forward<F>(f)));
+    }
+
+    /**
+     * Converts the value of this variant by applying the argument function to
+     * produce another variant with possibly different contained types.
+     *
+     * The argument is expected to be of a callable type. If it is callable
+     * with the currently contained value of this variant, it is called.
+     * Otherwise, the result is just the contained value. In either case, the
+     * result is implicitly converted to {@code R} before returned.
+     */
+    template<
+            typename F,
+            typename R = variant<typename std::decay<typename std::result_of<
+                    map_result<F>(T &&)>::type>::type...>>
+    /* constexpr */ R map(F &&f) && {
+        return std::move(*this).apply(mapper<F, R>(std::forward<F>(f)));
+    }
+
+    /**
      * Creates a new variant by constructing its contained value by calling the
      * constructor of <code>U</code> with forwarded arguments.
      *
@@ -1230,7 +1339,8 @@ public:
     static variant create(Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value &&
                     std::is_nothrow_destructible<U>::value) {
-        return variant(type_tag<U>(), std::forward<Arg>(arg)...);
+        return variant(
+                direct_initialize(), type_tag<U>(), std::forward<Arg>(arg)...);
     }
 
     /**
@@ -1257,7 +1367,11 @@ public:
                 std::is_nothrow_constructible<
                     U, std::initializer_list<ListArg> &, Arg &&...>::value &&
                 std::is_nothrow_destructible<U>::value) {
-        return variant(type_tag<U>(), list, std::forward<Arg>(arg)...);
+        return variant(
+                direct_initialize(),
+                type_tag<U>(),
+                list,
+                std::forward<Arg>(arg)...);
     }
 
     /**

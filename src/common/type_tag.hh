@@ -23,6 +23,7 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+#include "common/function_helper.hh"
 
 namespace sesh {
 namespace common {
@@ -217,9 +218,9 @@ public:
      */
     template<typename F>
     constexpr auto apply(F &&f) const
-            noexcept(noexcept(std::forward<F>(f)(std::declval<type_tag>())))
-            -> decltype(std::forward<F>(f)(std::declval<type_tag>())) {
-        return std::forward<F>(f)(type_tag());
+            noexcept(is_nothrow_callable<F(type_tag)>::value)
+            -> typename result_of<F(type_tag)>::type {
+        return invoke(std::forward<F>(f), type_tag());
     }
 
 }; // template<typename T> class type_tag<T>

@@ -25,6 +25,7 @@
 #include <functional>
 #include <memory>
 #include <utility>
+#include "common/direct_initialize.hh"
 #include "common/either.hh"
 #include "common/empty.hh"
 #include "common/type_tag.hh"
@@ -65,8 +66,8 @@ private:
     using input = common::variant<empty, trial, forward_source>;
     using output = common::variant<empty, callback, forward_target>;
 
-    input m_input = input(common::type_tag<empty>());
-    output m_output = output(common::type_tag<empty>());
+    input m_input = input(empty());
+    output m_output = output(empty());
 
     void fire_if_ready() {
         if (m_input.tag() != m_input.template tag<trial>())
@@ -100,10 +101,14 @@ public:
 
         try {
             m_input.template emplace_with_fallback<empty>(
-                    common::type_tag<trial>(), std::forward<Arg>(arg)...);
+                    common::direct_initialize(),
+                    common::type_tag<trial>(),
+                    std::forward<Arg>(arg)...);
         } catch (...) {
             m_input.emplace(
-                    common::type_tag<trial>(), std::current_exception());
+                    common::direct_initialize(),
+                    common::type_tag<trial>(),
+                    std::current_exception());
         }
 
         fire_if_ready();
@@ -184,9 +189,14 @@ public:
                     std::move(to->m_output.template value<callback>()));
 
         // Connect
-        to->m_input.emplace(common::type_tag<forward_source>(), from);
+        to->m_input.emplace(
+                common::direct_initialize(),
+                common::type_tag<forward_source>(),
+                from);
         from->m_output.emplace(
-                common::type_tag<forward_target>(), std::move(to));
+                common::direct_initialize(),
+                common::type_tag<forward_target>(),
+                std::move(to));
     }
 
 }; // template<typename T> class delay

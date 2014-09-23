@@ -24,6 +24,7 @@
 namespace {
 
 using sesh::common::is_callable;
+using sesh::common::partial_common_result;
 using sesh::common::result_of_t;
 
 class dummy {
@@ -49,6 +50,14 @@ auto result_of_sfinae(Callable &&c, Argument &&... arg)
             std::true_type());
 
 std::false_type result_of_sfinae(...);
+
+template<typename F, typename... A>
+auto partial_common_result_sfinae(partial_common_result<F, A...>)
+    -> decltype(
+            std::declval<partial_common_result<F, A...>::type>(),
+            std::true_type());
+
+std::false_type partial_common_result_sfinae(...);
 
 namespace {
 
@@ -122,6 +131,41 @@ TEST_CASE("Result of data member pointer dereference with bogus arguments") {
     using R2 = decltype(
             result_of_sfinae(std::declval<P>(), std::declval<stub *>(), 1));
     CHECK_FALSE(R2::value);
+}
+
+TEST_CASE("Partial common result with empty argument list") {
+    struct F { };
+    CHECK_FALSE(decltype(partial_common_result_sfinae(
+            partial_common_result<F>()))::value);
+}
+
+TEST_CASE("Partial common result is not defined for different result types") {
+    struct F {
+        int operator()(int i) { return i; }
+        double operator()(double d) { return d; }
+    };
+    CHECK_FALSE(decltype(partial_common_result_sfinae(
+            partial_common_result<F, int, double>()))::value);
+}
+
+TEST_CASE("Partial common result of two different argument types") {
+    struct F {
+        void operator()(int) { }
+        void operator()(double) { }
+    };
+    using R = typename partial_common_result<F, int, double>::type;
+    CHECK((std::is_same<R, void>::value));
+}
+
+TEST_CASE("Partial common result ignores uncallable argument types") {
+    struct F{
+        char operator()(int i) { return i; }
+        double operator()(double d) { return d; }
+    };
+    using R = typename partial_common_result<F, int, long>::type;
+    CHECK((std::is_same<R, char>::value));
+    CHECK_FALSE(decltype(partial_common_result_sfinae(
+            partial_common_result<F, int, double>()))::value);
 }
 
 } // namespace

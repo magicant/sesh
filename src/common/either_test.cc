@@ -21,6 +21,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include "catch.hpp"
+#include "common/direct_initialize.hh"
 #include "common/either.hh"
 #include "common/empty.hh"
 #include "common/type_tag.hh"
@@ -29,6 +30,7 @@
 namespace {
 
 using sesh::common::bad_maybe_access;
+using sesh::common::direct_initialize;
 using sesh::common::either;
 using sesh::common::empty;
 using sesh::common::type_tag;
@@ -60,7 +62,7 @@ TEST_CASE("Either: in-place construction") {
     struct X {
         constexpr X(int, char, double) noexcept { }
     };
-    either<int, X>(type_tag<X>(), 1, '1', 1.0);
+    either<int, X>(direct_initialize(), type_tag<X>(), 1, '1', 1.0);
 }
 
 TEST_CASE("Either: conversion to Boolean") {
@@ -247,7 +249,8 @@ TEST_CASE("Either: operator= with another either, success") {
 TEST_CASE("Either: operator= with another either, failure") {
     using E = either<empty, copy_thrower>;
     E e;
-    CHECK_THROWS_AS(e = E(type_tag<copy_thrower>()), empty);
+    CHECK_THROWS_AS(
+            e = E(direct_initialize(), type_tag<copy_thrower>()), empty);
     CHECK(e.tag() == type_tag<empty>());
 }
 

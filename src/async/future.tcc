@@ -27,6 +27,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "common/function_helper.hh"
 #include "common/shared_function.hh"
 
 namespace sesh {
@@ -69,8 +70,9 @@ public:
 
     template<typename From>
     void operator()(From &&r) {
-        std::move(m_receiver).set_result_from(
-                [this, &r] { return m_function(std::forward<From>(r)); });
+        std::move(m_receiver).set_result_from([this, &r] {
+            return common::invoke(m_function, std::forward<From>(r));
+        });
     }
 
 };
@@ -106,14 +108,14 @@ public:
 
     template<typename From>
     auto operator()(const common::trial<From> &r)
-            -> decltype(m_function(r.get())) {
-        return m_function(r.get());
+            -> typename common::result_of<Function &(const From &)>::type {
+        return common::invoke(m_function, r.get());
     }
 
     template<typename From>
     auto operator()(common::trial<From> &&r)
-            -> decltype(m_function(std::move(r.get()))) {
-        return m_function(std::move(r.get()));
+            -> typename common::result_of<Function &(From &&)>::type {
+        return common::invoke(m_function, std::move(r.get()));
     }
 
 };
@@ -149,14 +151,16 @@ public:
     T operator()(const common::trial<T> &r) {
         if (r)
             return *r;
-        return m_function(r.template value<std::exception_ptr>());
+        return common::invoke(
+                m_function, r.template value<std::exception_ptr>());
     }
 
     template<typename T>
     T operator()(common::trial<T> &&r) {
         if (r)
             return std::move(*r);
-        return m_function(r.template value<std::exception_ptr>());
+        return common::invoke(
+                m_function, r.template value<std::exception_ptr>());
     }
 
 };

@@ -193,13 +193,13 @@ void convert(const signal_action &from, struct sesh_osapi_signal_action &to) {
 void convert(const struct sesh_osapi_signal_action &from, signal_action &to) {
     switch (from.type) {
     case SESH_OSAPI_SIG_DFL:
-        to.emplace(type_tag<api::default_action>());
+        to.emplace(api::default_action());
         break;
     case SESH_OSAPI_SIG_IGN:
-        to.emplace(type_tag<api::ignore>());
+        to.emplace(api::ignore());
         break;
     case SESH_OSAPI_SIG_HANDLER:
-        to.emplace(type_tag<sesh_osapi_signal_handler *>(), from.handler);
+        to.emplace(from.handler);
         break;
     }
 }
