@@ -86,7 +86,7 @@ public:
  * results. Like Haskell's Either type, the definition of this class template
  * is <em>right-biased</em>; the left value stands for an unsuccessful result
  * and right for successful. If the two types should be treated equally, you
- * should use {@link variant} directly.
+ * should use {@link variant_impl::variant} directly.
  *
  * @tparam L The type of failed results.
  * @tparam R The type of successful results.

@@ -51,7 +51,7 @@ public:
      * The pointer arguments to file descriptor sets and a signal number set
      * may be null. Non-null pointers passed to this function must be obtained
      * from the {@link #create_file_descriptor_set} and {@link
-     * #createSignalNumberSet} functions called for the same {@code *this}.
+     * #create_signal_number_set} functions called for the same {@code *this}.
      *
      * @param timeout A negative value means no timeout.
      */
