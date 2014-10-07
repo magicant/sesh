@@ -29,7 +29,7 @@
 #include "os/io/file_descriptor.hh"
 #include "os/io/file_descriptor_set.hh"
 #include "os/io/file_descriptor_set_test_helper.hh"
-#include "os/signaling/signal_number_set.hh"
+#include "os/signaling/signal_number_set_test_helper.hh"
 #include "os/time_api_test_helper.hh"
 
 /*
@@ -59,6 +59,7 @@ class pselect_api_stub : public pselect_api, public time_api_fake {
 public:
 
     using file_descriptor_set_impl = io::file_descriptor_set_fake;
+    using signal_number_set_impl = signaling::signal_number_set_fake;
 
     using pselect_function = std::function<std::error_code(
             const pselect_api_stub &,
@@ -79,6 +80,12 @@ public:
             override {
         return std::unique_ptr<io::file_descriptor_set>(
                 new file_descriptor_set_impl());
+    }
+
+    std::unique_ptr<signaling::signal_number_set> create_signal_number_set()
+            const override {
+        return std::unique_ptr<signaling::signal_number_set>(
+                new signal_number_set_impl());
     }
 
     static void check_equal(

@@ -41,6 +41,10 @@ public:
     virtual auto create_file_descriptor_set() const
             -> std::unique_ptr<io::file_descriptor_set> = 0;
 
+    /** Returns a unique pointer to a new empty signal number set. */
+    virtual auto create_signal_number_set() const
+            -> std::unique_ptr<signaling::signal_number_set> = 0;
+
     /**
      * Wait for a file descriptor or signal event.
      *
