@@ -24,7 +24,6 @@
 #include <vector>
 #include "language/syntax/conditional_pipeline.hh"
 #include "language/syntax/pipeline.hh"
-#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -34,7 +33,7 @@ namespace syntax {
  * An and-or list is a pipeline possibly followed by any number of conditional
  * pipelines.
  */
-class and_or_list : public printable {
+class and_or_list {
 
 public:
 
@@ -59,7 +58,7 @@ public:
     and_or_list(and_or_list &&) = default;
     and_or_list &operator=(const and_or_list &) = delete;
     and_or_list &operator=(and_or_list &&) = default;
-    ~and_or_list() override = default;
+    ~and_or_list() = default;
 
     pipeline &first() noexcept { return m_first; }
     const pipeline &first() const noexcept { return m_first; }
@@ -77,8 +76,6 @@ public:
     synchronicity_type synchronicity() const noexcept {
         return m_synchronicity;
     }
-
-    void print(printer &) const override;
 
 }; // class and_or_list
 

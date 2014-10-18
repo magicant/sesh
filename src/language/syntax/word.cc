@@ -74,11 +74,6 @@ bool word::is_raw_string() const {
             [](const component_pointer &c) { return c->is_raw_string(); });
 }
 
-void word::print(printer &p) const {
-    for (const component_pointer &c : components())
-        p << *c;
-}
-
 } // namespace syntax
 } // namespace language
 } // namespace sesh

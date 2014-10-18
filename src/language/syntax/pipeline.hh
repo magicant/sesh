@@ -23,7 +23,6 @@
 #include <memory>
 #include <vector>
 #include "language/syntax/command.hh"
-#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -33,7 +32,7 @@ namespace syntax {
  * A pipeline is a list of one or more commands that are executed at a time
  * with the standard input/output connected with each other.
  */
-class pipeline : public printable {
+class pipeline {
 
 public:
 
@@ -57,7 +56,7 @@ public:
     pipeline(pipeline &&) = default;
     pipeline &operator=(const pipeline &) = delete;
     pipeline &operator=(pipeline &&) = default;
-    ~pipeline() override = default;
+    ~pipeline() = default;
 
     std::vector<command_pointer> &commands() noexcept {
         return m_commands;
@@ -72,8 +71,6 @@ public:
     exit_status_mode_type exit_status_mode() const noexcept {
         return m_exit_status_mode;
     }
-
-    void print(printer &) const override;
 
 }; // class pipeline
 

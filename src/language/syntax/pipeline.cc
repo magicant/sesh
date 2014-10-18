@@ -18,10 +18,7 @@
 #include "buildconfig.h"
 #include "pipeline.hh"
 
-#include <utility>
 #include <vector>
-#include "common/xchar.hh"
-#include "language/syntax/printer.hh"
 
 namespace sesh {
 namespace language {
@@ -29,24 +26,6 @@ namespace syntax {
 
 pipeline::pipeline(exit_status_mode_type e) :
         m_commands(), m_exit_status_mode(e) { }
-
-void pipeline::print(printer &p) const {
-    switch (exit_status_mode()) {
-    case exit_status_mode_type::straight:
-        break;
-    case exit_status_mode_type::negated:
-        p << L("! ");
-        break;
-    }
-
-    bool is_first = true;
-    for (const command_pointer &c : commands()) {
-        if (!is_first)
-            p << L("| ");
-        p << *c;
-        is_first = false;
-    }
-}
 
 } // namespace syntax
 } // namespace language

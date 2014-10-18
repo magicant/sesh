@@ -20,15 +20,11 @@
 #include "catch.hpp"
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/syntax/printer.hh"
-#include "language/syntax/printer_test_helper.hh"
 #include "language/syntax/raw_string.hh"
 
 namespace {
 
 using sesh::common::xstring;
-using sesh::language::syntax::for_each_line_mode;
-using sesh::language::syntax::printer;
 using sesh::language::syntax::raw_string;
 
 TEST_CASE("Raw string constructors and value") {
@@ -52,14 +48,6 @@ TEST_CASE("Raw string, append constant value") {
     CHECK(s == L("1"));
     CHECK(raw_string(L("ABC")).append_constant_value(s));
     CHECK(s == L("1ABC"));
-}
-
-TEST_CASE("Raw string print") {
-    for_each_line_mode([](printer &p) {
-        p << raw_string(L("1")) << raw_string(L(""));
-        p << raw_string(L("23"));
-        CHECK(p.to_string() == L("123"));
-    });
 }
 
 } // namespace

@@ -22,7 +22,6 @@
 
 #include <memory>
 #include "common/xstring.hh"
-#include "language/syntax/printable.hh"
 #include "language/syntax/word.hh"
 
 namespace sesh {
@@ -30,7 +29,7 @@ namespace language {
 namespace syntax {
 
 /** An assignment is part of a simple command. */
-class assignment : public printable {
+class assignment {
 
 public:
 
@@ -51,7 +50,7 @@ public:
     assignment(assignment &&) = default;
     assignment &operator=(const assignment &) = delete;
     assignment &operator=(assignment &&) = default;
-    ~assignment() override = default;
+    ~assignment() = default;
 
     common::xstring &variable_name() noexcept {
         return m_variable_name;
@@ -62,8 +61,6 @@ public:
 
     word &value() noexcept { return *m_value; }
     const word &value() const noexcept { return *m_value; }
-
-    void print(printer &) const override;
 
 }; // class assignment
 

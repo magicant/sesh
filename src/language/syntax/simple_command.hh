@@ -54,7 +54,7 @@ public:
     simple_command(simple_command &&) = default;
     simple_command &operator=(const simple_command &) = delete;
     simple_command &operator=(simple_command &&) = default;
-    ~simple_command() override = default;
+    ~simple_command() = default;
 
     std::vector<word_pointer> &words() noexcept {
         return m_words;
@@ -69,8 +69,6 @@ public:
     const std::vector<assignment_pointer> &assignments() const noexcept {
         return m_assignments;
     }
-
-    void print(printer &) const override;
 
 }; // class simple_command
 

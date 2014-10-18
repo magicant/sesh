@@ -49,20 +49,12 @@ public:
     explicit raw_string(common::xstring &&s) noexcept :
             m_value(std::move(s)) { }
 
-    raw_string(const raw_string &) = default;
-    raw_string(raw_string &&) = default;
-    raw_string &operator=(const raw_string &) = default;
-    raw_string &operator=(raw_string &&) = default;
-    ~raw_string() override = default;
-
     bool is_raw_string() const noexcept override { return true; }
 
     common::xstring &value() { return m_value; }
     const common::xstring &value() const { return m_value; }
 
     bool append_constant_value(common::xstring &) const override;
-
-    void print(printer &) const override;
 
 }; // class raw_string
 

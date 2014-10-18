@@ -18,26 +18,11 @@
 #include "buildconfig.h"
 #include "simple_command.hh"
 
-#include <utility>
-#include "common/xchar.hh"
-#include "language/syntax/printer.hh"
-
 namespace sesh {
 namespace language {
 namespace syntax {
 
 simple_command::simple_command() : command(), m_words(), m_assignments() { }
-
-void simple_command::print(printer &p) const {
-    for (const assignment_pointer &a : assignments()) {
-        p << *a;
-        p.delayed_characters() << L(' ');
-    }
-    for (const word_pointer &w : words()) {
-        p << *w;
-        p.delayed_characters() << L(' ');
-    }
-}
 
 } // namespace syntax
 } // namespace language

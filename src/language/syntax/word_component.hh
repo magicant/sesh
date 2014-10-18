@@ -21,22 +21,16 @@
 #include "buildconfig.h"
 
 #include "common/xstring.hh"
-#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
-class word_component : public printable {
+class word_component {
 
 public:
 
-    word_component() = default;
-    word_component(const word_component &) = default;
-    word_component(word_component &&) = default;
-    word_component &operator=(const word_component &) = default;
-    word_component &operator=(word_component &&) = default;
-    ~word_component() override = default;
+    virtual ~word_component() = default;
 
     virtual bool is_raw_string() const noexcept { return false; }
 

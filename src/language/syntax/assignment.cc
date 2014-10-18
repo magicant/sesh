@@ -18,11 +18,8 @@
 #include "buildconfig.h"
 #include "assignment.hh"
 
-#include <stdexcept>
 #include <utility>
-#include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/syntax/printer.hh"
 #include "language/syntax/word.hh"
 
 namespace sesh {
@@ -50,10 +47,6 @@ assignment::assignment(const xstring &variable_name, word_pointer &&value) :
 assignment::assignment(xstring &&variable_name, word_pointer &&value) :
         m_variable_name(std::move(variable_name)), m_value(std::move(value)) {
     create_word_if_null(m_value);
-}
-
-void assignment::print(printer &p) const {
-    p << variable_name() << L('=') << value();
 }
 
 } // namespace syntax

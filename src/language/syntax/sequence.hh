@@ -23,7 +23,6 @@
 #include <memory>
 #include <vector>
 #include "language/syntax/and_or_list.hh"
-#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -35,7 +34,7 @@ namespace syntax {
  * may contain no and-or lists. Users of this class must validate the number of
  * contained and-or lists.
  */
-class sequence : public printable {
+class sequence {
 
 public:
 
@@ -52,7 +51,7 @@ public:
     sequence(sequence &&) = default;
     sequence &operator=(const sequence &) = delete;
     sequence &operator=(sequence &&) = default;
-    ~sequence() override = default;
+    ~sequence() = default;
 
     std::vector<and_or_list_pointer> &and_or_lists() noexcept {
         return m_and_or_lists;
@@ -60,8 +59,6 @@ public:
     const std::vector<and_or_list_pointer> &and_or_lists() const noexcept {
         return m_and_or_lists;
     }
-
-    void print(printer &) const override;
 
 }; // class sequence
 

@@ -18,11 +18,8 @@
 #include "buildconfig.h"
 #include "conditional_pipeline.hh"
 
-#include <stdexcept>
 #include <utility>
-#include "common/xchar.hh"
 #include "language/syntax/pipeline.hh"
-#include "language/syntax/printer.hh"
 
 namespace sesh {
 namespace language {
@@ -36,16 +33,6 @@ conditional_pipeline::conditional_pipeline(
         m_condition(c), m_pipeline(std::move(p)) {
     if (m_pipeline == nullptr)
         m_pipeline.reset(new class pipeline);
-}
-
-void conditional_pipeline::print(printer &p) const {
-    switch (condition()) {
-    case condition_type::and_then:  p << L("&&");  break;
-    case condition_type::or_else:   p << L("||");  break;
-    }
-    p.break_line();
-    p.print_indent();
-    p << *m_pipeline;
 }
 
 } // namespace syntax

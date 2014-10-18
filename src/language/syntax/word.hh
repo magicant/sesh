@@ -25,7 +25,6 @@
 #include <vector>
 #include "common/either.hh"
 #include "common/xstring.hh"
-#include "language/syntax/printable.hh"
 #include "language/syntax/word_component.hh"
 
 namespace sesh {
@@ -36,7 +35,7 @@ namespace syntax {
  * A word is a token that may contain expansions. A word is composed of any
  * number of word components.
  */
-class word : public printable {
+class word {
 
 public:
 
@@ -61,7 +60,7 @@ public:
     word(word &&) = default;
     word &operator=(const word &) = delete;
     word &operator=(word &&) = default;
-    ~word() override = default;
+    ~word() = default;
 
     const std::vector<component_pointer> &components() const noexcept {
         return m_components;
@@ -95,8 +94,6 @@ public:
 
     /** Returns true if all components of this word are raw strings. */
     bool is_raw_string() const;
-
-    void print(printer &) const override;
 
 }; // class word
 

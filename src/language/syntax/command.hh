@@ -20,28 +20,18 @@
 
 #include "buildconfig.h"
 
-#include <utility>
-#include "language/syntax/printable.hh"
-
 namespace sesh {
 namespace language {
 namespace syntax {
 
 /** A command is either a simple or compound command. */
-class command : public printable {
-
-private:
+class command {
 
     // TODO Redirection
 
 public:
 
-    command() = default;
-    command(const command &) = default;
-    command(command &&) = default;
-    command &operator=(const command &) = default;
-    command &operator=(command &&) = default;
-    ~command() override = default;
+    virtual ~command() = default;
 
 }; // class command
 

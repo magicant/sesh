@@ -19,7 +19,6 @@
 #include "raw_string.hh"
 
 #include "common/xstring.hh"
-#include "language/syntax/printer.hh"
 
 using sesh::common::xstring;
 
@@ -30,10 +29,6 @@ namespace syntax {
 bool raw_string::append_constant_value(xstring &s) const {
     s += value();
     return true;
-}
-
-void raw_string::print(printer &p) const {
-    p << value();
 }
 
 } // namespace syntax

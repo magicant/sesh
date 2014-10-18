@@ -44,13 +44,8 @@ TESTPROGRAMS = \
 	src/language/source/source_test \
 	src/language/syntax/and_or_list_test \
 	src/language/syntax/assignment_test \
-	src/language/syntax/command_test \
 	src/language/syntax/conditional_pipeline_test \
-	src/language/syntax/pipeline_test \
-	src/language/syntax/printer_test \
 	src/language/syntax/raw_string_test \
-	src/language/syntax/sequence_test \
-	src/language/syntax/simple_command_test \
 	src/language/syntax/word_test \
 	src/os/event/awaiter_error_file_descriptor_test \
 	src/os/event/awaiter_file_descriptor_test \
@@ -146,12 +141,8 @@ src_sesh_SOURCES = \
 	src/language/syntax/conditional_pipeline.hh \
 	src/language/syntax/pipeline.cc \
 	src/language/syntax/pipeline.hh \
-	src/language/syntax/printable.hh \
-	src/language/syntax/printer.cc \
-	src/language/syntax/printer.hh \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/raw_string.hh \
-	src/language/syntax/sequence.cc \
 	src/language/syntax/sequence.hh \
 	src/language/syntax/simple_command.cc \
 	src/language/syntax/simple_command.hh \
@@ -291,62 +282,25 @@ src_language_syntax_and_or_list_test_SOURCES = \
 	src/language/syntax/and_or_list.cc \
 	src/language/syntax/and_or_list_test.cc \
 	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/pipeline.cc \
-	src/language/syntax/printer.cc
+	src/language/syntax/pipeline.cc
 src_language_syntax_assignment_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/syntax/assignment.cc \
 	src/language/syntax/assignment_test.cc \
-	src/language/syntax/printer.cc \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/word.cc
-src_language_syntax_command_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/command_test.cc
 src_language_syntax_conditional_pipeline_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/source/location.cc \
 	src/language/syntax/conditional_pipeline.cc \
 	src/language/syntax/conditional_pipeline_test.cc \
-	src/language/syntax/pipeline.cc \
-	src/language/syntax/printer.cc
-src_language_syntax_pipeline_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/pipeline.cc \
-	src/language/syntax/pipeline_test.cc \
-	src/language/syntax/printer.cc
-src_language_syntax_printer_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/syntax/printer.cc \
-	src/language/syntax/printer_test.cc
+	src/language/syntax/pipeline.cc
 src_language_syntax_raw_string_test_SOURCES = \
 	src/catch_main.cc \
-	src/language/syntax/printer.cc \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/raw_string_test.cc
-src_language_syntax_sequence_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/and_or_list.cc \
-	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/pipeline.cc \
-	src/language/syntax/printer.cc \
-	src/language/syntax/sequence.cc \
-	src/language/syntax/sequence_test.cc
-src_language_syntax_simple_command_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/assignment.cc \
-	src/language/syntax/printer.cc \
-	src/language/syntax/raw_string.cc \
-	src/language/syntax/simple_command.cc \
-	src/language/syntax/simple_command_test.cc \
-	src/language/syntax/word.cc
 src_language_syntax_word_test_SOURCES = \
 	src/catch_main.cc \
-	src/language/syntax/printer.cc \
 	src/language/syntax/raw_string.cc \
 	src/language/syntax/word.cc \
 	src/language/syntax/word_test.cc
@@ -436,7 +390,6 @@ TESTHEADERS = \
 	src/language/source/location_test_helper.hh \
 	src/language/source/origin_test_helper.hh \
 	src/language/source/source_test_helper.hh \
-	src/language/syntax/printer_test_helper.hh \
 	src/os/event/awaiter_test_helper.hh \
 	src/os/event/pselect_api_test_helper.hh \
 	src/os/io/file_description_api_test_helper.hh \

@@ -23,8 +23,6 @@
 #include "common/xchar.hh"
 #include "common/xstring.hh"
 #include "language/syntax/assignment.hh"
-#include "language/syntax/printer.hh"
-#include "language/syntax/printer_test_helper.hh"
 #include "language/syntax/raw_string.hh"
 #include "language/syntax/word.hh"
 
@@ -32,8 +30,6 @@ namespace {
 
 using sesh::common::xstring;
 using sesh::language::syntax::assignment;
-using sesh::language::syntax::for_each_line_mode;
-using sesh::language::syntax::printer;
 using sesh::language::syntax::raw_string;
 using sesh::language::syntax::word;
 
@@ -90,13 +86,6 @@ TEST_CASE("Assignment data 2") {
     assignment a2(xstring(name), assignment::word_pointer(new word));
     CHECK(a2.variable_name() == name);
     CHECK(a2.value().components().size() == 0);
-}
-
-TEST_CASE_METHOD(fixture, "Assignment print") {
-    for_each_line_mode([this](printer &p) {
-        p << a;
-        CHECK(p.to_string() == L("varName=assignedValue"));
-    });
 }
 
 } // namespace

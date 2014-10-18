@@ -19,8 +19,6 @@
 #include "and_or_list.hh"
 
 #include <utility>
-#include "common/xchar.hh"
-#include "language/syntax/printer.hh"
 
 namespace sesh {
 namespace language {
@@ -28,30 +26,6 @@ namespace syntax {
 
 and_or_list::and_or_list(pipeline &&first, synchronicity_type s) :
         m_first(std::move(first)), m_rest(), m_synchronicity(s) { }
-
-namespace {
-
-inline void print_separator(and_or_list::synchronicity_type s, printer &p) {
-    p.clear_delayed_characters();
-    switch (s) {
-    case and_or_list::synchronicity_type::sequential:
-        p.delayed_characters() << L(';');
-        break;
-    case and_or_list::synchronicity_type::asynchronous:
-        p << L('&');
-        break;
-    }
-    p.delayed_characters() << L(' ');
-}
-
-} // namespace
-
-void and_or_list::print(printer &p) const {
-    p << first();
-    for (const conditional_pipeline &cp : rest())
-        p << cp;
-    print_separator(synchronicity(), p);
-}
 
 } // namespace syntax
 } // namespace language

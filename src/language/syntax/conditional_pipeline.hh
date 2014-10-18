@@ -22,7 +22,6 @@
 
 #include <memory>
 #include "language/syntax/pipeline.hh"
-#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -32,7 +31,7 @@ namespace syntax {
  * A conditional pipeline is a pipeline that is executed conditionally
  * depending on the exit status of the previous pipeline.
  */
-class conditional_pipeline : public printable {
+class conditional_pipeline {
 
 public:
 
@@ -65,15 +64,13 @@ public:
     conditional_pipeline(conditional_pipeline &&) = default;
     conditional_pipeline &operator=(const conditional_pipeline &) = delete;
     conditional_pipeline &operator=(conditional_pipeline &&) = default;
-    ~conditional_pipeline() override = default;
+    ~conditional_pipeline() = default;
 
     condition_type &condition() noexcept { return m_condition; }
     condition_type condition() const noexcept { return m_condition; }
 
     class pipeline &pipeline() { return *m_pipeline; }
     const class pipeline &pipeline() const { return *m_pipeline; }
-
-    void print(printer &) const override;
 
 }; // class conditional_pipeline
 
