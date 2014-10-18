@@ -42,11 +42,6 @@ TESTPROGRAMS = \
 	src/language/source/line_continued_source_test \
 	src/language/source/location_test \
 	src/language/source/source_test \
-	src/language/syntax/and_or_list_test \
-	src/language/syntax/assignment_test \
-	src/language/syntax/conditional_pipeline_test \
-	src/language/syntax/raw_string_test \
-	src/language/syntax/word_test \
 	src/os/event/awaiter_error_file_descriptor_test \
 	src/os/event/awaiter_file_descriptor_test \
 	src/os/event/awaiter_readable_file_descriptor_test \
@@ -132,23 +127,6 @@ src_sesh_SOURCES = \
 	src/language/source/origin.hh \
 	src/language/source/source.cc \
 	src/language/source/source.hh \
-	src/language/syntax/and_or_list.cc \
-	src/language/syntax/and_or_list.hh \
-	src/language/syntax/assignment.cc \
-	src/language/syntax/assignment.hh \
-	src/language/syntax/command.hh \
-	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/conditional_pipeline.hh \
-	src/language/syntax/pipeline.cc \
-	src/language/syntax/pipeline.hh \
-	src/language/syntax/raw_string.cc \
-	src/language/syntax/raw_string.hh \
-	src/language/syntax/sequence.hh \
-	src/language/syntax/simple_command.cc \
-	src/language/syntax/simple_command.hh \
-	src/language/syntax/word.cc \
-	src/language/syntax/word.hh \
-	src/language/syntax/word_component.hh \
 	src/main.cc \
 	src/os/api.cc \
 	src/os/api.hh \
@@ -276,34 +254,6 @@ src_language_source_source_test_SOURCES = \
 	src/common/message.cc \
 	src/language/source/source.cc \
 	src/language/source/source_test.cc
-src_language_syntax_and_or_list_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/and_or_list.cc \
-	src/language/syntax/and_or_list_test.cc \
-	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/pipeline.cc
-src_language_syntax_assignment_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/syntax/assignment.cc \
-	src/language/syntax/assignment_test.cc \
-	src/language/syntax/raw_string.cc \
-	src/language/syntax/word.cc
-src_language_syntax_conditional_pipeline_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/conditional_pipeline_test.cc \
-	src/language/syntax/pipeline.cc
-src_language_syntax_raw_string_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/syntax/raw_string.cc \
-	src/language/syntax/raw_string_test.cc
-src_language_syntax_word_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/syntax/raw_string.cc \
-	src/language/syntax/word.cc \
-	src/language/syntax/word_test.cc
 src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
 	src/catch_main.cc \
 	src/os/event/awaiter.cc \
