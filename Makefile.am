@@ -129,6 +129,15 @@ src_sesh_SOURCES = \
 	src/language/source/origin.hh \
 	src/language/source/source.cc \
 	src/language/source/source.hh \
+	src/language/syntax/and_or_list.hh \
+	src/language/syntax/command.hh \
+	src/language/syntax/conditional_pipeline.hh \
+	src/language/syntax/pipeline.hh \
+	src/language/syntax/raw_string.hh \
+	src/language/syntax/sequence.hh \
+	src/language/syntax/simple_command.hh \
+	src/language/syntax/word.hh \
+	src/language/syntax/word_component.hh \
 	src/main.cc \
 	src/os/api.cc \
 	src/os/api.hh \
