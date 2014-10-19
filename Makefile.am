@@ -121,6 +121,8 @@ src_sesh_SOURCES = \
 	src/language/printing/buffer.cc \
 	src/language/printing/buffer.hh \
 	src/language/printing/raw_string.hh \
+	src/language/printing/word_component.cc \
+	src/language/printing/word_component.hh \
 	src/language/source/buffer.cc \
 	src/language/source/buffer.hh \
 	src/language/source/diagnostic_message.cc \

@@ -135,6 +135,28 @@ public:
 
 }; // class buffer
 
+/**
+ * The buffer printer is a wrapper of a reference to a buffer and is callable
+ * with any one argument, which is forwarded to the print function with the
+ * buffer.
+ */
+class buffer_printer {
+
+private:
+
+    buffer &m_buffer;
+
+public:
+
+    explicit buffer_printer(buffer &b) noexcept : m_buffer(b) { }
+
+    template<typename T>
+    void operator()(T &&v) const {
+        print(std::forward<T>(v), m_buffer);
+    }
+
+}; // class buffer_printer
+
 } // namespace printing
 } // namespace language
 } // namespace sesh
