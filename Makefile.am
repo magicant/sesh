@@ -39,6 +39,7 @@ TESTPROGRAMS = \
 	src/common/variant_test \
 	src/common/visitor_test \
 	src/language/printing/buffer_test \
+	src/language/printing/raw_string_test \
 	src/language/source/buffer_test \
 	src/language/source/line_appended_source_test \
 	src/language/source/line_continued_source_test \
@@ -119,6 +120,7 @@ src_sesh_SOURCES = \
 	src/i18n/M.h \
 	src/language/printing/buffer.cc \
 	src/language/printing/buffer.hh \
+	src/language/printing/raw_string.hh \
 	src/language/source/buffer.cc \
 	src/language/source/buffer.hh \
 	src/language/source/diagnostic_message.cc \
@@ -245,6 +247,10 @@ src_language_printing_buffer_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/printing/buffer.cc \
 	src/language/printing/buffer_test.cc
+src_language_printing_raw_string_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/raw_string_test.cc
 src_language_source_buffer_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/message.cc \
