@@ -37,6 +37,7 @@ TESTPROGRAMS = \
 	src/common/trie_test \
 	src/common/type_tag_test \
 	src/common/variant_test \
+	src/common/visitor_test \
 	src/language/source/buffer_test \
 	src/language/source/line_appended_source_test \
 	src/language/source/line_continued_source_test \
@@ -108,6 +109,7 @@ src_sesh_SOURCES = \
 	src/common/trie.hh \
 	src/common/type_tag.hh \
 	src/common/variant.hh \
+	src/common/visitor.hh \
 	src/common/xchar.hh \
 	src/common/xostream.hh \
 	src/common/xsstream.hh \
@@ -224,6 +226,9 @@ src_common_type_tag_test_SOURCES = \
 src_common_variant_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/variant_test.cc
+src_common_visitor_test_SOURCES = \
+	src/catch_main.cc \
+	src/common/visitor_test.cc
 src_language_source_buffer_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/message.cc \
