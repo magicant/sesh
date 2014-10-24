@@ -40,6 +40,7 @@ TESTPROGRAMS = \
 	src/common/visitor_test \
 	src/language/printing/buffer_test \
 	src/language/printing/raw_string_test \
+	src/language/printing/simple_command_test \
 	src/language/printing/word_test \
 	src/language/source/buffer_test \
 	src/language/source/line_appended_source_test \
@@ -122,6 +123,8 @@ src_sesh_SOURCES = \
 	src/language/printing/buffer.cc \
 	src/language/printing/buffer.hh \
 	src/language/printing/raw_string.hh \
+	src/language/printing/simple_command.cc \
+	src/language/printing/simple_command.hh \
 	src/language/printing/word.cc \
 	src/language/printing/word.hh \
 	src/language/printing/word_component.cc \
@@ -256,6 +259,13 @@ src_language_printing_raw_string_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/printing/buffer.cc \
 	src/language/printing/raw_string_test.cc
+src_language_printing_simple_command_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/simple_command.cc \
+	src/language/printing/simple_command_test.cc \
+	src/language/printing/word.cc \
+	src/language/printing/word_component.cc
 src_language_printing_word_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/printing/buffer.cc \
@@ -378,6 +388,7 @@ TESTHEADERS = \
 	src/language/source/location_test_helper.hh \
 	src/language/source/origin_test_helper.hh \
 	src/language/source/source_test_helper.hh \
+	src/language/syntax/simple_command_test_helper.hh \
 	src/language/syntax/word_component_test_helper.hh \
 	src/language/syntax/word_test_helper.hh \
 	src/os/event/awaiter_test_helper.hh \
