@@ -122,6 +122,8 @@ src_sesh_SOURCES = \
 	src/i18n/M.h \
 	src/language/printing/buffer.cc \
 	src/language/printing/buffer.hh \
+	src/language/printing/command.cc \
+	src/language/printing/command.hh \
 	src/language/printing/raw_string.hh \
 	src/language/printing/simple_command.cc \
 	src/language/printing/simple_command.hh \
