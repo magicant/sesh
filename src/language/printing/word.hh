@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,32 +15,24 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_language_printing_word_hh
+#define INCLUDED_language_printing_word_hh
+
 #include "buildconfig.h"
 
-#include <cstddef>
-#include <memory>
-#include "catch.hpp"
-#include "common/xchar.hh"
-#include "common/xstring.hh"
-#include "language/syntax/command.hh"
-#include "language/syntax/printer.hh"
+#include "language/printing/buffer.hh"
+#include "language/syntax/word.hh"
 
-namespace {
+namespace sesh {
+namespace language {
+namespace printing {
 
-using sesh::common::xstring;
-using sesh::language::syntax::command;
-using sesh::language::syntax::printer;
+void print(const syntax::word &, buffer &);
 
-class command_stub : public command {
-public:
-    using command::command;
-    void print(printer &) const override;
-};
+} // namespace printing
+} // namespace language
+} // namespace sesh
 
-void command_stub::print(printer &) const {
-    CHECK(false);
-}
-
-} // namespace
+#endif // #ifndef INCLUDED_language_printing_word_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -21,82 +21,22 @@
 #include "buildconfig.h"
 
 #include <memory>
-#include <utility>
 #include <vector>
-#include "common/either.hh"
-#include "common/xstring.hh"
-#include "language/syntax/printable.hh"
 #include "language/syntax/word_component.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
-/**
- * A word is a token that may contain expansions. A word is composed of any
- * number of word components.
- */
-class word : public printable {
+/** A word is a token that is made up of zero or more word components. */
+class word {
 
 public:
 
-    using component_pointer = std::unique_ptr<word_component>;
+    /** The type of pointers to a word component. Pointers must not be null. */
+    using component_pointer = std::shared_ptr<const word_component>;
 
-private:
-
-    std::vector<component_pointer> m_components;
-
-    mutable common::maybe<common::maybe<common::xstring>>
-            m_maybe_constant_value_cache;
-
-public:
-
-    template<typename... Arg>
-    word(Arg &&... arg) :
-            m_components(std::forward<Arg>(arg)...),
-            m_maybe_constant_value_cache() { }
-
-    word() = default;
-    word(const word &) = delete;
-    word(word &&) = default;
-    word &operator=(const word &) = delete;
-    word &operator=(word &&) = default;
-    ~word() override = default;
-
-    const std::vector<component_pointer> &components() const noexcept {
-        return m_components;
-    }
-
-    /**
-     * Adds a component to this word.
-     * @param c non-null pointer to the component to add.
-     */
-    void add_component(component_pointer c);
-
-    /**
-     * Moves all components of the argument word to the end of this word. The
-     * argument word will be empty after this method returns.
-     */
-    void append(word &&);
-
-private:
-
-    common::maybe<common::xstring> compute_maybe_constant_value() const;
-
-public:
-
-    /**
-     * If the value of this word is constant, i.e., this word always evaluates
-     * to the same single string regardless of the execution environment, then
-     * returns a reference to a maybe object containing the constant value.
-     * Otherwise, returns a reference to an empty maybe object.
-     */
-    const common::maybe<common::xstring> &maybe_constant_value() const;
-
-    /** Returns true if all components of this word are raw strings. */
-    bool is_raw_string() const;
-
-    void print(printer &) const override;
+    std::vector<component_pointer> components;
 
 }; // class word
 

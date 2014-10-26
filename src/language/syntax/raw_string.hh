@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -20,49 +20,23 @@
 
 #include "buildconfig.h"
 
-#include <utility>
 #include "common/xstring.hh"
-#include "language/syntax/word_component.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
 /**
- * A raw string is a word component that is an unquoted string literal.
+ * A raw string is a word component composed of a non-empty string.
  *
- * The value of a raw string is not expected to contain characters that have
- * special meanings in the shell syntax (e.g. semicolon and backslash), but the
- * implementation of this class does not itself check the validity of the
- * string value.
+ * Despite that definition, an instance of this class may have an empty string.
+ * Users of this class must ensure that the string is non-empty.
  */
-class raw_string : public word_component {
-
-private:
-
-    common::xstring m_value;
+class raw_string {
 
 public:
 
-    raw_string() : m_value() { }
-    explicit raw_string(const common::xstring &s) : m_value(s) { }
-    explicit raw_string(common::xstring &&s) noexcept :
-            m_value(std::move(s)) { }
-
-    raw_string(const raw_string &) = default;
-    raw_string(raw_string &&) = default;
-    raw_string &operator=(const raw_string &) = default;
-    raw_string &operator=(raw_string &&) = default;
-    ~raw_string() override = default;
-
-    bool is_raw_string() const noexcept override { return true; }
-
-    common::xstring &value() { return m_value; }
-    const common::xstring &value() const { return m_value; }
-
-    bool append_constant_value(common::xstring &) const override;
-
-    void print(printer &) const override;
+    common::xstring value;
 
 }; // class raw_string
 

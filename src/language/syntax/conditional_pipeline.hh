@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -20,9 +20,8 @@
 
 #include "buildconfig.h"
 
-#include <memory>
+#include <utility>
 #include "language/syntax/pipeline.hh"
-#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -32,48 +31,36 @@ namespace syntax {
  * A conditional pipeline is a pipeline that is executed conditionally
  * depending on the exit status of the previous pipeline.
  */
-class conditional_pipeline : public printable {
+class conditional_pipeline {
 
 public:
 
-    using pipeline_pointer = std::unique_ptr<class pipeline>;
-
+    /** Defines a condition on which the pipeline is executed. */
     enum class condition_type {
         /**
-         * A conditional pipeline that has the and-then condition is executed
-         * if the exit status of the previous pipeline is zero.
+         * The pipeline is executed if the exit status of the previous pipeline
+         * is zero.
          */
         and_then,
         /**
-         * A conditional pipeline that has the or-else condition is executed
-         * if the exit status of the previous pipeline is non-zero.
+         * The pipeline is executed if the exit status of the previous pipeline
+         * is non-zero.
          */
         or_else,
     };
 
-private:
+    class pipeline pipeline;
+    condition_type condition;
 
-    condition_type m_condition;
-    pipeline_pointer m_pipeline;
-
-public:
-
-    explicit conditional_pipeline(condition_type c);
-    conditional_pipeline(condition_type c, pipeline_pointer &&p);
-
-    conditional_pipeline(const conditional_pipeline &) = delete;
-    conditional_pipeline(conditional_pipeline &&) = default;
-    conditional_pipeline &operator=(const conditional_pipeline &) = delete;
-    conditional_pipeline &operator=(conditional_pipeline &&) = default;
-    ~conditional_pipeline() override = default;
-
-    condition_type &condition() noexcept { return m_condition; }
-    condition_type condition() const noexcept { return m_condition; }
-
-    class pipeline &pipeline() { return *m_pipeline; }
-    const class pipeline &pipeline() const { return *m_pipeline; }
-
-    void print(printer &) const override;
+    /**
+     * Constructs a conditional pipeline.
+     * @param c Condition on which the pipeline is executed.
+     * @param a Arguments that are passed to the constructor of {@link
+     * pipeline} to initialize {@link #pipeline}.
+     */
+    template<typename... A>
+    explicit conditional_pipeline(condition_type c, A &&... a) :
+            pipeline(std::forward<A>(a)...), condition(c) { }
 
 }; // class conditional_pipeline
 

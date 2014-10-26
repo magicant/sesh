@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -16,82 +16,69 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "printer.hh"
+#include "buffer.hh"
 
+#include <limits>
 #include "common/xchar.hh"
 #include "common/xstring.hh"
 
-namespace sesh {
-namespace language {
-namespace syntax {
-
 namespace {
 
-using common::xstring;
+using sesh::common::xstring;
 
 } // namespace
 
-printer::printer(line_mode_type line_mode) :
-        m_line_mode(line_mode),
+namespace sesh {
+namespace language {
+namespace printing {
+
+buffer::buffer(line_mode_type mode) :
         m_main_buffer(),
         m_delayed_characters(),
         m_delayed_lines(),
-        m_indent_level() {
+        m_line_mode(mode),
+        m_indent_level() { }
+
+void buffer::clear_delayed_characters() {
+    m_delayed_characters.str({});
 }
 
-xstring printer::to_string() const {
-    return m_main_buffer.str();
-}
-
-void printer::clear_delayed_characters() {
-    m_delayed_characters.str(xstring());
-}
-
-void printer::commit_delayed_characters(){
+void buffer::commit_delayed_characters() {
     m_main_buffer << m_delayed_characters.str();
     clear_delayed_characters();
 }
 
-/**
- * If the line mode is multi_line, a newline and the contents of the delayed
- * line buffer are appended to the main buffer and the delayed character buffer
- * is cleared.
- *
- * If the line mode is single_line, the contents of the delayed character
- * buffer is set to a single space. The delayed line buffer is ignored.
- *
- * In either case, the delayed line buffer is cleared.
- */
-void printer::break_line() {
-    switch (m_line_mode) {
+void buffer::break_line() {
+    switch (line_mode()) {
     case line_mode_type::single_line:
-        m_delayed_characters.str(L(" "));
         break;
     case line_mode_type::multi_line:
         clear_delayed_characters();
         m_main_buffer << L('\n') << m_delayed_lines.str();
         break;
     }
-
-    m_delayed_lines.str(xstring());
+    m_delayed_lines.str({});
 }
 
-/**
- * Inserts a series of spaces. The number of spaces is determined from the
- * current indent level. The delayed character buffer is ignored. This function
- * does nothing if the line mode is not multi_line.
- */
-void printer::print_indent() {
-    switch (m_line_mode) {
+void buffer::indent() {
+    switch (line_mode()) {
     case line_mode_type::single_line:
         return;
     case line_mode_type::multi_line:
-        m_main_buffer << xstring(4 * m_indent_level, L(' '));
+        constexpr size_type width = 4;
+        size_type count = width * indent_level();
+        if (count / width != indent_level())
+            count = std::numeric_limits<size_type>::max();
+        append_delayed_characters(xstring(count, L(' ')));
         return;
     }
 }
 
-} // namespace syntax
+xstring buffer::to_string() const {
+    return m_main_buffer.str();
+}
+
+} // namespace printing
 } // namespace language
 } // namespace sesh
 

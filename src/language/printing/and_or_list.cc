@@ -15,46 +15,44 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_simple_command_hh
-#define INCLUDED_language_syntax_simple_command_hh
-
 #include "buildconfig.h"
+#include "and_or_list.hh"
 
-#include <vector>
-#include "language/syntax/word.hh"
+#include "language/syntax/and_or_list.hh"
+#include "language/printing/conditional_pipeline.hh"
+#include "language/printing/pipeline.hh"
+
+namespace {
+
+using sesh::language::syntax::and_or_list;
+using sesh::language::syntax::conditional_pipeline;
+
+} // namespace
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace printing {
 
-/**
- * A simple command is a combination of one or more non-empty words,
- * assignments, and redirections.
- *
- * Despite that definition, an instance of this class may not contain any of
- * words, assignments, and redirections. Users of this class must validate that
- * the instance is non-empty. Users must also ensure that words are non-empty.
- */
-class simple_command {
+void print(const and_or_list &l, buffer &b) {
+    print(l.first, b);
 
-public:
+    for (const conditional_pipeline &p : l.rest)
+        print(p, b);
 
-    std::vector<word> words;
-    // TODO assignments
-    // TODO redirections
-
-    bool empty() const {
-        return words.empty();
-        // TODO assignments
-        // TODO redirections
+    b.clear_delayed_characters();
+    switch (l.synchronicity) {
+    case and_or_list::synchronicity_type::sequential:
+        b.append_delayed_characters(L("; "));
+        break;
+    case and_or_list::synchronicity_type::asynchronous:
+        b.append_main(L('&'));
+        b.append_delayed_characters(L(' '));
+        break;
     }
+}
 
-}; // class simple_command
-
-} // namespace syntax
+} // namespace printing
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_syntax_simple_command_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

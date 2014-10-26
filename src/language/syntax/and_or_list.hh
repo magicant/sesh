@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -20,11 +20,9 @@
 
 #include "buildconfig.h"
 
-#include <memory>
 #include <vector>
 #include "language/syntax/conditional_pipeline.hh"
 #include "language/syntax/pipeline.hh"
-#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
@@ -32,53 +30,18 @@ namespace syntax {
 
 /**
  * An and-or list is a pipeline possibly followed by any number of conditional
- * pipelines.
+ * pipelines. An and-or list is executed either synchronously or
+ * asynchronously.
  */
-class and_or_list : public printable {
+class and_or_list {
 
 public:
 
-    enum class synchronicity_type {
-        sequential,
-        asynchronous,
-    };
+    enum class synchronicity_type { sequential, asynchronous };
 
-private:
-
-    pipeline m_first;
-    std::vector<conditional_pipeline> m_rest;
-    synchronicity_type m_synchronicity;
-
-public:
-
-    explicit and_or_list(
-            pipeline &&first,
-            synchronicity_type = synchronicity_type::sequential);
-
-    and_or_list(const and_or_list &) = delete;
-    and_or_list(and_or_list &&) = default;
-    and_or_list &operator=(const and_or_list &) = delete;
-    and_or_list &operator=(and_or_list &&) = default;
-    ~and_or_list() override = default;
-
-    pipeline &first() noexcept { return m_first; }
-    const pipeline &first() const noexcept { return m_first; }
-
-    std::vector<conditional_pipeline> &rest() noexcept {
-        return m_rest;
-    }
-    const std::vector<conditional_pipeline> &rest() const noexcept {
-        return m_rest;
-    }
-
-    synchronicity_type &synchronicity() noexcept {
-        return m_synchronicity;
-    }
-    synchronicity_type synchronicity() const noexcept {
-        return m_synchronicity;
-    }
-
-    void print(printer &) const override;
+    pipeline first;
+    std::vector<conditional_pipeline> rest;
+    synchronicity_type synchronicity = synchronicity_type::sequential;
 
 }; // class and_or_list
 

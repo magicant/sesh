@@ -37,21 +37,20 @@ TESTPROGRAMS = \
 	src/common/trie_test \
 	src/common/type_tag_test \
 	src/common/variant_test \
+	src/common/visitor_test \
+	src/language/printing/and_or_list_test \
+	src/language/printing/buffer_test \
+	src/language/printing/conditional_pipeline_test \
+	src/language/printing/pipeline_test \
+	src/language/printing/raw_string_test \
+	src/language/printing/sequence_test \
+	src/language/printing/simple_command_test \
+	src/language/printing/word_test \
 	src/language/source/buffer_test \
 	src/language/source/line_appended_source_test \
 	src/language/source/line_continued_source_test \
 	src/language/source/location_test \
 	src/language/source/source_test \
-	src/language/syntax/and_or_list_test \
-	src/language/syntax/assignment_test \
-	src/language/syntax/command_test \
-	src/language/syntax/conditional_pipeline_test \
-	src/language/syntax/pipeline_test \
-	src/language/syntax/printer_test \
-	src/language/syntax/raw_string_test \
-	src/language/syntax/sequence_test \
-	src/language/syntax/simple_command_test \
-	src/language/syntax/word_test \
 	src/os/event/awaiter_error_file_descriptor_test \
 	src/os/event/awaiter_file_descriptor_test \
 	src/os/event/awaiter_readable_file_descriptor_test \
@@ -118,12 +117,32 @@ src_sesh_SOURCES = \
 	src/common/trie.hh \
 	src/common/type_tag.hh \
 	src/common/variant.hh \
+	src/common/visitor.hh \
 	src/common/xchar.hh \
 	src/common/xostream.hh \
 	src/common/xsstream.hh \
 	src/common/xstring.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
+	src/language/printing/and_or_list.cc \
+	src/language/printing/and_or_list.hh \
+	src/language/printing/buffer.cc \
+	src/language/printing/buffer.hh \
+	src/language/printing/command.cc \
+	src/language/printing/command.hh \
+	src/language/printing/conditional_pipeline.cc \
+	src/language/printing/conditional_pipeline.hh \
+	src/language/printing/pipeline.cc \
+	src/language/printing/pipeline.hh \
+	src/language/printing/raw_string.hh \
+	src/language/printing/sequence.cc \
+	src/language/printing/sequence.hh \
+	src/language/printing/simple_command.cc \
+	src/language/printing/simple_command.hh \
+	src/language/printing/word.cc \
+	src/language/printing/word.hh \
+	src/language/printing/word_component.cc \
+	src/language/printing/word_component.hh \
 	src/language/source/buffer.cc \
 	src/language/source/buffer.hh \
 	src/language/source/diagnostic_message.cc \
@@ -137,25 +156,13 @@ src_sesh_SOURCES = \
 	src/language/source/origin.hh \
 	src/language/source/source.cc \
 	src/language/source/source.hh \
-	src/language/syntax/and_or_list.cc \
 	src/language/syntax/and_or_list.hh \
-	src/language/syntax/assignment.cc \
-	src/language/syntax/assignment.hh \
 	src/language/syntax/command.hh \
-	src/language/syntax/conditional_pipeline.cc \
 	src/language/syntax/conditional_pipeline.hh \
-	src/language/syntax/pipeline.cc \
 	src/language/syntax/pipeline.hh \
-	src/language/syntax/printable.hh \
-	src/language/syntax/printer.cc \
-	src/language/syntax/printer.hh \
-	src/language/syntax/raw_string.cc \
 	src/language/syntax/raw_string.hh \
-	src/language/syntax/sequence.cc \
 	src/language/syntax/sequence.hh \
-	src/language/syntax/simple_command.cc \
 	src/language/syntax/simple_command.hh \
-	src/language/syntax/word.cc \
 	src/language/syntax/word.hh \
 	src/language/syntax/word_component.hh \
 	src/main.cc \
@@ -255,6 +262,72 @@ src_common_type_tag_test_SOURCES = \
 src_common_variant_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/variant_test.cc
+src_common_visitor_test_SOURCES = \
+	src/catch_main.cc \
+	src/common/visitor_test.cc
+src_language_printing_and_or_list_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/and_or_list.cc \
+	src/language/printing/and_or_list_test.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/command.cc \
+	src/language/printing/conditional_pipeline.cc \
+	src/language/printing/pipeline.cc \
+	src/language/printing/simple_command.cc \
+	src/language/printing/word.cc \
+	src/language/printing/word_component.cc
+src_language_printing_buffer_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/buffer_test.cc
+src_language_printing_conditional_pipeline_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/command.cc \
+	src/language/printing/conditional_pipeline.cc \
+	src/language/printing/conditional_pipeline_test.cc \
+	src/language/printing/pipeline.cc \
+	src/language/printing/simple_command.cc \
+	src/language/printing/word.cc \
+	src/language/printing/word_component.cc
+src_language_printing_pipeline_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/command.cc \
+	src/language/printing/pipeline.cc \
+	src/language/printing/pipeline_test.cc \
+	src/language/printing/simple_command.cc \
+	src/language/printing/word.cc \
+	src/language/printing/word_component.cc
+src_language_printing_raw_string_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/raw_string_test.cc
+src_language_printing_sequence_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/and_or_list.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/command.cc \
+	src/language/printing/conditional_pipeline.cc \
+	src/language/printing/pipeline.cc \
+	src/language/printing/sequence.cc \
+	src/language/printing/sequence_test.cc \
+	src/language/printing/simple_command.cc \
+	src/language/printing/word.cc \
+	src/language/printing/word_component.cc
+src_language_printing_simple_command_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/simple_command.cc \
+	src/language/printing/simple_command_test.cc \
+	src/language/printing/word.cc \
+	src/language/printing/word_component.cc
+src_language_printing_word_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/word.cc \
+	src/language/printing/word_component.cc \
+	src/language/printing/word_test.cc
 src_language_source_buffer_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/message.cc \
@@ -285,71 +358,6 @@ src_language_source_source_test_SOURCES = \
 	src/common/message.cc \
 	src/language/source/source.cc \
 	src/language/source/source_test.cc
-src_language_syntax_and_or_list_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/and_or_list.cc \
-	src/language/syntax/and_or_list_test.cc \
-	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/pipeline.cc \
-	src/language/syntax/printer.cc
-src_language_syntax_assignment_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/syntax/assignment.cc \
-	src/language/syntax/assignment_test.cc \
-	src/language/syntax/printer.cc \
-	src/language/syntax/raw_string.cc \
-	src/language/syntax/word.cc
-src_language_syntax_command_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/command_test.cc
-src_language_syntax_conditional_pipeline_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/conditional_pipeline_test.cc \
-	src/language/syntax/pipeline.cc \
-	src/language/syntax/printer.cc
-src_language_syntax_pipeline_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/pipeline.cc \
-	src/language/syntax/pipeline_test.cc \
-	src/language/syntax/printer.cc
-src_language_syntax_printer_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/syntax/printer.cc \
-	src/language/syntax/printer_test.cc
-src_language_syntax_raw_string_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/syntax/printer.cc \
-	src/language/syntax/raw_string.cc \
-	src/language/syntax/raw_string_test.cc
-src_language_syntax_sequence_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/and_or_list.cc \
-	src/language/syntax/conditional_pipeline.cc \
-	src/language/syntax/pipeline.cc \
-	src/language/syntax/printer.cc \
-	src/language/syntax/sequence.cc \
-	src/language/syntax/sequence_test.cc
-src_language_syntax_simple_command_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/source/location.cc \
-	src/language/syntax/assignment.cc \
-	src/language/syntax/printer.cc \
-	src/language/syntax/raw_string.cc \
-	src/language/syntax/simple_command.cc \
-	src/language/syntax/simple_command_test.cc \
-	src/language/syntax/word.cc
-src_language_syntax_word_test_SOURCES = \
-	src/catch_main.cc \
-	src/language/syntax/printer.cc \
-	src/language/syntax/raw_string.cc \
-	src/language/syntax/word.cc \
-	src/language/syntax/word_test.cc
 src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
 	src/catch_main.cc \
 	src/os/event/awaiter.cc \
@@ -436,7 +444,14 @@ TESTHEADERS = \
 	src/language/source/location_test_helper.hh \
 	src/language/source/origin_test_helper.hh \
 	src/language/source/source_test_helper.hh \
-	src/language/syntax/printer_test_helper.hh \
+	src/language/syntax/and_or_list_test_helper.hh \
+	src/language/syntax/command_test_helper.hh \
+	src/language/syntax/conditional_pipeline_test_helper.hh \
+	src/language/syntax/pipeline_test_helper.hh \
+	src/language/syntax/sequence_test_helper.hh \
+	src/language/syntax/simple_command_test_helper.hh \
+	src/language/syntax/word_component_test_helper.hh \
+	src/language/syntax/word_test_helper.hh \
 	src/os/event/awaiter_test_helper.hh \
 	src/os/event/pselect_api_test_helper.hh \
 	src/os/io/file_description_api_test_helper.hh \

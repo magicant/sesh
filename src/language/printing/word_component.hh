@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,29 +15,24 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_language_printing_word_component_hh
+#define INCLUDED_language_printing_word_component_hh
+
 #include "buildconfig.h"
-#include "raw_string.hh"
 
-#include "common/xstring.hh"
-#include "language/syntax/printer.hh"
-
-using sesh::common::xstring;
+#include "language/printing/buffer.hh"
+#include "language/syntax/word_component.hh"
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace printing {
 
-bool raw_string::append_constant_value(xstring &s) const {
-    s += value();
-    return true;
-}
+void print(const syntax::word_component &, buffer &);
 
-void raw_string::print(printer &p) const {
-    p << value();
-}
-
-} // namespace syntax
+} // namespace printing
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_printing_word_component_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

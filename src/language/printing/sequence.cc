@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,37 +15,36 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_printer_test_helper_hh
-#define INCLUDED_language_syntax_printer_test_helper_hh
-
 #include "buildconfig.h"
+#include "sequence.hh"
 
-#include <functional>
-#include "language/syntax/printer.hh"
-
-namespace sesh {
-namespace language {
-namespace syntax {
+#include "language/printing/and_or_list.hh"
+#include "language/syntax/and_or_list.hh"
+#include "language/syntax/sequence.hh"
 
 namespace {
 
-inline void test(
-        std::function<void(printer &)> f, printer::line_mode_type lm) {
-    printer p(lm);
-    f(p);
-}
+using sesh::language::syntax::and_or_list;
+using sesh::language::syntax::sequence;
 
 } // namespace
 
-inline void for_each_line_mode(std::function<void(printer &)> f) {
-    test(f, printer::line_mode_type::single_line);
-    test(f, printer::line_mode_type::multi_line);
+namespace sesh {
+namespace language {
+namespace printing {
+
+void print(const sequence &s, buffer &b) {
+    for (const and_or_list &l : s.and_or_lists) {
+        if (&l != &s.and_or_lists.front()) {
+            b.break_line();
+            b.indent();
+        }
+        print(l, b);
+    }
 }
 
-} // namespace syntax
+} // namespace printing
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_syntax_printer_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

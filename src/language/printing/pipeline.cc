@@ -15,46 +15,46 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_simple_command_hh
-#define INCLUDED_language_syntax_simple_command_hh
-
 #include "buildconfig.h"
+#include "pipeline.hh"
 
-#include <vector>
-#include "language/syntax/word.hh"
+#include <memory>
+#include "common/xchar.hh"
+#include "language/printing/command.hh"
+#include "language/syntax/command.hh"
+
+namespace {
+
+using sesh::language::syntax::command;
+using sesh::language::syntax::pipeline;
+
+} // namespace
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace printing {
 
-/**
- * A simple command is a combination of one or more non-empty words,
- * assignments, and redirections.
- *
- * Despite that definition, an instance of this class may not contain any of
- * words, assignments, and redirections. Users of this class must validate that
- * the instance is non-empty. Users must also ensure that words are non-empty.
- */
-class simple_command {
-
-public:
-
-    std::vector<word> words;
-    // TODO assignments
-    // TODO redirections
-
-    bool empty() const {
-        return words.empty();
-        // TODO assignments
-        // TODO redirections
+void print(const pipeline &p, buffer &b) {
+    switch (p.exit_status_mode) {
+    case pipeline::exit_status_mode_type::straight:
+        break;
+    case pipeline::exit_status_mode_type::negated:
+        b.append_main(L("!"));
+        b.append_delayed_characters(L(' '));
+        break;
     }
 
-}; // class simple_command
+    for (const std::shared_ptr<const command> &c : p.commands) {
+        if (&c != &p.commands.front()) {
+            b.append_main(L('|'));
+            b.append_delayed_characters(L(' '));
+        }
+        print(*c, b);
+    }
+}
 
-} // namespace syntax
+} // namespace printing
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_syntax_simple_command_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

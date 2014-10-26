@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,43 +15,24 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "buildconfig.h"
-#include "sequence.hh"
+#ifndef INCLUDED_language_printing_command_hh
+#define INCLUDED_language_printing_command_hh
 
-#include "language/syntax/and_or_list.hh"
-#include "language/syntax/printer.hh"
+#include "buildconfig.h"
+
+#include "language/printing/buffer.hh"
+#include "language/syntax/command.hh"
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace printing {
 
-namespace {
+void print(const syntax::command &, buffer &);
 
-inline void print_separator(printer &p) {
-    switch (p.line_mode()) {
-    case printer::line_mode_type::single_line:
-        break;
-    case printer::line_mode_type::multi_line:
-        p.break_line();
-        p.print_indent();
-        break;
-    }
-}
-
-} // namespace
-
-void sequence::print(printer &p) const {
-    bool is_first = true;
-    for (const and_or_list_pointer &aol : and_or_lists()) {
-        if (!is_first)
-            print_separator(p);
-        p << *aol;
-        is_first = false;
-    }
-}
-
-} // namespace syntax
+} // namespace printing
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_printing_command_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

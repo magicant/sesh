@@ -15,38 +15,29 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_sequence_hh
-#define INCLUDED_language_syntax_sequence_hh
-
 #include "buildconfig.h"
+#include "command.hh"
 
-#include <vector>
-#include "language/syntax/and_or_list.hh"
+#include "common/visitor.hh"
+#include "language/printing/buffer.hh"
+#include "language/printing/simple_command.hh"
+
+namespace {
+
+using sesh::language::syntax::command;
+
+} // namespace
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace printing {
 
-/**
- * A sequence, which is called a "list" in the POSIX standard, is a series of
- * one or more and-or lists. 
- *
- * Despite that definition, an instance of this class may contain no and-or
- * lists. Users of this class must validate the number of contained and-or
- * lists.
- */
-class sequence {
+void print(const command &c, buffer &b) {
+    visit(c, buffer_printer(b));
+}
 
-public:
-
-    std::vector<and_or_list> and_or_lists;
-
-}; // class sequence
-
-} // namespace syntax
+} // namespace printing
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_syntax_sequence_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

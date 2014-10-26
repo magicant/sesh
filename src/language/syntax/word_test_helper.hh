@@ -15,46 +15,35 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_simple_command_hh
-#define INCLUDED_language_syntax_simple_command_hh
+#ifndef INCLUDED_language_syntax_word_test_helper_hh
+#define INCLUDED_language_syntax_word_test_helper_hh
 
 #include "buildconfig.h"
 
-#include <vector>
+#include <utility>
+#include "common/copy.hh"
+#include "common/xstring.hh"
 #include "language/syntax/word.hh"
+#include "language/syntax/word_component_test_helper.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
-/**
- * A simple command is a combination of one or more non-empty words,
- * assignments, and redirections.
- *
- * Despite that definition, an instance of this class may not contain any of
- * words, assignments, and redirections. Users of this class must validate that
- * the instance is non-empty. Users must also ensure that words are non-empty.
- */
-class simple_command {
+inline word make_word_stub(common::xstring &&s) {
+    word w;
+    w.components.push_back(make_word_component_stub(std::move(s)));
+    return w;
+}
 
-public:
-
-    std::vector<word> words;
-    // TODO assignments
-    // TODO redirections
-
-    bool empty() const {
-        return words.empty();
-        // TODO assignments
-        // TODO redirections
-    }
-
-}; // class simple_command
+inline word make_word_stub(const common::xstring &s) {
+    return make_word_stub(common::copy(s));
+}
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_simple_command_hh
+#endif // #ifndef INCLUDED_language_syntax_word_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

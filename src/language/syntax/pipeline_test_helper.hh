@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,46 +15,34 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "buildconfig.h"
-#include "and_or_list.hh"
+#ifndef INCLUDED_language_syntax_pipeline_test_helper_hh
+#define INCLUDED_language_syntax_pipeline_test_helper_hh
 
-#include <utility>
-#include "common/xchar.hh"
-#include "language/syntax/printer.hh"
+#include "buildconfig.h"
+
+#include "common/copy.hh"
+#include "common/xstring.hh"
+#include "language/syntax/command_test_helper.hh"
+#include "language/syntax/pipeline.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
-and_or_list::and_or_list(pipeline &&first, synchronicity_type s) :
-        m_first(std::move(first)), m_rest(), m_synchronicity(s) { }
-
-namespace {
-
-inline void print_separator(and_or_list::synchronicity_type s, printer &p) {
-    p.clear_delayed_characters();
-    switch (s) {
-    case and_or_list::synchronicity_type::sequential:
-        p.delayed_characters() << L(';');
-        break;
-    case and_or_list::synchronicity_type::asynchronous:
-        p << L('&');
-        break;
-    }
-    p.delayed_characters() << L(' ');
+inline pipeline make_pipeline_stub(common::xstring &&s) {
+    pipeline p;
+    p.commands.push_back(make_command_stub(s));
+    return p;
 }
 
-} // namespace
-
-void and_or_list::print(printer &p) const {
-    p << first();
-    for (const conditional_pipeline &cp : rest())
-        p << cp;
-    print_separator(synchronicity(), p);
+inline pipeline make_pipeline_stub(const common::xstring &s) {
+    return make_pipeline_stub(common::copy(s));
 }
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_syntax_pipeline_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

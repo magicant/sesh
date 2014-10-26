@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,49 +15,35 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "buildconfig.h"
-#include "assignment.hh"
+#ifndef INCLUDED_language_syntax_and_or_list_test_helper_hh
+#define INCLUDED_language_syntax_and_or_list_test_helper_hh
 
-#include <stdexcept>
+#include "buildconfig.h"
+
 #include <utility>
-#include "common/xchar.hh"
+#include "common/copy.hh"
 #include "common/xstring.hh"
-#include "language/syntax/printer.hh"
-#include "language/syntax/word.hh"
+#include "language/syntax/and_or_list.hh"
+#include "language/syntax/pipeline_test_helper.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
-namespace {
-
-using common::xstring;
-
-void create_word_if_null(assignment::word_pointer &w) {
-    if (w == nullptr)
-        w.reset(new word);
+inline and_or_list make_and_or_list_stub(common::xstring &&s) {
+    and_or_list l;
+    l.first = make_pipeline_stub(std::move(s));
+    return l;
 }
 
-} // namespace
-
-assignment::assignment() : m_variable_name(), m_value(new word) { }
-
-assignment::assignment(const xstring &variable_name, word_pointer &&value) :
-        m_variable_name(variable_name), m_value(std::move(value)) {
-    create_word_if_null(m_value);
-}
-
-assignment::assignment(xstring &&variable_name, word_pointer &&value) :
-        m_variable_name(std::move(variable_name)), m_value(std::move(value)) {
-    create_word_if_null(m_value);
-}
-
-void assignment::print(printer &p) const {
-    p << variable_name() << L('=') << value();
+inline and_or_list make_and_or_list_stub(const common::xstring &s) {
+    return make_and_or_list_stub(common::copy(s));
 }
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_syntax_and_or_list_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

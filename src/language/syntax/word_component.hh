@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -20,34 +20,19 @@
 
 #include "buildconfig.h"
 
-#include "common/xstring.hh"
-#include "language/syntax/printable.hh"
+#include "common/visitor.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
-class word_component : public printable {
+// Forward declaration to avoid recursion
+class raw_string;
 
-public:
+using word_component_visitor = common::visitor<raw_string>;
 
-    word_component() = default;
-    word_component(const word_component &) = default;
-    word_component(word_component &&) = default;
-    word_component &operator=(const word_component &) = default;
-    word_component &operator=(word_component &&) = default;
-    ~word_component() override = default;
-
-    virtual bool is_raw_string() const noexcept { return false; }
-
-    /**
-     * If this word component always evaluates to the same string in any shell
-     * environment state, appends the string to the argument and returns true.
-     * Otherwise, returns false without any side effects.
-     */
-    virtual bool append_constant_value(common::xstring &) const = 0;
-
-}; // class word_component
+/** A word component is one of the elements of a word. */
+using word_component = common::visitable<word_component_visitor>;
 
 } // namespace syntax
 } // namespace language

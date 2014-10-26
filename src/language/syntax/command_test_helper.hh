@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,41 +15,35 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include "buildconfig.h"
-#include "conditional_pipeline.hh"
+#ifndef INCLUDED_language_syntax_command_test_helper_hh
+#define INCLUDED_language_syntax_command_test_helper_hh
 
-#include <stdexcept>
-#include <utility>
-#include "common/xchar.hh"
-#include "language/syntax/pipeline.hh"
-#include "language/syntax/printer.hh"
+#include "buildconfig.h"
+
+#include "common/copy.hh"
+#include "common/visitor.hh"
+#include "common/xstring.hh"
+#include "language/syntax/command.hh"
+#include "language/syntax/simple_command_test_helper.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
-conditional_pipeline::conditional_pipeline(condition_type c) :
-        m_condition(c), m_pipeline(new class pipeline) { }
-
-conditional_pipeline::conditional_pipeline(
-        condition_type c, pipeline_pointer &&p) :
-        m_condition(c), m_pipeline(std::move(p)) {
-    if (m_pipeline == nullptr)
-        m_pipeline.reset(new class pipeline);
+inline auto make_command_stub(common::xstring &&s)
+        -> std::shared_ptr<const command> {
+    return common::make_shared_visitable<command>(make_simple_command_stub(s));
 }
 
-void conditional_pipeline::print(printer &p) const {
-    switch (condition()) {
-    case condition_type::and_then:  p << L("&&");  break;
-    case condition_type::or_else:   p << L("||");  break;
-    }
-    p.break_line();
-    p.print_indent();
-    p << *m_pipeline;
+inline auto make_command_stub(const common::xstring &s)
+        -> std::shared_ptr<const command> {
+    return make_command_stub(common::copy(s));
 }
 
 } // namespace syntax
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_syntax_command_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

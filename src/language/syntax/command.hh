@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -20,30 +20,19 @@
 
 #include "buildconfig.h"
 
-#include <utility>
-#include "language/syntax/printable.hh"
+#include "common/visitor.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
+// Forward declaration to avoid recursion
+class simple_command;
+
+using command_visitor = common::visitor<simple_command>;
+
 /** A command is either a simple or compound command. */
-class command : public printable {
-
-private:
-
-    // TODO Redirection
-
-public:
-
-    command() = default;
-    command(const command &) = default;
-    command(command &&) = default;
-    command &operator=(const command &) = default;
-    command &operator=(command &&) = default;
-    ~command() override = default;
-
-}; // class command
+using command = common::visitable<command_visitor>;
 
 } // namespace syntax
 } // namespace language

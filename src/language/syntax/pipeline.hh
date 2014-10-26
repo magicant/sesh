@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -22,58 +22,45 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
 #include "language/syntax/command.hh"
-#include "language/syntax/printable.hh"
 
 namespace sesh {
 namespace language {
 namespace syntax {
 
 /**
- * A pipeline is a list of one or more commands that are executed at a time
- * with the standard input/output connected with each other.
+ * A pipeline is a sequence of one or more commands that are executed at a time
+ * with their standard input/output connected with each other.
+ *
+ * Despite that definition, an instance of this class may not contain any
+ * command. Users of this class must ensure that the instance contains at least
+ * one command and that all the command pointers are non-null.
  */
-class pipeline : public printable {
+class pipeline {
 
 public:
 
-    using command_pointer = std::unique_ptr<command>;
+    /** The type of pointers to a command. Pointers must not be null. */
+    using command_pointer = std::shared_ptr<const command>;
 
-    enum class exit_status_mode_type {
-        straight,
-        negated,
-    };
+    enum class exit_status_mode_type { straight, negated };
 
-private:
+    std::vector<command_pointer> commands;
+    exit_status_mode_type exit_status_mode;
 
-    std::vector<command_pointer> m_commands;
-    exit_status_mode_type m_exit_status_mode;
+    /**
+     * Constructs a pipeline.
+     * @param esm Exit status mode of the new pipeline.
+     * @param a Arguments that are passed to the constructor of {@code
+     * std::vector<command_pointer>} to initialize {@link #commands}.
+     */
+    template<typename... A>
+    explicit pipeline(exit_status_mode_type esm, A &&... a) :
+            commands(std::forward<A>(a)...), exit_status_mode(esm) { }
 
-public:
-
-    explicit pipeline(exit_status_mode_type = exit_status_mode_type::straight);
-
-    pipeline(const pipeline &) = delete;
-    pipeline(pipeline &&) = default;
-    pipeline &operator=(const pipeline &) = delete;
-    pipeline &operator=(pipeline &&) = default;
-    ~pipeline() override = default;
-
-    std::vector<command_pointer> &commands() noexcept {
-        return m_commands;
-    }
-    const std::vector<command_pointer> &commands() const noexcept {
-        return m_commands;
-    }
-
-    exit_status_mode_type &exit_status_mode() noexcept {
-        return m_exit_status_mode;
-    }
-    exit_status_mode_type exit_status_mode() const noexcept {
-        return m_exit_status_mode;
-    }
-
-    void print(printer &) const override;
+    /** Constructs a new straight, empty pipeline. */
+    pipeline() : pipeline(exit_status_mode_type::straight) { }
 
 }; // class pipeline
 
