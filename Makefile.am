@@ -38,6 +38,7 @@ TESTPROGRAMS = \
 	src/common/type_tag_test \
 	src/common/variant_test \
 	src/common/visitor_test \
+	src/language/printing/and_or_list_test \
 	src/language/printing/buffer_test \
 	src/language/printing/conditional_pipeline_test \
 	src/language/printing/pipeline_test \
@@ -122,6 +123,8 @@ src_sesh_SOURCES = \
 	src/common/xstring.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
+	src/language/printing/and_or_list.cc \
+	src/language/printing/and_or_list.hh \
 	src/language/printing/buffer.cc \
 	src/language/printing/buffer.hh \
 	src/language/printing/command.cc \
@@ -259,6 +262,17 @@ src_common_variant_test_SOURCES = \
 src_common_visitor_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/visitor_test.cc
+src_language_printing_and_or_list_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/and_or_list.cc \
+	src/language/printing/and_or_list_test.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/command.cc \
+	src/language/printing/conditional_pipeline.cc \
+	src/language/printing/pipeline.cc \
+	src/language/printing/simple_command.cc \
+	src/language/printing/word.cc \
+	src/language/printing/word_component.cc
 src_language_printing_buffer_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/printing/buffer.cc \
@@ -415,6 +429,7 @@ TESTHEADERS = \
 	src/language/source/location_test_helper.hh \
 	src/language/source/origin_test_helper.hh \
 	src/language/source/source_test_helper.hh \
+	src/language/syntax/and_or_list_test_helper.hh \
 	src/language/syntax/command_test_helper.hh \
 	src/language/syntax/conditional_pipeline_test_helper.hh \
 	src/language/syntax/pipeline_test_helper.hh \
