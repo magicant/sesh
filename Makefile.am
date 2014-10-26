@@ -46,11 +46,6 @@ TESTPROGRAMS = \
 	src/language/printing/sequence_test \
 	src/language/printing/simple_command_test \
 	src/language/printing/word_test \
-	src/language/source/buffer_test \
-	src/language/source/line_appended_source_test \
-	src/language/source/line_continued_source_test \
-	src/language/source/location_test \
-	src/language/source/source_test \
 	src/os/event/awaiter_error_file_descriptor_test \
 	src/os/event/awaiter_file_descriptor_test \
 	src/os/event/awaiter_readable_file_descriptor_test \
@@ -143,19 +138,6 @@ src_sesh_SOURCES = \
 	src/language/printing/word.hh \
 	src/language/printing/word_component.cc \
 	src/language/printing/word_component.hh \
-	src/language/source/buffer.cc \
-	src/language/source/buffer.hh \
-	src/language/source/diagnostic_message.cc \
-	src/language/source/diagnostic_message.hh \
-	src/language/source/line_appended_source.cc \
-	src/language/source/line_appended_source.hh \
-	src/language/source/line_continued_source.cc \
-	src/language/source/line_continued_source.hh \
-	src/language/source/location.cc \
-	src/language/source/location.hh \
-	src/language/source/origin.hh \
-	src/language/source/source.cc \
-	src/language/source/source.hh \
 	src/language/syntax/and_or_list.hh \
 	src/language/syntax/command.hh \
 	src/language/syntax/conditional_pipeline.hh \
@@ -328,36 +310,6 @@ src_language_printing_word_test_SOURCES = \
 	src/language/printing/word.cc \
 	src/language/printing/word_component.cc \
 	src/language/printing/word_test.cc
-src_language_source_buffer_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/buffer.cc \
-	src/language/source/buffer_test.cc \
-	src/language/source/source.cc
-src_language_source_line_appended_source_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/line_appended_source.cc \
-	src/language/source/line_appended_source_test.cc \
-	src/language/source/location.cc \
-	src/language/source/source.cc
-src_language_source_line_continued_source_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/line_continued_source.cc \
-	src/language/source/line_continued_source_test.cc \
-	src/language/source/location.cc \
-	src/language/source/source.cc
-src_language_source_location_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/location.cc \
-	src/language/source/location_test.cc
-src_language_source_source_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/source.cc \
-	src/language/source/source_test.cc
 src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
 	src/catch_main.cc \
 	src/os/event/awaiter.cc \
@@ -440,10 +392,6 @@ src_os_signaling_handler_configuration_test_SOURCES = \
 
 TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \
-	src/language/source/diagnostic_message_test_helper.hh \
-	src/language/source/location_test_helper.hh \
-	src/language/source/origin_test_helper.hh \
-	src/language/source/source_test_helper.hh \
 	src/language/syntax/and_or_list_test_helper.hh \
 	src/language/syntax/command_test_helper.hh \
 	src/language/syntax/conditional_pipeline_test_helper.hh \
