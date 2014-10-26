@@ -43,6 +43,7 @@ TESTPROGRAMS = \
 	src/language/printing/conditional_pipeline_test \
 	src/language/printing/pipeline_test \
 	src/language/printing/raw_string_test \
+	src/language/printing/sequence_test \
 	src/language/printing/simple_command_test \
 	src/language/printing/word_test \
 	src/language/source/buffer_test \
@@ -134,6 +135,8 @@ src_sesh_SOURCES = \
 	src/language/printing/pipeline.cc \
 	src/language/printing/pipeline.hh \
 	src/language/printing/raw_string.hh \
+	src/language/printing/sequence.cc \
+	src/language/printing/sequence.hh \
 	src/language/printing/simple_command.cc \
 	src/language/printing/simple_command.hh \
 	src/language/printing/word.cc \
@@ -300,6 +303,18 @@ src_language_printing_raw_string_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/printing/buffer.cc \
 	src/language/printing/raw_string_test.cc
+src_language_printing_sequence_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/printing/and_or_list.cc \
+	src/language/printing/buffer.cc \
+	src/language/printing/command.cc \
+	src/language/printing/conditional_pipeline.cc \
+	src/language/printing/pipeline.cc \
+	src/language/printing/sequence.cc \
+	src/language/printing/sequence_test.cc \
+	src/language/printing/simple_command.cc \
+	src/language/printing/word.cc \
+	src/language/printing/word_component.cc
 src_language_printing_simple_command_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/printing/buffer.cc \
@@ -433,6 +448,7 @@ TESTHEADERS = \
 	src/language/syntax/command_test_helper.hh \
 	src/language/syntax/conditional_pipeline_test_helper.hh \
 	src/language/syntax/pipeline_test_helper.hh \
+	src/language/syntax/sequence_test_helper.hh \
 	src/language/syntax/simple_command_test_helper.hh \
 	src/language/syntax/word_component_test_helper.hh \
 	src/language/syntax/word_test_helper.hh \
