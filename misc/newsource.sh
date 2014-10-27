@@ -105,8 +105,13 @@ print_c_include_guard_end() {
     printf '#endif // #ifndef %s\n' "${1}"
 }
 
-# $1 = source file name
+# $1 (optional) = source file name
 print_c_namespace_begin() (
+    if [ "${#}" -eq 0 ]; then
+        printf 'namespace {\n'
+        return
+    fi
+
     case "${1}" in
         (*/*)
             namespace="sesh/${1%/*}/"
@@ -125,6 +130,11 @@ print_c_namespace_begin() (
 
 # $1 = source file name
 print_c_namespace_end() (
+    if [ "${#}" -eq 0 ]; then
+        printf '} // namespace\n'
+        return
+    fi
+
     case "${1}" in
         (*/*)
             namespace="/sesh/${1%/*}"
@@ -175,6 +185,20 @@ print_template() (
             echo
             print_c_include_buildconfig
             print_c_include "${matching_header}"
+            echo
+            print_c_modeline
+            ;;
+        (*_test.cc)
+            print_c_copyright_notice
+            echo
+            print_c_include_buildconfig
+            echo
+            print_c_include "catch.hpp"
+            print_c_include "${file%_test.cc}.hh"
+            echo
+            print_c_namespace_begin
+            echo
+            print_c_namespace_end
             echo
             print_c_modeline
             ;;
