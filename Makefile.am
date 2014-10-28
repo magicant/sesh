@@ -98,7 +98,6 @@ src_sesh_SOURCES = \
 	src/common/enum_set.hh \
 	src/common/enum_traits.hh \
 	src/common/errno_helper.hh \
-	src/common/error_level.hh \
 	src/common/function_helper.hh \
 	src/common/functional_initialize.hh \
 	src/common/identity.hh \
@@ -194,7 +193,8 @@ src_sesh_SOURCES = \
 	src/os/signaling/signal_error_code.hh \
 	src/os/signaling/signal_number.hh \
 	src/os/signaling/signal_number_set.hh \
-	src/os/time_api.hh
+	src/os/time_api.hh \
+	src/ui/message/category.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_delay_holder_test_SOURCES = \
