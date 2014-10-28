@@ -46,6 +46,7 @@ TESTPROGRAMS = \
 	src/language/printing/sequence_test \
 	src/language/printing/simple_command_test \
 	src/language/printing/word_test \
+	src/language/source/fragment_test \
 	src/os/event/awaiter_error_file_descriptor_test \
 	src/os/event/awaiter_file_descriptor_test \
 	src/os/event/awaiter_readable_file_descriptor_test \
@@ -138,6 +139,8 @@ src_sesh_SOURCES = \
 	src/language/printing/word.hh \
 	src/language/printing/word_component.cc \
 	src/language/printing/word_component.hh \
+	src/language/source/fragment.cc \
+	src/language/source/fragment.hh \
 	src/language/syntax/and_or_list.hh \
 	src/language/syntax/command.hh \
 	src/language/syntax/conditional_pipeline.hh \
@@ -310,6 +313,10 @@ src_language_printing_word_test_SOURCES = \
 	src/language/printing/word.cc \
 	src/language/printing/word_component.cc \
 	src/language/printing/word_test.cc
+src_language_source_fragment_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/source/fragment.cc \
+	src/language/source/fragment_test.cc
 src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
 	src/catch_main.cc \
 	src/os/event/awaiter.cc \
@@ -392,6 +399,7 @@ src_os_signaling_handler_configuration_test_SOURCES = \
 
 TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \
+	src/language/source/fragment_test_helper.hh \
 	src/language/syntax/and_or_list_test_helper.hh \
 	src/language/syntax/command_test_helper.hh \
 	src/language/syntax/conditional_pipeline_test_helper.hh \
