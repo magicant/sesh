@@ -31,7 +31,6 @@ TESTPROGRAMS = \
 	src/common/enum_iterator_test \
 	src/common/enum_set_test \
 	src/common/function_helper_test \
-	src/common/message_test \
 	src/common/reference_test \
 	src/common/shared_function_test \
 	src/common/trie_test \
@@ -59,7 +58,8 @@ TESTPROGRAMS = \
 	src/os/io/non_blocking_file_descriptor_test \
 	src/os/io/reader_test \
 	src/os/io/writer_test \
-	src/os/signaling/handler_configuration_test
+	src/os/signaling/handler_configuration_test \
+	src/ui/message/format_test
 
 TESTSCRIPTS = \
 	src/checkheaderinclude.sh \
@@ -103,8 +103,6 @@ src_sesh_SOURCES = \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
 	src/common/logic_helper.hh \
-	src/common/message.cc \
-	src/common/message.hh \
 	src/common/nop.hh \
 	src/common/reference.hh \
 	src/common/shared_function.hh \
@@ -194,7 +192,9 @@ src_sesh_SOURCES = \
 	src/os/signaling/signal_number.hh \
 	src/os/signaling/signal_number_set.hh \
 	src/os/time_api.hh \
-	src/ui/message/category.hh
+	src/ui/message/category.hh \
+	src/ui/message/format.cc \
+	src/ui/message/format.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_delay_holder_test_SOURCES = \
@@ -227,10 +227,6 @@ src_common_enum_set_test_SOURCES = \
 src_common_function_helper_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/function_helper_test.cc
-src_common_message_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/common/message_test.cc
 src_common_reference_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/reference_test.cc
@@ -396,6 +392,10 @@ src_os_signaling_handler_configuration_test_SOURCES = \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/handler_configuration_test.cc \
 	src/os/signaling/signal_error_category.cc
+src_ui_message_format_test_SOURCES = \
+	src/catch_main.cc \
+	src/ui/message/format.cc \
+	src/ui/message/format_test.cc
 
 TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \

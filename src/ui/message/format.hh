@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_message_hh
-#define INCLUDED_common_message_hh
+#ifndef INCLUDED_ui_message_format_hh
+#define INCLUDED_ui_message_format_hh
 
 #include "buildconfig.h"
 
@@ -25,11 +25,12 @@
 #include "common/xstring.hh"
 
 namespace sesh {
-namespace common {
+namespace ui {
+namespace message {
 
 /**
- * A message is a pair of a format string and a value list that can be used to
- * form a complete message to be presented to a human.
+ * A format is a pair of a format string and a value list that can be used to
+ * form a complete message to be presented to the user.
  *
  * The format string must obey the syntax of boost::format, which is similar to
  * but different from that of printf. This class template provides a
@@ -46,7 +47,7 @@ namespace common {
  * @tparam Arg Types of arguments required to complete the message.
  */
 template<typename... Arg>
-class message;
+class format;
 
 /**
  * Complete message.
@@ -57,7 +58,7 @@ class message;
  * public API of this class.
  */
 template<>
-class message<> {
+class format<> {
 
 public:
 
@@ -81,12 +82,6 @@ private:
 
 public:
 
-    /** @see message<>::message(string_type &&) */
-    explicit message(const char_type * = nullptr);
-
-    /** @see message<>::message(string_type &&) */
-    explicit message(const string_type &);
-
     /**
      * Constructs a message object with the specified format string.
      *
@@ -94,17 +89,13 @@ public:
      * the caller must make sure to match the argument types required by the
      * format string with the class template parameters.
      */
-    explicit message(string_type &&);
+    explicit format(string_type &&);
 
-    /**
-     * Returns a boost::format object.
-     *
-     * The remaining argument count of the return value matches the number of
-     * template parameters of the message template class. For a complete
-     * message, it is zero. The number of expected, bound, and fed arguments of
-     * the return value is unspecified.
-     */
-    format_type to_format() const;
+    /** @see format<>::format(string_type &&) */
+    explicit format(const string_type &);
+
+    /** @see format<>::format(string_type &&) */
+    explicit format(const char_type * = nullptr);
 
     /** Converts the complete message to a string. */
     string_type to_string() const;
@@ -132,37 +123,35 @@ protected:
         return m_feed_arguments;
     }
 
-};
+}; // template<> class format<>
 
 /**
  * Incomplete message.
  *
  * Implementation note: The recursive derivation is a trick to implement the %
- * operator without copying the message object.
+ * operator without copying the format object.
  */
 template<typename Head, typename... Tail>
-class message<Head, Tail...> : private message<Tail...> {
+class format<Head, Tail...> : private format<Tail...> {
 
 public:
 
-    using typename message<Tail...>::string_type;
-    using typename message<Tail...>::char_type;
-    using typename message<Tail...>::char_traits;
-    using typename message<Tail...>::allocator_type;
-    using typename message<Tail...>::format_type;
+    using typename format<Tail...>::string_type;
+    using typename format<Tail...>::char_type;
+    using typename format<Tail...>::char_traits;
+    using typename format<Tail...>::allocator_type;
+    using typename format<Tail...>::format_type;
 
-    using message<Tail...>::message;
-
-    using message<Tail...>::to_format;
+    using format<Tail...>::format;
 
 protected:
 
-    using message<Tail...>::argument_feeder;
+    using format<Tail...>::argument_feeder;
 
 public:
 
-    /** Binds an argument value to this message object. */
-    message<Tail...> &&operator%(const Head &value) && {
+    /** Binds an argument value to this format object. */
+    format<Tail...> &&operator%(const Head &value) && {
         auto &old = argument_feeder();
         argument_feeder() = [old, value](format_type &f) -> format_type & {
             return old(f) % value;
@@ -170,11 +159,12 @@ public:
         return std::move(*this);
     }
 
-};
+}; // template<typename Head, typename... Tail> class format<Head, Tail...>
 
-} // namespace common
+} // namespace message
+} // namespace ui
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_common_message_hh
+#endif // #ifndef INCLUDED_ui_message_format_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

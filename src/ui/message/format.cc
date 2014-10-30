@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -16,20 +16,24 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "message.hh"
+#include "format.hh"
 
 #include <utility>
 #include "boost/format.hpp"
+#include "common/copy.hh"
 #include "common/identity.hh"
-
-using sesh::common::identity;
+#include "common/xchar.hh"
 
 namespace sesh {
-namespace common {
+namespace ui {
+namespace message {
 
 namespace {
 
-using char_type = message<>::char_type;
+using sesh::common::copy;
+using sesh::common::identity;
+
+using char_type = format<>::char_type;
 
 const char_type *default_string(const char_type *s) noexcept {
     return s == nullptr ? L("") : s;
@@ -37,26 +41,22 @@ const char_type *default_string(const char_type *s) noexcept {
 
 } // namespace
 
-message<>::message(const char_type *s) :
-        m_format_string(default_string(s)), m_feed_arguments(identity()) { }
-
-message<>::message(const string_type &s) :
-        m_format_string(s), m_feed_arguments(identity()) { }
-
-message<>::message(string_type &&s) :
+format<>::format(string_type &&s) :
         m_format_string(std::move(s)), m_feed_arguments(identity()) { }
 
-auto message<>::to_format() const -> format_type {
+format<>::format(const string_type &s) : format(copy(s)) { }
+
+format<>::format(const char_type *s) :
+        format(string_type(default_string(s))) { }
+
+auto format<>::to_string() const -> string_type {
     format_type f(m_format_string);
     m_feed_arguments(f);
-    return f;
+    return f.str();
 }
 
-auto message<>::to_string() const -> string_type {
-    return to_format().str();
-}
-
-} // namespace common
+} // namespace message
+} // namespace ui
 } // namespace sesh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
