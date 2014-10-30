@@ -194,7 +194,8 @@ src_sesh_SOURCES = \
 	src/os/time_api.hh \
 	src/ui/message/category.hh \
 	src/ui/message/format.cc \
-	src/ui/message/format.hh
+	src/ui/message/format.hh \
+	src/ui/message/report.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_delay_holder_test_SOURCES = \
@@ -415,7 +416,8 @@ TESTHEADERS = \
 	src/os/io/non_blocking_file_descriptor_test_helper.hh \
 	src/os/signaling/handler_configuration_api_test_helper.hh \
 	src/os/signaling/signal_number_set_test_helper.hh \
-	src/os/time_api_test_helper.hh
+	src/os/time_api_test_helper.hh \
+	src/ui/message/report_test_helper.hh
 
 ### Documentation
 
