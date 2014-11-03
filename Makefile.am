@@ -24,6 +24,7 @@ TESTPROGRAMS = \
 	src/async/delay_holder_test \
 	src/async/delay_test \
 	src/async/future_test \
+	src/async/lazy_test \
 	src/async/promise_test \
 	src/async/shared_future_test \
 	src/common/container_helper_test \
@@ -85,6 +86,7 @@ src_sesh_SOURCES = \
 	src/async/delay_holder.hh \
 	src/async/future.hh \
 	src/async/future.tcc \
+	src/async/lazy.hh \
 	src/async/promise.hh \
 	src/async/shared_future.hh \
 	src/async/shared_future.tcc \
@@ -207,6 +209,9 @@ src_async_delay_test_SOURCES = \
 src_async_future_test_SOURCES = \
 	src/async/future_test.cc \
 	src/catch_main.cc
+src_async_lazy_test_SOURCES = \
+	src/catch_main.cc \
+	src/async/lazy_test.cc
 src_async_promise_test_SOURCES = \
 	src/async/promise_test.cc \
 	src/catch_main.cc
