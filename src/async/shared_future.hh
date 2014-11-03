@@ -266,6 +266,9 @@ public:
  * A shared future is a future that accepts multiple callback functions.
  *
  * All callbacks receives const references to the same result object.
+ *
+ * The template argument may be an incomplete type when the template is
+ * instantiated.
  */
 template<typename T>
 class shared_future : public shared_future_base<T> {
