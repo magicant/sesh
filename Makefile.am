@@ -48,6 +48,7 @@ TESTPROGRAMS = \
 	src/language/printing/simple_command_test \
 	src/language/printing/word_test \
 	src/language/source/fragment_test \
+	src/language/source/stream_test \
 	src/os/event/awaiter_error_file_descriptor_test \
 	src/os/event/awaiter_file_descriptor_test \
 	src/os/event/awaiter_readable_file_descriptor_test \
@@ -142,6 +143,8 @@ src_sesh_SOURCES = \
 	src/language/printing/word_component.hh \
 	src/language/source/fragment.cc \
 	src/language/source/fragment.hh \
+	src/language/source/stream.cc \
+	src/language/source/stream.hh \
 	src/language/syntax/and_or_list.hh \
 	src/language/syntax/command.hh \
 	src/language/syntax/conditional_pipeline.hh \
@@ -324,6 +327,11 @@ src_language_source_fragment_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/source/fragment.cc \
 	src/language/source/fragment_test.cc
+src_language_source_stream_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/language/source/stream_test.cc
 src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
 	src/catch_main.cc \
 	src/os/event/awaiter.cc \
