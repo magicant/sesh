@@ -27,6 +27,7 @@ TESTPROGRAMS = \
 	src/async/lazy_test \
 	src/async/promise_test \
 	src/async/shared_future_test \
+	src/async/shared_lazy_test \
 	src/common/container_helper_test \
 	src/common/either_test \
 	src/common/enum_iterator_test \
@@ -90,6 +91,7 @@ src_sesh_SOURCES = \
 	src/async/promise.hh \
 	src/async/shared_future.hh \
 	src/async/shared_future.tcc \
+	src/async/shared_lazy.hh \
 	src/buildconfig.h \
 	src/common/container_helper.hh \
 	src/common/copy.hh \
@@ -217,6 +219,9 @@ src_async_promise_test_SOURCES = \
 	src/catch_main.cc
 src_async_shared_future_test_SOURCES = \
 	src/async/shared_future_test.cc \
+	src/catch_main.cc
+src_async_shared_lazy_test_SOURCES = \
+	src/async/shared_lazy_test.cc \
 	src/catch_main.cc
 src_common_container_helper_test_SOURCES = \
 	src/catch_main.cc \
