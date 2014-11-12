@@ -122,6 +122,7 @@ src_sesh_SOURCES = \
 	src/common/xstring.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
+	src/language/parsing/parser.hh \
 	src/language/printing/and_or_list.cc \
 	src/language/printing/and_or_list.hh \
 	src/language/printing/buffer.cc \
@@ -418,6 +419,7 @@ src_ui_message_format_test_SOURCES = \
 
 TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \
+	src/language/parsing/parser_test_helper.hh \
 	src/language/source/fragment_test_helper.hh \
 	src/language/syntax/and_or_list_test_helper.hh \
 	src/language/syntax/command_test_helper.hh \
