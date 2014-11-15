@@ -55,15 +55,18 @@ public:
     using value_type = string_type::value_type;
     using size_type = string_type::size_type;
 
-    /** Nullable pointer to a non-empty fragment. */
-    std::shared_ptr<const fragment> head;
-
     /**
      * Index into the value of the fragment. The index must be less than the
      * length of the {@link #head}'s value. If {@link #head} is null, the index
      * must be zero.
      */
     size_type index = 0;
+
+    /** Nullable pointer to a non-empty fragment. */
+    std::shared_ptr<const fragment> head;
+    // "head" has to be declared after "index" so that the implicitly-defined
+    // assignment operator assigns "index" before assigning "head" to avoid
+    // possible bad pointer access.
 
     fragment_position() = default;
 
@@ -74,7 +77,7 @@ public:
     fragment_position(Head &&head, size_type index = 0)
             noexcept(std::is_nothrow_constructible<
                     std::shared_ptr<const fragment>, Head>::value) :
-            head(std::forward<Head>(head)), index(index) { }
+            index(index), head(std::forward<Head>(head)) { }
 
 }; // class fragment_position
 
