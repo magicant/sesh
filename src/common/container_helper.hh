@@ -116,6 +116,34 @@ bool contains(const Container &c, const Element &e) {
     return find(c, e) != c.end();
 }
 
+/** Copy-inserts all elements of a container to another container. */
+template<typename From, typename To>
+void copy(From &&from, To &to) {
+    std::copy(std::begin(from), std::end(from), std::back_inserter(to));
+}
+
+/**
+ * Copy-inserts elements of a container that meet a predicate to another
+ * container.
+ */
+template<typename From, typename To, typename UnaryPredicate>
+void copy_if(From &&from, To &to, UnaryPredicate &&p) {
+    std::copy_if(
+            std::begin(from),
+            std::end(from),
+            std::back_inserter(to),
+            std::forward<UnaryPredicate>(p));
+}
+
+/**
+ * Move-inserts all elements of a container to another container. Note that
+ * the source elements are not removed from the source container.
+ */
+template<typename From, typename To>
+void move(From &&from, To &to) {
+    std::move(std::begin(from), std::end(from), std::back_inserter(to));
+}
+
 /**
  * Creates a new vector that contains the arguments. The vector elements are
  * move- or copy-constructed from the arguments.

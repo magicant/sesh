@@ -89,6 +89,33 @@ TEST_CASE("String \"hello\" doesn't 'x'") {
     CHECK_FALSE(contains(s, 'x'));
 }
 
+TEST_CASE("Container helper: copy") {
+    const std::vector<int> from = {1, 2, 3};
+    std::vector<int> to;
+    sesh::common::copy(from, to);
+    CHECK(from == to);
+}
+
+TEST_CASE("Container helper: copy_if") {
+    const std::vector<int> from = {1, 2, 3, 4, 5};
+    std::vector<int> to;
+    sesh::common::copy_if(from, to, [](int i) { return i % 2 == 0; });
+    CHECK(to == (std::vector<int>{2, 4}));
+}
+
+TEST_CASE("Container helper: move") {
+    struct move_only_int {
+        int value;
+        move_only_int(int i) noexcept : value(i) { }
+        move_only_int(move_only_int &&) = default;
+    };
+    std::vector<move_only_int> from, to;
+    from.emplace_back(3);
+    sesh::common::move(from, to);
+    REQUIRE(to.size() == 1);
+    CHECK(to[0].value == 3);
+}
+
 TEST_CASE("Container helper: create vector of {}") {
     std::vector<int> v = make_vector_of<int>();
     CHECK(v.empty());
