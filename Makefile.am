@@ -24,14 +24,15 @@ TESTPROGRAMS = \
 	src/async/delay_holder_test \
 	src/async/delay_test \
 	src/async/future_test \
+	src/async/lazy_test \
 	src/async/promise_test \
 	src/async/shared_future_test \
+	src/async/shared_lazy_test \
 	src/common/container_helper_test \
 	src/common/either_test \
 	src/common/enum_iterator_test \
 	src/common/enum_set_test \
 	src/common/function_helper_test \
-	src/common/message_test \
 	src/common/reference_test \
 	src/common/shared_function_test \
 	src/common/trie_test \
@@ -46,11 +47,8 @@ TESTPROGRAMS = \
 	src/language/printing/sequence_test \
 	src/language/printing/simple_command_test \
 	src/language/printing/word_test \
-	src/language/source/buffer_test \
-	src/language/source/line_appended_source_test \
-	src/language/source/line_continued_source_test \
-	src/language/source/location_test \
-	src/language/source/source_test \
+	src/language/source/fragment_test \
+	src/language/source/stream_test \
 	src/os/event/awaiter_error_file_descriptor_test \
 	src/os/event/awaiter_file_descriptor_test \
 	src/os/event/awaiter_readable_file_descriptor_test \
@@ -63,7 +61,8 @@ TESTPROGRAMS = \
 	src/os/io/non_blocking_file_descriptor_test \
 	src/os/io/reader_test \
 	src/os/io/writer_test \
-	src/os/signaling/handler_configuration_test
+	src/os/signaling/handler_configuration_test \
+	src/ui/message/format_test
 
 TESTSCRIPTS = \
 	src/checkheaderinclude.sh \
@@ -89,9 +88,11 @@ src_sesh_SOURCES = \
 	src/async/delay_holder.hh \
 	src/async/future.hh \
 	src/async/future.tcc \
+	src/async/lazy.hh \
 	src/async/promise.hh \
 	src/async/shared_future.hh \
 	src/async/shared_future.tcc \
+	src/async/shared_lazy.hh \
 	src/buildconfig.h \
 	src/common/container_helper.hh \
 	src/common/copy.hh \
@@ -102,14 +103,11 @@ src_sesh_SOURCES = \
 	src/common/enum_set.hh \
 	src/common/enum_traits.hh \
 	src/common/errno_helper.hh \
-	src/common/error_level.hh \
 	src/common/function_helper.hh \
 	src/common/functional_initialize.hh \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
 	src/common/logic_helper.hh \
-	src/common/message.cc \
-	src/common/message.hh \
 	src/common/nop.hh \
 	src/common/reference.hh \
 	src/common/shared_function.hh \
@@ -124,6 +122,7 @@ src_sesh_SOURCES = \
 	src/common/xstring.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
+	src/language/parsing/parser.hh \
 	src/language/printing/and_or_list.cc \
 	src/language/printing/and_or_list.hh \
 	src/language/printing/buffer.cc \
@@ -143,19 +142,10 @@ src_sesh_SOURCES = \
 	src/language/printing/word.hh \
 	src/language/printing/word_component.cc \
 	src/language/printing/word_component.hh \
-	src/language/source/buffer.cc \
-	src/language/source/buffer.hh \
-	src/language/source/diagnostic_message.cc \
-	src/language/source/diagnostic_message.hh \
-	src/language/source/line_appended_source.cc \
-	src/language/source/line_appended_source.hh \
-	src/language/source/line_continued_source.cc \
-	src/language/source/line_continued_source.hh \
-	src/language/source/location.cc \
-	src/language/source/location.hh \
-	src/language/source/origin.hh \
-	src/language/source/source.cc \
-	src/language/source/source.hh \
+	src/language/source/fragment.cc \
+	src/language/source/fragment.hh \
+	src/language/source/stream.cc \
+	src/language/source/stream.hh \
 	src/language/syntax/and_or_list.hh \
 	src/language/syntax/command.hh \
 	src/language/syntax/conditional_pipeline.hh \
@@ -209,7 +199,11 @@ src_sesh_SOURCES = \
 	src/os/signaling/signal_error_code.hh \
 	src/os/signaling/signal_number.hh \
 	src/os/signaling/signal_number_set.hh \
-	src/os/time_api.hh
+	src/os/time_api.hh \
+	src/ui/message/category.hh \
+	src/ui/message/format.cc \
+	src/ui/message/format.hh \
+	src/ui/message/report.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
 src_async_delay_holder_test_SOURCES = \
@@ -221,11 +215,17 @@ src_async_delay_test_SOURCES = \
 src_async_future_test_SOURCES = \
 	src/async/future_test.cc \
 	src/catch_main.cc
+src_async_lazy_test_SOURCES = \
+	src/catch_main.cc \
+	src/async/lazy_test.cc
 src_async_promise_test_SOURCES = \
 	src/async/promise_test.cc \
 	src/catch_main.cc
 src_async_shared_future_test_SOURCES = \
 	src/async/shared_future_test.cc \
+	src/catch_main.cc
+src_async_shared_lazy_test_SOURCES = \
+	src/async/shared_lazy_test.cc \
 	src/catch_main.cc
 src_common_container_helper_test_SOURCES = \
 	src/catch_main.cc \
@@ -242,10 +242,6 @@ src_common_enum_set_test_SOURCES = \
 src_common_function_helper_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/function_helper_test.cc
-src_common_message_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/common/message_test.cc
 src_common_reference_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/reference_test.cc
@@ -328,36 +324,15 @@ src_language_printing_word_test_SOURCES = \
 	src/language/printing/word.cc \
 	src/language/printing/word_component.cc \
 	src/language/printing/word_test.cc
-src_language_source_buffer_test_SOURCES = \
+src_language_source_fragment_test_SOURCES = \
 	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/buffer.cc \
-	src/language/source/buffer_test.cc \
-	src/language/source/source.cc
-src_language_source_line_appended_source_test_SOURCES = \
+	src/language/source/fragment.cc \
+	src/language/source/fragment_test.cc
+src_language_source_stream_test_SOURCES = \
 	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/line_appended_source.cc \
-	src/language/source/line_appended_source_test.cc \
-	src/language/source/location.cc \
-	src/language/source/source.cc
-src_language_source_line_continued_source_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/line_continued_source.cc \
-	src/language/source/line_continued_source_test.cc \
-	src/language/source/location.cc \
-	src/language/source/source.cc
-src_language_source_location_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/location.cc \
-	src/language/source/location_test.cc
-src_language_source_source_test_SOURCES = \
-	src/catch_main.cc \
-	src/common/message.cc \
-	src/language/source/source.cc \
-	src/language/source/source_test.cc
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/language/source/stream_test.cc
 src_os_event_awaiter_error_file_descriptor_test_SOURCES = \
 	src/catch_main.cc \
 	src/os/event/awaiter.cc \
@@ -437,13 +412,15 @@ src_os_signaling_handler_configuration_test_SOURCES = \
 	src/os/signaling/handler_configuration_api.cc \
 	src/os/signaling/handler_configuration_test.cc \
 	src/os/signaling/signal_error_category.cc
+src_ui_message_format_test_SOURCES = \
+	src/catch_main.cc \
+	src/ui/message/format.cc \
+	src/ui/message/format_test.cc
 
 TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \
-	src/language/source/diagnostic_message_test_helper.hh \
-	src/language/source/location_test_helper.hh \
-	src/language/source/origin_test_helper.hh \
-	src/language/source/source_test_helper.hh \
+	src/language/parsing/parser_test_helper.hh \
+	src/language/source/fragment_test_helper.hh \
 	src/language/syntax/and_or_list_test_helper.hh \
 	src/language/syntax/command_test_helper.hh \
 	src/language/syntax/conditional_pipeline_test_helper.hh \
@@ -459,7 +436,8 @@ TESTHEADERS = \
 	src/os/io/non_blocking_file_descriptor_test_helper.hh \
 	src/os/signaling/handler_configuration_api_test_helper.hh \
 	src/os/signaling/signal_number_set_test_helper.hh \
-	src/os/time_api_test_helper.hh
+	src/os/time_api_test_helper.hh \
+	src/ui/message/report_test_helper.hh
 
 ### Documentation
 

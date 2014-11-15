@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,28 +15,30 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_source_diagnostic_message_test_helper_hh
-#define INCLUDED_language_source_diagnostic_message_test_helper_hh
+#ifndef INCLUDED_language_source_fragment_test_helper_hh
+#define INCLUDED_language_source_fragment_test_helper_hh
 
 #include "buildconfig.h"
 
-#include "common/message.hh"
-#include "language/source/diagnostic_message.hh"
+#include <ostream>
+#include "language/source/fragment.hh"
 
 namespace sesh {
 namespace language {
 namespace source {
 
-void checkEqual(const diagnostic_message &a, const diagnostic_message &b) {
-    CHECK(a.position() == b.position());
-    CHECK(a.error_level() == b.error_level());
-    CHECK(a.message().toString() == b.message().toString());
+template<typename Char, typename Traits>
+std::basic_ostream<Char, Traits> &operator<<(
+        std::basic_ostream<Char, Traits> &os,
+        const fragment_position &fp) {
+    return os << '{' << static_cast<const void *>(fp.head.get()) << ", " <<
+            fp.index << '}';
 }
 
 } // namespace source
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_source_diagnostic_message_test_helper_hh
+#endif // #ifndef INCLUDED_language_source_fragment_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

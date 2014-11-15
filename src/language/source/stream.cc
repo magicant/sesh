@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 WATANABE Yuki
+/* Copyright (C) 2014 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -15,23 +15,35 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_common_error_level_hh
-#define INCLUDED_common_error_level_hh
-
 #include "buildconfig.h"
+#include "stream.hh"
+
+#include <iterator>
+#include "async/future.hh"
+
+namespace {
+
+using sesh::async::make_future;
+
+} // namespace
 
 namespace sesh {
-namespace common {
+namespace language {
+namespace source {
 
-enum class error_level {
-    error,
-    warning,
-    note,
-};
+stream_value_future empty_stream_value_future() {
+    return make_future<stream_value>();
+}
 
-} // namespace common
+stream stream_of(const fragment_position &fp, const stream &s) {
+    if (fp == nullptr)
+        return s;
+    return static_cast<stream_value_future>(
+            make_future<stream_value>(fp, stream_of(std::next(fp), s)));
+}
+
+} // namespace source
+} // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_common_error_level_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

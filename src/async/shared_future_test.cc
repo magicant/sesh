@@ -47,6 +47,11 @@ public:
     throwing_copyable(throwing_copyable &&) = default;
 };
 
+TEST_CASE("Shared future: instantiation with incomplete type") {
+    class incomplete_type;
+    CHECK(sizeof(shared_future<incomplete_type>) > 0);
+}
+
 TEST_CASE("Shared future: default construction and invalidness") {
     shared_future<int> f;
     CHECK_FALSE(f.is_valid());
