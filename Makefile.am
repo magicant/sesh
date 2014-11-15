@@ -95,6 +95,7 @@ src_sesh_SOURCES = \
 	src/async/shared_future.tcc \
 	src/async/shared_lazy.hh \
 	src/buildconfig.h \
+	src/common/constant_function.hh \
 	src/common/container_helper.hh \
 	src/common/copy.hh \
 	src/common/direct_initialize.hh \
