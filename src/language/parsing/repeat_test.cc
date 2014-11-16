@@ -36,12 +36,14 @@ using sesh::async::future;
 using sesh::async::make_future_of;
 using sesh::common::xchar;
 using sesh::common::xstring;
+using sesh::language::parsing::check_parser_failure;
 using sesh::language::parsing::check_parser_no_reports;
 using sesh::language::parsing::check_parser_reports;
 using sesh::language::parsing::check_parser_success_context;
 using sesh::language::parsing::check_parser_success_rest;
 using sesh::language::parsing::check_parser_success_result;
 using sesh::language::parsing::context;
+using sesh::language::parsing::one_or_more;
 using sesh::language::parsing::product;
 using sesh::language::parsing::repeat;
 using sesh::language::parsing::result;
@@ -141,6 +143,76 @@ TEST_CASE("repeat accumulates reports from successful parses") {
     check_parser_reports(
             [](const state &s) {
                 return repeat(modify_context_and_report, s);
+            },
+            {},
+            {0},
+            [](const std::vector<report> &r) {
+                REQUIRE(r.size() == 2);
+                check_equal(r[0], {category::warning});
+                check_equal(r[1], {category::warning});
+            });
+}
+
+future<result<int>> failer(const state &) {
+    result<int> r;
+    r.reports.emplace_back(category::error);
+    return make_future_of(std::move(r));
+}
+
+TEST_CASE("one_or_more fails if parser fails first") {
+    check_parser_failure(
+            [](const state &s) { return one_or_more(failer, s); }, {});
+}
+
+TEST_CASE("Failed one_or_more returns reports from parser") {
+    check_parser_reports(
+            [](const state &s) { return one_or_more(failer, s); },
+            {},
+            {0},
+            [](const std::vector<report> &r) {
+                REQUIRE(r.size() == 1);
+                check_equal(r[0], {category::error});
+            });
+}
+
+TEST_CASE("one_or_more: 1 result") {
+    using namespace std::placeholders;
+    check_parser_success_result(
+            [](const state &s) {
+                return one_or_more(
+                        std::bind(test_char, is_a_or_b, _1),
+                        s,
+                        xstring(L("!")));
+            },
+            L("a"),
+            [](const xstring &s) { CHECK(s == L("!a")); });
+}
+
+TEST_CASE("one_or_more: 3 results") {
+    using namespace std::placeholders;
+    check_parser_success_result(
+            [](const state &s) {
+                return one_or_more(
+                        std::bind(test_char, is_a_or_b, _1), s, xstring());
+            },
+            L("aba"),
+            [](const xstring &s) { CHECK(s == L("aba")); });
+}
+
+TEST_CASE("one_or_more: rest of 3 results") {
+    using namespace std::placeholders;
+    check_parser_success_rest(
+            [](const state &s) {
+                return one_or_more(std::bind(test_char, is_a_or_b, _1), s);
+            },
+            L("aba"),
+            L("x"));
+}
+
+TEST_CASE("one_or_more accumulates reports from successful parses") {
+    check_parser_reports(
+            [](const state &s) {
+                return one_or_more(modify_context_and_report, s);
             },
             {},
             {0},

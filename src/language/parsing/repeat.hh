@@ -26,6 +26,7 @@
 #include <vector>
 #include "async/future.hh"
 #include "common/container_helper.hh"
+#include "common/empty.hh"
 #include "language/parsing/parser.hh"
 
 namespace sesh {
@@ -45,16 +46,21 @@ public:
     std::vector<ui::message::report> reports;
 
     template<typename T>
+    async::future<result<ResultList>> operator()(
+            product<T> &&p, std::vector<ui::message::report> &&r) {
+        state = std::move(p.state);
+        results.push_back(std::move(p.value));
+        common::move(r, reports);
+        return (*this)();
+    }
+
+    template<typename T>
     async::future<result<ResultList>> operator()(result<T> &&r) {
         if (!r.product)
             return async::make_future<result<ResultList>>(
                     product<ResultList>{std::move(results), std::move(state)},
                     std::move(reports));
-
-        state = std::move(r.product->state);
-        results.push_back(std::move(r.product->value));
-        common::move(r.reports, reports);
-        return (*this)();
+        return (*this)(std::move(*r.product), std::move(r.reports));
     }
 
     async::future<result<ResultList>> operator()() {
@@ -62,6 +68,25 @@ public:
     }
 
 }; // template<typename Parser, typename ResultList> class repeater
+
+template<typename Parser, typename ResultList>
+class nonempty_repeater {
+
+public:
+
+    using repeater_type = class repeater<Parser, ResultList>;
+
+    repeater_type repeater;
+
+    template<typename T>
+    async::future<result<ResultList>> operator()(result<T> &&r) {
+        if (!r.product)
+            return async::make_future<result<ResultList>>(
+                    common::empty(), std::move(r.reports));
+        return repeater(std::move(*r.product), std::move(r.reports));
+    }
+
+}; // template<typename Parser, typename ResultList> class nonempty_repeater
 
 } // namespace repeat_impl
 
@@ -93,6 +118,22 @@ async::future<result<ResultList>> repeat(
     repeat_impl::repeater<typename std::decay<P>::type, ResultList> r{
             std::forward<P>(p), s, std::forward<ResultList>(results), {}};
     return r();
+}
+
+/**
+ * Like {@link repeat}, but requires the argument parser to succeed at least
+ * once. If it fails in the first round, one_or_more also fails with the same
+ * reports.
+ */
+template<
+        typename P,
+        typename ResultList = std::vector<typename result_type_of<P>::type>>
+async::future<result<ResultList>> one_or_more(
+        P &&p, const state &s, ResultList &&results = ResultList()) {
+    using Parser = typename std::decay<P>::type;
+    repeat_impl::nonempty_repeater<Parser, ResultList> r{{
+            std::forward<P>(p), s, std::forward<ResultList>(results), {}}};
+    return r.repeater.parser(s).map(std::move(r)).unwrap();
 }
 
 } // namespace parsing
