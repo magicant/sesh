@@ -64,7 +64,7 @@ void check_parser(P &&parse, const state &s, C &&check_result) {
     bool called = false;
     std::move(r).then(
             [&called, &check_result](const common::trial<result<R>> &t) {
-        REQUIRE(t);
+        REQUIRE_NOTHROW(t.get());
         std::forward<C>(check_result)(*t);
         called = true;
     });
