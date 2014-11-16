@@ -42,14 +42,28 @@ namespace sesh {
 namespace language {
 namespace parsing {
 
+namespace {
+
+class char_tester {
+
+public:
+
+    std::function<bool(xchar)> predicate;
+    class context context;
+
+    result<xchar> operator()(const stream_value &sv) {
+        if (sv.first == nullptr || !predicate(*sv.first))
+            return {};
+        return product<xchar>{*sv.first, {sv.second, context}};
+    }
+
+}; // class char_tester
+
+} // namespace
+
 auto test_char(const std::function<bool(xchar)> &p, const state &s)
         -> future<result<xchar>> {
-    auto &c = s.context;
-    return s.rest->get().map([p, c](const stream_value &sv) -> result<xchar> {
-        if (sv.first == nullptr || !p(*sv.first))
-            return {};
-        return product<xchar>{*sv.first, {sv.second, c}};
-    });
+    return s.rest->get().map(char_tester{p, s.context});
 }
 
 future<result<xchar>> parse_char(xchar c, const state &s) {
