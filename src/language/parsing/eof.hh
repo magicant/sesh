@@ -27,15 +27,12 @@ namespace sesh {
 namespace language {
 namespace parsing {
 
-/** Dummy type which represents the end of input. */
-class eof { };
-
 /**
  * Parser that succeeds at the end of input.
  *
  * This parser never returns any report even on failure.
  */
-extern parser<eof> parse_eof;
+extern parser<common::empty> parse_eof;
 
 } // namespace parsing
 } // namespace language

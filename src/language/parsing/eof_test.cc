@@ -28,6 +28,7 @@
 
 namespace {
 
+using sesh::common::empty;
 using sesh::common::trial;
 using sesh::language::parsing::check_parser_failure;
 using sesh::language::parsing::check_parser_no_reports;
@@ -35,7 +36,6 @@ using sesh::language::parsing::check_parser_success_context_free;
 using sesh::language::parsing::check_parser_success_rest;
 using sesh::language::parsing::check_parser_success_result;
 using sesh::language::parsing::context;
-using sesh::language::parsing::eof;
 using sesh::language::parsing::parse_eof;
 using sesh::language::parsing::result;
 using sesh::language::parsing::state;
@@ -45,7 +45,7 @@ using sesh::language::source::fragment_position;
 using sesh::language::source::stream_of;
 
 TEST_CASE("EOF parser succeeds at EOF") {
-    check_parser_success_result(parse_eof, {}, [](eof) { });
+    check_parser_success_result(parse_eof, {}, [](empty) { });
 }
 
 TEST_CASE("EOF parser reports nothing on success") {
