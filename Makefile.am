@@ -41,6 +41,7 @@ TESTPROGRAMS = \
 	src/common/visitor_test \
 	src/language/parsing/char_test \
 	src/language/parsing/eof_test \
+	src/language/parsing/repeat_test \
 	src/language/printing/and_or_list_test \
 	src/language/printing/buffer_test \
 	src/language/printing/conditional_pipeline_test \
@@ -130,6 +131,7 @@ src_sesh_SOURCES = \
 	src/language/parsing/eof.cc \
 	src/language/parsing/eof.hh \
 	src/language/parsing/parser.hh \
+	src/language/parsing/repeat.hh \
 	src/language/printing/and_or_list.cc \
 	src/language/printing/and_or_list.hh \
 	src/language/printing/buffer.cc \
@@ -280,6 +282,13 @@ src_language_parsing_eof_test_SOURCES = \
 	src/language/parsing/eof_test.cc \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc
+src_language_parsing_repeat_test_SOURCES = \
+	src/catch_main.cc \
+	src/language/parsing/char.cc \
+	src/language/parsing/repeat_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
 src_language_printing_and_or_list_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/printing/and_or_list.cc \
