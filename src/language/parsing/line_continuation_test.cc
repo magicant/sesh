@@ -33,6 +33,7 @@ using sesh::language::parsing::check_parser_success_context_free;
 using sesh::language::parsing::check_parser_success_rest;
 using sesh::language::parsing::check_parser_success_result;
 using sesh::language::parsing::skip_line_continuation;
+using sesh::language::parsing::skip_line_continuations;
 
 TEST_CASE("EOF is not line continuation") {
     check_parser_failure(skip_line_continuation, {});
@@ -74,6 +75,14 @@ TEST_CASE("skip_line_continuation is context-free") {
 
 TEST_CASE("skip_line_continuation don't read beyond line continuation") {
     check_parser_no_excess(skip_line_continuation, L("\\\n"));
+}
+
+TEST_CASE("skip_line_continuations succeeds with no line continuation") {
+    check_parser_success_rest(skip_line_continuations, {});
+}
+
+TEST_CASE("skip_line_continuations succeeds with two line continuations") {
+    check_parser_success_rest(skip_line_continuations, L("\\\n\\\n"), L("X"));
 }
 
 } // namespace
