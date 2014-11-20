@@ -22,7 +22,7 @@
 #include "async/future.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/parsing/char.hh"
+#include "language/parsing/line_continued_char.hh"
 #include "language/parsing/mapper.hh"
 #include "language/parsing/repeat.hh"
 #include "language/syntax/raw_string.hh"
@@ -42,9 +42,10 @@ namespace parsing {
 
 auto parse_raw_string(const std::function<bool(xchar)> &p, const state &s)
         -> future<result<raw_string>> {
+    using std::placeholders::_1;
     return map_value(
             one_or_more(
-                std::bind(test_char, p, std::placeholders::_1),
+                std::bind(test_char_after_line_continuations, p, _1),
                 s,
                 xstring{}),
             [](xstring &&s) { return raw_string{std::move(s)}; });
