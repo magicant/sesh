@@ -42,6 +42,7 @@ TESTPROGRAMS = \
 	src/language/parsing/char_test \
 	src/language/parsing/eof_test \
 	src/language/parsing/line_continuation_test \
+	src/language/parsing/line_continued_char_test \
 	src/language/parsing/raw_string_test \
 	src/language/parsing/repeat_test \
 	src/language/printing/and_or_list_test \
@@ -98,6 +99,8 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/joiner.hh \
 	src/language/parsing/line_continuation.cc \
 	src/language/parsing/line_continuation.hh \
+	src/language/parsing/line_continued_char.cc \
+	src/language/parsing/line_continued_char.hh \
 	src/language/parsing/mapper.hh \
 	src/language/parsing/parser.hh \
 	src/language/parsing/raw_string.cc \
@@ -299,6 +302,13 @@ src_language_parsing_line_continuation_test_SOURCES = \
 	src/catch_main.cc \
 	$(src_sesh_SOURCES_PARSER) \
 	src/language/parsing/line_continuation_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
+src_language_parsing_line_continued_char_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/line_continued_char_test.cc \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc \
 	src/ui/message/format.cc
