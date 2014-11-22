@@ -54,7 +54,7 @@ public:
     result<xchar> operator()(const stream_value &sv) {
         if (sv.first == nullptr || !predicate(*sv.first))
             return {};
-        return product<xchar>{*sv.first, {sv.second, context}};
+        return product<xchar>{*sv.first, {sv.second, std::move(context)}};
     }
 
 }; // class char_tester
@@ -68,11 +68,11 @@ auto test_char(const std::function<bool(xchar)> &p, const state &s)
 
 future<result<xchar>> parse_char(xchar c, const state &s) {
     using namespace std::placeholders;
-    return test_char(std::bind(xchar_traits::eq, c, _1), std::move(s));
+    return test_char(std::bind(xchar_traits::eq, c, _1), s);
 }
 
 future<result<xchar>> accept_char(const state &s) {
-    return test_char(constant(true), std::move(s));
+    return test_char(constant(true), s);
 }
 
 } // namespace parsing
