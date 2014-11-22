@@ -53,7 +53,7 @@ inline source::stream stream_stub(
 }
 
 inline context default_context_stub() {
-    return {0};
+    return {{}, 0};
 }
 
 template<typename P, typename C>
@@ -159,7 +159,7 @@ void check_parser_success_context(
 template<typename P>
 void check_parser_success_context_free(
         P &&parse, const source::fragment::value_type &src) {
-    const context c = {4567};
+    const context c = {{}, 4567};
     check_parser_success_context(
             std::forward<P>(parse),
             src,

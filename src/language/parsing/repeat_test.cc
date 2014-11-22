@@ -18,6 +18,7 @@
 #include "buildconfig.h"
 
 #include <functional>
+#include <locale>
 #include "async/future.hh"
 #include "catch.hpp"
 #include "common/xchar.hh"
@@ -88,8 +89,11 @@ TEST_CASE("repeat passes context") {
                 return repeat(modify_context_and_report, s);
             },
             {},
-            {0},
-            [](const context &c) { CHECK(c.dummy == 2); });
+            {std::locale(), 0},
+            [](const context &c) {
+                CHECK(c.locale == std::locale());
+                CHECK(c.dummy == 2);
+            });
 }
 
 TEST_CASE("repeat: 1 result (with EOF)") {
