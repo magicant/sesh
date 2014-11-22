@@ -15,29 +15,47 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parsing_eof_hh
-#define INCLUDED_language_parsing_eof_hh
-
 #include "buildconfig.h"
+#include "line_continuation.hh"
 
+#include <functional>
+#include "async/future.hh"
+#include "common/constant_function.hh"
 #include "common/empty.hh"
-#include "language/parsing/parser.hh"
+#include "common/xchar.hh"
+#include "language/parsing/blackhole.hh"
+#include "language/parsing/char.hh"
+#include "language/parsing/joiner.hh"
+#include "language/parsing/mapper.hh"
+#include "language/parsing/repeat.hh"
+
+namespace {
+
+using sesh::async::future;
+using sesh::common::empty;
+using sesh::common::xchar;
+
+} // namespace
 
 namespace sesh {
 namespace language {
 namespace parsing {
 
-/**
- * Parser that succeeds at the end of input.
- *
- * This parser never returns any report even on failure.
- */
-extern parser<common::empty> parse_eof;
+auto skip_line_continuation(const state &s)
+        -> future<result<std::tuple<xchar, xchar>>> {
+    using namespace std::placeholders;
+    static const auto p = join(
+            std::bind(parse_char, L('\\'), _1),
+            std::bind(parse_char, L('\n'), _1));
+    return p(s);
+}
+
+future<result<blackhole>> skip_line_continuations(const state &s) {
+    return repeat(skip_line_continuation, s, blackhole());
+}
 
 } // namespace parsing
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_parsing_eof_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

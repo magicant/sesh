@@ -41,8 +41,9 @@ public:
 
     template<
             typename From,
-            typename To = typename result_type_of<
-                    typename std::result_of<F(product<From> &&)>::type>::type>
+            typename To = typename result_type_of<typename std::decay<
+                    typename std::result_of<F(product<From> &&)>::type>::
+                    type>::type>
     result<To> operator()(result<From> &&from) {
         result<To> to(common::empty(), std::move(from.reports));
         if (from.product)
@@ -62,7 +63,8 @@ public:
 
     template<
             typename From,
-            typename To = typename std::result_of<F(From &&)>::type>
+            typename To = typename std::decay<
+                    typename std::result_of<F(From &&)>::type>::type>
     product<To> operator()(product<From> &&from) {
         return {f(std::move(from.value)), std::move(from.state)};
     }
@@ -74,8 +76,9 @@ public:
 template<
         typename From,
         typename Mapper,
-        typename To = typename result_type_of<
-                typename std::result_of<Mapper(product<From>)>::type>::type>
+        typename To = typename result_type_of<typename std::decay<
+                typename std::result_of<Mapper(product<From>)>::type>::
+                type>::type>
 auto map_product(async::future<result<From>> &&f, Mapper &&m)
         -> async::future<result<To>> {
     using M = mapper_impl::product_mapper<typename std::decay<Mapper>::type>;
@@ -85,7 +88,8 @@ auto map_product(async::future<result<From>> &&f, Mapper &&m)
 template<
         typename From,
         typename Mapper,
-        typename To = typename std::result_of<Mapper(From)>::type>
+        typename To = typename std::decay<
+                typename std::result_of<Mapper(From)>::type>::type>
 auto map_value(async::future<result<From>> &&f, Mapper &&m)
         -> async::future<result<To>> {
     using M = mapper_impl::value_mapper<typename std::decay<Mapper>::type>;

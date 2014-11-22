@@ -16,23 +16,25 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "raw_string.hh"
+#include "line_continued_char.hh"
 
 #include <functional>
+#include <tuple>
 #include "async/future.hh"
+#include "common/constant_function.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/parsing/line_continued_char.hh"
+#include "language/parsing/char.hh"
+#include "language/parsing/joiner.hh"
+#include "language/parsing/line_continuation.hh"
 #include "language/parsing/mapper.hh"
-#include "language/parsing/repeat.hh"
-#include "language/syntax/raw_string.hh"
 
 namespace {
 
 using sesh::async::future;
+using sesh::common::constant;
 using sesh::common::xchar;
-using sesh::common::xstring;
-using sesh::language::syntax::raw_string;
+using sesh::common::xchar_traits;
 
 } // namespace
 
@@ -40,15 +42,24 @@ namespace sesh {
 namespace language {
 namespace parsing {
 
-auto parse_raw_string(const std::function<bool(xchar)> &p, const state &s)
-        -> future<result<raw_string>> {
-    using std::placeholders::_1;
+future<result<xchar>> test_char_after_line_continuations(
+        const std::function<bool(xchar)> &p, const state &s) {
+    using namespace std::placeholders;
     return map_value(
-            one_or_more(
-                std::bind(test_char_after_line_continuations, p, _1),
-                s,
-                xstring{}),
-            [](xstring &&s) { return raw_string{std::move(s)}; });
+            join(skip_line_continuations, std::bind(test_char, p, _1))(s),
+            static_cast<xchar &&(*)(std::tuple<blackhole, xchar> &&)>(
+                std::get<1>));
+}
+
+future<result<xchar>> parse_char_after_line_continuations(
+        xchar c, const state &s) {
+    using namespace std::placeholders;
+    return test_char_after_line_continuations(
+            std::bind(xchar_traits::eq, c, _1), s);
+}
+
+future<result<xchar>> accept_char_after_line_continuations(const state &s) {
+    return test_char_after_line_continuations(constant(true), s);
 }
 
 } // namespace parsing

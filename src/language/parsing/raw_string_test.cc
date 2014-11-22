@@ -38,6 +38,8 @@ using sesh::language::syntax::raw_string;
 
 constexpr bool is_a(xchar c) noexcept { return c == L('a'); }
 
+constexpr bool is_not_dot(xchar c) noexcept { return c != L('.'); }
+
 TEST_CASE("Raw string parser rejects empty result") {
     using namespace std::placeholders;
     check_parser_failure(std::bind(parse_raw_string, is_a, _1), {});
@@ -57,6 +59,14 @@ TEST_CASE("Raw string parser with 3-character result") {
             std::bind(parse_raw_string, is_a, _1),
             L("aaax"),
             [](const raw_string &s) { CHECK(s.value == L("aaa")); });
+}
+
+TEST_CASE("Parsing raw string with line continuations") {
+    using namespace std::placeholders;
+    check_parser_success_result(
+            std::bind(parse_raw_string, is_not_dot, _1),
+            L("\\\nab\\\n\\\nc.\\\n"),
+            [](const raw_string &s) { CHECK(s.value == L("abc")); });
 }
 
 TEST_CASE("Raw string parser is context-free") {

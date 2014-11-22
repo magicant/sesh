@@ -20,12 +20,14 @@
 
 #include <utility>
 #include "async/future.hh"
+#include "common/empty.hh"
 #include "language/parsing/parser.hh"
 #include "language/source/stream.hh"
 
 namespace {
 
 using sesh::async::future;
+using sesh::common::empty;
 using sesh::language::parsing::product;
 using sesh::language::parsing::result;
 using sesh::language::parsing::state;
@@ -37,12 +39,12 @@ namespace sesh {
 namespace language {
 namespace parsing {
 
-future<result<eof>> parse_eof(const state &s) {
+future<result<empty>> parse_eof(const state &s) {
     auto &c = s.context;
-    return s.rest->get().map([c](const stream_value &sv) -> result<eof> {
+    return s.rest->get().map([c](const stream_value &sv) -> result<empty> {
         if (sv.first != nullptr)
             return {};
-        return product<eof>{eof(), {sv.second, c}};
+        return product<empty>{empty(), {sv.second, c}};
     });
 }
 

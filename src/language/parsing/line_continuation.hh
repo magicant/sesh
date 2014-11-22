@@ -15,12 +15,15 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parsing_eof_hh
-#define INCLUDED_language_parsing_eof_hh
+#ifndef INCLUDED_language_parsing_line_continuation_hh
+#define INCLUDED_language_parsing_line_continuation_hh
 
 #include "buildconfig.h"
 
+#include <tuple>
 #include "common/empty.hh"
+#include "common/xchar.hh"
+#include "language/parsing/blackhole.hh"
 #include "language/parsing/parser.hh"
 
 namespace sesh {
@@ -28,16 +31,29 @@ namespace language {
 namespace parsing {
 
 /**
- * Parser that succeeds at the end of input.
+ * Skips a line continuation and returns a tuple of the two characters that
+ * make up the line continuation.
  *
- * This parser never returns any report even on failure.
+ * This parser fails if there is no line continuation at the current position.
+ *
+ * This parser never returns any reports even on failure.
  */
-extern parser<common::empty> parse_eof;
+extern parser<std::tuple<common::xchar, common::xchar>> skip_line_continuation;
+
+/**
+ * Skips as many line continuations as possible.
+ *
+ * This parser succeeds even if there is no line continuation at the current
+ * position.
+ *
+ * This parser never returns any reports.
+ */
+extern parser<blackhole> skip_line_continuations;
 
 } // namespace parsing
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_parsing_eof_hh
+#endif // #ifndef INCLUDED_language_parsing_line_continuation_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
