@@ -40,6 +40,7 @@ TESTPROGRAMS = \
 	src/common/variant_test \
 	src/common/visitor_test \
 	src/language/parsing/char_test \
+	src/language/parsing/comment_test \
 	src/language/parsing/eof_test \
 	src/language/parsing/line_continuation_test \
 	src/language/parsing/line_continued_char_test \
@@ -93,6 +94,8 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/blackhole.hh \
 	src/language/parsing/char.cc \
 	src/language/parsing/char.hh \
+	src/language/parsing/comment.cc \
+	src/language/parsing/comment.hh \
 	src/language/parsing/constant_parser.hh \
 	src/language/parsing/eof.cc \
 	src/language/parsing/eof.hh \
@@ -292,6 +295,13 @@ src_language_parsing_char_test_SOURCES = \
 	src/language/parsing/char_test.cc \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc
+src_language_parsing_comment_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/comment_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
 src_language_parsing_eof_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/parsing/eof.cc \
