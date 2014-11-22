@@ -145,7 +145,6 @@ TEST_CASE("repeat accumulates reports from successful parses") {
                 return repeat(modify_context_and_report, s);
             },
             {},
-            {0},
             [](const std::vector<report> &r) {
                 REQUIRE(r.size() == 2);
                 check_equal(r[0], {category::warning});
@@ -168,7 +167,6 @@ TEST_CASE("Failed one_or_more returns reports from parser") {
     check_parser_reports(
             [](const state &s) { return one_or_more(failer, s); },
             {},
-            {0},
             [](const std::vector<report> &r) {
                 REQUIRE(r.size() == 1);
                 check_equal(r[0], {category::error});
@@ -215,7 +213,6 @@ TEST_CASE("one_or_more accumulates reports from successful parses") {
                 return one_or_more(modify_context_and_report, s);
             },
             {},
-            {0},
             [](const std::vector<report> &r) {
                 REQUIRE(r.size() == 2);
                 check_equal(r[0], {category::warning});

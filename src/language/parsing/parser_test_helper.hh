@@ -283,6 +283,27 @@ void check_parser_reports(
 }
 
 /**
+ * Checks the reports returned by the argument parser function.
+ *
+ * @param parse Parser function
+ * @param src Source code fragment string that the parser may read. The
+ * check will fail if the parser tries to read more than the source.
+ * @param check_reports Function that checks if the reports are correct. Must
+ * be callable with <code>const std::vector&lt;report> &amp;</code>.
+ */
+template<typename P, typename C>
+void check_parser_reports(
+        P &&parse,
+        const source::fragment::value_type &src,
+        C &&check_reports) {
+    check_parser_reports(
+            std::forward<P>(parse),
+            src,
+            default_context_stub(),
+            std::forward<C>(check_reports));
+}
+
+/**
  * Checks if the argument parser function yields no reports when applied to the
  * argument source code.
  *
