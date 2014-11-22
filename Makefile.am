@@ -94,6 +94,7 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/blackhole.hh \
 	src/language/parsing/char.cc \
 	src/language/parsing/char.hh \
+	src/language/parsing/char_predicate.hh \
 	src/language/parsing/comment.cc \
 	src/language/parsing/comment.hh \
 	src/language/parsing/constant_parser.hh \

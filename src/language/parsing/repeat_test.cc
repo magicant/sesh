@@ -53,7 +53,7 @@ using sesh::language::parsing::test_char;
 using sesh::ui::message::category;
 using sesh::ui::message::report;
 
-constexpr bool is_a_or_b(xchar c) noexcept {
+constexpr bool is_a_or_b(xchar c, const context &) noexcept {
     return c == L('a') || c == L('b');
 }
 

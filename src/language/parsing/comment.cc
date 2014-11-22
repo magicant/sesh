@@ -50,7 +50,7 @@ const auto parse_hash_and_non_newlines = join(
             return repeat(
                 std::bind(
                     test_char,
-                    [](xchar c) { return c != L('\n'); },
+                    [](xchar c, const context &) { return c != L('\n'); },
                     std::placeholders::_1),
                 s,
                 xstring{});
