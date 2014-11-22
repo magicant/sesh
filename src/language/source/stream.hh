@@ -36,7 +36,7 @@ class stream_value;
 using stream_value_future = async::shared_future<stream_value>;
 
 /**
- * A stream is an abstract sequence of {@link async::shared_future}s of [@link
+ * A stream is an abstract sequence of {@link async::shared_future}s of {@link
  * fragment_position}s.
  *
  * The stream abstracts how the shell reads source code lines, so the parser
