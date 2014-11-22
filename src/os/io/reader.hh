@@ -47,8 +47,8 @@ namespace io {
  *
  * The result is (a copy of) the argument file descriptor and either a vector
  * of bytes that were successfully read or a non-zero error code. The vector is
- * empty if and only if {@code max_bytes_to_read} is zero or the file
- * descriptor is at the end of file.
+ * empty if and only if @c max_bytes_to_read is zero or the file descriptor is
+ * at the end of file.
  *
  * @param max_bytes_to_read The maximum number of bytes to read. Note that the
  * actual number of bytes returned may be smaller.

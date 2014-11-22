@@ -43,7 +43,7 @@ namespace common {
  * original value type.
  *
  * @tparam KeyDigit The key type of the inner maps. The entire trie is then
- * regarded as a map from strings from {@code KeyDigit} to {@code Value}.
+ * regarded as a map from strings from @c KeyDigit to @c Value.
  * @tparam Value The value type. Must be containable in maybe.
  * @tparam KeyComparator The comparator of key units. It must have a function
  * call operator that takes two (constant references to) key units and returns
@@ -684,9 +684,9 @@ public:
 
     /**
      * Creates (the root node of) a new trie and add values from the iterator.
-     * The value type of the iterator must be {@code std::pair<key_string,
-     * Value>}, where the key string type must be a container that iterates
-     * KeyDigit.
+     * The value type of the iterator must be <code>std::pair&lt;key_string,
+     * Value></code>, where the key string type must be a container that
+     * iterates @c KeyDigit.
      */
     template<typename InputIterator>
     trie(

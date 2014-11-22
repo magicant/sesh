@@ -54,8 +54,8 @@ public:
      * function.
      *
      * The argument status instance must be obtained from the {@link
-     * #get_file_description_status} function called for the same {@code
-     * *this}.
+     * #get_file_description_status} function called for the same
+     * <code>*this</code>.
      */
     virtual std::error_code set_file_description_status(
             const file_descriptor &, const file_description_status &) const

@@ -93,8 +93,8 @@ public:
  *
  * @tparam E An enumeration type. Its first enumerator must have an underlying
  * value of zero. All enumerators must be defined successively (as an integer
- * sequence). The last enumerator must be specified by {@code
- * enum_traits&lt;E>::max}.
+ * sequence). The last enumerator must be specified by
+ * <code>enum_traits&lt;E>::max</code>.
  */
 template<typename E>
 enum_iterator_impl::full_range<E> enumerators() noexcept {

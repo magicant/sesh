@@ -193,9 +193,9 @@ private:
 
     std::map<signal_number, signal_data> m_data;
 
-    /** Null until {@code #initialize_masks()} is called. */
+    /** Null until {@link #initialize_masks()} is called. */
     std::unique_ptr<signal_number_set> m_initial_mask;
-    /** Null until {@code #initialize_masks()} is called. */
+    /** Null until {@link #initialize_masks()} is called. */
     std::unique_ptr<signal_number_set> m_mask_for_pselect;
 
     /** Gets (or creates) the configuration for the argument signal number. */

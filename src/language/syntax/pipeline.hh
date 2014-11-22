@@ -52,8 +52,9 @@ public:
     /**
      * Constructs a pipeline.
      * @param esm Exit status mode of the new pipeline.
-     * @param a Arguments that are passed to the constructor of {@code
-     * std::vector<command_pointer>} to initialize {@link #commands}.
+     * @param a Arguments that are passed to the constructor of
+     * <code>std::vector&lt;command_pointer></code> to initialize {@link
+     * #commands}.
      */
     template<typename... A>
     explicit pipeline(exit_status_mode_type esm, A &&... a) :

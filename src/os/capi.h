@@ -123,7 +123,7 @@ size_t sesh_osapi_read(int fd, void *buffer, size_t maxBytesToRead);
  */
 size_t sesh_osapi_write(int fd, const void *bytes, size_t bytesToWrite);
 
-/** Returns {@code FD_SETSIZE}. */
+/** Returns @c FD_SETSIZE. */
 int sesh_osapi_fd_setsize(void);
 
 /** An abstract wrapper of the POSIX fd_set type. */
