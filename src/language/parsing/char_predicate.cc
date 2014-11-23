@@ -15,26 +15,33 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_parsing_char_predicate_hh
-#define INCLUDED_language_parsing_char_predicate_hh
-
 #include "buildconfig.h"
+#include "char_predicate.hh"
 
+#include <locale>
 #include "common/xchar.hh"
-#include "language/parsing/parser.hh"
+
+namespace {
+
+using sesh::common::xchar;
+
+} // namespace
 
 namespace sesh {
 namespace language {
 namespace parsing {
 
-using char_predicate = bool(common::xchar, const context &);
-
-extern char_predicate is_blank;
+bool is_blank(xchar x, const context &c) {
+#if HAVE_STD__ISBLANK
+    return std::isblank(x, c.locale);
+#else
+    (void) c.locale;
+    return x == L(' ') || x == L('\t');
+#endif // #if HAVE_STD__ISBLANK
+}
 
 } // namespace parsing
 } // namespace language
 } // namespace sesh
-
-#endif // #ifndef INCLUDED_language_parsing_char_predicate_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
