@@ -43,7 +43,7 @@ namespace language {
 namespace parsing {
 
 future<result<xchar>> test_char_after_line_continuations(
-        const std::function<bool(xchar)> &p, const state &s) {
+        const std::function<char_predicate> &p, const state &s) {
     using namespace std::placeholders;
     return map_value(
             join(skip_line_continuations, std::bind(test_char, p, _1))(s),

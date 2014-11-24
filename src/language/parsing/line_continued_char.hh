@@ -21,6 +21,7 @@
 #include "buildconfig.h"
 
 #include "common/xchar.hh"
+#include "language/parsing/char_predicate.hh"
 #include "language/parsing/parser.hh"
 
 namespace sesh {
@@ -36,7 +37,7 @@ namespace parsing {
  * This parser never returns any report even on failure.
  */
 auto test_char_after_line_continuations(
-        const std::function<bool(common::xchar)> &, const state &)
+        const std::function<char_predicate> &, const state &)
         -> async::future<result<common::xchar>>;
 
 /**

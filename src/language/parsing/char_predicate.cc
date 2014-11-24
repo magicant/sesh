@@ -16,23 +16,14 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "raw_string.hh"
+#include "char_predicate.hh"
 
-#include <functional>
-#include "async/future.hh"
+#include <locale>
 #include "common/xchar.hh"
-#include "common/xstring.hh"
-#include "language/parsing/line_continued_char.hh"
-#include "language/parsing/mapper.hh"
-#include "language/parsing/repeat.hh"
-#include "language/syntax/raw_string.hh"
 
 namespace {
 
-using sesh::async::future;
 using sesh::common::xchar;
-using sesh::common::xstring;
-using sesh::language::syntax::raw_string;
 
 } // namespace
 
@@ -40,15 +31,13 @@ namespace sesh {
 namespace language {
 namespace parsing {
 
-auto parse_raw_string(const std::function<char_predicate> &p, const state &s)
-        -> future<result<raw_string>> {
-    using std::placeholders::_1;
-    return map_value(
-            one_or_more(
-                std::bind(test_char_after_line_continuations, p, _1),
-                s,
-                xstring{}),
-            [](xstring &&s) { return raw_string{std::move(s)}; });
+bool is_blank(xchar x, const context &c) {
+#if HAVE_STD__ISBLANK
+    return std::isblank(x, c.locale);
+#else
+    (void) c.locale;
+    return x == L(' ') || x == L('\t');
+#endif // #if HAVE_STD__ISBLANK
 }
 
 } // namespace parsing

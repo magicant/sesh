@@ -26,6 +26,7 @@
 
 #include "buildconfig.h"
 
+#include <locale>
 #include <utility>
 #include <vector>
 #include "async/future.hh"
@@ -42,6 +43,8 @@ namespace parsing {
 class context {
 
 public:
+
+    std::locale locale;
 
     /**
      * Dummy data. Will be replaced with pending_here_documents and aliases.

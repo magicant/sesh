@@ -16,23 +16,27 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "raw_string.hh"
+#include "whitespace.hh"
 
 #include <functional>
+#include <utility>
 #include "async/future.hh"
-#include "common/xchar.hh"
-#include "common/xstring.hh"
+#include "common/constant_function.hh"
+#include "common/empty.hh"
+#include "language/parsing/blackhole.hh"
+#include "language/parsing/char_predicate.hh"
+#include "language/parsing/comment.hh"
+#include "language/parsing/joiner.hh"
+#include "language/parsing/line_continuation.hh"
 #include "language/parsing/line_continued_char.hh"
 #include "language/parsing/mapper.hh"
+#include "language/parsing/option.hh"
 #include "language/parsing/repeat.hh"
-#include "language/syntax/raw_string.hh"
 
 namespace {
 
 using sesh::async::future;
-using sesh::common::xchar;
-using sesh::common::xstring;
-using sesh::language::syntax::raw_string;
+using sesh::common::empty;
 
 } // namespace
 
@@ -40,15 +44,22 @@ namespace sesh {
 namespace language {
 namespace parsing {
 
-auto parse_raw_string(const std::function<char_predicate> &p, const state &s)
-        -> future<result<raw_string>> {
+namespace {
+
+future<result<blackhole>> skip_blanks(const state &s) {
     using std::placeholders::_1;
-    return map_value(
-            one_or_more(
-                std::bind(test_char_after_line_continuations, p, _1),
-                s,
-                xstring{}),
-            [](xstring &&s) { return raw_string{std::move(s)}; });
+    return repeat(
+            std::bind(test_char_after_line_continuations, is_blank, _1),
+            s,
+            blackhole());
+}
+
+} // namespace
+
+future<result<empty>> skip_whitespaces(const state &s) {
+    static const auto p = join(
+            skip_blanks, skip_line_continuations, option(skip_comment));
+    return map_value(p(s), constant(empty()));
 }
 
 } // namespace parsing

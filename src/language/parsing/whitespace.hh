@@ -15,44 +15,28 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_language_parsing_whitespace_hh
+#define INCLUDED_language_parsing_whitespace_hh
+
 #include "buildconfig.h"
-#include "raw_string.hh"
 
-#include <functional>
-#include "async/future.hh"
-#include "common/xchar.hh"
-#include "common/xstring.hh"
-#include "language/parsing/line_continued_char.hh"
-#include "language/parsing/mapper.hh"
-#include "language/parsing/repeat.hh"
-#include "language/syntax/raw_string.hh"
-
-namespace {
-
-using sesh::async::future;
-using sesh::common::xchar;
-using sesh::common::xstring;
-using sesh::language::syntax::raw_string;
-
-} // namespace
+#include "common/empty.hh"
+#include "language/parsing/parser.hh"
 
 namespace sesh {
 namespace language {
 namespace parsing {
 
-auto parse_raw_string(const std::function<char_predicate> &p, const state &s)
-        -> future<result<raw_string>> {
-    using std::placeholders::_1;
-    return map_value(
-            one_or_more(
-                std::bind(test_char_after_line_continuations, p, _1),
-                s,
-                xstring{}),
-            [](xstring &&s) { return raw_string{std::move(s)}; });
-}
+/**
+ * Skips any number of blanks optionally including line continuations and/or
+ * followed by a comment.
+ */
+extern parser<common::empty> skip_whitespaces;
 
 } // namespace parsing
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_parsing_whitespace_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

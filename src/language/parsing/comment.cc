@@ -16,23 +16,25 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "raw_string.hh"
+#include "comment.hh"
 
 #include <functional>
+#include <tuple>
 #include "async/future.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"
-#include "language/parsing/line_continued_char.hh"
+#include "language/parsing/char.hh"
+#include "language/parsing/joiner.hh"
 #include "language/parsing/mapper.hh"
+#include "language/parsing/parser.hh"
 #include "language/parsing/repeat.hh"
-#include "language/syntax/raw_string.hh"
 
 namespace {
 
 using sesh::async::future;
 using sesh::common::xchar;
+using sesh::common::xchar_traits;
 using sesh::common::xstring;
-using sesh::language::syntax::raw_string;
 
 } // namespace
 
@@ -40,15 +42,27 @@ namespace sesh {
 namespace language {
 namespace parsing {
 
-auto parse_raw_string(const std::function<char_predicate> &p, const state &s)
-        -> future<result<raw_string>> {
-    using std::placeholders::_1;
-    return map_value(
-            one_or_more(
-                std::bind(test_char_after_line_continuations, p, _1),
+namespace {
+
+const auto parse_hash_and_non_newlines = join(
+        std::bind(parse_char, L('#'), std::placeholders::_1),
+        [](const state &s) {
+            return repeat(
+                std::bind(
+                    test_char,
+                    [](xchar c, const context &) { return c != L('\n'); },
+                    std::placeholders::_1),
                 s,
-                xstring{}),
-            [](xstring &&s) { return raw_string{std::move(s)}; });
+                xstring{});
+        });
+
+} // namespace
+
+future<result<xstring>> skip_comment(const state &s) {
+    return map_value(
+            parse_hash_and_non_newlines(s),
+            static_cast<xstring &&(*)(std::tuple<xchar, xstring> &&t)>(
+                std::get<1>));
 }
 
 } // namespace parsing

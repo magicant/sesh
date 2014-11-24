@@ -25,6 +25,7 @@
 #include "common/copy.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"
+#include "language/parsing/char_predicate.hh"
 #include "language/source/stream.hh"
 
 namespace {
@@ -48,31 +49,31 @@ class char_tester {
 
 public:
 
-    std::function<bool(xchar)> predicate;
+    std::function<char_predicate> predicate;
     class context context;
 
     result<xchar> operator()(const stream_value &sv) {
-        if (sv.first == nullptr || !predicate(*sv.first))
+        if (sv.first == nullptr || !predicate(*sv.first, context))
             return {};
-        return product<xchar>{*sv.first, {sv.second, context}};
+        return product<xchar>{*sv.first, {sv.second, std::move(context)}};
     }
 
 }; // class char_tester
 
 } // namespace
 
-auto test_char(const std::function<bool(xchar)> &p, const state &s)
+auto test_char(const std::function<char_predicate> &p, const state &s)
         -> future<result<xchar>> {
     return s.rest->get().map(char_tester{p, s.context});
 }
 
 future<result<xchar>> parse_char(xchar c, const state &s) {
     using namespace std::placeholders;
-    return test_char(std::bind(xchar_traits::eq, c, _1), std::move(s));
+    return test_char(std::bind(xchar_traits::eq, c, _1), s);
 }
 
 future<result<xchar>> accept_char(const state &s) {
-    return test_char(constant(true), std::move(s));
+    return test_char(constant(true), s);
 }
 
 } // namespace parsing

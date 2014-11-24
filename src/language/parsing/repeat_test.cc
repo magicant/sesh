@@ -18,6 +18,7 @@
 #include "buildconfig.h"
 
 #include <functional>
+#include <locale>
 #include "async/future.hh"
 #include "catch.hpp"
 #include "common/xchar.hh"
@@ -52,7 +53,7 @@ using sesh::language::parsing::test_char;
 using sesh::ui::message::category;
 using sesh::ui::message::report;
 
-constexpr bool is_a_or_b(xchar c) noexcept {
+constexpr bool is_a_or_b(xchar c, const context &) noexcept {
     return c == L('a') || c == L('b');
 }
 
@@ -88,8 +89,11 @@ TEST_CASE("repeat passes context") {
                 return repeat(modify_context_and_report, s);
             },
             {},
-            {0},
-            [](const context &c) { CHECK(c.dummy == 2); });
+            {std::locale(), 0},
+            [](const context &c) {
+                CHECK(c.locale == std::locale());
+                CHECK(c.dummy == 2);
+            });
 }
 
 TEST_CASE("repeat: 1 result (with EOF)") {
@@ -145,7 +149,6 @@ TEST_CASE("repeat accumulates reports from successful parses") {
                 return repeat(modify_context_and_report, s);
             },
             {},
-            {0},
             [](const std::vector<report> &r) {
                 REQUIRE(r.size() == 2);
                 check_equal(r[0], {category::warning});
@@ -168,7 +171,6 @@ TEST_CASE("Failed one_or_more returns reports from parser") {
     check_parser_reports(
             [](const state &s) { return one_or_more(failer, s); },
             {},
-            {0},
             [](const std::vector<report> &r) {
                 REQUIRE(r.size() == 1);
                 check_equal(r[0], {category::error});
@@ -215,7 +217,6 @@ TEST_CASE("one_or_more accumulates reports from successful parses") {
                 return one_or_more(modify_context_and_report, s);
             },
             {},
-            {0},
             [](const std::vector<report> &r) {
                 REQUIRE(r.size() == 2);
                 check_equal(r[0], {category::warning});

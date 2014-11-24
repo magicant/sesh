@@ -23,6 +23,7 @@
 #include <functional>
 #include "async/future.hh"
 #include "common/xchar.hh"
+#include "language/parsing/char_predicate.hh"
 #include "language/parsing/parser.hh"
 #include "language/syntax/raw_string.hh"
 
@@ -38,7 +39,7 @@ namespace parsing {
  * returns no reports.
  */
 auto parse_raw_string(
-        const std::function<bool(common::xchar)> &, const state &)
+        const std::function<char_predicate> &, const state &)
         -> async::future<result<syntax::raw_string>>;
 
 } // namespace parsing

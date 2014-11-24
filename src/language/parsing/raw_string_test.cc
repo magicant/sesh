@@ -29,6 +29,7 @@ namespace {
 
 using sesh::common::xchar;
 using sesh::common::xstring;
+using sesh::language::parsing::context;
 using sesh::language::parsing::check_parser_failure;
 using sesh::language::parsing::check_parser_success_context_free;
 using sesh::language::parsing::check_parser_success_rest;
@@ -36,9 +37,13 @@ using sesh::language::parsing::check_parser_success_result;
 using sesh::language::parsing::parse_raw_string;
 using sesh::language::syntax::raw_string;
 
-constexpr bool is_a(xchar c) noexcept { return c == L('a'); }
+constexpr bool is_a(xchar c, const context &) noexcept {
+    return c == L('a');
+}
 
-constexpr bool is_not_dot(xchar c) noexcept { return c != L('.'); }
+constexpr bool is_not_dot(xchar c, const context &) noexcept {
+    return c != L('.');
+}
 
 TEST_CASE("Raw string parser rejects empty result") {
     using namespace std::placeholders;
