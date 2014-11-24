@@ -47,7 +47,8 @@ public:
      *
      * The pointer arguments to signal number sets may be null. Non-null
      * pointers passed to this function must be obtained from the {@link
-     * #create_signal_number_set} functions called for the same {@code *this}.
+     * #create_signal_number_set} functions called for the same
+     * <code>*this</code>.
      */
     virtual std::error_code sigprocmask(
             mask_change_how,
@@ -69,7 +70,7 @@ public:
      * Changes and/or queries the signal handler setting for a signal.
      *
      * This function currently allows setting the signal handler function only.
-     * The {@code sa_mask} set and {@code sa_flags} are considered empty.
+     * The @c sa_mask set and @c sa_flags are considered empty.
      */
     virtual std::error_code sigaction(
             signal_number,

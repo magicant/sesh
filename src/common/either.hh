@@ -113,8 +113,8 @@ public:
 
     /**
      * Tests if this is a successful result.
-     * @returns true if {@code this->tag() == type_tag<value_type>()}, false if
-     * {@code this->tag() == type_tag<error_type>()}.
+     * @returns true if <code>this->tag() == type_tag<value_type>()</code>,
+     * false if <code>this->tag() == type_tag<error_type>()</code>.
      */
     constexpr explicit operator bool() const noexcept {
         return !(this->tag() == type_tag<error_type>());
@@ -204,7 +204,7 @@ public:
      * If the constructor throws, this either object is reinitialized by
      * default construction of error_type before the exception is re-thrown. If
      * the default constructor of error_type throws again, the program is
-     * {@code std::terminate}d.
+     * <code>std::terminate</code>d.
      */
     template<typename... Arg>
     /* constexpr */ void try_emplace(Arg &&... arg) {
@@ -218,7 +218,7 @@ public:
     /**
      * Destructs the current value and resets this object to the
      * default-constructed error_type value. If the default constructor of
-     * error_type throws, the program is {@code std::terminate}d.
+     * error_type throws, the program is <code>std::terminate</code>d.
      */
     /* constexpr */ void clear() noexcept {
         this->emplace(direct_initialize(), type_tag<error_type>());
@@ -233,7 +233,7 @@ public:
      * If the constructor throws, this either object is reinitialized by
      * default construction of error_type before the exception is re-thrown. If
      * the default constructor of error_type throws again, the program is
-     * {@code std::terminate}d.
+     * <code>std::terminate</code>d.
      *
      * @tparam T the type of the assigned object.
      * @param v the assigned object.

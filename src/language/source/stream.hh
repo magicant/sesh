@@ -36,7 +36,7 @@ class stream_value;
 using stream_value_future = async::shared_future<stream_value>;
 
 /**
- * A stream is an abstract sequence of {@link async::shared_future}s of [@link
+ * A stream is an abstract sequence of {@link async::shared_future}s of {@link
  * fragment_position}s.
  *
  * The stream abstracts how the shell reads source code lines, so the parser
@@ -58,12 +58,12 @@ using stream_value_future = async::shared_future<stream_value>;
  * fragment position and the succeeding stream. The resultant fragment position
  * will be null if the stream has reached the end of input.
  *
- * Homomorphism requirement: Let {@code s} be an instance of stream and {@code
- * p} the pair presented in the shared future returned by calling {@code s}.
- * Assume {@code p.first} is incrementable and let {@code q} be the result of
- * {@code ++p.first}. If {@code q.head} yields a non-null pointer, the fragment
- * position in the pair presented in the shared future returned by calling
- * {@code p.second} must be {@code q}.
+ * Homomorphism requirement: Let @c s be an instance of stream and @c p the
+ * pair presented in the shared future returned by calling @c s. Assume
+ * <code>p.first</code> is incrementable and let <code>q</code> be the result
+ * of <code>++p.first</code>. If <code>q.head</code> yields a non-null pointer,
+ * the fragment position in the pair presented in the shared future returned by
+ * calling <code>p.second</code> must be @c q.
  */
 using stream = async::shared_lazy<stream_value_future>;
 

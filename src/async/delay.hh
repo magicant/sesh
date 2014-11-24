@@ -82,9 +82,9 @@ private:
 public:
 
     /**
-     * Sets the result of this delay object by constructing {@code trial&lt;T>}
-     * with the arguments. If the constructor throws, the result is set to the
-     * exception thrown.
+     * Sets the result of this delay object by constructing
+     * <code>trial&lt;T></code> with the arguments. If the constructor throws,
+     * the result is set to the exception thrown.
      *
      * The behavior is undefined if the result has already been set.
      *

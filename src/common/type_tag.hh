@@ -142,8 +142,8 @@ index_of() noexcept {
  * The type tag is an enumeration-like type to render distinct values which
  * each corresponds to one of the template parameter types.
  *
- * Note that the specialization {@code type_tag<>} cannot be instantiated since
- * it cannot represent any type.
+ * Note that the specialization <code>type_tag<></code> cannot be instantiated
+ * since it cannot represent any type.
  */
 template<typename...>
 class type_tag;
@@ -294,9 +294,9 @@ public:
 
     /**
      * Constructs a type tag object that represents the type represented by the
-     * argument type tag. The argument's representable types {@code U1, U2,
-     * UN...} must be a subset of the new object's representable types {@code
-     * T1, T2, TN...}.
+     * argument type tag. The argument's representable types <code>U1, U2,
+     * UN...</code> must be a subset of the new object's representable types
+     * <code>T1, T2, TN...</code>.
      */
     template<typename U1, typename U2, typename... UN>
     constexpr type_tag(type_tag<U1, U2, UN...> t) noexcept :
@@ -322,9 +322,9 @@ public:
 
     /**
      * Applies the argument function to this type tag.
-     * @tparam F A type which is callable with {@code type_tag<T>} for any type
-     * T that may be represented by this type tag. The return type must be the
-     * same for all possible {@code type_tag<T>} argument.
+     * @tparam F A type which is callable with <code>type_tag&lt;T></code> for
+     * any type @c T that may be represented by this type tag. The return type
+     * must be the same for all possible <code>type_tag&lt;T></code> argument.
      * @param f A reference to the function object that is called.
      * @return The result of the function call.
      */

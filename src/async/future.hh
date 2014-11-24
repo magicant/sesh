@@ -56,7 +56,7 @@ public:
      * promise.
      *
      * @tparam F Type of the callback function. It must return void when called
-     * with an argument of type {@code common::trial<T> &&}.
+     * with an argument of type <code>common::trial<T> &&</code>.
      */
     template<typename F>
     typename std::enable_if<std::is_void<typename std::result_of<
@@ -73,7 +73,7 @@ public:
      * will be propagated to the promise.
      *
      * @tparam F Type of the callback function. It must be callable with an
-     * argument of type {@code common::trial<T> &&}.
+     * argument of type <code>common::trial<T> &&</code>.
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
@@ -89,7 +89,7 @@ public:
      * future.
      *
      * @tparam F Type of the callback function. It must be callable with an
-     * argument of type {@code common::trial<T> &&}.
+     * argument of type <code>common::trial<T> &&</code>.
      * @tparam R Result type of the callback. Must not be void.
      */
     template<
@@ -111,7 +111,7 @@ public:
      * If the callback throws an exception, that will be propagated alike.
      *
      * @tparam F Type of the callback function. It must be callable with an
-     * argument of type {@code T &&}.
+     * argument of type <code>T &&</code>.
      * @tparam R Result type of the callback.
      */
     template<typename F, typename R>
@@ -131,7 +131,7 @@ public:
      * If the callback throws an exception, that will be propagated alike.
      *
      * @tparam F Type of the callback function. It must be callable with an
-     * argument of type {@code T &&}.
+     * argument of type <code>T &&</code>.
      * @tparam R Result type of the callback.
      */
     template<

@@ -42,7 +42,7 @@ namespace variant_impl {
 /**
  * Defined to be (a subclass of) std::true_type or std::false_type depending on
  * the template parameter types. The Boolean will be true if and only if
- * {@code T} is the same type as one (or more) of {@code U}s.
+ * @c T is the same type as one (or more) of <code>U</code>s.
  */
 template<typename T, typename... U>
 class is_any_of : public for_any<std::is_same<T, U>::value...> { };
@@ -1266,7 +1266,7 @@ public:
      * The argument is expected to be of a callable type. If it is callable
      * with the currently contained value of this variant, it is called.
      * Otherwise, the result is just the contained value. In either case, the
-     * result is implicitly converted to {@code R} before returned.
+     * result is implicitly converted to @c R before returned.
      */
     template<
             typename F,
@@ -1282,7 +1282,7 @@ public:
      * The argument is expected to be of a callable type. If it is callable
      * with the currently contained value of this variant, it is called.
      * Otherwise, the result is just the contained value. In either case, the
-     * result is implicitly converted to {@code R} before returned.
+     * result is implicitly converted to @c R before returned.
      */
     template<
             typename F,
@@ -1298,7 +1298,7 @@ public:
      * The argument is expected to be of a callable type. If it is callable
      * with the currently contained value of this variant, it is called.
      * Otherwise, the result is just the contained value. In either case, the
-     * result is implicitly converted to {@code R} before returned.
+     * result is implicitly converted to @c R before returned.
      */
     template<
             typename F,
@@ -1315,7 +1315,7 @@ public:
      * The argument is expected to be of a callable type. If it is callable
      * with the currently contained value of this variant, it is called.
      * Otherwise, the result is just the contained value. In either case, the
-     * result is implicitly converted to {@code R} before returned.
+     * result is implicitly converted to @c R before returned.
      */
     template<
             typename F,
@@ -1435,8 +1435,8 @@ constexpr bool operator==(const variant<T...> &l, const variant<T...> &r) {
  * Checks the order of two variants.
  *
  * Variants with different type indexes are ordered by indexes. Variants with
- * the same indexes are compared by applying the {@code <} operator to the
- * values.
+ * the same indexes are compared by applying the <code>&lt;</code> operator to
+ * the values.
  */
 template<typename... T>
 constexpr bool operator<(const variant<T...> &l, const variant<T...> &r) {

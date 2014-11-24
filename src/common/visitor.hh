@@ -90,9 +90,9 @@ public:
  * A template for a concrete visitor class that wraps a callable value that
  * actually performs desired operation on the visited object.
  * @tparam F The type of the callable object that is wrapped in this class. It
- * must be callable with an argument of type {@code const T &} for all {@code
- * T}s.
- * @param T The types of objects this visitor operates on.
+ * must be callable with an argument of type <code>const T &</code> for all
+ * <code>T</code>s.
+ * @tparam T The types of objects this visitor operates on.
  */
 template<typename F, typename... T>
 class visitor_value :
@@ -128,7 +128,7 @@ public:
 
     /**
      * Calls the argument visitor passing an appropriate argument (normally
-     * {@code *this}).
+     * <code>*this</code>).
      */
     virtual void apply(const visitor_type &) const = 0;
 
@@ -139,7 +139,7 @@ public:
  * to the visitor.
  *
  * @tparam Visitor The type of the visitor. It must be callable with an
- * argument of type {@code const Value &}.
+ * argument of type <code>const Value &</code>.
  * @tparam Value The type of the value that is wrapped in this class and passed
  * to the visitor.
  */
