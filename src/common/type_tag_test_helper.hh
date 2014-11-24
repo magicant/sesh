@@ -30,7 +30,7 @@ namespace common {
 namespace type_tag_impl {
 
 template<typename Char, typename Traits>
-struct Printer {
+struct printer {
 
     std::basic_ostream<Char, Traits> &os;
 
@@ -39,14 +39,14 @@ struct Printer {
         return os << typeid(U).name();
     }
 
-}; // template<typename Char, typename Traits> struct Printer
+}; // template<typename Char, typename Traits> struct printer
 
 } // namespace type_tag_impl
 
 template<typename Char, typename Traits, typename... T>
 inline std::basic_ostream<Char, Traits> &operator<<(
         std::basic_ostream<Char, Traits> &os, type_tag<T...> t) {
-    return t.apply(type_tag_impl::Printer<Char, Traits>{os});
+    return t.apply(type_tag_impl::printer<Char, Traits>{os});
 }
 
 } // namespace common
