@@ -69,7 +69,7 @@ using sesh::os::signaling::signal_number_set;
 using time_point = sesh::os::event::pselect_api::steady_clock_time;
 
 template<int DurationInSecondsInt>
-class TimeoutTest :
+class timeout_test :
         protected awaiter_test_fixture<handler_configuration_api_dummy> {
 
 protected:
@@ -80,9 +80,9 @@ protected:
 
 public:
 
-    TimeoutTest();
+    timeout_test();
 
-}; // class TimeoutTest
+}; // class timeout_test
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<handler_configuration_api_dummy>,
@@ -125,7 +125,7 @@ TEST_CASE_METHOD(
 }
 
 template<int DurationInSecondsInt>
-TimeoutTest<DurationInSecondsInt>::TimeoutTest() {
+timeout_test<DurationInSecondsInt>::timeout_test() {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
     future<trigger> f = a.expect(timeout(duration()));
@@ -163,9 +163,9 @@ TimeoutTest<DurationInSecondsInt>::TimeoutTest() {
     CHECK(callback_called);
 }
 
-TEST_CASE_METHOD(TimeoutTest<1>, "Awaiter: timeout 1") { }
+TEST_CASE_METHOD(timeout_test<1>, "Awaiter: timeout 1") { }
 
-TEST_CASE_METHOD(TimeoutTest<2>, "Awaiter: timeout 2") { }
+TEST_CASE_METHOD(timeout_test<2>, "Awaiter: timeout 2") { }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<handler_configuration_api_dummy>,
