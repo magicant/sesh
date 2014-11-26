@@ -46,21 +46,20 @@ public:
     std::vector<ui::message::report> reports;
 
     template<typename T>
-    async::future<result<ResultList>> operator()(
-            product<T> &&p, std::vector<ui::message::report> &&r) {
+    async::future<result<ResultList>> operator()(product<T> &&p) {
         state = std::move(p.state);
         results.push_back(std::move(p.value));
-        common::move(r, reports);
         return (*this)();
     }
 
     template<typename T>
     async::future<result<ResultList>> operator()(result<T> &&r) {
+        common::move(r.reports, reports);
         if (!r.product)
             return async::make_future<result<ResultList>>(
                     product<ResultList>{std::move(results), std::move(state)},
                     std::move(reports));
-        return (*this)(std::move(*r.product), std::move(r.reports));
+        return (*this)(std::move(*r.product));
     }
 
     async::future<result<ResultList>> operator()() {
@@ -83,7 +82,8 @@ public:
         if (!r.product)
             return async::make_future<result<ResultList>>(
                     common::empty(), std::move(r.reports));
-        return repeater(std::move(*r.product), std::move(r.reports));
+        common::move(r.reports, repeater.reports);
+        return repeater(std::move(*r.product));
     }
 
 }; // template<typename Parser, typename ResultList> class nonempty_repeater
@@ -95,8 +95,8 @@ public:
  * accumulated in a vector (or a compatible container). The repeat as a whole
  * always succeeds regardless of how many times the argument parser succeeds.
  *
- * Reports from successful parses are accumulated and returned in the final
- * result. Reports from the failed parse are ignored.
+ * Reports from the repeated parsing (including the ones from the last failed
+ * parsing) are accumulated and returned in the final result.
  *
  * The parser function should not be a nop; otherwise the repeat would never
  * end.
