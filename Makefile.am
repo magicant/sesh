@@ -47,6 +47,7 @@ TESTPROGRAMS = \
 	src/language/parsing/raw_string_test \
 	src/language/parsing/repeat_test \
 	src/language/parsing/whitespace_test \
+	src/language/parsing/word_component_test \
 	src/language/printing/and_or_list_test \
 	src/language/printing/buffer_test \
 	src/language/printing/conditional_pipeline_test \
@@ -114,7 +115,9 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/raw_string.hh \
 	src/language/parsing/repeat.hh \
 	src/language/parsing/whitespace.cc \
-	src/language/parsing/whitespace.hh
+	src/language/parsing/whitespace.hh \
+	src/language/parsing/word_component.cc \
+	src/language/parsing/word_component.hh
 
 src_sesh_SOURCES = \
 	$(src_sesh_SOURCES_PARSER) \
@@ -349,6 +352,13 @@ src_language_parsing_whitespace_test_SOURCES = \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc \
 	src/ui/message/format.cc
+src_language_parsing_word_component_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/word_component_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
 src_language_printing_and_or_list_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/printing/and_or_list.cc \
@@ -507,6 +517,7 @@ src_ui_message_format_test_SOURCES = \
 
 TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \
+	src/common/visitor_test_helper.hh \
 	src/language/parsing/parser_test_helper.hh \
 	src/language/source/fragment_test_helper.hh \
 	src/language/syntax/and_or_list_test_helper.hh \
