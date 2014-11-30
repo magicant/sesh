@@ -49,4 +49,4 @@ void check_equal(const report &l, const report &r) {
 
 #endif // #ifndef INCLUDED_ui_message_report_test_helper_hh
 
-/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s ft=cpp: */

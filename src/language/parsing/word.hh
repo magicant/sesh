@@ -48,4 +48,4 @@ extern auto parse_word(const std::function<char_predicate> &, const state &)
 
 #endif // #ifndef INCLUDED_language_parsing_word_hh
 
-/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s ft=cpp: */
