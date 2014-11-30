@@ -30,6 +30,7 @@ namespace parsing {
 using char_predicate = bool(common::xchar, const context &);
 
 extern char_predicate is_blank;
+extern char_predicate is_token_char;
 
 } // namespace parsing
 } // namespace language
