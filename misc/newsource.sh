@@ -85,8 +85,8 @@ END
 }
 
 print_c_modeline() {
-    cat <<\END
-/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
+    cat <<END
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s ft=${1}: */
 END
 }
 
@@ -186,7 +186,7 @@ print_template() (
             print_c_include_buildconfig
             print_c_include "${matching_header}"
             echo
-            print_c_modeline
+            print_c_modeline c
             ;;
         (*_test.cc)
             print_c_copyright_notice
@@ -200,7 +200,7 @@ print_template() (
             echo
             print_c_namespace_end
             echo
-            print_c_modeline
+            print_c_modeline cpp
             ;;
         (*.cc)
             print_c_copyright_notice
@@ -212,7 +212,7 @@ print_template() (
             echo
             print_c_namespace_end "${file}"
             echo
-            print_c_modeline
+            print_c_modeline cpp
             ;;
         (*.h)
             print_c_copyright_notice
@@ -223,7 +223,7 @@ print_template() (
             echo
             print_c_include_guard_end "${guard_macro}"
             echo
-            print_c_modeline
+            print_c_modeline cpp
             ;;
         (*.hh)
             print_c_copyright_notice
@@ -238,7 +238,7 @@ print_template() (
             echo
             print_c_include_guard_end "${guard_macro}"
             echo
-            print_c_modeline
+            print_c_modeline cpp
             ;;
         (*.tcc)
             print_c_copyright_notice
@@ -254,7 +254,7 @@ print_template() (
             echo
             print_c_include_guard_end "${guard_macro}"
             echo
-            print_c_modeline
+            print_c_modeline cpp
             ;;
         (*)
             printf '%s: %s: unsupported file type\n' "${0}" "${file}" >&2
