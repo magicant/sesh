@@ -143,16 +143,17 @@ TEST_CASE("repeat: rest of 3 results") {
             L("x"));
 }
 
-TEST_CASE("repeat accumulates reports from successful parses") {
+TEST_CASE("repeat accumulates reports from repeated parsing") {
     check_parser_reports(
             [](const state &s) {
                 return repeat(modify_context_and_report, s);
             },
             {},
             [](const std::vector<report> &r) {
-                REQUIRE(r.size() == 2);
+                REQUIRE(r.size() == 3);
                 check_equal(r[0], {category::warning});
                 check_equal(r[1], {category::warning});
+                check_equal(r[2], {category::error});
             });
 }
 
@@ -211,16 +212,17 @@ TEST_CASE("one_or_more: rest of 3 results") {
             L("x"));
 }
 
-TEST_CASE("one_or_more accumulates reports from successful parses") {
+TEST_CASE("one_or_more accumulates reports from repeated parsing") {
     check_parser_reports(
             [](const state &s) {
                 return one_or_more(modify_context_and_report, s);
             },
             {},
             [](const std::vector<report> &r) {
-                REQUIRE(r.size() == 2);
+                REQUIRE(r.size() == 3);
                 check_equal(r[0], {category::warning});
                 check_equal(r[1], {category::warning});
+                check_equal(r[2], {category::error});
             });
 }
 

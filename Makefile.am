@@ -36,6 +36,7 @@ TESTPROGRAMS = \
 	src/common/reference_test \
 	src/common/shared_function_test \
 	src/common/trie_test \
+	src/common/type_tag_set_test \
 	src/common/type_tag_test \
 	src/common/variant_test \
 	src/common/visitor_test \
@@ -46,7 +47,10 @@ TESTPROGRAMS = \
 	src/language/parsing/line_continued_char_test \
 	src/language/parsing/raw_string_test \
 	src/language/parsing/repeat_test \
+	src/language/parsing/token_test \
 	src/language/parsing/whitespace_test \
+	src/language/parsing/word_component_test \
+	src/language/parsing/word_test \
 	src/language/printing/and_or_list_test \
 	src/language/printing/buffer_test \
 	src/language/printing/conditional_pipeline_test \
@@ -113,8 +117,14 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/raw_string.cc \
 	src/language/parsing/raw_string.hh \
 	src/language/parsing/repeat.hh \
+	src/language/parsing/token.cc \
+	src/language/parsing/token.hh \
 	src/language/parsing/whitespace.cc \
-	src/language/parsing/whitespace.hh
+	src/language/parsing/whitespace.hh \
+	src/language/parsing/word.cc \
+	src/language/parsing/word.hh \
+	src/language/parsing/word_component.cc \
+	src/language/parsing/word_component.hh
 
 src_sesh_SOURCES = \
 	$(src_sesh_SOURCES_PARSER) \
@@ -149,6 +159,7 @@ src_sesh_SOURCES = \
 	src/common/static_cast_function.hh \
 	src/common/trie.hh \
 	src/common/type_tag.hh \
+	src/common/type_tag_set.hh \
 	src/common/variant.hh \
 	src/common/visitor.hh \
 	src/common/xchar.hh \
@@ -285,6 +296,9 @@ src_common_shared_function_test_SOURCES = \
 src_common_trie_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/trie_test.cc
+src_common_type_tag_set_test_SOURCES = \
+	src/catch_main.cc \
+	src/common/type_tag_set_test.cc
 src_common_type_tag_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/type_tag.hh \
@@ -342,10 +356,31 @@ src_language_parsing_repeat_test_SOURCES = \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc \
 	src/ui/message/format.cc
+src_language_parsing_token_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/token_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
 src_language_parsing_whitespace_test_SOURCES = \
 	src/catch_main.cc \
 	$(src_sesh_SOURCES_PARSER) \
 	src/language/parsing/whitespace_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
+src_language_parsing_word_component_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/word_component_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
+src_language_parsing_word_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/word_test.cc \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc \
 	src/ui/message/format.cc
@@ -507,6 +542,7 @@ src_ui_message_format_test_SOURCES = \
 
 TESTHEADERS = \
 	src/common/type_tag_test_helper.hh \
+	src/common/visitor_test_helper.hh \
 	src/language/parsing/parser_test_helper.hh \
 	src/language/source/fragment_test_helper.hh \
 	src/language/syntax/and_or_list_test_helper.hh \

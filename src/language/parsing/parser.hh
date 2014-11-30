@@ -100,11 +100,12 @@ public:
     common::maybe<product_type> product;
 
     /**
-     * Reports from the parser. If parsing failed, there should be at least one
-     * {@link ui::message::category::error error} report. Reports of other
-     * categories can be included, regardless of whether the parsing was
-     * successful or not. Note that the reports might not be presented to the
-     * human user because the result may be superseded by another result of
+     * Reports from the parser. If parsing failed with a fatal syntax error
+     * that is not expected to be recovered by another parser, there should be
+     * at least one {@link ui::message::category::error error} report. Reports
+     * of other categories can be included, regardless of whether the parsing
+     * was successful or not. Note that the reports might not be presented to
+     * the human user because the result may be superseded by another result of
      * parse.
      */
     std::vector<ui::message::report> reports;

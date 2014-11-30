@@ -15,41 +15,37 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#ifndef INCLUDED_language_parsing_word_hh
+#define INCLUDED_language_parsing_word_hh
+
 #include "buildconfig.h"
-#include "char_predicate.hh"
 
-#include <locale>
-#include "common/xchar.hh"
-#include "common/xstring.hh"
-
-namespace {
-
-using sesh::common::contains;
-using sesh::common::xchar;
-using sesh::common::xstring;
-
-} // namespace
+#include "async/future.hh"
+#include "language/parsing/char_predicate.hh"
+#include "language/parsing/parser.hh"
+#include "language/syntax/word.hh"
 
 namespace sesh {
 namespace language {
 namespace parsing {
 
-bool is_blank(xchar x, const context &c) {
-#if HAVE_STD__ISBLANK
-    return std::isblank(x, c.locale);
-#else
-    (void) c.locale;
-    return x == L(' ') || x == L('\t');
-#endif // #if HAVE_STD__ISBLANK
-}
-
-bool is_token_char(xchar x, const context &c) {
-    static const xstring delimiters = L(" \t\n;&|<>()");
-    return !contains(delimiters, x) && !is_blank(x, c);
-}
+/**
+ * Parses a word, possibly including line continuations.
+ *
+ * The argument char predicate is used to decide what characters can be
+ * included in raw_string word components.
+ *
+ * The parser succeeds even if there is no word component; an empty word is
+ * returned. The parser fails with some error report if a syntax error is
+ * found.
+ */
+extern auto parse_word(const std::function<char_predicate> &, const state &)
+        -> async::future<result<syntax::word>>;
 
 } // namespace parsing
 } // namespace language
 } // namespace sesh
+
+#endif // #ifndef INCLUDED_language_parsing_word_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */

@@ -16,36 +16,38 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "char_predicate.hh"
+#include "word.hh"
 
-#include <locale>
-#include "common/xchar.hh"
-#include "common/xstring.hh"
-
-namespace {
-
-using sesh::common::contains;
-using sesh::common::xchar;
-using sesh::common::xstring;
-
-} // namespace
+#include <functional>
+#include <utility>
+#include <vector>
+#include "async/future.hh"
+#include "language/parsing/mapper.hh"
+#include "language/parsing/repeat.hh"
+#include "language/parsing/word_component.hh"
+#include "language/syntax/word.hh"
+#include "language/syntax/word_component.hh"
 
 namespace sesh {
 namespace language {
 namespace parsing {
 
-bool is_blank(xchar x, const context &c) {
-#if HAVE_STD__ISBLANK
-    return std::isblank(x, c.locale);
-#else
-    (void) c.locale;
-    return x == L(' ') || x == L('\t');
-#endif // #if HAVE_STD__ISBLANK
+namespace {
+
+using sesh::async::future;
+using sesh::language::syntax::word;
+
+word to_word(std::vector<word_component_pointer> &&wcps) {
+    return {std::move(wcps)};
 }
 
-bool is_token_char(xchar x, const context &c) {
-    static const xstring delimiters = L(" \t\n;&|<>()");
-    return !contains(delimiters, x) && !is_blank(x, c);
+}
+
+future<result<word>> parse_word(
+        const std::function<char_predicate> &p, const state &s) {
+    using std::placeholders::_1;
+    auto r = repeat(std::bind(parse_word_component, p, _1), s);
+    return map_value(std::move(r), to_word);
 }
 
 } // namespace parsing

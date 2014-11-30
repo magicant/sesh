@@ -16,17 +16,28 @@
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "buildconfig.h"
-#include "char_predicate.hh"
+#include "word_component.hh"
 
-#include <locale>
+#include <functional>
+#include <memory>
+#include <utility>
+#include "async/future.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"
+#include "language/parsing/mapper.hh"
+#include "language/parsing/raw_string.hh"
+#include "language/syntax/raw_string.hh"
+#include "language/syntax/word_component.hh"
 
 namespace {
 
+using sesh::async::future;
 using sesh::common::contains;
+using sesh::common::make_shared_visitable;
 using sesh::common::xchar;
 using sesh::common::xstring;
+using sesh::language::syntax::raw_string;
+using sesh::language::syntax::word_component;
 
 } // namespace
 
@@ -34,18 +45,27 @@ namespace sesh {
 namespace language {
 namespace parsing {
 
-bool is_blank(xchar x, const context &c) {
-#if HAVE_STD__ISBLANK
-    return std::isblank(x, c.locale);
-#else
-    (void) c.locale;
-    return x == L(' ') || x == L('\t');
-#endif // #if HAVE_STD__ISBLANK
+namespace {
+
+const xstring special_chars = L("\"$'\\`");
+
+template<typename T>
+word_component_pointer to_word_component_pointer(T &&t) {
+    return make_shared_visitable<word_component>(std::move(t));
 }
 
-bool is_token_char(xchar x, const context &c) {
-    static const xstring delimiters = L(" \t\n;&|<>()");
-    return !contains(delimiters, x) && !is_blank(x, c);
+}
+
+future<result<word_component_pointer>> parse_word_component(
+        const std::function<char_predicate> &p, const state &s) {
+    // TODO support word component types other than raw string
+
+    std::function<char_predicate> p2 = [p](xchar x, const context &c) {
+        return !contains(special_chars, x) && p(x, c);
+    };
+
+    return map_value(
+            parse_raw_string(p2, s), &to_word_component_pointer<raw_string>);
 }
 
 } // namespace parsing
