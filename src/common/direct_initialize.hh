@@ -32,4 +32,4 @@ class direct_initialize {
 
 #endif // #ifndef INCLUDED_common_direct_initialize_hh
 
-/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s ft=cpp: */

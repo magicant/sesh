@@ -125,4 +125,4 @@ TEST_CASE("Stream chain") {
 
 } // namespace
 
-/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s ft=cpp: */

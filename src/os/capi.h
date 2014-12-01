@@ -254,4 +254,4 @@ struct default_delete<struct ::sesh_osapi_sigset> {
 
 #endif // #ifndef INCLUDED_os_capi_h
 
-/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s ft=cpp: */

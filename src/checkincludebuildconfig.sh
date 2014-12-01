@@ -58,4 +58,4 @@ find . -name '*.h' -o -name '*.hh' -o -name '*.tcc' -o \
     [ "${errors}" -eq 0 ]
 }
 
-# vim: set et sw=4 sts=4 tw=79:
+# vim: set et sw=4 sts=4 tw=79 ft=sh:

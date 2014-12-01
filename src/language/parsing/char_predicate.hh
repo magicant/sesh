@@ -38,4 +38,4 @@ extern char_predicate is_token_char;
 
 #endif // #ifndef INCLUDED_language_parsing_char_predicate_hh
 
-/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s: */
+/* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s ft=cpp: */
