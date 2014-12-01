@@ -43,7 +43,7 @@ public:
     // TODO assignments
     // TODO redirections
 
-    bool empty() const {
+    bool empty() const noexcept {
         return words.empty();
         // TODO assignments
         // TODO redirections
