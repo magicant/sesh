@@ -47,6 +47,7 @@ TESTPROGRAMS = \
 	src/language/parsing/line_continued_char_test \
 	src/language/parsing/raw_string_test \
 	src/language/parsing/repeat_test \
+	src/language/parsing/simple_command_test \
 	src/language/parsing/token_test \
 	src/language/parsing/whitespace_test \
 	src/language/parsing/word_component_test \
@@ -118,6 +119,8 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/raw_string.hh \
 	src/language/parsing/repeat.hh \
 	src/language/parsing/report_helper.hh \
+	src/language/parsing/simple_command.cc \
+	src/language/parsing/simple_command.hh \
 	src/language/parsing/token.cc \
 	src/language/parsing/token.hh \
 	src/language/parsing/whitespace.cc \
@@ -354,6 +357,13 @@ src_language_parsing_repeat_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/parsing/char.cc \
 	src/language/parsing/repeat_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
+src_language_parsing_simple_command_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/simple_command_test.cc \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc \
 	src/ui/message/format.cc
