@@ -117,6 +117,7 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/raw_string.cc \
 	src/language/parsing/raw_string.hh \
 	src/language/parsing/repeat.hh \
+	src/language/parsing/report_helper.hh \
 	src/language/parsing/token.cc \
 	src/language/parsing/token.hh \
 	src/language/parsing/whitespace.cc \
