@@ -261,6 +261,52 @@ void check_parser_failure(
  * Checks the reports returned by the argument parser function.
  *
  * @param parse Parser function
+ * @param fp Fragment position for the source code string the parser may read.
+ * The check will fail if the parser tries to read more than the source.
+ * @param c Context in which parsing starts.
+ * @param check_reports Function that checks if the reports are correct. Must
+ * be callable with <code>const std::vector&lt;report> &amp;</code>.
+ */
+template<typename P, typename C>
+void check_parser_reports_with_fragment(
+        P &&parse,
+        const source::fragment_position &fp,
+        const context &c,
+        C &&check_reports) {
+    using R = typename result_type_of<P>::type;
+    check_parser(
+            std::forward<P>(parse),
+            {stream_of(fp), c},
+            [&check_reports](const result<R> &r) {
+                std::forward<C>(check_reports)(r.reports);
+            });
+}
+
+/**
+ * Checks the reports returned by the argument parser function.
+ *
+ * @param parse Parser function
+ * @param fp Fragment position for the source code string the parser may read.
+ * The check will fail if the parser tries to read more than the source.
+ * @param check_reports Function that checks if the reports are correct. Must
+ * be callable with <code>const std::vector&lt;report> &amp;</code>.
+ */
+template<typename P, typename C>
+void check_parser_reports_with_fragment(
+        P &&parse,
+        const source::fragment_position &fp,
+        C &&check_reports) {
+    check_parser_reports_with_fragment(
+            std::forward<P>(parse),
+            fp,
+            default_context_stub(),
+            std::forward<C>(check_reports));
+}
+
+/**
+ * Checks the reports returned by the argument parser function.
+ *
+ * @param parse Parser function
  * @param src Source code fragment string that the parser may read. The
  * check will fail if the parser tries to read more than the source.
  * @param c Context in which parsing starts.
