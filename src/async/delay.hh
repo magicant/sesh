@@ -47,11 +47,13 @@ namespace async {
  * the client just after the result is passed to the callback, so the result
  * and callback are soon destroyed anyway.
  *
+ * A delay object must be allocated in the heap and managed by std::shared_ptr.
+ *
  * @tparam T The result type. It must be a decayed move-constructible type
  * other than std::exception_ptr.
  */
 template<typename T>
-class delay : public runnable {
+class delay : public runnable, public std::enable_shared_from_this<delay<T>> {
 
 public:
 
@@ -70,12 +72,12 @@ private:
     input m_input = input(empty());
     output m_output = output(empty());
 
-    void fire_if_ready() {
+    continuation to_continuation() {
         if (m_input.tag() != m_input.template tag<trial>())
-            return;
+            return {};
         if (m_output.tag() != m_output.template tag<callback>())
-            return;
-        run();
+            return {};
+        return continuation(this->shared_from_this());
     }
 
     continuation do_run() noexcept final override {
@@ -116,7 +118,7 @@ public:
                     std::current_exception());
         }
 
-        fire_if_ready();
+        to_continuation();
     }
 
     /**
@@ -140,7 +142,7 @@ public:
 
         m_output.template emplace_with_fallback<empty>(std::move(f));
 
-        fire_if_ready();
+        to_continuation();
     }
 
     /**
