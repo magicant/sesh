@@ -25,6 +25,7 @@
 #include <functional>
 #include <memory>
 #include <utility>
+#include "async/continuation.hh"
 #include "common/direct_initialize.hh"
 #include "common/either.hh"
 #include "common/empty.hh"
@@ -50,7 +51,7 @@ namespace async {
  * other than std::exception_ptr.
  */
 template<typename T>
-class delay {
+class delay : public runnable {
 
 public:
 
@@ -74,9 +75,13 @@ private:
             return;
         if (m_output.tag() != m_output.template tag<callback>())
             return;
+        run();
+    }
 
+    continuation do_run() noexcept final override {
         auto &f = m_output.template value<callback>();
         f(std::move(m_input.template value<trial>()));
+        return {}; // TODO
     }
 
 public:
