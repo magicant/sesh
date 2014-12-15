@@ -21,8 +21,12 @@
 #include "buildconfig.h"
 
 #include <utility>
+#include "catch.hpp"
 #include "common/copy.hh"
+#include "common/visitor.hh"
+#include "common/visitor_test_helper.hh"
 #include "common/xstring.hh"
+#include "language/syntax/raw_string.hh"
 #include "language/syntax/word.hh"
 #include "language/syntax/word_component_test_helper.hh"
 
@@ -38,6 +42,17 @@ inline word make_word_stub(common::xstring &&s) {
 
 inline word make_word_stub(const common::xstring &s) {
     return make_word_stub(common::copy(s));
+}
+
+inline void expect_raw_string_word(
+        const word &actual_word, const common::xstring &expected_string) {
+    REQUIRE(actual_word.components.size() == 1);
+    const auto &wc = actual_word.components[0];
+    REQUIRE(wc != nullptr);
+    auto checker = [&expected_string](const raw_string &rs) {
+        CHECK(rs.value == expected_string);
+    };
+    visit(*wc, common::make_checking_visitor<raw_string>(checker));
 }
 
 } // namespace syntax

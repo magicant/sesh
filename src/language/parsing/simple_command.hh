@@ -15,46 +15,35 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_syntax_simple_command_hh
-#define INCLUDED_language_syntax_simple_command_hh
+#ifndef INCLUDED_language_parsing_simple_command_hh
+#define INCLUDED_language_parsing_simple_command_hh
 
 #include "buildconfig.h"
 
-#include <vector>
-#include "language/syntax/word.hh"
+#include "common/variant.hh"
+#include "language/parsing/parser.hh"
+#include "language/syntax/simple_command.hh"
 
 namespace sesh {
 namespace language {
-namespace syntax {
+namespace parsing {
+
+// TODO support keywords and aliases
+using simple_command_parse = common::variant<syntax::simple_command>;
 
 /**
- * A simple command is a combination of one or more non-empty words,
- * assignments, and redirections.
+ * Parses a simple command by parsing blank-separated tokens. This parser skips
+ * any whitespaces after the last token.
  *
- * Despite that definition, an instance of this class may not contain any of
- * words, assignments, and redirections. Users of this class must validate that
- * the instance is non-empty. Users must also ensure that words are non-empty.
+ * If the first token is a keyword or alias, that is returned instead of a
+ * simple command. If there is no token, the parser fails with an error.
  */
-class simple_command {
+extern parser<simple_command_parse> parse_simple_command;
 
-public:
-
-    std::vector<word> words;
-    // TODO assignments
-    // TODO redirections
-
-    bool empty() const noexcept {
-        return words.empty();
-        // TODO assignments
-        // TODO redirections
-    }
-
-}; // class simple_command
-
-} // namespace syntax
+} // namespace parsing
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_syntax_simple_command_hh
+#endif // #ifndef INCLUDED_language_parsing_simple_command_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s ft=cpp: */
