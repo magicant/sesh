@@ -21,6 +21,7 @@ bin_PROGRAMS = src/sesh
 ### Tests
 
 TESTPROGRAMS = \
+	src/async/continuation_test \
 	src/async/delay_holder_test \
 	src/async/delay_test \
 	src/async/future_test \
@@ -128,6 +129,7 @@ src_sesh_SOURCES_PARSER = \
 
 src_sesh_SOURCES = \
 	$(src_sesh_SOURCES_PARSER) \
+	src/async/continuation.hh \
 	src/async/delay.hh \
 	src/async/delay_holder.hh \
 	src/async/future.hh \
@@ -251,6 +253,9 @@ src_sesh_SOURCES = \
 	src/ui/message/report.hh
 
 # Header files that are contained in sesh_SOURCES are not listed below.
+src_async_continuation_test_SOURCES = \
+	src/async/continuation_test.cc \
+	src/catch_main.cc
 src_async_delay_holder_test_SOURCES = \
 	src/async/delay_holder_test.cc \
 	src/catch_main.cc
