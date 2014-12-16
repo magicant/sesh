@@ -95,11 +95,15 @@ public:
      *
      * The behavior is undefined if the result has already been set.
      *
-     * If a callback function has already been set, it is called immediately
-     * with the result set.
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result and callback are both set to the delay, the continuation calls
+     * the callback passing the result to it. Otherwise, the continuation is a
+     * nop.
      */
     template<typename... Arg>
-    void set_result(Arg &&... arg) {
+    continuation set_result(Arg &&... arg) {
         assert(m_input.tag() != m_input.template tag<trial>());
 
         if (m_output.tag() == m_output.template tag<forward_target>())
@@ -118,7 +122,7 @@ public:
                     std::current_exception());
         }
 
-        to_continuation();
+        return to_continuation();
     }
 
     /**
@@ -127,29 +131,32 @@ public:
      * The behavior is undefined if a callback has already been set or the
      * argument callback is empty.
      *
-     * If a result has already been set, the callback function is called
-     * immediately with the result.
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result and callback are both set to the delay, the continuation calls
+     * the callback passing the result to it. Otherwise, the continuation is a
+     * nop.
      */
-    void set_callback(callback &&f) {
+    continuation set_callback(callback &&f) {
         assert(m_output.tag() != m_output.template tag<callback>());
         assert(f != nullptr);
 
         if (m_input.tag() == m_input.template tag<forward_source>()) {
             if (auto fs = m_input.template value<forward_source>().lock())
-                fs->set_callback(std::move(f));
-            return;
+                return fs->set_callback(std::move(f));
+            return {};
         }
 
         m_output.template emplace_with_fallback<empty>(std::move(f));
 
-        to_continuation();
+        return to_continuation();
     }
 
     /**
      * Connects two delay objects as if a callback is set to the "from" object
      * so that the result set to the "from" object is simply transferred to the
-     * "to" object. If a result and callback both have already been set, the
-     * result is immediately passed to the callback.
+     * "to" object.
      *
      * Using this function is more efficient than setting a callback normally.
      * Especially, when more than two delay objects are connected in a row with
@@ -163,8 +170,15 @@ public:
      * not have a callback and result set, respectively. After calling this
      * function, {@link #set_callback} and {@link #set_result} must not be
      * called for the "from" and "to" objects, respectively.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result and callback are both set to the connected delays, the
+     * continuation calls the callback passing the result to it. Otherwise, the
+     * continuation is a nop.
      */
-    static void forward(
+    static continuation forward(
             std::shared_ptr<delay> &&from, std::shared_ptr<delay> &&to) {
         assert(from != nullptr);
         assert(from->m_output.tag() !=
@@ -178,7 +192,7 @@ public:
                 from->m_input.template tag<forward_source>()) {
             from = from->m_input.template value<forward_source>().lock();
             if (from == nullptr)
-                return;
+                return {};
         }
 
         // Normalize "to"
@@ -204,6 +218,7 @@ public:
                 common::direct_initialize(),
                 common::type_tag<forward_target>(),
                 std::move(to));
+        return {};
     }
 
 }; // template<typename T> class delay
