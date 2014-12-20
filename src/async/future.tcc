@@ -27,6 +27,8 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "async/continuation.hh"
+#include "common/copy.hh"
 #include "common/function_helper.hh"
 #include "common/shared_function.hh"
 
@@ -38,10 +40,10 @@ template<typename T>
 template<typename Function>
 typename std::enable_if<std::is_void<typename std::result_of<
         typename std::decay<Function>::type(common::trial<T> &&)
->::type>::value>::type
+>::type>::value, continuation>::type
 future_base<T>::then(Function &&f) && {
-    future_base copy = std::move(*this);
-    copy.delay().set_callback(std::forward<Function>(f));
+    return common::copy(std::move(*this)).delay().set_callback(
+            std::forward<Function>(f));
 }
 
 template<typename T>
@@ -69,8 +71,8 @@ public:
             m_receiver(std::move(receiver)) { }
 
     template<typename From>
-    void operator()(From &&r) {
-        std::move(m_receiver).set_result_from([this, &r] {
+    continuation operator()(From &&r) {
+        return std::move(m_receiver).set_result_from([this, &r] {
             return common::invoke(m_function, std::forward<From>(r));
         });
     }
@@ -79,10 +81,10 @@ public:
 
 template<typename From>
 template<typename Function, typename To>
-void future_base<From>::then(Function &&f, promise<To> &&p) && {
+continuation future_base<From>::then(Function &&f, promise<To> &&p) && {
     using C = composer<To, typename std::decay<Function>::type>;
-    std::move(*this).then(common::shared_function<C>::create(
-            std::forward<Function>(f), std::move(p)));
+    return common::copy(std::move(*this)).delay().set_callback(
+            C(std::forward<Function>(f), std::move(p)));
 }
 
 template<typename From>
@@ -122,9 +124,9 @@ public:
 
 template<typename From>
 template<typename Function, typename To>
-void future_base<From>::map(Function &&f, promise<To> &&p) && {
+continuation future_base<From>::map(Function &&f, promise<To> &&p) && {
     using M = mapper<typename std::decay<Function>::type>;
-    std::move(*this).then(M(std::forward<Function>(f)), std::move(p));
+    return std::move(*this).then(M(std::forward<Function>(f)), std::move(p));
 }
 
 template<typename From>
@@ -169,10 +171,10 @@ template<typename T>
 template<typename F>
 typename std::enable_if<std::is_same<
         T, typename std::result_of<F(std::exception_ptr)>::type
->::value>::type
+>::value, continuation>::type
 future_base<T>::recover(F &&function, promise<T> &&p) && {
     using R = recoverer<typename std::decay<F>::type>;
-    std::move(*this).then(R(std::forward<F>(function)), std::move(p));
+    return std::move(*this).then(R(std::forward<F>(function)), std::move(p));
 }
 
 template<typename T>
@@ -187,15 +189,15 @@ future_base<T>::recover(F &&function) && {
 }
 
 template<typename T>
-void future_base<T>::forward(promise<T> &&receiver) && {
-    // std::move(*this).map(common::identity(), std::move(receiver));
+continuation future_base<T>::forward(promise<T> &&receiver) && {
+    // return std::move(*this).map(common::identity(), std::move(receiver));
     /*
      * Mapping would leave intermediate delay objects that will not be
      * deallocated until the final result is set. This would cause an
      * infinitely recursive algorithm to grow the delay object chain until it
      * eats up the heap.
      */
-    delay_holder<T>::forward(std::move(*this), std::move(receiver));
+    return delay_holder<T>::forward(std::move(*this), std::move(receiver));
 }
 
 template<typename F>
@@ -231,8 +233,8 @@ future<T> make_failed_future_of(E &&e) {
 }
 
 template<typename T>
-void future_base<T>::wrap(promise<future<T>> &&p) && {
-    std::move(*this).map(make_future_of<T>, std::move(p));
+continuation future_base<T>::wrap(promise<future<T>> &&p) && {
+    return std::move(*this).map(make_future_of<T>, std::move(p));
 }
 
 template<typename T>
@@ -255,19 +257,20 @@ public:
     explicit unwrapper(promise<T> &&receiver) noexcept :
             m_receiver(std::move(receiver)) { }
 
-    void operator()(common::trial<future<T>> &&r) {
+    continuation operator()(common::trial<future<T>> &&r) {
         if (r)
             return std::move(*r).forward(std::move(m_receiver));
 
-        std::move(m_receiver).fail(r.template value<std::exception_ptr>());
+        return std::move(m_receiver).fail(
+                r.template value<std::exception_ptr>());
     }
 
 };
 
 template<typename T>
-void future<future<T>>::unwrap(promise<T> &&p) && {
-    std::move(*this).then(
-            common::shared_function<unwrapper<T>>::create(std::move(p)));
+continuation future<future<T>>::unwrap(promise<T> &&p) && {
+    return common::copy(std::move(*this)).delay().set_callback(
+            unwrapper<T>(std::move(p)));
 }
 
 template<typename T>

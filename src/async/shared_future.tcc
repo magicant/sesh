@@ -185,8 +185,8 @@ template<typename From>
 template<typename Function, typename To>
 void shared_future_base<From>::then(Function &&f, promise<To> &&p) const {
     using C = composer<To, typename std::decay<Function>::type>;
-    then(common::shared_function<C>::create(
-            std::forward<Function>(f), std::move(p)));
+    m_impl->template emplace_callback<C>(
+            std::forward<Function>(f), std::move(p));
 }
 
 template<typename From>
