@@ -291,8 +291,7 @@ public:
 
 template<typename T>
 void future<shared_future<T>>::unwrap(promise<T> &&p) && {
-    using U = common::shared_function<shared_unwrapper<T>>;
-    std::move(*this).then(U::create(std::move(p)));
+    std::move(*this).then(shared_unwrapper<T>(std::move(p)));
 }
 
 template<typename T>
@@ -304,8 +303,7 @@ future<T> future<shared_future<T>>::unwrap() && {
 
 template<typename T>
 void shared_future<shared_future<T>>::unwrap(promise<T> &&p) const {
-    using U = common::shared_function<shared_unwrapper<T>>;
-    this->then(U::create(std::move(p)));
+    this->then(shared_unwrapper<T>(std::move(p)));
 }
 
 template<typename T>

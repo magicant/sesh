@@ -30,7 +30,6 @@
 #include "async/continuation.hh"
 #include "common/copy.hh"
 #include "common/function_helper.hh"
-#include "common/shared_function.hh"
 
 namespace sesh {
 namespace async {
