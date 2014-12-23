@@ -128,7 +128,7 @@ future<result<simple_command_parse>> accept_nonempty_command(
 
 future<result<simple_command_parse>> parse_simple_command(const state &s) {
     auto r = parse_tokens(result<simple_command>(
-                product<simple_command>{simple_command{}, s},
+                product<simple_command>{simple_command(), s},
                 std::vector<report>()));
     return std::move(r).map(accept_nonempty_command).unwrap();
 }
