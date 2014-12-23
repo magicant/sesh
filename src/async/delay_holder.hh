@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <utility>
+#include "async/continuation.hh"
 #include "async/delay.hh"
 
 namespace sesh {
@@ -75,8 +76,8 @@ protected:
      * Calls the forward function for the delay object contained in the
      * arguments.
      */
-    static void forward(delay_holder &&from, delay_holder &&to) {
-        async::delay<T>::forward(
+    static continuation forward(delay_holder &&from, delay_holder &&to) {
+        return async::delay<T>::forward(
                 std::move(from.m_delay), std::move(to.m_delay));
     }
 

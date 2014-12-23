@@ -26,6 +26,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "async/continuation.hh"
 #include "async/delay_holder.hh"
 #include "async/promise.hh"
 #include "common/either.hh"
@@ -49,19 +50,25 @@ public:
     /**
      * Sets a callback function to receive the result from the associated
      * promise. After the callback is set, this future instance will have no
-     * associated promise. Then, if the result has already been set, the
-     * callback is called immediately.
+     * associated promise.
      *
      * The behavior is undefined if this future instance has no associated
      * promise.
      *
      * @tparam F Type of the callback function. It must return void when called
      * with an argument of type <code>common::trial<T> &&</code>.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result has already been set to the associated promise, the continuation
+     * calls the callback passing the result to it. Otherwise, the continuation
+     * is a nop.
      */
     template<typename F>
     typename std::enable_if<std::is_void<typename std::result_of<
             typename std::decay<F>::type(common::trial<T> &&)
-    >::type>::value>::type
+    >::type>::value, continuation>::type
     then(F &&) &&;
 
     /**
@@ -75,9 +82,16 @@ public:
      * @tparam F Type of the callback function. It must be callable with an
      * argument of type <code>common::trial<T> &&</code>.
      * @tparam R Result type of the callback.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result has already been set to the associated promise of this future,
+     * the continuation passes the result to the callback. Otherwise, the
+     * continuation is a nop.
      */
     template<typename F, typename R>
-    void then(F &&, promise<R> &&) &&;
+    continuation then(F &&, promise<R> &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.
@@ -113,9 +127,16 @@ public:
      * @tparam F Type of the callback function. It must be callable with an
      * argument of type <code>T &&</code>.
      * @tparam R Result type of the callback.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result has already been set to the associated promise of this future,
+     * the continuation passes the result to the callback. Otherwise, the
+     * continuation is a nop.
      */
     template<typename F, typename R>
-    void map(F &&, promise<R> &&) &&;
+    continuation map(F &&, promise<R> &&) &&;
 
     /**
      * Sets a callback function that converts the result to another result.
@@ -155,11 +176,18 @@ public:
      *
      * @tparam F Type of the callback function. It must be callable with an
      * exception pointer parameter and return a result of type T.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result has already been set to the associated promise of this future,
+     * the continuation passes the result to the callback. Otherwise, the
+     * continuation is a nop.
      */
     template<typename F>
     typename std::enable_if<std::is_same<
             T, typename std::result_of<F(std::exception_ptr)>::type
-    >::value>::type
+    >::value, continuation>::type
     recover(F &&, promise<T> &&) &&;
 
     /**
@@ -188,8 +216,15 @@ public:
     /**
      * Adds a callback to this future so that its result will be set to the
      * argument promise.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If a
+     * result and callback have already been set to the forwarded
+     * promise/future pair, the continuation calls the callback passing the
+     * result to it. Otherwise, the continuation is a nop.
      */
-    void forward(promise<T> &&) &&;
+    continuation forward(promise<T> &&) &&;
 
     /**
      * Sets a callback function to this future so that its result is wrapped in
@@ -198,8 +233,15 @@ public:
      * If this future receives an exception, it is directly propagated to the
      * argument promise, not to the inner future. If the move-constructor of
      * the result throws an exception, it is set to the inner future.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result has already been set to the associated promise, the continuation
+     * passes the result to the wrapped future. Otherwise, the continuation is
+     * a nop.
      */
-    void wrap(promise<future<T>> &&) &&;
+    continuation wrap(promise<future<T>> &&) &&;
 
     /**
      * Sets a callback function to this future so that its result is wrapped in
@@ -250,8 +292,15 @@ public:
      * Unwraps this nested future. The argument promise will receive the same
      * result as the inner future. If either future is invalid, the behavior is
      * undefined.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result has already been set to the associated promise, the continuation
+     * passes the result to the wrapped future. Otherwise, the continuation is
+     * a nop.
      */
-    void unwrap(promise<T> &&) &&;
+    continuation unwrap(promise<T> &&) &&;
 
     /**
      * Unwraps this nested future. The returned future will receive the same

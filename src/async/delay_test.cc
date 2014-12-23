@@ -37,12 +37,12 @@ using sesh::common::type_tag;
 
 TEST_CASE("Delay: set result and callback") {
     using T = std::tuple<int, float, char>;
-    delay<T> s;
+    auto d = std::make_shared<delay<T>>();
 
-    s.set_result(direct_initialize(), type_tag<T>(), 42, 3.0f, 'a');
+    d->set_result(direct_initialize(), type_tag<T>(), 42, 3.0f, 'a');
 
     unsigned call_count = 0;
-    s.set_callback([&call_count](trial<T> &&r) {
+    d->set_callback([&call_count](trial<T> &&r) {
         ++call_count;
         CHECK(r.get() == std::make_tuple(42, 3.0f, 'a'));
     });
@@ -50,16 +50,16 @@ TEST_CASE("Delay: set result and callback") {
 }
 
 TEST_CASE("Delay: set callback and result") {
-    delay<int> s;
+    auto d = std::make_shared<delay<int>>();
 
     unsigned call_count = 0;
-    s.set_callback([&call_count](trial<int> &&r) {
+    d->set_callback([&call_count](trial<int> &&r) {
         CHECK(r.get() == 42);
         ++call_count;
     });
     CHECK(call_count == 0);
 
-    s.set_result(42);
+    d->set_result(42);
     CHECK(call_count == 1);
 }
 
@@ -70,12 +70,12 @@ TEST_CASE("Delay: set result with throwing constructor and then callback") {
         thrower(const thrower &) { throw 42; }
     };
 
-    delay<thrower> s;
+    auto d = std::make_shared<delay<thrower>>();
 
-    s.set_result(thrower());
+    d->set_result(thrower());
 
     unsigned call_count = 0;
-    s.set_callback([&call_count](trial<thrower> &&r) {
+    d->set_callback([&call_count](trial<thrower> &&r) {
         ++call_count;
         try {
             r.get();

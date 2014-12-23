@@ -41,20 +41,66 @@ class shared_future_base<T>::impl {
 
 public:
 
-    using callback = std::function<void(const common::trial<T> &)>;
+    class callback {
+
+    private:
+
+        virtual void do_call(const common::trial<T> &) noexcept = 0;
+
+    public:
+
+        virtual ~callback() = default;
+
+        void operator()(const common::trial<T> &t) noexcept {
+            do_call(t);
+        }
+
+    }; // class callback
+
+    template<typename F>
+    class callback_wrapper : public callback {
+
+    public:
+
+        using value_type = F;
+
+    private:
+
+        F m_function;
+
+    public:
+
+        template<typename... A>
+        callback_wrapper(A &&... a)
+                noexcept(std::is_nothrow_constructible<F, A...>::value) :
+                m_function(std::forward<A>(a)...) { }
+
+        void do_call(const common::trial<T> &t) noexcept final override {
+            common::invoke(m_function, t);
+        }
+
+    }; // template<typename F> class callback_wrapper
+
+    using callback_pointer = std::unique_ptr<callback>;
 
 private:
 
     common::maybe<common::trial<T>> m_result;
 
     /** Empty after the result is set and all callbacks are called. */
-    std::vector<callback> m_callbacks;
+    std::vector<callback_pointer> m_callbacks;
 
 public:
 
     void set_result(common::trial<T> &&);
 
-    void add_callback(callback &&);
+    void add_callback(callback_pointer &&);
+
+    template<typename F, typename... A>
+    void emplace_callback(A &&...);
+
+    template<typename F>
+    void add_callback(F &&);
 
 }; // template<typename T> class shared_future_base<T>::impl
 
@@ -66,16 +112,29 @@ void shared_future_base<T>::impl::set_result(common::trial<T> &&t) {
         m_result.try_emplace(std::current_exception());
     }
 
-    for (callback &c : m_callbacks)
-        common::invoke(c, *m_result);
+    for (callback_pointer &c : m_callbacks)
+        common::invoke(*c, *m_result);
     m_callbacks.clear();
 }
 
 template<typename T>
-void shared_future_base<T>::impl::add_callback(callback &&c) {
+void shared_future_base<T>::impl::add_callback(callback_pointer &&c) {
     if (m_result)
-        return common::invoke(c, *m_result);
+        return common::invoke(*c, *m_result);
     m_callbacks.push_back(std::move(c));
+}
+
+template<typename T>
+template<typename F, typename... A>
+void shared_future_base<T>::impl::emplace_callback(A &&... a) {
+    return add_callback(
+            callback_pointer(new callback_wrapper<F>(std::forward<A>(a)...)));
+}
+
+template<typename T>
+template<typename F>
+void shared_future_base<T>::impl::add_callback(F &&f) {
+    return emplace_callback<typename std::decay<F>::type>(std::forward<F>(f));
 }
 
 template<typename T>
@@ -126,8 +185,8 @@ template<typename From>
 template<typename Function, typename To>
 void shared_future_base<From>::then(Function &&f, promise<To> &&p) const {
     using C = composer<To, typename std::decay<Function>::type>;
-    then(common::shared_function<C>::create(
-            std::forward<Function>(f), std::move(p)));
+    m_impl->template emplace_callback<C>(
+            std::forward<Function>(f), std::move(p));
 }
 
 template<typename From>
@@ -232,8 +291,7 @@ public:
 
 template<typename T>
 void future<shared_future<T>>::unwrap(promise<T> &&p) && {
-    using U = common::shared_function<shared_unwrapper<T>>;
-    std::move(*this).then(U::create(std::move(p)));
+    std::move(*this).then(shared_unwrapper<T>(std::move(p)));
 }
 
 template<typename T>
@@ -245,8 +303,7 @@ future<T> future<shared_future<T>>::unwrap() && {
 
 template<typename T>
 void shared_future<shared_future<T>>::unwrap(promise<T> &&p) const {
-    using U = common::shared_function<shared_unwrapper<T>>;
-    this->then(U::create(std::move(p)));
+    this->then(shared_unwrapper<T>(std::move(p)));
 }
 
 template<typename T>

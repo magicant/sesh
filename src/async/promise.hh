@@ -23,7 +23,9 @@
 #include <exception>
 #include <functional>
 #include <utility>
+#include "async/continuation.hh"
 #include "async/delay_holder.hh"
+#include "common/copy.hh"
 #include "common/direct_initialize.hh"
 #include "common/functional_initialize.hh"
 #include "common/type_tag.hh"
@@ -57,15 +59,20 @@ public:
      * Sets the result of the associated future by constructing T with the
      * arguments. If the constructor throws, the result is set to the exception
      * thrown. After the result is set, this promise will have no associated
-     * future. Then, if the future has already a callback set, it is called
-     * with the result.
+     * future.
      *
      * The behavior is undefined if this promise has no associated future.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * callback has already been set to the associated future, the continuation
+     * calls the callback passing the result to it. Otherwise, the continuation
+     * is a nop.
      */
     template<typename... Arg>
-    void set_result(Arg &&... arg) && {
-        promise copy = std::move(*this);
-        copy.delay().set_result(
+    continuation set_result(Arg &&... arg) && {
+        return common::copy(std::move(*this)).delay().set_result(
                 common::direct_initialize(),
                 common::type_tag<T>(),
                 std::forward<Arg>(arg)...);
@@ -76,41 +83,56 @@ public:
      * function, which must be callable with no arguments and return a value of
      * T. If the function throws, the result is set to the exception thrown.
      * After the result is set, this promise will have no associated future.
-     * Then, if the future has already a callback set, it is called with the
-     * result.
      *
      * The behavior is undefined if this promise has no associated future.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * callback has already been set to the associated future, the continuation
+     * calls the callback passing the result to it. Otherwise, the continuation
+     * is a nop.
      */
     template<typename F>
-    void set_result_from(F &&f) && {
-        promise copy = std::move(*this);
-        copy.delay().set_result(
+    continuation set_result_from(F &&f) && {
+        return common::copy(std::move(*this)).delay().set_result(
                 common::functional_initialize(), std::forward<F>(f));
     }
 
     /**
      * Sets the result of the associated future to the given exception. After
-     * the result is set, this promise will have no associated future. Then, if
-     * the future has already a callback set, it is called with the result.
+     * the result is set, this promise will have no associated future.
      *
      * The behavior is undefined if this promise has no associated future or if
      * the exception pointer is null.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * callback has already been set to the associated future, the continuation
+     * calls the callback passing the result to it. Otherwise, the continuation
+     * is a nop.
      */
-    void fail(const std::exception_ptr &e) && {
-        promise copy = std::move(*this);
-        copy.delay().set_result(e);
+    continuation fail(const std::exception_ptr &e) && {
+        return common::copy(std::move(*this)).delay().set_result(e);
     }
 
     /**
      * Sets the result of the associated future to the current exception. After
-     * the result is set, this promise will have no associated future. Then, if
-     * the future has already a callback set, it is called with the result.
+     * the result is set, this promise will have no associated future.
      *
      * This function can be used in a catch clause only. The behavior is
      * undefined if this promise has no associated future.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * callback has already been set to the associated future, the continuation
+     * calls the callback passing the result to it. Otherwise, the continuation
+     * is a nop.
      */
-    void fail_with_current_exception() && {
-        std::move(*this).fail(std::current_exception());
+    continuation fail_with_current_exception() && {
+        return std::move(*this).fail(std::current_exception());
     }
 
 }; // template<typename T> class promise

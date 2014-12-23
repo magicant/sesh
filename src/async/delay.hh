@@ -25,9 +25,11 @@
 #include <functional>
 #include <memory>
 #include <utility>
+#include "async/continuation.hh"
 #include "common/direct_initialize.hh"
 #include "common/either.hh"
 #include "common/empty.hh"
+#include "common/function_helper.hh"
 #include "common/type_tag.hh"
 
 namespace sesh {
@@ -46,15 +48,57 @@ namespace async {
  * the client just after the result is passed to the callback, so the result
  * and callback are soon destroyed anyway.
  *
+ * A delay object must be allocated in the heap and managed by std::shared_ptr.
+ *
  * @tparam T The result type. It must be a decayed move-constructible type
  * other than std::exception_ptr.
  */
 template<typename T>
-class delay {
+class delay : public runnable, public std::enable_shared_from_this<delay<T>> {
 
 public:
 
-    using callback = std::function<void(common::trial<T> &&)>;
+    class callback {
+
+    private:
+
+        virtual continuation do_call(common::trial<T> &&) noexcept = 0;
+
+    public:
+
+        virtual ~callback() = default;
+
+        continuation operator()(common::trial<T> &&t) noexcept {
+            return do_call(std::move(t));
+        }
+
+    }; // class callback
+
+    template<typename F>
+    class callback_wrapper : public callback {
+
+    public:
+
+        using value_type = F;
+
+    private:
+
+        F m_function;
+
+    public:
+
+        template<typename... A>
+        callback_wrapper(A &&... a)
+                noexcept(std::is_nothrow_constructible<F, A...>::value) :
+                m_function(std::forward<A>(a)...) { }
+
+        continuation do_call(common::trial<T> &&t) noexcept final override {
+            return call(m_function, std::move(t));
+        }
+
+    }; // template<typename F> class callback_wrapper
+
+    using callback_pointer = std::unique_ptr<callback>;
 
 private:
 
@@ -64,19 +108,22 @@ private:
     using forward_target = std::shared_ptr<delay>;
 
     using input = common::variant<empty, trial, forward_source>;
-    using output = common::variant<empty, callback, forward_target>;
+    using output = common::variant<empty, callback_pointer, forward_target>;
 
     input m_input = input(empty());
     output m_output = output(empty());
 
-    void fire_if_ready() {
+    continuation to_continuation() {
         if (m_input.tag() != m_input.template tag<trial>())
-            return;
-        if (m_output.tag() != m_output.template tag<callback>())
-            return;
+            return {};
+        if (m_output.tag() != m_output.template tag<callback_pointer>())
+            return {};
+        return continuation(this->shared_from_this());
+    }
 
-        auto &f = m_output.template value<callback>();
-        f(std::move(m_input.template value<trial>()));
+    continuation do_run() noexcept final override {
+        auto &f = m_output.template value<callback_pointer>();
+        return (*f)(std::move(m_input.template value<trial>()));
     }
 
 public:
@@ -88,11 +135,15 @@ public:
      *
      * The behavior is undefined if the result has already been set.
      *
-     * If a callback function has already been set, it is called immediately
-     * with the result set.
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result and callback are both set to the delay, the continuation calls
+     * the callback passing the result to it. Otherwise, the continuation is a
+     * nop.
      */
     template<typename... Arg>
-    void set_result(Arg &&... arg) {
+    continuation set_result(Arg &&... arg) {
         assert(m_input.tag() != m_input.template tag<trial>());
 
         if (m_output.tag() == m_output.template tag<forward_target>())
@@ -111,7 +162,7 @@ public:
                     std::current_exception());
         }
 
-        fire_if_ready();
+        return to_continuation();
     }
 
     /**
@@ -120,29 +171,80 @@ public:
      * The behavior is undefined if a callback has already been set or the
      * argument callback is empty.
      *
-     * If a result has already been set, the callback function is called
-     * immediately with the result.
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result and callback are both set to the delay, the continuation calls
+     * the callback passing the result to it. Otherwise, the continuation is a
+     * nop.
      */
-    void set_callback(callback &&f) {
-        assert(m_output.tag() != m_output.template tag<callback>());
+    continuation set_callback(callback_pointer &&f) {
+        assert(m_output.tag() != m_output.template tag<callback_pointer>());
         assert(f != nullptr);
 
         if (m_input.tag() == m_input.template tag<forward_source>()) {
             if (auto fs = m_input.template value<forward_source>().lock())
-                fs->set_callback(std::move(f));
-            return;
+                return fs->set_callback(std::move(f));
+            return {};
         }
 
-        m_output.template emplace_with_fallback<empty>(std::move(f));
+        m_output.emplace(std::move(f));
 
-        fire_if_ready();
+        return to_continuation();
+    }
+
+    /**
+     * Sets a callback function to this delay object.
+     *
+     * The behavior is undefined if a callback has already been set or the
+     * argument callback is empty.
+     *
+     * @tparam F Type of the callback. Must be copy- or move-constructible (if
+     * passed by l- or r-value reference, respectively) and must return
+     * continuation when called with <code>common::trial&lt;T></code>.
+     * @param a Parameters that are passed to the constructor of @t F.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result and callback are both set to the delay, the continuation calls
+     * the callback passing the result to it. Otherwise, the continuation is a
+     * nop.
+     */
+    template<typename F, typename... A>
+    continuation emplace_callback(A &&... a) {
+        return set_callback(callback_pointer(
+                new callback_wrapper<F>(std::forward<A>(a)...)));
+    }
+
+    /**
+     * Sets a callback function to this delay object.
+     *
+     * The behavior is undefined if a callback has already been set or the
+     * argument callback is empty.
+     *
+     * @tparam F Type of the callback. <code>std::delay&lt;F>::type</code> must
+     * be copy- or move-constructible (if passed by l- or r-value reference,
+     * respectively) and must return continuation when called with
+     * <code>common::trial&lt;T></code>.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result and callback are both set to the delay, the continuation calls
+     * the callback passing the result to it. Otherwise, the continuation is a
+     * nop.
+     */
+    template<typename F>
+    continuation set_callback(F &&f) {
+        return emplace_callback<typename std::decay<F>::type>(
+                std::forward<F>(f));
     }
 
     /**
      * Connects two delay objects as if a callback is set to the "from" object
      * so that the result set to the "from" object is simply transferred to the
-     * "to" object. If a result and callback both have already been set, the
-     * result is immediately passed to the callback.
+     * "to" object.
      *
      * Using this function is more efficient than setting a callback normally.
      * Especially, when more than two delay objects are connected in a row with
@@ -156,12 +258,19 @@ public:
      * not have a callback and result set, respectively. After calling this
      * function, {@link #set_callback} and {@link #set_result} must not be
      * called for the "from" and "to" objects, respectively.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * result and callback are both set to the connected delays, the
+     * continuation calls the callback passing the result to it. Otherwise, the
+     * continuation is a nop.
      */
-    static void forward(
+    static continuation forward(
             std::shared_ptr<delay> &&from, std::shared_ptr<delay> &&to) {
         assert(from != nullptr);
         assert(from->m_output.tag() !=
-                from->m_output.template tag<callback>());
+                from->m_output.template tag<callback_pointer>());
 
         assert(to != nullptr);
         assert(to->m_input.tag() != to->m_input.template tag<trial>());
@@ -171,7 +280,7 @@ public:
                 from->m_input.template tag<forward_source>()) {
             from = from->m_input.template value<forward_source>().lock();
             if (from == nullptr)
-                return;
+                return {};
         }
 
         // Normalize "to"
@@ -184,9 +293,10 @@ public:
                     std::move(from->m_input.template value<trial>()));
 
         // Transfer callback
-        if (to->m_output.tag() == to->m_output.template tag<callback>())
-            return from->set_callback(
-                    std::move(to->m_output.template value<callback>()));
+        if (to->m_output.tag() ==
+                to->m_output.template tag<callback_pointer>())
+            return from->set_callback(std::move(
+                    to->m_output.template value<callback_pointer>()));
 
         // Connect
         to->m_input.emplace(
@@ -197,6 +307,7 @@ public:
                 common::direct_initialize(),
                 common::type_tag<forward_target>(),
                 std::move(to));
+        return {};
     }
 
 }; // template<typename T> class delay
