@@ -280,19 +280,6 @@ public:
 
 }; // template<typename Union> class assigner
 
-/** A visitor that destructs a union value. */
-class destructor {
-
-public:
-
-    template<typename V>
-    void operator()(V &v) const
-            noexcept(std::is_nothrow_destructible<V>::value) {
-        v.~V();
-    }
-
-}; // class destructor
-
 namespace {
 
 /** A helper function that constructs an applier. */
