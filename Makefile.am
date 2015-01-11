@@ -36,6 +36,7 @@ TESTPROGRAMS = \
 	src/common/function_helper_test \
 	src/common/reference_test \
 	src/common/shared_function_test \
+	src/common/tagged_union_test \
 	src/common/trie_test \
 	src/common/type_tag_set_test \
 	src/common/type_tag_test \
@@ -163,6 +164,7 @@ src_sesh_SOURCES = \
 	src/common/reference.hh \
 	src/common/shared_function.hh \
 	src/common/static_cast_function.hh \
+	src/common/tagged_union.hh \
 	src/common/trie.hh \
 	src/common/type_tag.hh \
 	src/common/type_tag_set.hh \
@@ -302,6 +304,9 @@ src_common_reference_test_SOURCES = \
 src_common_shared_function_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/shared_function_test.cc
+src_common_tagged_union_test_SOURCES = \
+	src/catch_main.cc \
+	src/common/tagged_union_test.cc
 src_common_trie_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/trie_test.cc
