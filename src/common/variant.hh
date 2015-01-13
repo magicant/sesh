@@ -30,7 +30,6 @@
 #include <utility>
 #include "common/direct_initialize.hh"
 #include "common/function_helper.hh"
-#include "common/functional_initialize.hh"
 #include "common/logic_helper.hh"
 #include "common/type_tag.hh"
 
@@ -152,30 +151,6 @@ public:
     explicit value_union(type_tag<U> tag, Arg &&... arg)
             noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
             m_tail(tag, std::forward<Arg>(arg)...) { }
-
-    /**
-     * Constructs the value by move-constructing the result of the argument
-     * function, which must return (a reference to) an object of type Head.
-     */
-    template<typename F>
-    // constexpr XXX C++11 7.1.5.4
-    explicit value_union(functional_initialize, type_tag<Head>, F &&f)
-            noexcept(noexcept(std::declval<F>()()) &&
-                    std::is_nothrow_constructible<
-                        Head, typename std::result_of<F()>::type>::value) :
-            m_head(std::forward<F>(f)()) { }
-
-    /**
-     * Constructs the value by move-constructing the result of the argument
-     * function, which must return (a reference to) a value of one of the types
-     * that may be contained in this union.
-     */
-    template<typename U, typename F>
-    // constexpr XXX C++11 7.1.5.4
-    explicit value_union(functional_initialize fi, type_tag<U> tag, F &&f)
-            noexcept(std::is_nothrow_constructible<
-                tail_union, functional_initialize, type_tag<U>, F &&>::value) :
-            m_tail(fi, tag, std::forward<F>(f)) { }
 
 };
 
@@ -523,46 +498,6 @@ public:
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
             variant_base(
                     direct_initialize(), type_tag<V>(), std::forward<U>(v)) { }
-
-    /**
-     * Creates a new variant by move-constructing its contained value from the
-     * result of calling the argument function.
-     *
-     * Throws any exception thrown by the argument function or constructor.
-     *
-     * @tparam U the type of the new contained value to be constructed.
-     * @tparam F the type of the function argument.
-     * @param fi a dummy argument to disambiguate overload resolution.
-     * @param tag a dummy object to select the type of the contained value.
-     * @param f the function that constructs the new contained value.
-     */
-    template<typename U, typename F>
-    variant_base(functional_initialize fi, type_tag<U> tag, F &&f)
-            noexcept(std::is_nothrow_constructible<
-                value_type, functional_initialize, type_tag<U>, F &&>::value) :
-            tag_type(tag), m_value(fi, tag, std::forward<F>(f)) { }
-
-    /**
-     * Creates a new variant by move-constructing its contained value from the
-     * result of calling the argument function.
-     *
-     * Throws any exception thrown by the argument function or constructor.
-     *
-     * @tparam F the type of the function argument.
-     * @tparam U the type of the new contained value to be constructed.
-     *     (inferred from the return type of the argument function.)
-     * @param fi a dummy argument for overload resolution disambiguation.
-     * @param f the function that constructs the new contained value.
-     */
-    template<
-            typename F,
-            typename U = typename std::decay<
-                    typename std::result_of<F()>::type>::type>
-    variant_base(functional_initialize fi, F &&f)
-            noexcept(std::is_nothrow_constructible<
-                    variant_base, functional_initialize, type_tag<U>, F &&>
-                    ::value) :
-            variant_base(fi, type_tag<U>(), std::forward<F>(f)) { }
 
     /**
      * Returns a reference to the value of the template parameter type.
@@ -1283,20 +1218,6 @@ public:
                 type_tag<U>(),
                 list,
                 std::forward<Arg>(arg)...);
-    }
-
-    /**
-     * Creates a new variant by move-constructing its contained value from the
-     * result of calling the argument function.
-     *
-     * Throws any exception thrown by the argument function or constructor.
-     *
-     * @tparam F the type of the function argument.
-     * @param f the function that constructs the new contained value.
-     */
-    template<typename F>
-    static variant result_of(F &&f) {
-        return variant(functional_initialize(), std::forward<F>(f));
     }
 
 }; // template<typename... T> class variant

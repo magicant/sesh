@@ -26,7 +26,6 @@
 #include "catch.hpp"
 #include "common/container_helper.hh"
 #include "common/direct_initialize.hh"
-#include "common/functional_initialize.hh"
 #include "common/type_tag.hh"
 #include "common/variant.hh"
 
@@ -34,7 +33,6 @@ namespace {
 
 using sesh::common::contains;
 using sesh::common::direct_initialize;
-using sesh::common::functional_initialize;
 using sesh::common::type_tag;
 using sesh::common::variant;
 
@@ -162,7 +160,6 @@ TEST_CASE("Single variant construction & destruction") {
     variant<int>(DI, type_tag<int>());
     variant<int>(DI, type_tag<int>(), 123);
     variant<int>(123);
-    variant<int>(functional_initialize(), [] { return 123; });
 
     static_assert(
             noexcept(variant<int>(DI, type_tag<int>())),
@@ -170,15 +167,6 @@ TEST_CASE("Single variant construction & destruction") {
     static_assert(
             variant<int>::is_nothrow_destructible,
             "int is no-throw destructible");
-
-    auto throwing = []() noexcept(false) { return 0; };
-    auto nonthrowing = []() noexcept(true) { return 0; };
-    static_assert(
-            !noexcept(variant<int>(functional_initialize(), throwing)),
-            "functional initialize propagates noexcept(false)");
-    static_assert(
-            noexcept(variant<int>(functional_initialize(), nonthrowing)),
-            "functional initialize propagates noexcept(true)");
 
     std::vector<action> actions;
     variant<stub>(DI, type_tag<stub>(), actions);
@@ -188,11 +176,6 @@ TEST_CASE("Single variant construction & destruction") {
 
     CHECK_THROWS_AS(
             variant<default_throws>(DI, type_tag<default_throws>()),
-            exception);
-    CHECK_THROWS_AS(
-            variant<default_throws>(
-                    functional_initialize(),
-                    []() -> default_throws { throw exception(); }),
             exception);
 }
 
@@ -224,8 +207,6 @@ TEST_CASE("Double variant construction & destruction") {
     variant<A, B>(DI, type_tag<B>(), 0, 0.0);
     variant<A, B>{A()};
     variant<A, B>{B(0, 0.0)};
-    variant<A, B>(functional_initialize(), [] { return A(); });
-    variant<A, B>(functional_initialize(), [] { return B(0, 0.0); });
 
     static_assert(
             noexcept(variant<A, B>(DI, type_tag<A>())),
@@ -236,16 +217,6 @@ TEST_CASE("Double variant construction & destruction") {
     static_assert(
             variant<A, B>::is_nothrow_destructible,
             "A and B are no-throw destructible");
-
-    auto throwing = []() noexcept(false) { return 0; };
-    auto nonthrowing = []() noexcept(true) { return 0.0; };
-    static_assert(
-            !noexcept(variant<int, double>(functional_initialize(), throwing)),
-            "functional initialize propagates noexcept(false)");
-    static_assert(
-            noexcept(
-                variant<int, double>(functional_initialize(), nonthrowing)),
-            "functional initialize propagates noexcept(true)");
 }
 
 //TEST_CASE("Double variant throwing constructor") {
@@ -293,10 +264,6 @@ TEST_CASE("Quad variant construction & destruction") {
     variant<A, B, C, D>{B()};
     variant<A, B, C, D>{C()};
     variant<A, B, C, D>{D()};
-    variant<A, B, C, D>(functional_initialize(), [] { return A(); });
-    variant<A, B, C, D>(functional_initialize(), [] { return B(); });
-    variant<A, B, C, D>(functional_initialize(), [] { return C(); });
-    variant<A, B, C, D>(functional_initialize(), [] { return D(); });
 }
 
 TEST_CASE("Double variant copy initialization") {
@@ -320,7 +287,7 @@ TEST_CASE("Double variant value") {
     const float F1 = 456.0f, F2 = 567.0f;
 
     variant<int, float> i(DI, type_tag<int>(), I1);
-    variant<int, float> f(functional_initialize(), [=] { return F1; });
+    variant<int, float> f(DI, type_tag<float>(), F1);
 
     CHECK(i.value<int>() == I1);
     CHECK(f.value<float>() == F1);
@@ -337,7 +304,7 @@ TEST_CASE("Double variant constant value") {
     const float F = 456.0;
 
     const variant<int, float> i(DI, type_tag<int>(), I);
-    const variant<int, float> f(functional_initialize(), [=] { return F; });
+    const variant<int, float> f(DI, type_tag<float>(), F);
 
     CHECK(i.value<int>() == I);
     CHECK(f.value<float>() == F);
@@ -1040,19 +1007,6 @@ TEST_CASE("Double variant of") {
         CHECK(v4.tag() == v4.tag<stub>());
     }
     CHECK(contains(actions, action::copy_construction));
-}
-
-TEST_CASE("Double variant result of") {
-    int i = 42;
-    double d = 123.0;
-    variant<int, double> vi =
-            variant<int, double>::result_of([&i] { return i; });
-    variant<int, double> vd =
-            variant<int, double>::result_of([&d] { return d; });
-    REQUIRE(vi.tag() == vi.tag<int>());
-    CHECK(vi.value<int>() == 42);
-    REQUIRE(vd.tag() == vd.tag<double>());
-    CHECK(vd.value<double>() == 123.0);
 }
 
 TEST_CASE("Double variant swapping with same type") {
