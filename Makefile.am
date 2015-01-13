@@ -156,7 +156,6 @@ src_sesh_SOURCES = \
 	src/common/enum_traits.hh \
 	src/common/errno_helper.hh \
 	src/common/function_helper.hh \
-	src/common/functional_initialize.hh \
 	src/common/identity.hh \
 	src/common/integer_sequence.hh \
 	src/common/logic_helper.hh \

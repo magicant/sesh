@@ -28,7 +28,6 @@
 #include <utility>
 #include "common/direct_initialize.hh"
 #include "common/either.hh"
-#include "common/functional_initialize.hh"
 #include "common/type_tag.hh"
 #include "common/variant.hh"
 
