@@ -932,90 +932,16 @@ public:
 
 }; // template<typename... T> class variant_base
 
-/** A subclass of variant base that defines no move or copy constructor. */
-template<typename... T>
-class unmovable_variant : public variant_base<T...> {
-
-public:
-
-    using variant_base<T...>::variant_base;
-
-    unmovable_variant(const unmovable_variant &) = delete;
-    unmovable_variant(unmovable_variant &&) = delete;
-    unmovable_variant &operator=(const unmovable_variant &) = delete;
-    unmovable_variant &operator=(unmovable_variant &&) = delete;
-
-}; // template<typename... T> class unmovable_variant
-
-/** A subclass of variant base that defines the move constructor. */
-template<typename... T>
-class move_constructible_variant : public variant_base<T...> {
-
-public:
-
-    using variant_base<T...>::variant_base;
-
-    move_constructible_variant(const move_constructible_variant &) = delete;
-    move_constructible_variant(move_constructible_variant &&) = default;
-    move_constructible_variant &operator=(const move_constructible_variant &) =
-            delete;
-    move_constructible_variant &operator=(move_constructible_variant &&) =
-            delete;
-
-}; // template<typename... T> class move_constructible_variant
-
-/** A subclass of variant base that defines the move and copy constructor. */
-template<typename... T>
-class copy_constructible_variant : public variant_base<T...> {
-
-public:
-
-    using variant_base<T...>::variant_base;
-
-    copy_constructible_variant(const copy_constructible_variant &) = default;
-    copy_constructible_variant(copy_constructible_variant &&) = default;
-    copy_constructible_variant &operator=(const copy_constructible_variant &) =
-            delete;
-    copy_constructible_variant &operator=(copy_constructible_variant &&) =
-            delete;
-
-}; // template<typename... T> class copy_constructible_variant
-
-/**
- * Either unmovable or move-constructible variant class, selected by
- * move-constructibility of contained types.
- */
-template<typename... T>
-using conditionally_move_constructible_variant =
-        typename std::conditional<
-                for_all<std::is_move_constructible<T>::value...>::value,
-                move_constructible_variant<T...>,
-                unmovable_variant<T...>
-        >::type;
-
-/**
- * Either unmovable, move-constructible, or copy-constructible variant class,
- * selected by move- and copy-constructibility of contained types.
- */
-template<typename... T>
-using conditionally_copy_constructible_variant =
-        typename std::conditional<
-                for_all<std::is_copy_constructible<T>::value...>::value,
-                copy_constructible_variant<T...>,
-                conditionally_move_constructible_variant<T...>
-        >::type;
-
 /**
  * A subclass of conditionally copy-constructible variant that re-defines the
  * move assignment operator.
  */
 template<typename... T>
-class move_assignable_variant :
-        public conditionally_copy_constructible_variant<T...> {
+class move_assignable_variant : public variant_base<T...> {
 
 private:
 
-    using base = conditionally_copy_constructible_variant<T...>;
+    using base = variant_base<T...>;
 
 public:
 
@@ -1066,7 +992,7 @@ using conditionally_move_assignable_variant =
                 for_all<std::is_move_constructible<T>::value...>::value &&
                 for_all<std::is_move_assignable<T>::value...>::value,
                 move_assignable_variant<T...>,
-                conditionally_copy_constructible_variant<T...>
+                variant_base<T...>
         >::type;
 
 /**
