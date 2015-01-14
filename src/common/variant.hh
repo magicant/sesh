@@ -47,8 +47,6 @@ namespace variant_impl {
 template<typename T, typename... U>
 class is_any_of : public for_any<std::is_same<T, U>::value...> { };
 
-class move_if_noexcept { };
-
 /** Contains the value of a variant. */
 template<typename...>
 union value_union;
