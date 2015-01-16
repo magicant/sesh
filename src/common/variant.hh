@@ -432,20 +432,15 @@ public:
             for_all<std::is_nothrow_copy_constructible<T>::value...>::value;
     constexpr static bool is_nothrow_move_constructible =
             for_all<std::is_nothrow_move_constructible<T>::value...>::value;
-    constexpr static bool is_nothrow_destructible =
-            for_all<std::is_nothrow_destructible<T>::value...>::value;
     constexpr static bool is_nothrow_copy_assignable =
             for_all<std::is_nothrow_copy_assignable<T>::value...>::value &&
-            is_nothrow_copy_constructible &&
-            is_nothrow_destructible;
+            is_nothrow_copy_constructible;
     constexpr static bool is_nothrow_move_assignable =
             for_all<std::is_nothrow_move_assignable<T>::value...>::value &&
-            is_nothrow_move_constructible &&
-            is_nothrow_destructible;
+            is_nothrow_move_constructible;
     constexpr static bool is_nothrow_swappable =
             for_all<swap_impl::is_nothrow_swappable<T>::value...>::value &&
-            is_nothrow_move_constructible &&
-            is_nothrow_destructible;
+            is_nothrow_move_constructible;
 
     /** Returns the integral value that identifies the parameter type. */
     template<typename U>
@@ -618,10 +613,8 @@ public:
      * Destructor.
      *
      * Calls the currently contained value's destructor.
-     *
-     * Propagates any exception thrown by the destructor.
      */
-    ~variant_base() noexcept(is_nothrow_destructible) {
+    ~variant_base() noexcept {
         apply(destructor());
     }
 
@@ -721,8 +714,7 @@ public:
      * arguments.
      *
      * To ensure that a valid object is contained after return from this
-     * function, nothing must be thrown by the destructor that destructs the
-     * currently contained value or the constructor of the new value. If
+     * function, nothing must be thrown by the constructor of the new value. If
      * something is thrown at runtime, std::terminate is called.
      *
      * @see #emplace_with_fallback
@@ -740,14 +732,15 @@ public:
      * value by calling the constructor of this variant again with the given
      * arguments.
      *
-     * If the destructor or constructor threw something, the default
-     * constructor of <code>Fallback</code> is called as a fallback and the
-     * exception is re-thrown. If the <code>Fallback</code> default constructor
-     * threw again, std::terminate is called.
+     * If the constructor threw something, the default constructor of @c
+     * Fallback is called as a fallback and the exception is re-thrown. If the
+     * @c Fallback default constructor threw again, std::terminate is called.
+     *
+     * Requirements: @c Fallback must be default-constructible.
      */
     template<typename Fallback, typename... Arg>
     void emplace_with_fallback(Arg &&... arg)
-            noexcept(is_nothrow_destructible &&
+            noexcept(
                 std::is_nothrow_constructible<variant_base, Arg &&...>::value)
     {
         try {
@@ -765,13 +758,11 @@ public:
      * value by calling the constructor of this variant again with the given
      * arguments.
      *
-     * This overload is selected if the destructor and constructor are
-     * guaranteed never to throw. This overload is equivalent to {@link
-     * #emplace}.
+     * This overload is selected if the constructor is guaranteed never to
+     * throw. This overload is equivalent to {@link #emplace}.
      */
     template<typename... Arg>
     typename std::enable_if<
-            is_nothrow_destructible &&
             std::is_nothrow_constructible<variant_base, Arg &&...>::value
     >::type
     emplace_with_backup(Arg &&... arg) noexcept {
@@ -783,19 +774,18 @@ public:
      * value by calling the constructor of this variant again with the given
      * arguments.
      *
-     * This overload is selected if the destructor or constructor may throw. In
-     * case they throw something, a temporary backup of the original value is
-     * created before the destruction and construction. If an exception is
-     * thrown from the destructor or constructor, the backup is used to restore
-     * the original value before propagating the exception. If the restoration
-     * again fails with an exception, std::terminate is called. The backup is
-     * created by std::move_if_noexcept.
+     * This overload is selected if the constructor may throw. In case it
+     * should throw something, a temporary backup of the original value is
+     * created before the construction. If an exception is thrown, the backup
+     * is used to restore the original value before propagating the exception.
+     * If the restoration again fails with an exception, std::terminate is
+     * called. The backup is created by std::move_if_noexcept and restored by
+     * move-construction.
      *
      * Requirements: All the contained types must be move-constructible.
      */
     template<typename... Arg>
     typename std::enable_if<
-            !is_nothrow_destructible ||
             !std::is_nothrow_constructible<variant_base, Arg &&...>::value
     >::type
     emplace_with_backup(Arg &&... arg) {
@@ -1001,8 +991,8 @@ using conditionally_copy_assignable_variant =
  * <code>variant&lt;int, int></code>, but those types are indistinguishable
  * from outside of the variant object.
  *
- * @tparam T the types of which the value of this variant may be. They must be
- * decayed types (see std::decay).
+ * @tparam T Types of values that may be contained in the variant. They all
+ * must be no-throw destructible and decayed.
  */
 template<typename... T>
 class variant : public conditionally_copy_assignable_variant<T...> {
@@ -1022,10 +1012,6 @@ public:
             variant::is_nothrow_move_constructible ==
                 std::is_nothrow_move_constructible<base>::value,
             "is_nothrow_move_constructible is wrong");
-    static_assert(
-            variant::is_nothrow_destructible ==
-                std::is_nothrow_destructible<base>::value,
-            "is_nothrow_destructible is wrong");
 
     /**
      * Copy-assigns to this variant.
@@ -1092,7 +1078,7 @@ public:
      * using the move constructor.
      *
      * Requirements: All the contained types must be swappable, no-throw
-     * move-constructible, and no-throw destructible.
+     * move-constructible.
      */
     void swap(variant &other) noexcept(variant::is_nothrow_swappable) {
         if (this->tag() == other.tag())
@@ -1183,8 +1169,7 @@ public:
      */
     template<typename U, typename... Arg>
     static variant create(Arg &&... arg)
-            noexcept(std::is_nothrow_constructible<U, Arg...>::value &&
-                    std::is_nothrow_destructible<U>::value) {
+            noexcept(std::is_nothrow_constructible<U, Arg...>::value) {
         return variant(
                 direct_initialize(), type_tag<U>(), std::forward<Arg>(arg)...);
     }
@@ -1211,8 +1196,7 @@ public:
     create(std::initializer_list<ListArg> list, Arg &&... arg)
             noexcept(
                 std::is_nothrow_constructible<
-                    U, std::initializer_list<ListArg> &, Arg &&...>::value &&
-                std::is_nothrow_destructible<U>::value) {
+                    U, std::initializer_list<ListArg> &, Arg &&...>::value) {
         return variant(
                 direct_initialize(),
                 type_tag<U>(),
@@ -1230,7 +1214,7 @@ public:
  * move constructor.
  *
  * Requirements: All the contained types must be swappable, no-throw
- * move-constructible, and no-throw destructible.
+ * move-constructible.
  */
 template<typename... T>
 void swap(variant<T...> &a, variant<T...> &b)

@@ -131,9 +131,6 @@ struct non_move_assignable {
     non_move_assignable(non_move_assignable &&) = default;
     non_move_assignable &operator=(non_move_assignable &&) = delete;
 };
-struct non_destructible {
-    ~non_destructible() noexcept(false) { }
-};
 struct move_only_int {
     int value;
     move_only_int(int i) noexcept : value(i) { }
@@ -164,9 +161,6 @@ TEST_CASE("Single variant construction & destruction") {
     static_assert(
             noexcept(variant<int>(DI, type_tag<int>())),
             "int is no-throw constructible & destructible");
-    static_assert(
-            variant<int>::is_nothrow_destructible,
-            "int is no-throw destructible");
 
     std::vector<action> actions;
     variant<stub>(DI, type_tag<stub>(), actions);
@@ -184,16 +178,6 @@ TEST_CASE("Single variant construction & destruction") {
             !noexcept(variant<default_may_throw>(
                     DI, type_tag<default_may_throw>())),
             "default_may_throw constructor may throw");
-//}
-
-//TEST_CASE("Single variant throwing destructor") {
-    static_assert(
-            !noexcept(variant<non_destructible>(
-                    DI, type_tag<non_destructible>())),
-            "non_destructible destructor may throw");
-    static_assert(
-            !variant<non_destructible>::is_nothrow_destructible,
-            "non_destructible destructor may throw");
 //}
 
 TEST_CASE("Double variant construction & destruction") {
@@ -214,9 +198,6 @@ TEST_CASE("Double variant construction & destruction") {
     static_assert(
             !noexcept(variant<A, B>(DI, type_tag<B>(), 0, 0.0)),
             "B is not no-throw constructible");
-    static_assert(
-            variant<A, B>::is_nothrow_destructible,
-            "A and B are no-throw destructible");
 }
 
 //TEST_CASE("Double variant throwing constructor") {
@@ -232,23 +213,6 @@ TEST_CASE("Double variant construction & destruction") {
             !noexcept(variant<default_may_throw, default_may_throw>(
                     DI, type_tag<default_may_throw>())),
             "default_may_throw constructor may throw");
-//}
-
-//TEST_CASE("Double variant throwing destructor") {
-    static_assert(
-            !noexcept(variant<int, non_destructible>(
-                    DI, type_tag<non_destructible>())),
-            "non_destructible destructor is throwing");
-    static_assert(
-            !variant<int, non_destructible>::is_nothrow_destructible,
-            "non_destructible destructor is throwing");
-    static_assert(
-            !noexcept(variant<non_destructible, int>(
-                    DI, type_tag<non_destructible>())),
-            "non_destructible destructor is throwing");
-    static_assert(
-            !variant<non_destructible, int>::is_nothrow_destructible,
-            "non_destructible destructor is throwing");
 //}
 
 TEST_CASE("Quad variant construction & destruction") {
