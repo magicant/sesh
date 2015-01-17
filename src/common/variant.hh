@@ -628,40 +628,6 @@ protected:
 public:
 
     /**
-     * Assignment from the same type is disabled by default. Implementation
-     * subclasses may have their own assignment operators.
-     */
-    variant_base &operator=(const variant_base &) = delete;
-
-    /**
-     * Assignment from the same type is disabled by default. Implementation
-     * subclasses may have their own assignment operators.
-     */
-    variant_base &operator=(variant_base &&) = delete;
-
-}; // template<typename... T> class variant_base
-
-/**
- * A subclass of conditionally copy-constructible variant that re-defines the
- * move assignment operator.
- */
-template<typename... T>
-class move_assignable_variant : public variant_base<T...> {
-
-private:
-
-    using base = variant_base<T...>;
-
-public:
-
-    using base::base;
-
-    move_assignable_variant(const move_assignable_variant &) = default;
-    move_assignable_variant(move_assignable_variant &&) = default;
-    move_assignable_variant &operator=(const move_assignable_variant &) =
-            delete;
-
-    /**
      * Move assignment operator.
      *
      * If the left-hand-side and right-hand-side contain values of the same
@@ -680,48 +646,14 @@ public:
      * Requirements: All the contained types must be move-constructible and
      * move-assignable.
      */
-    move_assignable_variant &operator=(move_assignable_variant &&v)
-            noexcept(base::is_nothrow_move_assignable) {
-        if (this->tag() == v.tag())
-            std::move(v).apply(typename base::assigner(this->value()));
+    variant_base &operator=(variant_base &&v)
+            noexcept(is_nothrow_move_assignable) {
+        if (tag() == v.tag())
+            std::move(v).apply(assigner(value()));
         else
-            this->emplace_with_backup(std::move(v));
+            emplace_with_backup(std::move(v));
         return *this;
     }
-
-}; // template<typename... T> class move_assignable_variant
-
-/**
- * Either move-assignable or conditionally copy-constructible variant class,
- * selected by move-constructibility and -assignability.
- */
-template<typename... T>
-using conditionally_move_assignable_variant =
-        typename std::conditional<
-                for_all<std::is_move_constructible<T>::value...>::value &&
-                for_all<std::is_move_assignable<T>::value...>::value,
-                move_assignable_variant<T...>,
-                variant_base<T...>
-        >::type;
-
-/**
- * A subclass of move-assignable variant that re-defines the copy assignment
- * operator.
- */
-template<typename... T>
-class copy_assignable_variant : public move_assignable_variant<T...> {
-
-private:
-
-    using base = move_assignable_variant<T...>;
-
-public:
-
-    using base::base;
-
-    copy_assignable_variant(const copy_assignable_variant &) = default;
-    copy_assignable_variant(copy_assignable_variant &&) = default;
-    copy_assignable_variant &operator=(copy_assignable_variant &&) = default;
 
     /**
      * Copy assignment operator.
@@ -741,29 +673,16 @@ public:
      * Requirements: All the contained types must be copy-constructible and
      * copy-assignable.
      */
-    copy_assignable_variant &operator=(const copy_assignable_variant &v)
-            noexcept(base::is_nothrow_copy_assignable) {
-        if (this->tag() == v.tag())
-            v.apply(typename base::assigner(this->value()));
+    variant_base &operator=(const variant_base &v)
+            noexcept(is_nothrow_copy_assignable) {
+        if (tag() == v.tag())
+            v.apply(assigner(value()));
         else
-            this->emplace_with_backup(v);
+            emplace_with_backup(v);
         return *this;
     }
 
-}; // template<typename... T> class copy_assignable_variant
-
-/**
- * Either copy-assignable or conditionally move-assignable variant class,
- * selected by copy-constructibility and -assignability.
- */
-template<typename... T>
-using conditionally_copy_assignable_variant =
-        typename std::conditional<
-                for_all<std::is_copy_constructible<T>::value...>::value &&
-                for_all<std::is_copy_assignable<T>::value...>::value,
-                copy_assignable_variant<T...>,
-                conditionally_move_assignable_variant<T...>
-        >::type;
+}; // template<typename... T> class variant_base
 
 /**
  * A variant object contains exactly one object of one of the parameter types.
@@ -779,9 +698,9 @@ using conditionally_copy_assignable_variant =
  * must be no-throw destructible and decayed.
  */
 template<typename... T>
-class variant : public conditionally_copy_assignable_variant<T...> {
+class variant : public variant_base<T...> {
 
-    using base = conditionally_copy_assignable_variant<T...>;
+    using base = variant_base<T...>;
 
     // constructor inheritance
     using base::base;
@@ -810,12 +729,7 @@ public:
      * <code>variant&lt;U...></code> must be copy-assignable.
      */
     template<typename... U>
-    typename std::enable_if<
-            std::is_copy_assignable<
-                    conditionally_copy_assignable_variant<U...>>::value,
-            variant &
-            >::type
-    operator=(const variant<U...> &v)
+    variant &operator=(const variant<U...> &v)
             noexcept(variant<U...>::is_nothrow_copy_assignable &&
                     variant::is_nothrow_move_constructible) {
         if (this->tag() == typename base::tag_type(v.tag()))
@@ -839,12 +753,7 @@ public:
      * <code>variant&lt;U...></code> must be move-assignable.
      */
     template<typename... U>
-    typename std::enable_if<
-            std::is_move_assignable<
-                    conditionally_copy_assignable_variant<U...>>::value,
-            variant &
-            >::type
-    operator=(variant<U...> &&v)
+    variant &operator=(variant<U...> &&v)
             noexcept(variant<U...>::is_nothrow_move_assignable &&
                     variant::is_nothrow_move_constructible) {
         if (this->tag() == typename base::tag_type(v.tag()))
