@@ -636,33 +636,6 @@ protected:
 public:
 
     /**
-     * Move assignment operator.
-     *
-     * If the left-hand-side and right-hand-side contain values of the same
-     * type, the value is assigned by its move (or copy) assignment operator.
-     * Otherwise, the old value is destructed and the new value is
-     * move- (or copy-) constructed.
-     *
-     * If the move constructor for the new value may throw, a temporary copy of
-     * the old value is move- or copy-constructed before the destruction so
-     * that, if the constructor for the new value throws, we can restore the
-     * variant to the original value.
-     *
-     * Propagates any exception thrown by the assignment operator or move/copy
-     * constructor.
-     *
-     * Requirements: All the contained types must be move-constructible and
-     * move-assignable.
-     */
-    variant &operator=(variant &&v) noexcept(is_nothrow_move_assignable) {
-        if (tag() == v.tag())
-            std::move(v).apply(assigner(value()));
-        else
-            emplace_with_backup(std::move(v));
-        return *this;
-    }
-
-    /**
      * Copy assignment operator.
      *
      * If the left-hand-side and right-hand-side contain values of the same
@@ -708,6 +681,33 @@ public:
             v.apply(assigner(value()));
         else
             emplace_with_backup(v);
+        return *this;
+    }
+
+    /**
+     * Move assignment operator.
+     *
+     * If the left-hand-side and right-hand-side contain values of the same
+     * type, the value is assigned by its move (or copy) assignment operator.
+     * Otherwise, the old value is destructed and the new value is
+     * move- (or copy-) constructed.
+     *
+     * If the move constructor for the new value may throw, a temporary copy of
+     * the old value is move- or copy-constructed before the destruction so
+     * that, if the constructor for the new value throws, we can restore the
+     * variant to the original value.
+     *
+     * Propagates any exception thrown by the assignment operator or move/copy
+     * constructor.
+     *
+     * Requirements: All the contained types must be move-constructible and
+     * move-assignable.
+     */
+    variant &operator=(variant &&v) noexcept(is_nothrow_move_assignable) {
+        if (tag() == v.tag())
+            std::move(v).apply(assigner(value()));
+        else
+            emplace_with_backup(std::move(v));
         return *this;
     }
 
