@@ -555,43 +555,6 @@ TEST_CASE("Double variant emplacement with backup; "
     CHECK(v.tag() == v.tag<move_throws>());
 }
 
-TEST_CASE("Double variant reset") {
-    std::vector<action> actions;
-    {
-        variant<int, stub> v(DI, type_tag<int>(), 1);
-        CHECK(v.value<int>() == 1);
-
-        CHECK_NOTHROW(v.reset(stub(actions)));
-        CHECK(v.tag() == v.tag<stub>());
-        CHECK(actions.size() == 3);
-
-        CHECK_NOTHROW(v.reset(2));
-        REQUIRE(v.tag() == v.tag<int>());
-        CHECK(v.value<int>() == 2);
-        CHECK(actions.size() == 4);
-
-        stub s(actions);
-        CHECK(actions.size() == 5);
-        CHECK_NOTHROW(v.reset(s));
-        CHECK(v.tag() == v.tag<stub>());
-        CHECK(actions.size() == 6);
-        CHECK_NOTHROW(v.reset(s));
-        CHECK(v.tag() == v.tag<stub>());
-        CHECK(actions.size() == 8);
-    }
-    CHECK(actions.size() == 10);
-    CHECK(actions.at(0) == action::standard_construction); // of temporary
-    CHECK(actions.at(1) == action::move_construction); // of variant value
-    CHECK(actions.at(2) == action::destruction); // of temporary
-    CHECK(actions.at(3) == action::destruction); // of variant value
-    CHECK(actions.at(4) == action::standard_construction); // of local
-    CHECK(actions.at(5) == action::copy_construction); // of variant value
-    CHECK(actions.at(6) == action::destruction); // of variant value
-    CHECK(actions.at(7) == action::copy_construction); // of variant value
-    CHECK(actions.at(8) == action::destruction); // of local
-    CHECK(actions.at(9) == action::destruction); // of variant value
-}
-
 TEST_CASE("Double variant assignment with same type") {
     std::vector<action> actions1, actions2;
     {
@@ -984,8 +947,8 @@ TEST_CASE("Double variant swapping with same type") {
     REQUIRE(v2.tag() == v2.tag<int>());
     CHECK(v2.value<int>() == 7);
 
-    v1.reset(32.0);
-    v2.reset(8.5);
+    v1.emplace(32.0);
+    v2.emplace(8.5);
     v1.swap(v2);
     REQUIRE(v1.tag() == v1.tag<double>());
     CHECK(v1.value<double>() == 8.5);
