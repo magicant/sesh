@@ -149,9 +149,21 @@ public:
 
 }; // template<typename F> class map_result
 
-/** Fundamental implementation of variant. */
+/**
+ * A variant object contains exactly one object of one of the parameter types.
+ * For example, an object of <code>variant&lt;int, double></code> contains
+ * either an integer or double value.
+ *
+ * The parameter types are usually different from each other. It is allowed to
+ * create a variant that has the same parameter types such as
+ * <code>variant&lt;int, int></code>, but those types are indistinguishable
+ * from outside of the variant object.
+ *
+ * @tparam T Types of values that may be contained in the variant. They all
+ * must be no-throw destructible and decayed.
+ */
 template<typename... T>
-class variant_base {
+class variant {
 
 public:
 
@@ -216,7 +228,7 @@ public:
      * @see tagged_union
      */
     template<typename Head, typename... Tail>
-    variant_base(direct_initialize, Head &&h, Tail &&... t)
+    variant(direct_initialize, Head &&h, Tail &&... t)
             noexcept(std::is_nothrow_constructible<
                     value_type, Head, Tail...>::value) :
             m_value(std::forward<Head>(h), std::forward<Tail>(t)...) { }
@@ -239,10 +251,9 @@ public:
                     std::is_constructible<V, U>::value>::type,
             typename = typename std::enable_if<
                     is_any_of<V, T...>::value>::type>
-    variant_base(U &&v)
+    variant(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
-            variant_base(
-                    direct_initialize(), type_tag<V>(), std::forward<U>(v)) { }
+            variant(direct_initialize(), type_tag<V>(), std::forward<U>(v)) { }
 
     /**
      * Copy constructor.
@@ -254,7 +265,7 @@ public:
      *
      * Requirements: All the contained types must be copy-constructible.
      */
-    variant_base(const variant_base &v) = default;
+    variant(const variant &v) = default;
 
     /**
      * Widening copy constructor.
@@ -269,9 +280,9 @@ public:
      * copy-constructible.
      */
     template<typename... U>
-    variant_base(const variant_base<U...> &v)
-            noexcept(variant_base<U...>::is_nothrow_copy_constructible) :
-            variant_base(direct_initialize(), v.value()) { }
+    variant(const variant<U...> &v)
+            noexcept(variant<U...>::is_nothrow_copy_constructible) :
+            variant(direct_initialize(), v.value()) { }
 
     /**
      * Move constructor.
@@ -283,7 +294,7 @@ public:
      *
      * Requirements: All the contained types must be move-constructible.
      */
-    variant_base(variant_base &&v) = default;
+    variant(variant &&v) = default;
 
     /**
      * Widening move constructor.
@@ -298,9 +309,9 @@ public:
      * move-constructible.
      */
     template<typename... U>
-    variant_base(variant_base<U...> &&v)
-            noexcept(variant_base<U...>::is_nothrow_move_constructible) :
-            variant_base(direct_initialize(), std::move(v.value())) { }
+    variant(variant<U...> &&v)
+            noexcept(variant<U...>::is_nothrow_move_constructible) :
+            variant(direct_initialize(), std::move(v.value())) { }
 
     /**
      * Widening move-if-noexcept constructor.
@@ -317,8 +328,8 @@ public:
      * move-constructible.
      */
     template<typename... U>
-    variant_base(move_if_noexcept min, variant_base<U...> &v)
-            noexcept(variant_base<U...>::is_nothrow_move_constructible) :
+    variant(move_if_noexcept min, variant<U...> &v)
+            noexcept(variant<U...>::is_nothrow_move_constructible) :
             m_value(min, v.value()) { }
 
     /**
@@ -326,7 +337,7 @@ public:
      *
      * Calls the currently contained value's destructor.
      */
-    ~variant_base() = default;
+    ~variant() = default;
 
     /**
      * Returns a reference to the value of the template parameter type.
@@ -441,7 +452,7 @@ private:
 
     /*
      * Lverloads of construct_value have the same signatures as that of the
-     * variant_base constructor.
+     * variant constructor.
      */
 
     template<typename Head, typename... Tail>
@@ -466,20 +477,20 @@ private:
     }
 
     template<typename... U>
-    void construct_value(const variant_base<U...> &v)
-            noexcept(variant_base<U...>::is_nothrow_copy_constructible) {
+    void construct_value(const variant<U...> &v)
+            noexcept(variant<U...>::is_nothrow_copy_constructible) {
         return construct_value(direct_initialize(), v.value());
     }
 
     template<typename... U>
-    void construct_value(variant_base<U...> &&v)
-            noexcept(variant_base<U...>::is_nothrow_move_constructible) {
+    void construct_value(variant<U...> &&v)
+            noexcept(variant<U...>::is_nothrow_move_constructible) {
         return construct_value(direct_initialize(), std::move(v.value()));
     }
 
     template<typename... U>
-    void construct_value(move_if_noexcept min, variant_base<U...> &v)
-            noexcept(variant_base<U...>::is_nothrow_move_constructible) {
+    void construct_value(move_if_noexcept min, variant<U...> &v)
+            noexcept(variant<U...>::is_nothrow_move_constructible) {
         new (&m_value) value_type(min, v.value());
     }
 
@@ -521,8 +532,7 @@ public:
      */
     template<typename Fallback, typename... Arg>
     void emplace_with_fallback(Arg &&... arg)
-            noexcept(
-                std::is_nothrow_constructible<variant_base, Arg &&...>::value)
+            noexcept(std::is_nothrow_constructible<variant, Arg &&...>::value)
     {
         try {
             m_value.~value_type();
@@ -544,8 +554,7 @@ public:
      */
     template<typename... Arg>
     typename std::enable_if<
-            std::is_nothrow_constructible<variant_base, Arg &&...>::value
-    >::type
+            std::is_nothrow_constructible<variant, Arg &&...>::value>::type
     emplace_with_backup(Arg &&... arg) noexcept {
         return emplace(std::forward<Arg>(arg)...);
     }
@@ -567,8 +576,7 @@ public:
      */
     template<typename... Arg>
     typename std::enable_if<
-            !std::is_nothrow_constructible<variant_base, Arg &&...>::value
-    >::type
+            !std::is_nothrow_constructible<variant, Arg &&...>::value>::type
     emplace_with_backup(Arg &&... arg) {
         value_type backup(move_if_noexcept(), m_value);
         try {
@@ -646,8 +654,7 @@ public:
      * Requirements: All the contained types must be move-constructible and
      * move-assignable.
      */
-    variant_base &operator=(variant_base &&v)
-            noexcept(is_nothrow_move_assignable) {
+    variant &operator=(variant &&v) noexcept(is_nothrow_move_assignable) {
         if (tag() == v.tag())
             std::move(v).apply(assigner(value()));
         else
@@ -673,48 +680,13 @@ public:
      * Requirements: All the contained types must be copy-constructible and
      * copy-assignable.
      */
-    variant_base &operator=(const variant_base &v)
-            noexcept(is_nothrow_copy_assignable) {
+    variant &operator=(const variant &v) noexcept(is_nothrow_copy_assignable) {
         if (tag() == v.tag())
             v.apply(assigner(value()));
         else
             emplace_with_backup(v);
         return *this;
     }
-
-}; // template<typename... T> class variant_base
-
-/**
- * A variant object contains exactly one object of one of the parameter types.
- * For example, an object of <code>variant&lt;int, double></code> contains
- * either an integer or double value.
- *
- * The parameter types are usually different from each other. It is allowed to
- * create a variant that has the same parameter types such as
- * <code>variant&lt;int, int></code>, but those types are indistinguishable
- * from outside of the variant object.
- *
- * @tparam T Types of values that may be contained in the variant. They all
- * must be no-throw destructible and decayed.
- */
-template<typename... T>
-class variant : public variant_base<T...> {
-
-    using base = variant_base<T...>;
-
-    // constructor inheritance
-    using base::base;
-
-public:
-
-    static_assert(
-            variant::is_nothrow_copy_constructible ==
-                std::is_nothrow_copy_constructible<base>::value,
-            "is_nothrow_copy_constructible is wrong");
-    static_assert(
-            variant::is_nothrow_move_constructible ==
-                std::is_nothrow_move_constructible<base>::value,
-            "is_nothrow_move_constructible is wrong");
 
     /**
      * Copy-assigns to this variant.
@@ -731,12 +703,11 @@ public:
     template<typename... U>
     variant &operator=(const variant<U...> &v)
             noexcept(variant<U...>::is_nothrow_copy_assignable &&
-                    variant::is_nothrow_move_constructible) {
-        if (this->tag() == typename base::tag_type(v.tag()))
-            v.apply(typename base::assigner(this->value()));
+                    is_nothrow_move_constructible) {
+        if (tag() == tag_type(v.tag()))
+            v.apply(assigner(value()));
         else
-            this->emplace_with_backup(
-                    static_cast<const variant_base<U...> &>(v));
+            emplace_with_backup(v);
         return *this;
     }
 
@@ -755,11 +726,11 @@ public:
     template<typename... U>
     variant &operator=(variant<U...> &&v)
             noexcept(variant<U...>::is_nothrow_move_assignable &&
-                    variant::is_nothrow_move_constructible) {
-        if (this->tag() == typename base::tag_type(v.tag()))
-            std::move(v).apply(typename base::assigner(this->value()));
+                    is_nothrow_move_constructible) {
+        if (tag() == tag_type(v.tag()))
+            std::move(v).apply(assigner(value()));
         else
-            this->emplace_with_backup(static_cast<variant_base<U...> &&>(v));
+            emplace_with_backup(std::move(v));
         return *this;
     }
 
@@ -773,13 +744,13 @@ public:
      * Requirements: All the contained types must be swappable, no-throw
      * move-constructible.
      */
-    void swap(variant &other) noexcept(variant::is_nothrow_swappable) {
-        if (this->tag() == other.tag())
-            return this->apply(swap_impl::swapper<variant<T...>>(other));
+    void swap(variant &other) noexcept(is_nothrow_swappable) {
+        if (tag() == other.tag())
+            return apply(swap_impl::swapper<variant<T...>>(other));
 
         assert(this != &other);
 
-        variant<T...> temporary(std::move(*this));
+        variant temporary(std::move(*this));
         this->emplace(std::move(other));
         other.emplace(std::move(temporary));
     }
@@ -797,7 +768,7 @@ public:
             typename F,
             typename R = typename partial_common_result<F, const T &...>::type>
     constexpr R flat_map(F &&f) const & {
-        return this->apply(mapper<F, R>(std::forward<F>(f)));
+        return apply(mapper<F, R>(std::forward<F>(f)));
     }
 
     /**
@@ -830,7 +801,7 @@ public:
             typename R = variant<typename std::decay<typename std::result_of<
                     map_result<F>(const T &)>::type>::type...>>
     constexpr R map(F &&f) const & {
-        return this->apply(mapper<F, R>(std::forward<F>(f)));
+        return apply(mapper<F, R>(std::forward<F>(f)));
     }
 
     /**
