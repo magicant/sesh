@@ -141,6 +141,8 @@ public:
 
 }; // template<typename F> class map_result
 
+} // namespace variant_impl
+
 /**
  * A variant object contains exactly one object of one of the parameter types.
  * For example, an object of <code>variant&lt;int, double></code> contains
@@ -194,7 +196,8 @@ public:
             for_all<std::is_nothrow_move_assignable<T>::value...>::value &&
             is_nothrow_move_constructible;
     constexpr static bool is_nothrow_swappable =
-            for_all<swap_impl::is_nothrow_swappable<T>::value...>::value &&
+            for_all<variant_impl::swap_impl::is_nothrow_swappable<T>::value...
+                    >::value &&
             is_nothrow_move_constructible;
 
     /** Returns the integral value that identifies the parameter type. */
@@ -737,8 +740,9 @@ public:
      * move-constructible.
      */
     void swap(variant &other) noexcept(is_nothrow_swappable) {
+        using S = variant_impl::swap_impl::swapper<variant<T...>>;
         if (tag() == other.tag())
-            return apply(swap_impl::swapper<variant<T...>>(other));
+            return apply(S(other));
 
         assert(this != &other);
 
@@ -760,7 +764,8 @@ public:
             typename F,
             typename R = typename partial_common_result<F, const T &...>::type>
     constexpr R flat_map(F &&f) const & {
-        return apply(mapper<F, R>(std::forward<F>(f)));
+        using M = variant_impl::mapper<F, R>;
+        return apply(M(std::forward<F>(f)));
     }
 
     /**
@@ -776,7 +781,8 @@ public:
             typename F,
             typename R = typename partial_common_result<F, T &&...>::type>
     /* constexpr */ R flat_map(F &&f) && {
-        return std::move(*this).apply(mapper<F, R>(std::forward<F>(f)));
+        using M = variant_impl::mapper<F, R>;
+        return std::move(*this).apply(M(std::forward<F>(f)));
     }
 
     /**
@@ -791,9 +797,10 @@ public:
     template<
             typename F,
             typename R = variant<typename std::decay<typename std::result_of<
-                    map_result<F>(const T &)>::type>::type...>>
+                    variant_impl::map_result<F>(const T &)>::type>::type...>>
     constexpr R map(F &&f) const & {
-        return apply(mapper<F, R>(std::forward<F>(f)));
+        using M = variant_impl::mapper<F, R>;
+        return apply(M(std::forward<F>(f)));
     }
 
     /**
@@ -808,9 +815,10 @@ public:
     template<
             typename F,
             typename R = variant<typename std::decay<typename std::result_of<
-                    map_result<F>(T &&)>::type>::type...>>
+                    variant_impl::map_result<F>(T &&)>::type>::type...>>
     /* constexpr */ R map(F &&f) && {
-        return std::move(*this).apply(mapper<F, R>(std::forward<F>(f)));
+        using M = variant_impl::mapper<F, R>;
+        return std::move(*this).apply(M(std::forward<F>(f)));
     }
 
     /**
@@ -878,6 +886,8 @@ void swap(variant<T...> &a, variant<T...> &b)
     a.swap(b);
 }
 
+namespace variant_impl {
+
 template<template<typename> class C, typename... T>
 class comparator {
 
@@ -897,10 +907,13 @@ public:
 
 }; // template<template<typename> typename C, typename... T> class comparator
 
+} // namespace variant_impl
+
 /** Checks if two variants have the same indexes and equal values. */
 template<typename... T>
 constexpr bool operator==(const variant<T...> &l, const variant<T...> &r) {
-    return l.tag() == r.tag() && l.apply(comparator<std::equal_to, T...>(r));
+    return l.tag() == r.tag() &&
+            l.apply(variant_impl::comparator<std::equal_to, T...>(r));
 }
 
 /**
@@ -913,13 +926,9 @@ constexpr bool operator==(const variant<T...> &l, const variant<T...> &r) {
 template<typename... T>
 constexpr bool operator<(const variant<T...> &l, const variant<T...> &r) {
     return l.tag() == r.tag() ?
-            l.apply(comparator<std::less, T...>(r)) :
+            l.apply(variant_impl::comparator<std::less, T...>(r)) :
             l.tag() < r.tag();
 }
-
-} // namespace variant_impl
-
-using variant_impl::variant;
 
 } // namespace common
 } // namespace sesh
