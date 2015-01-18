@@ -39,14 +39,6 @@ namespace common {
 
 namespace variant_impl {
 
-/**
- * Defined to be (a subclass of) std::true_type or std::false_type depending on
- * the template parameter types. The Boolean will be true if and only if
- * @c T is the same type as one (or more) of <code>U</code>s.
- */
-template<typename T, typename... U>
-class is_any_of : public for_any<std::is_same<T, U>::value...> { };
-
 namespace swap_impl {
 
 using std::swap;
