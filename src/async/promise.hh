@@ -27,7 +27,7 @@
 #include "async/delay_holder.hh"
 #include "common/copy.hh"
 #include "common/direct_initialize.hh"
-#include "common/functional_initialize.hh"
+#include "common/function_helper.hh"
 #include "common/type_tag.hh"
 
 namespace sesh {
@@ -79,27 +79,6 @@ public:
     }
 
     /**
-     * Sets the result of the associated future to the result of the argument
-     * function, which must be callable with no arguments and return a value of
-     * T. If the function throws, the result is set to the exception thrown.
-     * After the result is set, this promise will have no associated future.
-     *
-     * The behavior is undefined if this promise has no associated future.
-     *
-     * @return Continuation that must be resumed immediately after returning
-     * from this function. Note that the continuation destructor automatically
-     * resumes it so normally you can simply ignore the return value. If the
-     * callback has already been set to the associated future, the continuation
-     * calls the callback passing the result to it. Otherwise, the continuation
-     * is a nop.
-     */
-    template<typename F>
-    continuation set_result_from(F &&f) && {
-        return common::copy(std::move(*this)).delay().set_result(
-                common::functional_initialize(), std::forward<F>(f));
-    }
-
-    /**
      * Sets the result of the associated future to the given exception. After
      * the result is set, this promise will have no associated future.
      *
@@ -133,6 +112,31 @@ public:
      */
     continuation fail_with_current_exception() && {
         return std::move(*this).fail(std::current_exception());
+    }
+
+    /**
+     * Sets the result of the associated future to the result of the argument
+     * function, which must be callable with no arguments and return a value of
+     * T. If the function throws, the result is set to the exception thrown.
+     * After the result is set, this promise will have no associated future.
+     *
+     * The behavior is undefined if this promise has no associated future.
+     *
+     * @return Continuation that must be resumed immediately after returning
+     * from this function. Note that the continuation destructor automatically
+     * resumes it so normally you can simply ignore the return value. If the
+     * callback has already been set to the associated future, the continuation
+     * calls the callback passing the result to it. Otherwise, the continuation
+     * is a nop.
+     */
+    template<typename F>
+    continuation set_result_from(F &&f) && {
+        try {
+            return std::move(*this).set_result(
+                    common::invoke(std::forward<F>(f)));
+        } catch (...) {
+            return std::move(*this).fail_with_current_exception();
+        }
     }
 
 }; // template<typename T> class promise

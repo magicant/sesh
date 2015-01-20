@@ -242,6 +242,32 @@ class partial_common_result :
         public function_helper_impl::partial_common_result<
                 common_result<Function>, Argument...> { };
 
+/** Function object that performs {@code std::move_if_noexcept}. */
+class move_if_noexcept {
+
+public:
+
+    template<typename V>
+    constexpr auto operator()(V &v) const noexcept
+            -> decltype(std::move_if_noexcept(v)) {
+        return std::move_if_noexcept(v);
+    }
+
+}; // class move_if_noexcept
+
+/** Function object that destructs the argument. */
+class destructor {
+
+public:
+
+    /** Destructs the argument, which must be no-throw destructible. */
+    template<typename V>
+    void operator()(V &v) const noexcept {
+        v.~V();
+    }
+
+}; // class destructor
+
 } // namespace common
 } // namespace sesh
 

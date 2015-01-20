@@ -24,6 +24,8 @@
 #include <type_traits>
 #include <utility>
 #include "common/function_helper.hh"
+#include "common/logic_helper.hh"
+#include "helpermacros.h"
 
 namespace sesh {
 namespace common {
@@ -330,26 +332,644 @@ public:
      */
     template<typename F>
     constexpr auto apply(F &&f) const
-            noexcept(
-                noexcept(std::declval<F>()(std::declval<type_tag<T1>>())) &&
-                noexcept(std::declval<type_tag<T2, TN...>>().apply(
-                    std::declval<F>())))
-            -> decltype(std::declval<F>()(std::declval<type_tag<T1>>())) {
-        static_assert(
-                std::is_same<
-                    decltype(std::declval<F>()(std::declval<type_tag<T1>>())),
-                    decltype(std::declval<F>()(std::declval<type_tag<T2>>()))
-                >::value,
-                "The return types must be the same");
-        using type_tag_2 = type_tag<T2, TN...>;
-        using value_2 = typename type_tag_2::value_type;
-        return m_value == value_type::v0 /* *this == type_tag<T1>() */ ?
-                std::forward<F>(f)(type_tag<T1>()) :
-                type_tag_2(static_cast<value_2>(static_cast<int>(m_value) - 1))
-                    .apply(std::forward<F>(f));
-    }
+            noexcept(for_all<
+                    is_nothrow_callable<F(type_tag<T1>)>::value,
+                    is_nothrow_callable<F(type_tag<T2>)>::value,
+                    is_nothrow_callable<F(type_tag<TN>)>::value...>::value)
+            -> typename common_result<
+                    F, type_tag<T1>, type_tag<T2>, type_tag<TN>...>::type;
 
 }; // class type_tag<T1, T2, TN...>
+
+namespace type_tag_impl {
+
+template<typename T0, typename T1, typename F>
+auto apply(F &&f, type_tag_value<2>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value)
+        -> typename common_result<F, type_tag<T0>, type_tag<T1>>::type {
+    switch (v) {
+    case type_tag_value<2>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<2>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    }
+    UNREACHABLE();
+}
+
+template<typename T0, typename T1, typename T2, typename F>
+auto apply(F &&f, type_tag_value<3>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>>::type {
+    switch (v) {
+    case type_tag_value<3>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<3>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<3>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    }
+    UNREACHABLE();
+}
+
+template<typename T0, typename T1, typename T2, typename T3, typename F>
+auto apply(F &&f, type_tag_value<4>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>
+        >::type {
+    switch (v) {
+    case type_tag_value<4>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<4>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<4>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<4>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename F>
+auto apply(F &&f, type_tag_value<5>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>>::type {
+    switch (v) {
+    case type_tag_value<5>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<5>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<5>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<5>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<5>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename F>
+auto apply(F &&f, type_tag_value<6>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>>::type {
+    switch (v) {
+    case type_tag_value<6>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<6>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<6>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<6>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<6>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<6>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename F>
+auto apply(F &&f, type_tag_value<7>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>>::type {
+    switch (v) {
+    case type_tag_value<7>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<7>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<7>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<7>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<7>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<7>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<7>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename T7, typename F>
+auto apply(F &&f, type_tag_value<8>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value &&
+                is_nothrow_callable<F(type_tag<T7>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>, type_tag<T7>>::type {
+    switch (v) {
+    case type_tag_value<8>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<8>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<8>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<8>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<8>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<8>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<8>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    case type_tag_value<8>::type::v7:
+        return invoke(std::forward<F>(f), type_tag<T7>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename T7, typename T8, typename F>
+auto apply(F &&f, type_tag_value<9>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value &&
+                is_nothrow_callable<F(type_tag<T7>)>::value &&
+                is_nothrow_callable<F(type_tag<T8>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>, type_tag<T7>,
+                type_tag<T8>>::type {
+    switch (v) {
+    case type_tag_value<9>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<9>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<9>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<9>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<9>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<9>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<9>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    case type_tag_value<9>::type::v7:
+        return invoke(std::forward<F>(f), type_tag<T7>());
+    case type_tag_value<9>::type::v8:
+        return invoke(std::forward<F>(f), type_tag<T8>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename T7, typename T8, typename T9,
+        typename F>
+auto apply(F &&f, type_tag_value<10>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value &&
+                is_nothrow_callable<F(type_tag<T7>)>::value &&
+                is_nothrow_callable<F(type_tag<T8>)>::value &&
+                is_nothrow_callable<F(type_tag<T9>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>, type_tag<T7>,
+                type_tag<T8>, type_tag<T9>>::type {
+    switch (v) {
+    case type_tag_value<10>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<10>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<10>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<10>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<10>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<10>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<10>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    case type_tag_value<10>::type::v7:
+        return invoke(std::forward<F>(f), type_tag<T7>());
+    case type_tag_value<10>::type::v8:
+        return invoke(std::forward<F>(f), type_tag<T8>());
+    case type_tag_value<10>::type::v9:
+        return invoke(std::forward<F>(f), type_tag<T9>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename T7, typename T8, typename T9,
+        typename T10, typename F>
+auto apply(F &&f, type_tag_value<11>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value &&
+                is_nothrow_callable<F(type_tag<T7>)>::value &&
+                is_nothrow_callable<F(type_tag<T8>)>::value &&
+                is_nothrow_callable<F(type_tag<T9>)>::value &&
+                is_nothrow_callable<F(type_tag<T10>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>, type_tag<T7>,
+                type_tag<T8>, type_tag<T9>, type_tag<T10>>::type {
+    switch (v) {
+    case type_tag_value<11>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<11>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<11>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<11>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<11>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<11>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<11>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    case type_tag_value<11>::type::v7:
+        return invoke(std::forward<F>(f), type_tag<T7>());
+    case type_tag_value<11>::type::v8:
+        return invoke(std::forward<F>(f), type_tag<T8>());
+    case type_tag_value<11>::type::v9:
+        return invoke(std::forward<F>(f), type_tag<T9>());
+    case type_tag_value<11>::type::v10:
+        return invoke(std::forward<F>(f), type_tag<T10>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename T7, typename T8, typename T9,
+        typename T10, typename T11, typename F>
+auto apply(F &&f, type_tag_value<12>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value &&
+                is_nothrow_callable<F(type_tag<T7>)>::value &&
+                is_nothrow_callable<F(type_tag<T8>)>::value &&
+                is_nothrow_callable<F(type_tag<T9>)>::value &&
+                is_nothrow_callable<F(type_tag<T10>)>::value &&
+                is_nothrow_callable<F(type_tag<T11>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>, type_tag<T7>,
+                type_tag<T8>, type_tag<T9>, type_tag<T10>, type_tag<T11>
+                >::type {
+    switch (v) {
+    case type_tag_value<12>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<12>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<12>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<12>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<12>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<12>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<12>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    case type_tag_value<12>::type::v7:
+        return invoke(std::forward<F>(f), type_tag<T7>());
+    case type_tag_value<12>::type::v8:
+        return invoke(std::forward<F>(f), type_tag<T8>());
+    case type_tag_value<12>::type::v9:
+        return invoke(std::forward<F>(f), type_tag<T9>());
+    case type_tag_value<12>::type::v10:
+        return invoke(std::forward<F>(f), type_tag<T10>());
+    case type_tag_value<12>::type::v11:
+        return invoke(std::forward<F>(f), type_tag<T11>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename T7, typename T8, typename T9,
+        typename T10, typename T11, typename T12, typename F>
+auto apply(F &&f, type_tag_value<13>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value &&
+                is_nothrow_callable<F(type_tag<T7>)>::value &&
+                is_nothrow_callable<F(type_tag<T8>)>::value &&
+                is_nothrow_callable<F(type_tag<T9>)>::value &&
+                is_nothrow_callable<F(type_tag<T10>)>::value &&
+                is_nothrow_callable<F(type_tag<T11>)>::value &&
+                is_nothrow_callable<F(type_tag<T12>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>, type_tag<T7>,
+                type_tag<T8>, type_tag<T9>, type_tag<T10>, type_tag<T11>,
+                type_tag<T12>>::type {
+    switch (v) {
+    case type_tag_value<13>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<13>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<13>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<13>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<13>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<13>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<13>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    case type_tag_value<13>::type::v7:
+        return invoke(std::forward<F>(f), type_tag<T7>());
+    case type_tag_value<13>::type::v8:
+        return invoke(std::forward<F>(f), type_tag<T8>());
+    case type_tag_value<13>::type::v9:
+        return invoke(std::forward<F>(f), type_tag<T9>());
+    case type_tag_value<13>::type::v10:
+        return invoke(std::forward<F>(f), type_tag<T10>());
+    case type_tag_value<13>::type::v11:
+        return invoke(std::forward<F>(f), type_tag<T11>());
+    case type_tag_value<13>::type::v12:
+        return invoke(std::forward<F>(f), type_tag<T12>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename T7, typename T8, typename T9,
+        typename T10, typename T11, typename T12, typename T13, typename F>
+auto apply(F &&f, type_tag_value<14>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value &&
+                is_nothrow_callable<F(type_tag<T7>)>::value &&
+                is_nothrow_callable<F(type_tag<T8>)>::value &&
+                is_nothrow_callable<F(type_tag<T9>)>::value &&
+                is_nothrow_callable<F(type_tag<T10>)>::value &&
+                is_nothrow_callable<F(type_tag<T11>)>::value &&
+                is_nothrow_callable<F(type_tag<T12>)>::value &&
+                is_nothrow_callable<F(type_tag<T13>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>, type_tag<T7>,
+                type_tag<T8>, type_tag<T9>, type_tag<T10>, type_tag<T11>,
+                type_tag<T12>, type_tag<T13>>::type {
+    switch (v) {
+    case type_tag_value<14>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<14>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<14>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<14>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<14>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<14>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<14>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    case type_tag_value<14>::type::v7:
+        return invoke(std::forward<F>(f), type_tag<T7>());
+    case type_tag_value<14>::type::v8:
+        return invoke(std::forward<F>(f), type_tag<T8>());
+    case type_tag_value<14>::type::v9:
+        return invoke(std::forward<F>(f), type_tag<T9>());
+    case type_tag_value<14>::type::v10:
+        return invoke(std::forward<F>(f), type_tag<T10>());
+    case type_tag_value<14>::type::v11:
+        return invoke(std::forward<F>(f), type_tag<T11>());
+    case type_tag_value<14>::type::v12:
+        return invoke(std::forward<F>(f), type_tag<T12>());
+    case type_tag_value<14>::type::v13:
+        return invoke(std::forward<F>(f), type_tag<T13>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename T7, typename T8, typename T9,
+        typename T10, typename T11, typename T12, typename T13, typename T14,
+        typename F>
+auto apply(F &&f, type_tag_value<15>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value &&
+                is_nothrow_callable<F(type_tag<T7>)>::value &&
+                is_nothrow_callable<F(type_tag<T8>)>::value &&
+                is_nothrow_callable<F(type_tag<T9>)>::value &&
+                is_nothrow_callable<F(type_tag<T10>)>::value &&
+                is_nothrow_callable<F(type_tag<T11>)>::value &&
+                is_nothrow_callable<F(type_tag<T12>)>::value &&
+                is_nothrow_callable<F(type_tag<T13>)>::value &&
+                is_nothrow_callable<F(type_tag<T14>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>, type_tag<T7>,
+                type_tag<T8>, type_tag<T9>, type_tag<T10>, type_tag<T11>,
+                type_tag<T12>, type_tag<T13>, type_tag<T14>>::type {
+    switch (v) {
+    case type_tag_value<15>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<15>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<15>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<15>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<15>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<15>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<15>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    case type_tag_value<15>::type::v7:
+        return invoke(std::forward<F>(f), type_tag<T7>());
+    case type_tag_value<15>::type::v8:
+        return invoke(std::forward<F>(f), type_tag<T8>());
+    case type_tag_value<15>::type::v9:
+        return invoke(std::forward<F>(f), type_tag<T9>());
+    case type_tag_value<15>::type::v10:
+        return invoke(std::forward<F>(f), type_tag<T10>());
+    case type_tag_value<15>::type::v11:
+        return invoke(std::forward<F>(f), type_tag<T11>());
+    case type_tag_value<15>::type::v12:
+        return invoke(std::forward<F>(f), type_tag<T12>());
+    case type_tag_value<15>::type::v13:
+        return invoke(std::forward<F>(f), type_tag<T13>());
+    case type_tag_value<15>::type::v14:
+        return invoke(std::forward<F>(f), type_tag<T14>());
+    }
+    UNREACHABLE();
+}
+
+template<
+        typename T0, typename T1, typename T2, typename T3, typename T4,
+        typename T5, typename T6, typename T7, typename T8, typename T9,
+        typename T10, typename T11, typename T12, typename T13, typename T14,
+        typename T15, typename F>
+auto apply(F &&f, type_tag_value<16>::type v)
+        noexcept(
+                is_nothrow_callable<F(type_tag<T0>)>::value &&
+                is_nothrow_callable<F(type_tag<T1>)>::value &&
+                is_nothrow_callable<F(type_tag<T2>)>::value &&
+                is_nothrow_callable<F(type_tag<T3>)>::value &&
+                is_nothrow_callable<F(type_tag<T4>)>::value &&
+                is_nothrow_callable<F(type_tag<T5>)>::value &&
+                is_nothrow_callable<F(type_tag<T6>)>::value &&
+                is_nothrow_callable<F(type_tag<T7>)>::value &&
+                is_nothrow_callable<F(type_tag<T8>)>::value &&
+                is_nothrow_callable<F(type_tag<T9>)>::value &&
+                is_nothrow_callable<F(type_tag<T10>)>::value &&
+                is_nothrow_callable<F(type_tag<T11>)>::value &&
+                is_nothrow_callable<F(type_tag<T12>)>::value &&
+                is_nothrow_callable<F(type_tag<T13>)>::value &&
+                is_nothrow_callable<F(type_tag<T14>)>::value &&
+                is_nothrow_callable<F(type_tag<T15>)>::value)
+        -> typename common_result<
+                F, type_tag<T0>, type_tag<T1>, type_tag<T2>, type_tag<T3>,
+                type_tag<T4>, type_tag<T5>, type_tag<T6>, type_tag<T7>,
+                type_tag<T8>, type_tag<T9>, type_tag<T10>, type_tag<T11>,
+                type_tag<T12>, type_tag<T13>, type_tag<T14>, type_tag<T15>
+                >::type {
+    switch (v) {
+    case type_tag_value<16>::type::v0:
+        return invoke(std::forward<F>(f), type_tag<T0>());
+    case type_tag_value<16>::type::v1:
+        return invoke(std::forward<F>(f), type_tag<T1>());
+    case type_tag_value<16>::type::v2:
+        return invoke(std::forward<F>(f), type_tag<T2>());
+    case type_tag_value<16>::type::v3:
+        return invoke(std::forward<F>(f), type_tag<T3>());
+    case type_tag_value<16>::type::v4:
+        return invoke(std::forward<F>(f), type_tag<T4>());
+    case type_tag_value<16>::type::v5:
+        return invoke(std::forward<F>(f), type_tag<T5>());
+    case type_tag_value<16>::type::v6:
+        return invoke(std::forward<F>(f), type_tag<T6>());
+    case type_tag_value<16>::type::v7:
+        return invoke(std::forward<F>(f), type_tag<T7>());
+    case type_tag_value<16>::type::v8:
+        return invoke(std::forward<F>(f), type_tag<T8>());
+    case type_tag_value<16>::type::v9:
+        return invoke(std::forward<F>(f), type_tag<T9>());
+    case type_tag_value<16>::type::v10:
+        return invoke(std::forward<F>(f), type_tag<T10>());
+    case type_tag_value<16>::type::v11:
+        return invoke(std::forward<F>(f), type_tag<T11>());
+    case type_tag_value<16>::type::v12:
+        return invoke(std::forward<F>(f), type_tag<T12>());
+    case type_tag_value<16>::type::v13:
+        return invoke(std::forward<F>(f), type_tag<T13>());
+    case type_tag_value<16>::type::v14:
+        return invoke(std::forward<F>(f), type_tag<T14>());
+    case type_tag_value<16>::type::v15:
+        return invoke(std::forward<F>(f), type_tag<T15>());
+    }
+    UNREACHABLE();
+}
+
+} // namespace type_tag_impl
+
+template<typename T1, typename T2, typename... TN>
+template<typename F>
+constexpr auto type_tag<T1, T2, TN...>::apply(F &&f) const
+        noexcept(for_all<
+                is_nothrow_callable<F(type_tag<T1>)>::value,
+                is_nothrow_callable<F(type_tag<T2>)>::value,
+                is_nothrow_callable<F(type_tag<TN>)>::value...>::value)
+        -> typename common_result<
+                F, type_tag<T1>, type_tag<T2>, type_tag<TN>...>::type {
+    return type_tag_impl::apply<T1, T2, TN...>(std::forward<F>(f), m_value);
+}
 
 template<typename T, typename T1, typename T2, typename... TN>
 constexpr bool operator==(type_tag<T> l, type_tag<T1, T2, TN...> r) noexcept {

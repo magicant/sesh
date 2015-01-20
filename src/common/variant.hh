@@ -30,307 +30,14 @@
 #include <utility>
 #include "common/direct_initialize.hh"
 #include "common/function_helper.hh"
-#include "common/functional_initialize.hh"
 #include "common/logic_helper.hh"
+#include "common/tagged_union.hh"
 #include "common/type_tag.hh"
 
 namespace sesh {
 namespace common {
 
 namespace variant_impl {
-
-/**
- * Defined to be (a subclass of) std::true_type or std::false_type depending on
- * the template parameter types. The Boolean will be true if and only if
- * @c T is the same type as one (or more) of <code>U</code>s.
- */
-template<typename T, typename... U>
-class is_any_of : public for_any<std::is_same<T, U>::value...> { };
-
-class move_if_noexcept { };
-
-/** Contains the value of a variant. */
-template<typename...>
-union value_union;
-
-template<>
-union value_union<> { };
-
-template<typename Head, typename... Tail>
-union value_union<Head, Tail...> {
-
-    static_assert(
-            std::is_same<Head, typename std::decay<Head>::type>::value,
-            "Contained type must be decayed");
-
-private:
-
-    using tail_union = value_union<Tail...>;
-
-    Head m_head;
-    tail_union m_tail;
-
-public:
-
-    /** The constructor does nothing. */
-    value_union() noexcept { }
-
-    /** Union cannot be copied without knowing the current value's type. */
-    value_union(const value_union &) = delete;
-
-    /** Union cannot be moved without knowing the current value's type. */
-    value_union(value_union &&) = delete;
-
-    /**
-     * The destructor does nothing. The active value in this union, if any,
-     * must be explicitly destructed using {@link destructor} before this
-     * destructor is called.
-     */
-    ~value_union() noexcept { }
-
-    /** Union cannot be assigned without knowing the current value's type. */
-    value_union &operator=(const value_union &) = delete;
-
-    /** Union cannot be assigned without knowing the current value's type. */
-    value_union &operator=(value_union &&) = delete;
-
-    /** Returns a reference to the value of type <code>U</code>. */
-    template<typename U>
-    typename std::enable_if<std::is_same<U, Head>::value, U &>::type
-    value() & noexcept {
-        return m_head;
-    }
-
-    /** Returns a reference to the value of type <code>U</code>. */
-    template<typename U>
-    typename std::enable_if<std::is_same<U, Head>::value, const U &>::type
-    value() const & noexcept {
-        return m_head;
-    }
-
-    /** Returns a reference to the value of type <code>U</code>. */
-    template<typename U>
-    typename std::enable_if<std::is_same<U, Head>::value, U &&>::type
-    value() && noexcept {
-        return std::move(m_head);
-    }
-
-    /** Returns a reference to the value of type <code>U</code>. */
-    template<typename U>
-    typename std::enable_if<!std::is_same<U, Head>::value, U &>::type
-    value() & noexcept {
-        return m_tail.template value<U>();
-    }
-
-    /** Returns a reference to the value of type <code>U</code>. */
-    template<typename U>
-    typename std::enable_if<!std::is_same<U, Head>::value, const U &>::type
-    value() const & noexcept {
-        return m_tail.template value<U>();
-    }
-
-    /** Returns a reference to the value of type <code>U</code>. */
-    template<typename U>
-    typename std::enable_if<!std::is_same<U, Head>::value, U &&>::type
-    value() && noexcept {
-        return std::move(m_tail).template value<U>();
-    }
-
-    /**
-     * Constructs the value of type <code>Head</code> using the given
-     * arguments.
-     */
-    template<typename... Arg>
-    // constexpr XXX C++11 7.1.5.4
-    explicit value_union(type_tag<Head>, Arg &&... arg)
-            noexcept(std::is_nothrow_constructible<Head, Arg...>::value) :
-            m_head(std::forward<Arg>(arg)...) { }
-
-    /**
-     * Constructs the value of type <code>U</code> using the given arguments.
-     */
-    template<typename U, typename... Arg>
-    // constexpr XXX C++11 7.1.5.4
-    explicit value_union(type_tag<U> tag, Arg &&... arg)
-            noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
-            m_tail(tag, std::forward<Arg>(arg)...) { }
-
-    /**
-     * Constructs the value by move-constructing the result of the argument
-     * function, which must return (a reference to) an object of type Head.
-     */
-    template<typename F>
-    // constexpr XXX C++11 7.1.5.4
-    explicit value_union(functional_initialize, type_tag<Head>, F &&f)
-            noexcept(noexcept(std::declval<F>()()) &&
-                    std::is_nothrow_constructible<
-                        Head, typename std::result_of<F()>::type>::value) :
-            m_head(std::forward<F>(f)()) { }
-
-    /**
-     * Constructs the value by move-constructing the result of the argument
-     * function, which must return (a reference to) a value of one of the types
-     * that may be contained in this union.
-     */
-    template<typename U, typename F>
-    // constexpr XXX C++11 7.1.5.4
-    explicit value_union(functional_initialize fi, type_tag<U> tag, F &&f)
-            noexcept(std::is_nothrow_constructible<
-                tail_union, functional_initialize, type_tag<U>, F &&>::value) :
-            m_tail(fi, tag, std::forward<F>(f)) { }
-
-};
-
-template<typename T, typename U>
-using copy_reference = typename std::conditional<
-        std::is_lvalue_reference<T>::value, U &, U &&>::type;
-
-/** A visitor on the type tag which forwards to a visitor on the variant. */
-template<typename Union, typename Visitor>
-class applier {
-
-private:
-
-    Union &&m_target;
-    Visitor &&m_visitor;
-
-public:
-
-    constexpr explicit applier(Union &&target, Visitor &&visitor) noexcept :
-            m_target(std::forward<Union>(target)),
-            m_visitor(std::forward<Visitor>(visitor)) { }
-
-    template<typename T, typename R = copy_reference<Union, T>>
-    constexpr auto operator()(type_tag<T>) const
-            noexcept(is_nothrow_callable<Visitor(R)>::value)
-            -> typename std::result_of<Visitor(R)>::type {
-        return invoke(std::forward<Visitor>(m_visitor),
-                std::forward<Union>(m_target).template value<T>());
-    }
-
-}; // template<typename Union> class applier
-
-/** A visitor that constructs a value of a target union. */
-template<typename Union>
-class constructor {
-
-private:
-
-    Union &m_target;
-
-public:
-
-    constexpr explicit constructor(Union &target) noexcept :
-            m_target(target) { }
-
-    template<
-            typename T,
-            typename V = typename std::remove_const<
-                    typename std::remove_reference<T>::type>::type>
-    void operator()(T &&v) const
-            noexcept(std::is_nothrow_constructible<V, T &&>::value) {
-        new (std::addressof(m_target)) Union(
-                type_tag<V>(), std::forward<T>(v));
-    }
-
-}; // template<typename Union> class constructor
-
-/** A visitor that constructs a value of a target union. */
-template<typename Union>
-class move_if_noexcept_constructor {
-
-private:
-
-    Union &m_target;
-
-public:
-
-    constexpr explicit move_if_noexcept_constructor(Union &target) noexcept :
-            m_target(target) { }
-
-    template<typename T>
-    void operator()(T &v) const
-            noexcept(std::is_nothrow_move_constructible<T>::value) {
-        new (std::addressof(m_target)) Union(
-                type_tag<T>(), std::move_if_noexcept(v));
-    }
-
-}; // template<typename Union> class move_if_noexcept_constructor
-
-/** A visitor that assigns a value to a target union. */
-template<typename Union>
-class assigner {
-
-private:
-
-    Union &m_target;
-
-public:
-
-    constexpr explicit assigner(Union &target) noexcept : m_target(target) { }
-
-    template<
-            typename T,
-            typename V = typename std::remove_const<
-                    typename std::remove_reference<T>::type>::type>
-    void operator()(T &&v) const
-            noexcept(std::is_nothrow_assignable<V &, T &&>::value) {
-        m_target.template value<V>() = std::forward<T>(v);
-    }
-
-}; // template<typename Union> class assigner
-
-/** A visitor that destructs a union value. */
-class destructor {
-
-public:
-
-    template<typename V>
-    void operator()(V &v) const
-            noexcept(std::is_nothrow_destructible<V>::value) {
-        v.~V();
-    }
-
-}; // class destructor
-
-namespace {
-
-/** A helper function that constructs an applier. */
-template<typename Union, typename Visitor>
-applier<Union, Visitor> make_applier(Union &&u, Visitor &&v) noexcept {
-    return applier<Union, Visitor>(
-            std::forward<Union>(u), std::forward<Visitor>(v));
-}
-
-/** A helper function that constructs a constructor. */
-template<typename Union>
-constructor<Union> make_constructor(Union &target) noexcept {
-    return constructor<Union>(target);
-}
-
-template<typename Union>
-move_if_noexcept_constructor<Union>
-make_move_if_noexcept_constructor(Union &target) noexcept {
-    return move_if_noexcept_constructor<Union>(target);
-}
-
-/** A helper function that constructs an assigner. */
-template<typename Union>
-assigner<Union> make_assigner(Union &target) noexcept {
-    return assigner<Union>(target);
-}
-
-/**
- * Re-constructs the pointed-to object by forwarding the argument to the
- * constructor. This function assumes the constructor never throws. If the
- * constructor did throw something at runtime, std::terminate is called.
- */
-template<typename T, typename... Arg>
-void reconstruct_or_terminate(T *t, Arg &&... arg) noexcept {
-    new (t) T(std::forward<Arg>(arg)...);
-}
-
-} // namespace
 
 namespace swap_impl {
 
@@ -434,35 +141,45 @@ public:
 
 }; // template<typename F> class map_result
 
-/** Fundamental implementation of variant. */
-template<typename... T>
-class variant_base : private type_tag<T...> {
+} // namespace variant_impl
 
-    /*
-     * The type tag sub-object is contained as a base class object rather than
-     * a non-static data member to allow empty base optimization.
-     */
+/**
+ * A variant object contains exactly one object of one of the parameter types.
+ * For example, an object of <code>variant&lt;int, double></code> contains
+ * either an integer or double value.
+ *
+ * The parameter types are usually different from each other. It is allowed to
+ * create a variant that has the same parameter types such as
+ * <code>variant&lt;int, int></code>, but those types are indistinguishable
+ * from outside of the variant object.
+ *
+ * @tparam T Types of values that may be contained in the variant. They all
+ * must be no-throw destructible and decayed.
+ */
+template<typename... T>
+class variant {
 
 public:
+
+    /** Internal type to contain the variant value. */
+    using value_type = tagged_union<T...>;
 
     /**
      * The type of the type tag which specifies the type of the contained
      * value.
      */
-    using tag_type = type_tag<T...>;
+    using tag_type = typename value_type::tag_type;
 
 private:
 
-    using value_type = value_union<T...>;
-
     value_type m_value;
 
-protected:
-
-    value_type &value() noexcept { return m_value; }
-    const value_type &value() const noexcept { return m_value; }
-
 public:
+
+    /** Returns the reference to the internal tagged union. */
+    value_type &value() noexcept { return m_value; }
+    /** Returns the reference to the internal tagged union. */
+    const value_type &value() const noexcept { return m_value; }
 
     /** The nth type of the contained types. */
     template<std::size_t n>
@@ -472,20 +189,16 @@ public:
             for_all<std::is_nothrow_copy_constructible<T>::value...>::value;
     constexpr static bool is_nothrow_move_constructible =
             for_all<std::is_nothrow_move_constructible<T>::value...>::value;
-    constexpr static bool is_nothrow_destructible =
-            for_all<std::is_nothrow_destructible<T>::value...>::value;
     constexpr static bool is_nothrow_copy_assignable =
             for_all<std::is_nothrow_copy_assignable<T>::value...>::value &&
-            is_nothrow_copy_constructible &&
-            is_nothrow_destructible;
+            is_nothrow_copy_constructible;
     constexpr static bool is_nothrow_move_assignable =
             for_all<std::is_nothrow_move_assignable<T>::value...>::value &&
-            is_nothrow_move_constructible &&
-            is_nothrow_destructible;
+            is_nothrow_move_constructible;
     constexpr static bool is_nothrow_swappable =
-            for_all<swap_impl::is_nothrow_swappable<T>::value...>::value &&
-            is_nothrow_move_constructible &&
-            is_nothrow_destructible;
+            for_all<variant_impl::swap_impl::is_nothrow_swappable<T>::value...
+                    >::value &&
+            is_nothrow_move_constructible;
 
     /** Returns the integral value that identifies the parameter type. */
     template<typename U>
@@ -497,24 +210,23 @@ public:
      * Returns an integral value that identifies the type of the currently
      * contained value.
      */
-    tag_type tag() const noexcept { return *this; }
+    tag_type tag() const noexcept { return m_value.tag(); }
 
     /**
-     * Creates a new variant by constructing its contained value by calling the
-     * constructor of <code>U</code> with forwarded arguments.
+     * Creates a new variant by calling the constructor of the backing tagged
+     * union with the arguments forwarded to it.
      *
      * Throws any exception thrown by the constructor.
      *
-     * @tparam U the type of the new contained value to be constructed.
-     *     (inferred from the type of type tag argument.)
-     * @tparam Arg the type of the constructor's arguments.
-     * @param tag a dummy object to select the type of the contained value.
-     * @param arg the arguments forwarded to the constructor.
+     * @param h First argument forwarded to the tagged union constructor.
+     * @param t Other arguments forwarded to the tagged union constructor.
+     * @see tagged_union
      */
-    template<typename U, typename... Arg>
-    explicit variant_base(direct_initialize, type_tag<U> tag, Arg &&... arg)
-            noexcept(std::is_nothrow_constructible<U, Arg...>::value) :
-            tag_type(tag), m_value(tag, std::forward<Arg>(arg)...) { }
+    template<typename Head, typename... Tail>
+    variant(direct_initialize, Head &&h, Tail &&... t)
+            noexcept(std::is_nothrow_constructible<
+                    value_type, Head, Tail...>::value) :
+            m_value(std::forward<Head>(h), std::forward<Tail>(t)...) { }
 
     /**
      * Creates a new variant by copy- or move-constructing its contained value
@@ -534,50 +246,93 @@ public:
                     std::is_constructible<V, U>::value>::type,
             typename = typename std::enable_if<
                     is_any_of<V, T...>::value>::type>
-    variant_base(U &&v)
+    variant(U &&v)
             noexcept(std::is_nothrow_constructible<V, U &&>::value) :
-            variant_base(
-                    direct_initialize(), type_tag<V>(), std::forward<U>(v)) { }
+            variant(direct_initialize(), type_tag<V>(), std::forward<U>(v)) { }
 
     /**
-     * Creates a new variant by move-constructing its contained value from the
-     * result of calling the argument function.
+     * Copy constructor.
      *
-     * Throws any exception thrown by the argument function or constructor.
+     * The copy constructor of the currently contained type in the argument is
+     * used to initialize the value of the new variant.
      *
-     * @tparam U the type of the new contained value to be constructed.
-     * @tparam F the type of the function argument.
-     * @param fi a dummy argument to disambiguate overload resolution.
-     * @param tag a dummy object to select the type of the contained value.
-     * @param f the function that constructs the new contained value.
+     * Propagates any exception thrown by the constructor.
+     *
+     * Requirements: All the contained types must be copy-constructible.
      */
-    template<typename U, typename F>
-    variant_base(functional_initialize fi, type_tag<U> tag, F &&f)
-            noexcept(std::is_nothrow_constructible<
-                value_type, functional_initialize, type_tag<U>, F &&>::value) :
-            tag_type(tag), m_value(fi, tag, std::forward<F>(f)) { }
+    variant(const variant &v) = default;
 
     /**
-     * Creates a new variant by move-constructing its contained value from the
-     * result of calling the argument function.
+     * Widening copy constructor.
      *
-     * Throws any exception thrown by the argument function or constructor.
+     * The copy constructor of the currently contained type in the argument is
+     * used to initialize the value of the new variant.
      *
-     * @tparam F the type of the function argument.
-     * @tparam U the type of the new contained value to be constructed.
-     *     (inferred from the return type of the argument function.)
-     * @param fi a dummy argument for overload resolution disambiguation.
-     * @param f the function that constructs the new contained value.
+     * Propagates any exception thrown by the constructor.
+     *
+     * @tparam U Types that may be contained in the argument variant. All
+     * <code>U</code>s must be contained in <code>T</code>s and
+     * copy-constructible.
      */
-    template<
-            typename F,
-            typename U = typename std::decay<
-                    typename std::result_of<F()>::type>::type>
-    variant_base(functional_initialize fi, F &&f)
-            noexcept(std::is_nothrow_constructible<
-                    variant_base, functional_initialize, type_tag<U>, F &&>
-                    ::value) :
-            variant_base(fi, type_tag<U>(), std::forward<F>(f)) { }
+    template<typename... U>
+    variant(const variant<U...> &v)
+            noexcept(variant<U...>::is_nothrow_copy_constructible) :
+            variant(direct_initialize(), v.value()) { }
+
+    /**
+     * Move constructor.
+     *
+     * The move (or copy) constructor of the currently contained type in the
+     * argument is used to initialize the value of the new variant.
+     *
+     * Propagates any exception thrown by the constructor.
+     *
+     * Requirements: All the contained types must be move-constructible.
+     */
+    variant(variant &&v) = default;
+
+    /**
+     * Widening move constructor.
+     *
+     * The move (or copy) constructor of the currently contained type in the
+     * argument is used to initialize the value of the new variant.
+     *
+     * Propagates any exception thrown by the constructor.
+     *
+     * @tparam U Types that may be contained in the argument variant. All
+     * <code>U</code>s must be contained in <code>T</code>s and
+     * move-constructible.
+     */
+    template<typename... U>
+    variant(variant<U...> &&v)
+            noexcept(variant<U...>::is_nothrow_move_constructible) :
+            variant(direct_initialize(), std::move(v.value())) { }
+
+    /**
+     * Widening move-if-noexcept constructor.
+     *
+     * The move (or copy) constructor of the currently contained type in the
+     * argument is used to initialize the value of the new variant. If the
+     * value has a never-throwing move constructor or no copy constructor, the
+     * value is move-constructed. Otherwise, it is copy-constructed.
+     *
+     * Propagates any exception thrown by the constructor.
+     *
+     * @tparam U Types that may be contained in the argument variant. All
+     * <code>U</code>s must be contained in <code>T</code>s and
+     * move-constructible.
+     */
+    template<typename... U>
+    variant(move_if_noexcept min, variant<U...> &v)
+            noexcept(variant<U...>::is_nothrow_move_constructible) :
+            m_value(min, v.value()) { }
+
+    /**
+     * Destructor.
+     *
+     * Calls the currently contained value's destructor.
+     */
+    ~variant() = default;
 
     /**
      * Returns a reference to the value of the template parameter type.
@@ -588,7 +343,6 @@ public:
      */
     template<typename U>
     U &value() & noexcept {
-        assert(tag() == tag<U>());
         return m_value.template value<U>();
     }
 
@@ -601,7 +355,6 @@ public:
      */
     template<typename U>
     const U &value() const & noexcept {
-        assert(tag() == tag<U>());
         return m_value.template value<U>();
     }
 
@@ -614,7 +367,6 @@ public:
      */
     template<typename U>
     U &&value() && noexcept {
-        assert(tag() == tag<U>());
         return std::move(m_value.template value<U>());
     }
 
@@ -636,11 +388,10 @@ public:
      */
     template<typename Visitor>
     auto apply(Visitor &&visitor) &
-            noexcept(noexcept(std::declval<tag_type &>().apply(
-                    std::declval<applier<value_type &, Visitor>>())))
+            noexcept(noexcept(std::declval<value_type &>().apply(
+                    std::declval<Visitor>())))
             -> typename common_result<Visitor, T &...>::type {
-        return tag_type::apply(make_applier(
-                    value(), std::forward<Visitor>(visitor)));
+        return m_value.apply(std::forward<Visitor>(visitor));
     }
 
     /**
@@ -662,11 +413,10 @@ public:
      */
     template<typename Visitor>
     auto apply(Visitor &&visitor) const &
-            noexcept(noexcept(std::declval<const tag_type &>().apply(
-                    std::declval<applier<const value_type &, Visitor>>())))
+            noexcept(noexcept(std::declval<const value_type &>().apply(
+                    std::declval<Visitor>())))
             -> typename common_result<Visitor, const T &...>::type {
-        return tag_type::apply(make_applier(
-                    value(), std::forward<Visitor>(visitor)));
+        return m_value.apply(std::forward<Visitor>(visitor));
     }
 
     /**
@@ -687,113 +437,64 @@ public:
      */
     template<typename Visitor>
     auto apply(Visitor &&visitor) &&
-            noexcept(noexcept(std::declval<tag_type &>().apply(
-                    std::declval<applier<value_type, Visitor>>())))
+            noexcept(noexcept(std::declval<value_type &&>().apply(
+                    std::declval<Visitor>())))
             -> typename common_result<Visitor, T &&...>::type {
-        return tag_type::apply(make_applier(
-                    std::move(value()), std::forward<Visitor>(visitor)));
+        return std::move(m_value).apply(std::forward<Visitor>(visitor));
     }
 
-    /**
-     * Destructor.
-     *
-     * Calls the currently contained value's destructor.
-     *
-     * Propagates any exception thrown by the destructor.
+private:
+
+    /*
+     * Lverloads of construct_value have the same signatures as that of the
+     * variant constructor.
      */
-    ~variant_base() noexcept(is_nothrow_destructible) {
-        apply(destructor());
+
+    template<typename Head, typename... Tail>
+    void construct_value(direct_initialize, Head &&h, Tail &&... t)
+            noexcept(std::is_nothrow_constructible<
+                    value_type, Head, Tail...>::value) {
+        new (&m_value) value_type(
+                std::forward<Head>(h), std::forward<Tail>(t)...);
     }
 
-    /**
-     * Copy constructor.
-     *
-     * The copy constructor of the currently contained type in the argument is
-     * used to initialize the value of the new variant.
-     *
-     * Propagates any exception thrown by the constructor.
-     *
-     * Requirements: All the contained types must be copy-constructible.
-     */
-    variant_base(const variant_base &v)
-            noexcept(is_nothrow_copy_constructible) :
-            tag_type(v.tag()) {
-        v.apply(make_constructor(value()));
+    template<
+            typename U,
+            typename V = typename std::decay<U>::type,
+            typename = typename std::enable_if<
+                    std::is_constructible<V, U>::value>::type,
+            typename = typename std::enable_if<
+                    is_any_of<V, T...>::value>::type>
+    void construct_value(U &&v)
+            noexcept(std::is_nothrow_constructible<V, U &&>::value) {
+        return construct_value(
+                direct_initialize(), type_tag<V>(), std::forward<U>(v));
     }
 
-    /**
-     * Widening copy constructor.
-     *
-     * The copy constructor of the currently contained type in the argument is
-     * used to initialize the value of the new variant.
-     *
-     * Propagates any exception thrown by the constructor.
-     *
-     * @tparam U Types that may be contained in the argument variant. All
-     * <code>U</code>s must be contained in <code>T</code>s and
-     * copy-constructible.
-     */
     template<typename... U>
-    variant_base(const variant_base<U...> &v)
-            noexcept(variant_base<U...>::is_nothrow_copy_constructible) :
-            tag_type(v.tag()) {
-        v.apply(make_constructor(value()));
+    void construct_value(const variant<U...> &v)
+            noexcept(variant<U...>::is_nothrow_copy_constructible) {
+        return construct_value(direct_initialize(), v.value());
     }
 
-    /**
-     * Move constructor.
-     *
-     * The move (or copy) constructor of the currently contained type in the
-     * argument is used to initialize the value of the new variant.
-     *
-     * Propagates any exception thrown by the constructor.
-     *
-     * Requirements: All the contained types must be move-constructible.
-     */
-    variant_base(variant_base &&v) noexcept(is_nothrow_move_constructible) :
-            tag_type(v.tag()) {
-        std::move(v).apply(make_constructor(value()));
-    }
-
-    /**
-     * Widening move constructor.
-     *
-     * The move (or copy) constructor of the currently contained type in the
-     * argument is used to initialize the value of the new variant.
-     *
-     * Propagates any exception thrown by the constructor.
-     *
-     * @tparam U Types that may be contained in the argument variant. All
-     * <code>U</code>s must be contained in <code>T</code>s and
-     * move-constructible.
-     */
     template<typename... U>
-    variant_base(variant_base<U...> &&v)
-            noexcept(variant_base<U...>::is_nothrow_move_constructible) :
-            tag_type(v.tag()) {
-        std::move(v).apply(make_constructor(this->value()));
+    void construct_value(variant<U...> &&v)
+            noexcept(variant<U...>::is_nothrow_move_constructible) {
+        return construct_value(direct_initialize(), std::move(v.value()));
     }
 
-    /**
-     * Widening move-if-noexcept constructor.
-     *
-     * The move (or copy) constructor of the currently contained type in the
-     * argument is used to initialize the value of the new variant. If the
-     * value has a never-throwing move constructor or no copy constructor, the
-     * value is move-constructed. Otherwise, it is copy-constructed.
-     *
-     * Propagates any exception thrown by the constructor.
-     *
-     * @tparam U Types that may be contained in the argument variant. All
-     * <code>U</code>s must be contained in <code>T</code>s and
-     * move-constructible.
-     */
     template<typename... U>
-    variant_base(move_if_noexcept, variant_base<U...> &v)
-            noexcept(variant_base<U...>::is_nothrow_move_constructible) :
-            tag_type(v.tag()) {
-        v.apply(make_move_if_noexcept_constructor(value()));
+    void construct_value(move_if_noexcept min, variant<U...> &v)
+            noexcept(variant<U...>::is_nothrow_move_constructible) {
+        new (&m_value) value_type(min, v.value());
     }
+
+    template<typename... Arg>
+    void construct_value_or_terminate(Arg &&... a) noexcept {
+        return construct_value(std::forward<Arg>(a)...);
+    }
+
+public:
 
     /**
      * Destructs the currently contained value and creates a new contained
@@ -801,18 +502,16 @@ public:
      * arguments.
      *
      * To ensure that a valid object is contained after return from this
-     * function, nothing must be thrown by the destructor that destructs the
-     * currently contained value or the constructor of the new value. If
+     * function, nothing must be thrown by the constructor of the new value. If
      * something is thrown at runtime, std::terminate is called.
      *
      * @see #emplace_with_fallback
      * @see #emplace_with_backup
-     * @see #reset
      */
     template<typename... Arg>
     void emplace(Arg &&... arg) noexcept {
-        this->~variant_base();
-        new (this) variant_base(std::forward<Arg>(arg)...);
+        m_value.~value_type();
+        construct_value(std::forward<Arg>(arg)...);
     }
 
     /**
@@ -820,22 +519,22 @@ public:
      * value by calling the constructor of this variant again with the given
      * arguments.
      *
-     * If the destructor or constructor threw something, the default
-     * constructor of <code>Fallback</code> is called as a fallback and the
-     * exception is re-thrown. If the <code>Fallback</code> default constructor
-     * threw again, std::terminate is called.
+     * If the constructor threw something, the default constructor of @c
+     * Fallback is called as a fallback and the exception is re-thrown. If the
+     * @c Fallback default constructor threw again, std::terminate is called.
+     *
+     * Requirements: @c Fallback must be default-constructible.
      */
     template<typename Fallback, typename... Arg>
     void emplace_with_fallback(Arg &&... arg)
-            noexcept(is_nothrow_destructible &&
-                std::is_nothrow_constructible<variant_base, Arg &&...>::value)
+            noexcept(std::is_nothrow_constructible<variant, Arg &&...>::value)
     {
         try {
-            this->~variant_base();
-            new (this) variant_base(std::forward<Arg>(arg)...);
+            m_value.~value_type();
+            construct_value(std::forward<Arg>(arg)...);
         } catch (...) {
-            reconstruct_or_terminate(
-                    this, direct_initialize(), type_tag<Fallback>());
+            construct_value_or_terminate(
+                    direct_initialize(), type_tag<Fallback>());
             throw;
         }
     }
@@ -845,15 +544,12 @@ public:
      * value by calling the constructor of this variant again with the given
      * arguments.
      *
-     * This overload is selected if the destructor and constructor are
-     * guaranteed never to throw. This overload is equivalent to {@link
-     * #emplace}.
+     * This overload is selected if the constructor is guaranteed never to
+     * throw. This overload is equivalent to {@link #emplace}.
      */
     template<typename... Arg>
     typename std::enable_if<
-            is_nothrow_destructible &&
-            std::is_nothrow_constructible<variant_base, Arg &&...>::value
-    >::type
+            std::is_nothrow_constructible<variant, Arg &&...>::value>::type
     emplace_with_backup(Arg &&... arg) noexcept {
         return emplace(std::forward<Arg>(arg)...);
     }
@@ -863,49 +559,29 @@ public:
      * value by calling the constructor of this variant again with the given
      * arguments.
      *
-     * This overload is selected if the destructor or constructor may throw. In
-     * case they throw something, a temporary backup of the original value is
-     * created before the destruction and construction. If an exception is
-     * thrown from the destructor or constructor, the backup is used to restore
-     * the original value before propagating the exception. If the restoration
-     * again fails with an exception, std::terminate is called. The backup is
-     * created by std::move_if_noexcept.
+     * This overload is selected if the constructor may throw. In case it
+     * should throw something, a temporary backup of the original value is
+     * created before the construction. If an exception is thrown, the backup
+     * is used to restore the original value before propagating the exception.
+     * If the restoration again fails with an exception, std::terminate is
+     * called. The backup is created by std::move_if_noexcept and restored by
+     * move-construction.
      *
      * Requirements: All the contained types must be move-constructible.
      */
     template<typename... Arg>
     typename std::enable_if<
-            !is_nothrow_destructible ||
-            !std::is_nothrow_constructible<variant_base, Arg &&...>::value
-    >::type
+            !std::is_nothrow_constructible<variant, Arg &&...>::value>::type
     emplace_with_backup(Arg &&... arg) {
-        variant_base backup(move_if_noexcept(), *this);
+        value_type backup(move_if_noexcept(), m_value);
         try {
-            this->~variant_base();
-            new (this) variant_base(std::forward<Arg>(arg)...);
+            m_value.~value_type();
+            construct_value(std::forward<Arg>(arg)...);
         } catch (...) {
-            reconstruct_or_terminate(this, std::move(backup));
+            construct_value_or_terminate(
+                    direct_initialize(), std::move(backup));
             throw;
         }
-    }
-
-    /**
-     * Sets the value of this variant to the argument by emplacement.
-     *
-     * If emplacement fails due to an exception, std::terminate is called.
-     *
-     * Requirements: The argument type <code>V</code> must be constructible.
-     *
-     * @tparam U the (usually inferred) type of the new contained value.
-     * @tparam V the actual type of the new contained value.
-     * @param v a reference to the original value
-     *
-     * @see #assign
-     * @see #emplace
-     */
-    template<typename U, typename V = typename std::decay<U>::type>
-    void reset(U &&v) noexcept {
-        emplace(direct_initialize(), type_tag<V>(), std::forward<U>(v));
     }
 
     /**
@@ -922,124 +598,86 @@ public:
      * @tparam U the (usually inferred) type of the new contained value.
      * @tparam V the actual type of the new contained value.
      * @param v a reference to the original value
-     *
-     * @see #reset
      */
     template<typename U, typename V = typename std::decay<U>::type>
     void assign(U &&v) noexcept(std::is_nothrow_assignable<V &, U &&>::value) {
         if (tag() == tag<V>())
             value<V>() = std::forward<U>(v);
         else
-            reset(std::forward<U>(v));
+            emplace(std::forward<U>(v));
+    }
+
+protected:
+
+    /** A visitor that assigns a value to the tagged union. */
+    class assigner {
+
+    private:
+
+        value_type &m_target;
+
+    public:
+
+        constexpr explicit assigner(value_type &t) noexcept : m_target(t) { }
+
+        template<typename U, typename V = typename std::decay<U>::type>
+        void operator()(U &&v) const
+                noexcept(std::is_nothrow_assignable<V &, U &&>::value) {
+            m_target.template value<V>() = std::forward<U>(v);
+        }
+
+    }; // class assigner
+
+public:
+
+    /**
+     * Copy assignment operator.
+     *
+     * If the left-hand-side and right-hand-side contain values of the same
+     * type, the value is assigned by its copy assignment operator. Otherwise,
+     * the old value is destructed and the new value is copy-constructed.
+     *
+     * If the copy constructor for the new value may throw, a temporary copy of
+     * the old value is move- or copy-constructed before the destruction so
+     * that, if the constructor for the new value throws, we can restore the
+     * variant to the original value.
+     *
+     * Propagates any exception thrown by the assignment operator or move/copy
+     * constructor.
+     *
+     * Requirements: All the contained types must be copy-constructible and
+     * copy-assignable.
+     */
+    variant &operator=(const variant &v) noexcept(is_nothrow_copy_assignable) {
+        if (tag() == v.tag())
+            v.apply(assigner(value()));
+        else
+            emplace_with_backup(v);
+        return *this;
     }
 
     /**
-     * Assignment from the same type is disabled by default. Implementation
-     * subclasses may have their own assignment operators.
+     * Copy-assigns to this variant.
+     *
+     * This is effectively equivalent to converting the argument from
+     * <code>variant&lt;U...></code> to <code>variant&lt;T...></code> and then
+     * assigning it to this variant with the (non-template) assignment
+     * operator, but this operator template uses less temporary objects.
+     *
+     * @tparam U Types that may be contained in the argument variant. All
+     * <code>U</code>s must be contained in <code>T</code>s and
+     * <code>variant&lt;U...></code> must be copy-assignable.
      */
-    variant_base &operator=(const variant_base &) = delete;
-
-    /**
-     * Assignment from the same type is disabled by default. Implementation
-     * subclasses may have their own assignment operators.
-     */
-    variant_base &operator=(variant_base &&) = delete;
-
-}; // template<typename... T> class variant_base
-
-/** A subclass of variant base that defines no move or copy constructor. */
-template<typename... T>
-class unmovable_variant : public variant_base<T...> {
-
-public:
-
-    using variant_base<T...>::variant_base;
-
-    unmovable_variant(const unmovable_variant &) = delete;
-    unmovable_variant(unmovable_variant &&) = delete;
-    unmovable_variant &operator=(const unmovable_variant &) = delete;
-    unmovable_variant &operator=(unmovable_variant &&) = delete;
-
-}; // template<typename... T> class unmovable_variant
-
-/** A subclass of variant base that defines the move constructor. */
-template<typename... T>
-class move_constructible_variant : public variant_base<T...> {
-
-public:
-
-    using variant_base<T...>::variant_base;
-
-    move_constructible_variant(const move_constructible_variant &) = delete;
-    move_constructible_variant(move_constructible_variant &&) = default;
-    move_constructible_variant &operator=(const move_constructible_variant &) =
-            delete;
-    move_constructible_variant &operator=(move_constructible_variant &&) =
-            delete;
-
-}; // template<typename... T> class move_constructible_variant
-
-/** A subclass of variant base that defines the move and copy constructor. */
-template<typename... T>
-class copy_constructible_variant : public variant_base<T...> {
-
-public:
-
-    using variant_base<T...>::variant_base;
-
-    copy_constructible_variant(const copy_constructible_variant &) = default;
-    copy_constructible_variant(copy_constructible_variant &&) = default;
-    copy_constructible_variant &operator=(const copy_constructible_variant &) =
-            delete;
-    copy_constructible_variant &operator=(copy_constructible_variant &&) =
-            delete;
-
-}; // template<typename... T> class copy_constructible_variant
-
-/**
- * Either unmovable or move-constructible variant class, selected by
- * move-constructibility of contained types.
- */
-template<typename... T>
-using conditionally_move_constructible_variant =
-        typename std::conditional<
-                for_all<std::is_move_constructible<T>::value...>::value,
-                move_constructible_variant<T...>,
-                unmovable_variant<T...>
-        >::type;
-
-/**
- * Either unmovable, move-constructible, or copy-constructible variant class,
- * selected by move- and copy-constructibility of contained types.
- */
-template<typename... T>
-using conditionally_copy_constructible_variant =
-        typename std::conditional<
-                for_all<std::is_copy_constructible<T>::value...>::value,
-                copy_constructible_variant<T...>,
-                conditionally_move_constructible_variant<T...>
-        >::type;
-
-/**
- * A subclass of conditionally copy-constructible variant that re-defines the
- * move assignment operator.
- */
-template<typename... T>
-class move_assignable_variant :
-        public conditionally_copy_constructible_variant<T...> {
-
-private:
-
-    using base = conditionally_copy_constructible_variant<T...>;
-
-public:
-
-    using base::base;
-
-    move_assignable_variant(const move_assignable_variant &) = default;
-    move_assignable_variant(move_assignable_variant &&) = default;
-    move_assignable_variant &operator=(const move_assignable_variant &) =
-            delete;
+    template<typename... U>
+    variant &operator=(const variant<U...> &v)
+            noexcept(variant<U...>::is_nothrow_copy_assignable &&
+                    is_nothrow_move_constructible) {
+        if (tag() == tag_type(v.tag()))
+            v.apply(assigner(value()));
+        else
+            emplace_with_backup(v);
+        return *this;
+    }
 
     /**
      * Move assignment operator.
@@ -1060,153 +698,11 @@ public:
      * Requirements: All the contained types must be move-constructible and
      * move-assignable.
      */
-    move_assignable_variant &operator=(move_assignable_variant &&v)
-            noexcept(base::is_nothrow_move_assignable) {
-        if (this->tag() == v.tag())
-            std::move(v).apply(make_assigner(this->value()));
+    variant &operator=(variant &&v) noexcept(is_nothrow_move_assignable) {
+        if (tag() == v.tag())
+            std::move(v).apply(assigner(value()));
         else
-            this->emplace_with_backup(std::move(v));
-        return *this;
-    }
-
-}; // template<typename... T> class move_assignable_variant
-
-/**
- * Either move-assignable or conditionally copy-constructible variant class,
- * selected by move-constructibility and -assignability.
- */
-template<typename... T>
-using conditionally_move_assignable_variant =
-        typename std::conditional<
-                for_all<std::is_move_constructible<T>::value...>::value &&
-                for_all<std::is_move_assignable<T>::value...>::value,
-                move_assignable_variant<T...>,
-                conditionally_copy_constructible_variant<T...>
-        >::type;
-
-/**
- * A subclass of move-assignable variant that re-defines the copy assignment
- * operator.
- */
-template<typename... T>
-class copy_assignable_variant : public move_assignable_variant<T...> {
-
-private:
-
-    using base = move_assignable_variant<T...>;
-
-public:
-
-    using base::base;
-
-    copy_assignable_variant(const copy_assignable_variant &) = default;
-    copy_assignable_variant(copy_assignable_variant &&) = default;
-    copy_assignable_variant &operator=(copy_assignable_variant &&) = default;
-
-    /**
-     * Copy assignment operator.
-     *
-     * If the left-hand-side and right-hand-side contain values of the same
-     * type, the value is assigned by its copy assignment operator. Otherwise,
-     * the old value is destructed and the new value is copy-constructed.
-     *
-     * If the copy constructor for the new value may throw, a temporary copy of
-     * the old value is move- or copy-constructed before the destruction so
-     * that, if the constructor for the new value throws, we can restore the
-     * variant to the original value.
-     *
-     * Propagates any exception thrown by the assignment operator or move/copy
-     * constructor.
-     *
-     * Requirements: All the contained types must be copy-constructible and
-     * copy-assignable.
-     */
-    copy_assignable_variant &operator=(const copy_assignable_variant &v)
-            noexcept(base::is_nothrow_copy_assignable) {
-        if (this->tag() == v.tag())
-            v.apply(make_assigner(this->value()));
-        else
-            this->emplace_with_backup(v);
-        return *this;
-    }
-
-}; // template<typename... T> class copy_assignable_variant
-
-/**
- * Either copy-assignable or conditionally move-assignable variant class,
- * selected by copy-constructibility and -assignability.
- */
-template<typename... T>
-using conditionally_copy_assignable_variant =
-        typename std::conditional<
-                for_all<std::is_copy_constructible<T>::value...>::value &&
-                for_all<std::is_copy_assignable<T>::value...>::value,
-                copy_assignable_variant<T...>,
-                conditionally_move_assignable_variant<T...>
-        >::type;
-
-/**
- * A variant object contains exactly one object of one of the parameter types.
- * For example, an object of <code>variant&lt;int, double></code> contains
- * either an integer or double value.
- *
- * The parameter types are usually different from each other. It is allowed to
- * create a variant that has the same parameter types such as
- * <code>variant&lt;int, int></code>, but those types are indistinguishable
- * from outside of the variant object.
- *
- * @tparam T the types of which the value of this variant may be. They must be
- * decayed types (see std::decay).
- */
-template<typename... T>
-class variant : public conditionally_copy_assignable_variant<T...> {
-
-    using base = conditionally_copy_assignable_variant<T...>;
-
-    // constructor inheritance
-    using base::base;
-
-public:
-
-    static_assert(
-            variant::is_nothrow_copy_constructible ==
-                std::is_nothrow_copy_constructible<base>::value,
-            "is_nothrow_copy_constructible is wrong");
-    static_assert(
-            variant::is_nothrow_move_constructible ==
-                std::is_nothrow_move_constructible<base>::value,
-            "is_nothrow_move_constructible is wrong");
-    static_assert(
-            variant::is_nothrow_destructible ==
-                std::is_nothrow_destructible<base>::value,
-            "is_nothrow_destructible is wrong");
-
-    /**
-     * Copy-assigns to this variant.
-     *
-     * This is effectively equivalent to converting the argument from
-     * <code>variant&lt;U...></code> to <code>variant&lt;T...></code> and then
-     * assigning it to this variant with the (non-template) assignment
-     * operator, but this operator template uses less temporary objects.
-     *
-     * @tparam U Types that may be contained in the argument variant. All
-     * <code>U</code>s must be contained in <code>T</code>s and
-     * <code>variant&lt;U...></code> must be copy-assignable.
-     */
-    template<typename... U>
-    typename std::enable_if<
-            std::is_copy_assignable<
-                    conditionally_copy_assignable_variant<U...>>::value,
-            variant &
-            >::type
-    operator=(const variant<U...> &v)
-            noexcept(variant<U...>::is_nothrow_copy_assignable &&
-                    variant::is_nothrow_move_constructible) {
-        if (this->tag() == typename base::tag_type(v.tag()))
-            v.apply(make_assigner(this->value()));
-        else
-            this->emplace_with_backup(
-                    static_cast<const variant_base<U...> &>(v));
+            emplace_with_backup(std::move(v));
         return *this;
     }
 
@@ -1223,18 +719,13 @@ public:
      * <code>variant&lt;U...></code> must be move-assignable.
      */
     template<typename... U>
-    typename std::enable_if<
-            std::is_move_assignable<
-                    conditionally_copy_assignable_variant<U...>>::value,
-            variant &
-            >::type
-    operator=(variant<U...> &&v)
+    variant &operator=(variant<U...> &&v)
             noexcept(variant<U...>::is_nothrow_move_assignable &&
-                    variant::is_nothrow_move_constructible) {
-        if (this->tag() == typename base::tag_type(v.tag()))
-            std::move(v).apply(make_assigner(this->value()));
+                    is_nothrow_move_constructible) {
+        if (tag() == tag_type(v.tag()))
+            std::move(v).apply(assigner(value()));
         else
-            this->emplace_with_backup(static_cast<variant_base<U...> &&>(v));
+            emplace_with_backup(std::move(v));
         return *this;
     }
 
@@ -1246,15 +737,16 @@ public:
      * using the move constructor.
      *
      * Requirements: All the contained types must be swappable, no-throw
-     * move-constructible, and no-throw destructible.
+     * move-constructible.
      */
-    void swap(variant &other) noexcept(variant::is_nothrow_swappable) {
-        if (this->tag() == other.tag())
-            return this->apply(swap_impl::swapper<variant<T...>>(other));
+    void swap(variant &other) noexcept(is_nothrow_swappable) {
+        using S = variant_impl::swap_impl::swapper<variant<T...>>;
+        if (tag() == other.tag())
+            return apply(S(other));
 
         assert(this != &other);
 
-        variant<T...> temporary(std::move(*this));
+        variant temporary(std::move(*this));
         this->emplace(std::move(other));
         other.emplace(std::move(temporary));
     }
@@ -1272,7 +764,8 @@ public:
             typename F,
             typename R = typename partial_common_result<F, const T &...>::type>
     constexpr R flat_map(F &&f) const & {
-        return this->apply(mapper<F, R>(std::forward<F>(f)));
+        using M = variant_impl::mapper<F, R>;
+        return apply(M(std::forward<F>(f)));
     }
 
     /**
@@ -1288,7 +781,8 @@ public:
             typename F,
             typename R = typename partial_common_result<F, T &&...>::type>
     /* constexpr */ R flat_map(F &&f) && {
-        return std::move(*this).apply(mapper<F, R>(std::forward<F>(f)));
+        using M = variant_impl::mapper<F, R>;
+        return std::move(*this).apply(M(std::forward<F>(f)));
     }
 
     /**
@@ -1303,9 +797,10 @@ public:
     template<
             typename F,
             typename R = variant<typename std::decay<typename std::result_of<
-                    map_result<F>(const T &)>::type>::type...>>
+                    variant_impl::map_result<F>(const T &)>::type>::type...>>
     constexpr R map(F &&f) const & {
-        return this->apply(mapper<F, R>(std::forward<F>(f)));
+        using M = variant_impl::mapper<F, R>;
+        return apply(M(std::forward<F>(f)));
     }
 
     /**
@@ -1320,9 +815,10 @@ public:
     template<
             typename F,
             typename R = variant<typename std::decay<typename std::result_of<
-                    map_result<F>(T &&)>::type>::type...>>
+                    variant_impl::map_result<F>(T &&)>::type>::type...>>
     /* constexpr */ R map(F &&f) && {
-        return std::move(*this).apply(mapper<F, R>(std::forward<F>(f)));
+        using M = variant_impl::mapper<F, R>;
+        return std::move(*this).apply(M(std::forward<F>(f)));
     }
 
     /**
@@ -1337,8 +833,7 @@ public:
      */
     template<typename U, typename... Arg>
     static variant create(Arg &&... arg)
-            noexcept(std::is_nothrow_constructible<U, Arg...>::value &&
-                    std::is_nothrow_destructible<U>::value) {
+            noexcept(std::is_nothrow_constructible<U, Arg...>::value) {
         return variant(
                 direct_initialize(), type_tag<U>(), std::forward<Arg>(arg)...);
     }
@@ -1365,27 +860,12 @@ public:
     create(std::initializer_list<ListArg> list, Arg &&... arg)
             noexcept(
                 std::is_nothrow_constructible<
-                    U, std::initializer_list<ListArg> &, Arg &&...>::value &&
-                std::is_nothrow_destructible<U>::value) {
+                    U, std::initializer_list<ListArg> &, Arg &&...>::value) {
         return variant(
                 direct_initialize(),
                 type_tag<U>(),
                 list,
                 std::forward<Arg>(arg)...);
-    }
-
-    /**
-     * Creates a new variant by move-constructing its contained value from the
-     * result of calling the argument function.
-     *
-     * Throws any exception thrown by the argument function or constructor.
-     *
-     * @tparam F the type of the function argument.
-     * @param f the function that constructs the new contained value.
-     */
-    template<typename F>
-    static variant result_of(F &&f) {
-        return variant(functional_initialize(), std::forward<F>(f));
     }
 
 }; // template<typename... T> class variant
@@ -1398,13 +878,15 @@ public:
  * move constructor.
  *
  * Requirements: All the contained types must be swappable, no-throw
- * move-constructible, and no-throw destructible.
+ * move-constructible.
  */
 template<typename... T>
 void swap(variant<T...> &a, variant<T...> &b)
         noexcept(variant<T...>::is_nothrow_swappable) {
     a.swap(b);
 }
+
+namespace variant_impl {
 
 template<template<typename> class C, typename... T>
 class comparator {
@@ -1425,10 +907,13 @@ public:
 
 }; // template<template<typename> typename C, typename... T> class comparator
 
+} // namespace variant_impl
+
 /** Checks if two variants have the same indexes and equal values. */
 template<typename... T>
 constexpr bool operator==(const variant<T...> &l, const variant<T...> &r) {
-    return l.tag() == r.tag() && l.apply(comparator<std::equal_to, T...>(r));
+    return l.tag() == r.tag() &&
+            l.apply(variant_impl::comparator<std::equal_to, T...>(r));
 }
 
 /**
@@ -1441,13 +926,9 @@ constexpr bool operator==(const variant<T...> &l, const variant<T...> &r) {
 template<typename... T>
 constexpr bool operator<(const variant<T...> &l, const variant<T...> &r) {
     return l.tag() == r.tag() ?
-            l.apply(comparator<std::less, T...>(r)) :
+            l.apply(variant_impl::comparator<std::less, T...>(r)) :
             l.tag() < r.tag();
 }
-
-} // namespace variant_impl
-
-using variant_impl::variant;
 
 } // namespace common
 } // namespace sesh
