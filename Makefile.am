@@ -42,6 +42,7 @@ TESTPROGRAMS = \
 	src/common/type_tag_test \
 	src/common/variant_test \
 	src/common/visitor_test \
+	src/language/parsing/and_or_list_test \
 	src/language/parsing/char_test \
 	src/language/parsing/command_test \
 	src/language/parsing/comment_test \
@@ -101,6 +102,8 @@ src/checklinelength.log: src/checklinelength.sh \
 ### Source files
 
 src_sesh_SOURCES_PARSER = \
+	src/language/parsing/and_or_list.cc \
+	src/language/parsing/and_or_list.hh \
 	src/language/parsing/blackhole.hh \
 	src/language/parsing/char.cc \
 	src/language/parsing/char.hh \
@@ -328,6 +331,13 @@ src_common_variant_test_SOURCES = \
 src_common_visitor_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/visitor_test.cc
+src_language_parsing_and_or_list_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/and_or_list_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
 src_language_parsing_char_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/parsing/char.cc \
