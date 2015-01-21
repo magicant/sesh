@@ -17,6 +17,7 @@
 
 #include "buildconfig.h"
 
+#include <memory>
 #include <vector>
 #include "catch.hpp"
 #include "common/copy.hh"
