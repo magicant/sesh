@@ -48,6 +48,7 @@ TESTPROGRAMS = \
 	src/language/parsing/eof_test \
 	src/language/parsing/line_continuation_test \
 	src/language/parsing/line_continued_char_test \
+	src/language/parsing/pipeline_test \
 	src/language/parsing/raw_string_test \
 	src/language/parsing/repeat_test \
 	src/language/parsing/simple_command_test \
@@ -120,6 +121,8 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/mapper.hh \
 	src/language/parsing/option.hh \
 	src/language/parsing/parser.hh \
+	src/language/parsing/pipeline.cc \
+	src/language/parsing/pipeline.hh \
 	src/language/parsing/raw_string.cc \
 	src/language/parsing/raw_string.hh \
 	src/language/parsing/repeat.hh \
@@ -362,6 +365,13 @@ src_language_parsing_line_continued_char_test_SOURCES = \
 	src/catch_main.cc \
 	$(src_sesh_SOURCES_PARSER) \
 	src/language/parsing/line_continued_char_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
+src_language_parsing_pipeline_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/pipeline_test.cc \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc \
 	src/ui/message/format.cc
