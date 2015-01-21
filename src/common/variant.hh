@@ -260,7 +260,7 @@ public:
      *
      * Requirements: All the contained types must be copy-constructible.
      */
-    variant(const variant &v) = default;
+    variant(const variant &) = default;
 
     /**
      * Widening copy constructor.
@@ -289,7 +289,7 @@ public:
      *
      * Requirements: All the contained types must be move-constructible.
      */
-    variant(variant &&v) = default;
+    variant(variant &&) = default;
 
     /**
      * Widening move constructor.
