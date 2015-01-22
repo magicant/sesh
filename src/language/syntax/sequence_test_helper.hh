@@ -21,6 +21,7 @@
 #include "buildconfig.h"
 
 #include <utility>
+#include "catch.hpp"
 #include "common/copy.hh"
 #include "common/xstring.hh"
 #include "language/syntax/and_or_list_test_helper.hh"
@@ -36,6 +37,14 @@ inline sequence make_sequence_stub(common::xstring &&s) {
 
 inline sequence make_sequence_stub(const common::xstring &s) {
     return make_sequence_stub(common::copy(s));
+}
+
+inline void expect_raw_string_sequence(
+        const sequence &actual_sequence,
+        std::initializer_list<common::xstring> expected_words) {
+    REQUIRE(actual_sequence.and_or_lists.size() == 1);
+    const auto &a = actual_sequence.and_or_lists[0];
+    expect_raw_string_and_or_list(a, expected_words);
 }
 
 } // namespace syntax

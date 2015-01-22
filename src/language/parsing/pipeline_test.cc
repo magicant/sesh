@@ -21,13 +21,12 @@
 #include <vector>
 #include "catch.hpp"
 #include "common/copy.hh"
-#include "common/visitor_test_helper.hh"
 #include "language/parsing/parser_test_helper.hh"
 #include "language/parsing/pipeline.hh"
 #include "language/source/fragment.hh"
 #include "language/syntax/pipeline.hh"
+#include "language/syntax/pipeline_test_helper.hh"
 #include "language/syntax/simple_command.hh"
-#include "language/syntax/word_test_helper.hh"
 #include "ui/message/category.hh"
 #include "ui/message/format.hh"
 #include "ui/message/report_test_helper.hh"
@@ -35,7 +34,6 @@
 namespace {
 
 using sesh::common::copy;
-using sesh::common::make_checking_visitor;
 using sesh::language::parsing::parse_pipeline;
 using sesh::language::parsing::pipeline_parse;
 using sesh::language::source::fragment;
@@ -73,16 +71,7 @@ TEST_CASE("Pipeline parser parses simple command") {
             [](const pipeline_parse &pp) {
                 REQUIRE(pp.tag() == pp.tag<pipeline>());
                 const auto &p = pp.value<pipeline>();
-                CHECK(p.exit_status_mode ==
-                        pipeline::exit_status_mode_type::straight);
-                REQUIRE(p.commands.size() == 1);
-                const auto &c = *p.commands[0];
-                const auto check = [](const simple_command &sc) {
-                    REQUIRE(sc.words.size() == 2);
-                    expect_raw_string_word(sc.words[0], L("command"));
-                    expect_raw_string_word(sc.words[1], L("argument"));
-                };
-                visit(c, make_checking_visitor<simple_command>(check));
+                expect_raw_string_pipeline(p, {L("command"), L("argument")});
             });
 }
 

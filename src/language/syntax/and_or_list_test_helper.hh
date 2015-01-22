@@ -20,7 +20,9 @@
 
 #include "buildconfig.h"
 
+#include <initializer_list>
 #include <utility>
+#include "catch.hpp"
 #include "common/copy.hh"
 #include "common/xstring.hh"
 #include "language/syntax/and_or_list.hh"
@@ -38,6 +40,15 @@ inline and_or_list make_and_or_list_stub(common::xstring &&s) {
 
 inline and_or_list make_and_or_list_stub(const common::xstring &s) {
     return make_and_or_list_stub(common::copy(s));
+}
+
+inline void expect_raw_string_and_or_list(
+        const and_or_list &actual_list,
+        std::initializer_list<common::xstring> expected_words) {
+    CHECK(actual_list.synchronicity ==
+            and_or_list::synchronicity_type::sequential);
+    CHECK(actual_list.rest.empty());
+    expect_raw_string_pipeline(actual_list.first, expected_words);
 }
 
 } // namespace syntax

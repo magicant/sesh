@@ -21,11 +21,11 @@
 #include <vector>
 #include "catch.hpp"
 #include "common/copy.hh"
-#include "common/visitor_test_helper.hh"
 #include "language/parsing/parser_test_helper.hh"
 #include "language/parsing/sequence.hh"
 #include "language/source/fragment.hh"
 #include "language/syntax/sequence.hh"
+#include "language/syntax/sequence_test_helper.hh"
 #include "language/syntax/simple_command.hh"
 #include "language/syntax/word_test_helper.hh"
 #include "ui/message/category.hh"
@@ -35,7 +35,6 @@
 namespace {
 
 using sesh::common::copy;
-using sesh::common::make_checking_visitor;
 using sesh::language::parsing::parse_sequence;
 using sesh::language::parsing::sequence_parse;
 using sesh::language::source::fragment;
@@ -73,16 +72,7 @@ TEST_CASE("Sequence parser parses simple command") {
             [](const sequence_parse &sp) {
                 REQUIRE(sp.tag() == sp.tag<sequence>());
                 const auto &s = sp.value<sequence>();
-                REQUIRE(s.and_or_lists.size() == 1);
-                const auto &a = s.and_or_lists[0];
-                REQUIRE(a.first.commands.size() == 1);
-                const auto &c = *a.first.commands[0];
-                const auto check = [](const simple_command &sc) {
-                    REQUIRE(sc.words.size() == 2);
-                    expect_raw_string_word(sc.words[0], L("command"));
-                    expect_raw_string_word(sc.words[1], L("argument"));
-                };
-                visit(c, make_checking_visitor<simple_command>(check));
+                expect_raw_string_sequence(s, {L("command"), L("argument")});
             });
 }
 

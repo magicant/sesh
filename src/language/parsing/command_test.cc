@@ -22,13 +22,11 @@
 #include "catch.hpp"
 #include "common/copy.hh"
 #include "common/xchar.hh"
-#include "common/visitor.hh"
-#include "common/visitor_test_helper.hh"
 #include "language/parsing/command.hh"
 #include "language/parsing/parser_test_helper.hh"
 #include "language/source/fragment.hh"
+#include "language/syntax/command_test_helper.hh"
 #include "language/syntax/simple_command.hh"
-#include "language/syntax/word_test_helper.hh"
 #include "ui/message/category.hh"
 #include "ui/message/format.hh"
 #include "ui/message/report_test_helper.hh"
@@ -36,7 +34,6 @@
 namespace {
 
 using sesh::common::copy;
-using sesh::common::make_checking_visitor;
 using sesh::language::parsing::command_parse;
 using sesh::language::parsing::command_pointer;
 using sesh::language::parsing::parse_command;
@@ -74,13 +71,8 @@ TEST_CASE("Command parser parses simple command") {
             [](const command_parse &p) {
                 REQUIRE(p.tag() == p.tag<command_pointer>());
                 const auto &c = p.value<command_pointer>();
-                const auto check = [](const simple_command &sc) {
-                    REQUIRE(sc.words.size() == 2);
-                    expect_raw_string_word(sc.words[0], L("command"));
-                    expect_raw_string_word(sc.words[1], L("argument"));
-                };
                 REQUIRE(c);
-                visit(*c, make_checking_visitor<simple_command>(check));
+                expect_raw_string_command(*c, {L("command"), L("argument")});
             });
 }
 

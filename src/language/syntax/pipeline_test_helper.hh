@@ -20,6 +20,8 @@
 
 #include "buildconfig.h"
 
+#include <initializer_list>
+#include "catch.hpp"
 #include "common/copy.hh"
 #include "common/xstring.hh"
 #include "language/syntax/command_test_helper.hh"
@@ -37,6 +39,17 @@ inline pipeline make_pipeline_stub(common::xstring &&s) {
 
 inline pipeline make_pipeline_stub(const common::xstring &s) {
     return make_pipeline_stub(common::copy(s));
+}
+
+inline void expect_raw_string_pipeline(
+        const pipeline &actual_pipeline,
+        std::initializer_list<common::xstring> expected_words) {
+    CHECK(actual_pipeline.exit_status_mode ==
+            pipeline::exit_status_mode_type::straight);
+    REQUIRE(actual_pipeline.commands.size() == 1);
+    const auto &command_ptr = actual_pipeline.commands[0];
+    REQUIRE(command_ptr != nullptr);
+    expect_raw_string_command(*command_ptr, expected_words);
 }
 
 } // namespace syntax

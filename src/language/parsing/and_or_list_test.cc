@@ -21,14 +21,13 @@
 #include <vector>
 #include "catch.hpp"
 #include "common/copy.hh"
-#include "common/visitor_test_helper.hh"
 #include "language/parsing/and_or_list.hh"
 #include "language/parsing/parser_test_helper.hh"
 #include "language/source/fragment.hh"
 #include "language/syntax/and_or_list.hh"
+#include "language/syntax/and_or_list_test_helper.hh"
 #include "language/syntax/pipeline.hh"
 #include "language/syntax/simple_command.hh"
-#include "language/syntax/word_test_helper.hh"
 #include "ui/message/category.hh"
 #include "ui/message/format.hh"
 #include "ui/message/report_test_helper.hh"
@@ -36,7 +35,6 @@
 namespace {
 
 using sesh::common::copy;
-using sesh::common::make_checking_visitor;
 using sesh::language::parsing::and_or_list_parse;
 using sesh::language::parsing::parse_and_or_list;
 using sesh::language::source::fragment;
@@ -75,17 +73,8 @@ TEST_CASE("And-or list parser parses simple command") {
             [](const and_or_list_parse &ap) {
                 REQUIRE(ap.tag() == ap.tag<and_or_list>());
                 const auto &a = ap.value<and_or_list>();
-                CHECK(a.synchronicity ==
-                        and_or_list::synchronicity_type::sequential);
-                CHECK(a.rest.empty());
-                REQUIRE(a.first.commands.size() == 1);
-                const auto &c = *a.first.commands[0];
-                const auto check = [](const simple_command &sc) {
-                    REQUIRE(sc.words.size() == 2);
-                    expect_raw_string_word(sc.words[0], L("command"));
-                    expect_raw_string_word(sc.words[1], L("argument"));
-                };
-                visit(c, make_checking_visitor<simple_command>(check));
+                expect_raw_string_and_or_list(
+                        a, {L("command"), L("argument")});
             });
 }
 
