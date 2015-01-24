@@ -29,8 +29,6 @@
 #include "language/syntax/pipeline.hh"
 #include "language/syntax/simple_command.hh"
 #include "ui/message/category.hh"
-#include "ui/message/format.hh"
-#include "ui/message/report_test_helper.hh"
 
 namespace {
 
@@ -43,27 +41,18 @@ using sesh::language::syntax::and_or_list;
 using sesh::language::syntax::pipeline;
 using sesh::language::syntax::simple_command;
 using sesh::ui::message::category;
-using sesh::ui::message::format;
-using sesh::ui::message::report;
 
 TEST_CASE("And-or list parser fails for empty input") {
     check_parser_failure(parse_and_or_list, L(";"));
 }
 
 TEST_CASE("And-or list parser reports empty command as error") {
-    fragment_position fp(std::make_shared<fragment>(L(";")));
-    check_parser_reports_with_fragment(
+    check_parser_single_report(
+            category::error,
+            L("empty command"),
             parse_and_or_list,
-            fp,
-            [fp](const std::vector<report> &rs) {
-                REQUIRE(rs.size() == 1);
-                check_equal(
-                        rs[0],
-                        report(
-                            category::error,
-                            format<>(L("empty command")),
-                            copy(fp)));
-            });
+            {},
+            L(";"));
 }
 
 TEST_CASE("And-or list parser parses simple command") {

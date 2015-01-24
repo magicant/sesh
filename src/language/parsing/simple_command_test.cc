@@ -52,19 +52,12 @@ TEST_CASE("Simple command parser fails for empty command") {
 }
 
 TEST_CASE("Simple command parser reports empty command as error") {
-    fragment_position fp(std::make_shared<fragment>(L(";")));
-    check_parser_reports_with_fragment(
+    check_parser_single_report(
+            category::error,
+            L("empty command"),
             parse_simple_command,
-            fp,
-            [fp](const std::vector<report> &rs) {
-                REQUIRE(rs.size() == 1);
-                check_equal(
-                        rs[0],
-                        report(
-                            category::error,
-                            format<>(L("empty command")),
-                            copy(fp)));
-            });
+            {},
+            L(";"));
 }
 
 void expect_raw_string_word_command_parse(

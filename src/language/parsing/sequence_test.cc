@@ -29,8 +29,6 @@
 #include "language/syntax/simple_command.hh"
 #include "language/syntax/word_test_helper.hh"
 #include "ui/message/category.hh"
-#include "ui/message/format.hh"
-#include "ui/message/report_test_helper.hh"
 
 namespace {
 
@@ -42,27 +40,14 @@ using sesh::language::source::fragment_position;
 using sesh::language::syntax::sequence;
 using sesh::language::syntax::simple_command;
 using sesh::ui::message::category;
-using sesh::ui::message::format;
-using sesh::ui::message::report;
 
 TEST_CASE("Sequence parser fails for empty input") {
     check_parser_failure(parse_sequence, L(";"));
 }
 
 TEST_CASE("Sequence parser reports empty command as error") {
-    fragment_position fp(std::make_shared<fragment>(L(";")));
-    check_parser_reports_with_fragment(
-            parse_sequence,
-            fp,
-            [fp](const std::vector<report> &rs) {
-                REQUIRE(rs.size() == 1);
-                check_equal(
-                        rs[0],
-                        report(
-                            category::error,
-                            format<>(L("empty command")),
-                            copy(fp)));
-            });
+    check_parser_single_report(
+            category::error, L("empty command"), parse_sequence, {}, L(";"));
 }
 
 TEST_CASE("Sequence parser parses simple command") {
