@@ -20,6 +20,9 @@
 
 #include "buildconfig.h"
 
+#include <cstddef>
+#include <initializer_list>
+#include "catch.hpp"
 #include "common/copy.hh"
 #include "common/xstring.hh"
 #include "language/syntax/simple_command.hh"
@@ -37,6 +40,18 @@ simple_command make_simple_command_stub(common::xstring &&s) {
 
 simple_command make_simple_command_stub(const common::xstring &s) {
     return make_simple_command_stub(common::copy(s));
+}
+
+inline void expect_raw_string_simple_command(
+        const simple_command &actual_command,
+        std::initializer_list<common::xstring> expected_words) {
+    REQUIRE(actual_command.words.size() == expected_words.size());
+    std::size_t i = 0;
+    for (const auto &w : expected_words) {
+        INFO("word #" << i);
+        expect_raw_string_word(actual_command.words[i], w);
+        ++i;
+    }
 }
 
 } // namespace syntax

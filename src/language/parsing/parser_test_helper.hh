@@ -24,6 +24,7 @@
 #include <memory>
 #include <utility>
 #include "catch.hpp"
+#include "common/copy.hh"
 #include "common/either.hh"
 #include "common/nop.hh"
 #include "common/xstring.hh"
@@ -31,7 +32,9 @@
 #include "language/source/fragment.hh"
 #include "language/source/fragment_test_helper.hh"
 #include "language/source/stream.hh"
+#include "ui/message/format.hh"
 #include "ui/message/report.hh"
+#include "ui/message/report_test_helper.hh"
 
 namespace sesh {
 namespace language {
@@ -369,6 +372,38 @@ void check_parser_no_reports(
             c,
             [](const std::vector<ui::message::report> &r) {
                 CHECK(r.empty());
+            });
+}
+
+template<typename P>
+void check_parser_single_report(
+        ui::message::category expected_category,
+        const common::xstring &expected_message,
+        P &&parse,
+        const source::fragment::value_type &source_before_report,
+        const source::fragment::value_type &source_after_report = {},
+        const context &c = default_context_stub()) {
+    source::fragment_position fp_report_point(
+            source_after_report.empty() ?
+            nullptr :
+            std::make_shared<source::fragment>(source_after_report));
+    auto fp_all =
+            source_before_report.empty() ?
+            fp_report_point :
+            source::fragment_position(std::make_shared<source::fragment>(
+                source_before_report, fp_report_point));
+    check_parser_reports_with_fragment(
+            std::forward<P>(parse),
+            fp_all,
+            c,
+            [=](const std::vector<ui::message::report> &rs) {
+                REQUIRE(rs.size() == 1);
+                check_equal(
+                        rs[0],
+                        ui::message::report(
+                            expected_category,
+                            ui::message::format<>(expected_message),
+                            common::copy(fp_report_point)));
             });
 }
 

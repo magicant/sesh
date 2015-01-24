@@ -1,4 +1,4 @@
-/* Copyright (C) 2014 WATANABE Yuki
+/* Copyright (C) 2015 WATANABE Yuki
  *
  * This file is part of Sesh.
  *
@@ -21,49 +21,55 @@
 #include <vector>
 #include "catch.hpp"
 #include "common/copy.hh"
-#include "common/xchar.hh"
-#include "language/parsing/command.hh"
+#include "language/parsing/and_or_list.hh"
 #include "language/parsing/parser_test_helper.hh"
 #include "language/source/fragment.hh"
-#include "language/syntax/command_test_helper.hh"
+#include "language/syntax/and_or_list.hh"
+#include "language/syntax/and_or_list_test_helper.hh"
+#include "language/syntax/pipeline.hh"
 #include "language/syntax/simple_command.hh"
 #include "ui/message/category.hh"
 
 namespace {
 
 using sesh::common::copy;
-using sesh::language::parsing::command_parse;
-using sesh::language::parsing::command_pointer;
-using sesh::language::parsing::parse_command;
+using sesh::language::parsing::and_or_list_parse;
+using sesh::language::parsing::parse_and_or_list;
 using sesh::language::source::fragment;
 using sesh::language::source::fragment_position;
+using sesh::language::syntax::and_or_list;
+using sesh::language::syntax::pipeline;
 using sesh::language::syntax::simple_command;
 using sesh::ui::message::category;
 
-TEST_CASE("Command parser fails for empty input") {
-    check_parser_failure(parse_command, L(";"));
+TEST_CASE("And-or list parser fails for empty input") {
+    check_parser_failure(parse_and_or_list, L(";"));
 }
 
-TEST_CASE("Command parser reports empty command as error") {
+TEST_CASE("And-or list parser reports empty command as error") {
     check_parser_single_report(
-            category::error, L("empty command"), parse_command, {}, L(";"));
+            category::error,
+            L("empty command"),
+            parse_and_or_list,
+            {},
+            L(";"));
 }
 
-TEST_CASE("Command parser parses simple command") {
+TEST_CASE("And-or list parser parses simple command") {
     check_parser_success_result(
-            parse_command,
+            parse_and_or_list,
             L("command  argument  ;"),
-            [](const command_parse &p) {
-                REQUIRE(p.tag() == p.tag<command_pointer>());
-                const auto &c = p.value<command_pointer>();
-                REQUIRE(c);
-                expect_raw_string_command(*c, {L("command"), L("argument")});
+            [](const and_or_list_parse &ap) {
+                REQUIRE(ap.tag() == ap.tag<and_or_list>());
+                const auto &a = ap.value<and_or_list>();
+                expect_raw_string_and_or_list(
+                        a, {L("command"), L("argument")});
             });
 }
 
-TEST_CASE("Command parser skips parsed simple command") {
+TEST_CASE("And-or list parser skips parsed simple command") {
     check_parser_success_rest(
-            parse_command,
+            parse_and_or_list,
             L("command  argument  "),
             L(";"));
 }

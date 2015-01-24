@@ -28,7 +28,7 @@ namespace sesh {
 namespace ui {
 namespace message {
 
-void check_equal(const report &l, const report &r) {
+inline void check_equal(const report &l, const report &r) {
     CHECK(l.category == r.category);
     CHECK(l.text.to_string() == r.text.to_string());
     CHECK(l.position.head == r.position.head);

@@ -20,8 +20,10 @@
 
 #include "buildconfig.h"
 
+#include <initializer_list>
 #include "common/copy.hh"
 #include "common/visitor.hh"
+#include "common/visitor_test_helper.hh"
 #include "common/xstring.hh"
 #include "language/syntax/command.hh"
 #include "language/syntax/simple_command_test_helper.hh"
@@ -38,6 +40,17 @@ inline auto make_command_stub(common::xstring &&s)
 inline auto make_command_stub(const common::xstring &s)
         -> std::shared_ptr<const command> {
     return make_command_stub(common::copy(s));
+}
+
+inline void expect_raw_string_command(
+        const command &actual_command,
+        std::initializer_list<common::xstring> expected_words) {
+    const auto check = [expected_words](const simple_command &sc) {
+        expect_raw_string_simple_command(sc, expected_words);
+    };
+    visit(
+            actual_command,
+            common::make_checking_visitor<simple_command>(check));
 }
 
 } // namespace syntax

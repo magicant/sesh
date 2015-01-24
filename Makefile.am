@@ -42,14 +42,17 @@ TESTPROGRAMS = \
 	src/common/type_tag_test \
 	src/common/variant_test \
 	src/common/visitor_test \
+	src/language/parsing/and_or_list_test \
 	src/language/parsing/char_test \
 	src/language/parsing/command_test \
 	src/language/parsing/comment_test \
 	src/language/parsing/eof_test \
 	src/language/parsing/line_continuation_test \
 	src/language/parsing/line_continued_char_test \
+	src/language/parsing/pipeline_test \
 	src/language/parsing/raw_string_test \
 	src/language/parsing/repeat_test \
+	src/language/parsing/sequence_test \
 	src/language/parsing/simple_command_test \
 	src/language/parsing/token_test \
 	src/language/parsing/whitespace_test \
@@ -100,6 +103,8 @@ src/checklinelength.log: src/checklinelength.sh \
 ### Source files
 
 src_sesh_SOURCES_PARSER = \
+	src/language/parsing/and_or_list.cc \
+	src/language/parsing/and_or_list.hh \
 	src/language/parsing/blackhole.hh \
 	src/language/parsing/char.cc \
 	src/language/parsing/char.hh \
@@ -120,10 +125,14 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/mapper.hh \
 	src/language/parsing/option.hh \
 	src/language/parsing/parser.hh \
+	src/language/parsing/pipeline.cc \
+	src/language/parsing/pipeline.hh \
 	src/language/parsing/raw_string.cc \
 	src/language/parsing/raw_string.hh \
 	src/language/parsing/repeat.hh \
 	src/language/parsing/report_helper.hh \
+	src/language/parsing/sequence.cc \
+	src/language/parsing/sequence.hh \
 	src/language/parsing/simple_command.cc \
 	src/language/parsing/simple_command.hh \
 	src/language/parsing/token.cc \
@@ -325,6 +334,13 @@ src_common_variant_test_SOURCES = \
 src_common_visitor_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/visitor_test.cc
+src_language_parsing_and_or_list_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/and_or_list_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
 src_language_parsing_char_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/parsing/char.cc \
@@ -365,6 +381,13 @@ src_language_parsing_line_continued_char_test_SOURCES = \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc \
 	src/ui/message/format.cc
+src_language_parsing_pipeline_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/pipeline_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
 src_language_parsing_raw_string_test_SOURCES = \
 	src/catch_main.cc \
 	$(src_sesh_SOURCES_PARSER) \
@@ -376,6 +399,13 @@ src_language_parsing_repeat_test_SOURCES = \
 	src/catch_main.cc \
 	src/language/parsing/char.cc \
 	src/language/parsing/repeat_test.cc \
+	src/language/source/fragment.cc \
+	src/language/source/stream.cc \
+	src/ui/message/format.cc
+src_language_parsing_sequence_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_PARSER) \
+	src/language/parsing/sequence_test.cc \
 	src/language/source/fragment.cc \
 	src/language/source/stream.cc \
 	src/ui/message/format.cc

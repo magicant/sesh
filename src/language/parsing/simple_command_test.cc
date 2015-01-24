@@ -22,15 +22,13 @@
 #include <vector>
 #include "catch.hpp"
 #include "common/copy.hh"
-#include "common/visitor.hh"
-#include "common/visitor_test_helper.hh"
 #include "common/xchar.hh"
 #include "common/xstring.hh"
 #include "language/parsing/parser_test_helper.hh"
 #include "language/parsing/simple_command.hh"
 #include "language/source/fragment.hh"
 #include "language/syntax/simple_command.hh"
-#include "language/syntax/word_test_helper.hh"
+#include "language/syntax/simple_command_test_helper.hh"
 #include "ui/message/category.hh"
 #include "ui/message/format.hh"
 #include "ui/message/report.hh"
@@ -54,19 +52,12 @@ TEST_CASE("Simple command parser fails for empty command") {
 }
 
 TEST_CASE("Simple command parser reports empty command as error") {
-    fragment_position fp(std::make_shared<fragment>(L(";")));
-    check_parser_reports_with_fragment(
+    check_parser_single_report(
+            category::error,
+            L("empty command"),
             parse_simple_command,
-            fp,
-            [fp](const std::vector<report> &rs) {
-                REQUIRE(rs.size() == 1);
-                check_equal(
-                        rs[0],
-                        report(
-                            category::error,
-                            format<>(L("empty command")),
-                            copy(fp)));
-            });
+            {},
+            L(";"));
 }
 
 void expect_raw_string_word_command_parse(
@@ -74,9 +65,7 @@ void expect_raw_string_word_command_parse(
         const xstring &expected_string) {
     REQUIRE(actual_parse.tag() == actual_parse.tag<simple_command>());
     const auto &sc = actual_parse.value<simple_command>();
-    REQUIRE(sc.words.size() == 1);
-    const auto &w = sc.words[0];
-    expect_raw_string_word(w, expected_string);
+    expect_raw_string_simple_command(sc, {expected_string});
 }
 
 TEST_CASE("Simple command parser succeeds with single word command") {
@@ -95,9 +84,8 @@ TEST_CASE("Simple command parser succeeds with double word command") {
             [](const simple_command_parse &p) {
                 REQUIRE(p.tag() == p.tag<simple_command>());
                 const auto &sc = p.value<simple_command>();
-                REQUIRE(sc.words.size() == 2);
-                expect_raw_string_word(sc.words[0], L("command"));
-                expect_raw_string_word(sc.words[1], L("argument"));
+                expect_raw_string_simple_command(
+                        sc, {L("command"), L("argument")});
             });
 }
 
