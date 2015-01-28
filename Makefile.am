@@ -187,6 +187,7 @@ src_sesh_SOURCES = \
 	src/common/xstring.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
+	src/language/executing/expansion.hh \
 	src/language/executing/word_char.hh \
 	src/language/printing/and_or_list.cc \
 	src/language/printing/and_or_list.hh \
