@@ -185,6 +185,7 @@ src_sesh_SOURCES = \
 	src/common/xostream.hh \
 	src/common/xsstream.hh \
 	src/common/xstring.hh \
+	src/environment/world.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
 	src/language/executing/expansion.hh \
