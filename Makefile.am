@@ -152,7 +152,9 @@ src_sesh_SOURCES_EXECUTOR = \
 	src/language/executing/raw_string.hh \
 	src/language/executing/string.cc \
 	src/language/executing/string.hh \
-	src/language/executing/word_char.hh
+	src/language/executing/word_char.hh \
+	src/language/executing/word_component.cc \
+	src/language/executing/word_component.hh
 
 src_sesh_SOURCES = \
 	$(src_sesh_SOURCES_EXECUTOR) \
