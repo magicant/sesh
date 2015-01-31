@@ -42,6 +42,7 @@ TESTPROGRAMS = \
 	src/common/type_tag_test \
 	src/common/variant_test \
 	src/common/visitor_test \
+	src/language/executing/raw_string_test \
 	src/language/parsing/and_or_list_test \
 	src/language/parsing/char_test \
 	src/language/parsing/command_test \
@@ -144,7 +145,17 @@ src_sesh_SOURCES_PARSER = \
 	src/language/parsing/word_component.cc \
 	src/language/parsing/word_component.hh
 
+src_sesh_SOURCES_EXECUTOR = \
+	src/language/executing/expansion.hh \
+	src/language/executing/expansion_result.hh \
+	src/language/executing/raw_string.cc \
+	src/language/executing/raw_string.hh \
+	src/language/executing/string.cc \
+	src/language/executing/string.hh \
+	src/language/executing/word_char.hh
+
 src_sesh_SOURCES = \
+	$(src_sesh_SOURCES_EXECUTOR) \
 	$(src_sesh_SOURCES_PARSER) \
 	src/async/continuation.hh \
 	src/async/delay.hh \
@@ -188,8 +199,6 @@ src_sesh_SOURCES = \
 	src/environment/world.hh \
 	src/helpermacros.h \
 	src/i18n/M.h \
-	src/language/executing/expansion.hh \
-	src/language/executing/word_char.hh \
 	src/language/printing/and_or_list.cc \
 	src/language/printing/and_or_list.hh \
 	src/language/printing/buffer.cc \
@@ -337,6 +346,10 @@ src_common_variant_test_SOURCES = \
 src_common_visitor_test_SOURCES = \
 	src/catch_main.cc \
 	src/common/visitor_test.cc
+src_language_executing_raw_string_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_EXECUTOR) \
+	src/language/executing/raw_string_test.cc
 src_language_parsing_and_or_list_test_SOURCES = \
 	src/catch_main.cc \
 	$(src_sesh_SOURCES_PARSER) \
