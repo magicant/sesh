@@ -284,6 +284,7 @@ public:
      * @tparam U Type of the element to construct.
      * @tparam A Types of the arguments that are forwarded to the constructor
      * of the element.
+     * @param t Dummy argument to help deduction of template parameter @c U.
      * @param a Arguments that are forwarded to the constructor of the
      * element.
      */

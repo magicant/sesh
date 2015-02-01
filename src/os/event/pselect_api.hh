@@ -54,7 +54,7 @@ public:
      * #create_signal_number_set} functions called for the same
      * <code>*this</code>.
      *
-     * @param timeout A negative value means no timeout.
+     * A negative timeout means no timeout.
      */
     virtual std::error_code pselect(
             io::file_descriptor::value_type fd_bound,

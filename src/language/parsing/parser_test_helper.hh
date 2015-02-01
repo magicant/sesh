@@ -180,6 +180,7 @@ void check_parser_success_context_free(
  * @param trailer Source code fragment string that follows @c source_to_parse.
  * The parser may look ahead over the trailer but is not expected to consume
  * it.
+ * @param c Context in which parsing starts.
  */
 template<typename P>
 void check_parser_success_rest(

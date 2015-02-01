@@ -179,14 +179,14 @@ void sesh_osapi_sigcopyset(
 /**
  * A direct wrapper for the POSIX pselect function.
  *
- * @param timeout in nanoseconds. A negative value means no timeout.
+ * A negative timeout means no timeout.
  */
 int sesh_osapi_pselect(
         int fd_bound,
         struct sesh_osapi_fd_set *read_fds,
         struct sesh_osapi_fd_set *write_fds,
         struct sesh_osapi_fd_set *error_fds,
-        long long timeout,
+        long long timeout_in_nanoseconds,
         const struct sesh_osapi_sigset *signal_mask);
 
 enum sesh_osapi_sigprocmask_how {
