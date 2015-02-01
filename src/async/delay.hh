@@ -202,7 +202,7 @@ public:
      * @tparam F Type of the callback. Must be copy- or move-constructible (if
      * passed by l- or r-value reference, respectively) and must return
      * continuation when called with <code>common::trial&lt;T></code>.
-     * @param a Parameters that are passed to the constructor of @t F.
+     * @param a Parameters that are passed to the constructor of @c F.
      *
      * @return Continuation that must be resumed immediately after returning
      * from this function. Note that the continuation destructor automatically
