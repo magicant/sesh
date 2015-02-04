@@ -24,6 +24,7 @@
 #include <utility>
 #include <vector>
 #include "async/future.hh"
+#include "async/future_test_helper.hh"
 #include "async/promise.hh"
 #include "catch.hpp"
 #include "common/either.hh"
@@ -92,20 +93,15 @@ TEST_CASE("Read: empty") {
     const file_descriptor::value_type fd = 2;
     uncallable_reader_api api;
     uncallable_proactor p;
-    future<result_pair> f =
-            read(api, p, dummy_non_blocking_file_descriptor(fd), 0);
-
-    bool called = false;
-    std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r);
-        CHECK(r->first.is_valid());
-        CHECK(r->first.value() == fd);
-        REQUIRE(r->second.tag() == r->second.tag<std::vector<char>>());
-        CHECK(r->second.value<std::vector<char>>().empty());
-        r->first.release().clear();
-        called = true;
+    expect_result(
+            read(api, p, dummy_non_blocking_file_descriptor(fd), 0),
+            [fd](result_pair &&r) {
+        CHECK(r.first.is_valid());
+        CHECK(r.first.value() == fd);
+        REQUIRE(r.second.tag() == r.second.tag<std::vector<char>>());
+        CHECK(r.second.value<std::vector<char>>().empty());
+        r.first.release().clear();
     });
-    CHECK(called);
 }
 
 } // namespace empty_read
@@ -277,21 +273,17 @@ TEST_CASE("Read: read error") {
     const file_descriptor::value_type fd = 4;
     read_error_api_stub api;
     echoing_proactor proactor;
-    future<result_pair> f = sesh::os::io::read(
-            api, proactor, dummy_non_blocking_file_descriptor(fd), {'A'});
-
-    bool called = false;
-    std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r);
-        CHECK(r->first.is_valid());
-        CHECK(r->first.value() == fd);
-        REQUIRE(r->second.tag() == r->second.tag<std::error_code>());
-        CHECK(r->second.value<std::error_code>() ==
+    expect_result(
+            sesh::os::io::read(
+                api, proactor, dummy_non_blocking_file_descriptor(fd), {'A'}),
+            [fd](result_pair &&r) {
+        CHECK(r.first.is_valid());
+        CHECK(r.first.value() == fd);
+        REQUIRE(r.second.tag() == r.second.tag<std::error_code>());
+        CHECK(r.second.value<std::error_code>() ==
                 std::make_error_code(std::errc::io_error));
-        r->first.release().clear();
-        called = true;
+        r.first.release().clear();
     });
-    CHECK(called);
 }
 
 } // namespace read_error

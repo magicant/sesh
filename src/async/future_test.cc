@@ -22,6 +22,7 @@
 #include <utility>
 #include "async/delay.hh"
 #include "async/future.hh"
+#include "async/future_test_helper.hh"
 #include "async/promise.hh"
 #include "catch.hpp"
 #include "common/either.hh"
@@ -394,25 +395,17 @@ TEST_CASE("Future, create by result construction, r-value") {
 }
 
 TEST_CASE("Future, create from existing value") {
-    bool called = false;
-    make_future_of(move_only()).then([&called](trial<move_only> &&r) {
-        CHECK_NOTHROW(r.get());
-        called = true;
-    });
-    CHECK(called);
+    expect_result(make_future_of(move_only()), [](move_only &&) { });
 }
 
 TEST_CASE("Future, create from exception") {
-    bool called = false;
-    make_failed_future_of<int>(1.0).then([&called](trial<int> &&r) {
+    expect_trial(make_failed_future_of<int>(1.0), [](trial<int> &&r) {
         try {
             r.get();
         } catch (double d) {
             CHECK(d == 1.0);
-            called = true;
         }
     });
-    CHECK(called);
 }
 
 TEST_CASE("Future, forward, success, int") {
@@ -431,12 +424,7 @@ TEST_CASE("Future, forward, success, move only object") {
     auto pf2 = make_promise_future_pair<move_only>();
     std::move(pf1.first).set_result(move_only());
     std::move(pf1.second).forward(std::move(pf2.first));
-
-    bool called = false;
-    std::move(pf2.second).then([&called](trial<move_only> &&) {
-        called = true;
-    });
-    CHECK(called);
+    expect_result(std::move(pf2.second), [](trial<move_only> &&) { });
 }
 
 TEST_CASE("Future, forward, failure") {

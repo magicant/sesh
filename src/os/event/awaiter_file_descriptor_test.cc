@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 #include "async/future.hh"
+#include "async/future_test_helper.hh"
 #include "catch.hpp"
 #include "common/either.hh"
 #include "common/type_tag_test_helper.hh"
@@ -66,22 +67,21 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing readable and writable FDs") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(
-            readable_file_descriptor(3), writable_file_descriptor(3));
-    std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        switch (t->tag()) {
+    expect_result(
+            a.expect(readable_file_descriptor(3), writable_file_descriptor(3)),
+            [this, start_time](trigger &&t) {
+        switch (t.tag()) {
         case trigger::tag<readable_file_descriptor>():
-            CHECK(t->value<readable_file_descriptor>().value() == 3);
+            CHECK(t.value<readable_file_descriptor>().value() == 3);
             break;
         case trigger::tag<writable_file_descriptor>():
-            CHECK(t->value<writable_file_descriptor>().value() == 3);
+            CHECK(t.value<writable_file_descriptor>().value() == 3);
             break;
         case trigger::tag<error_file_descriptor>():
         case trigger::tag<timeout>():
         case trigger::tag<signal>():
         case trigger::tag<user_provided_trigger>():
-            FAIL("tag=" << t->tag());
+            FAIL("tag=" << t.tag());
             break;
         }
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
@@ -115,22 +115,21 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing readable and error FDs") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(
-            readable_file_descriptor(3), error_file_descriptor(3));
-    std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        switch (t->tag()) {
+    expect_result(
+            a.expect(readable_file_descriptor(3), error_file_descriptor(3)),
+            [this, start_time](trigger &&t) {
+        switch (t.tag()) {
         case trigger::tag<readable_file_descriptor>():
-            CHECK(t->value<readable_file_descriptor>().value() == 3);
+            CHECK(t.value<readable_file_descriptor>().value() == 3);
             break;
         case trigger::tag<error_file_descriptor>():
-            CHECK(t->value<error_file_descriptor>().value() == 3);
+            CHECK(t.value<error_file_descriptor>().value() == 3);
             break;
         case trigger::tag<writable_file_descriptor>():
         case trigger::tag<timeout>():
         case trigger::tag<signal>():
         case trigger::tag<user_provided_trigger>():
-            FAIL("tag=" << t->tag());
+            FAIL("tag=" << t.tag());
             break;
         }
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
@@ -164,22 +163,21 @@ TEST_CASE_METHOD(
         "Awaiter: one trigger set containing writable and error FDs") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(
-            writable_file_descriptor(3), error_file_descriptor(3));
-    std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        switch (t->tag()) {
+    expect_result(
+            a.expect(writable_file_descriptor(3), error_file_descriptor(3)),
+            [this, start_time](trigger &&t) {
+        switch (t.tag()) {
         case trigger::tag<writable_file_descriptor>():
-            CHECK(t->value<writable_file_descriptor>().value() == 3);
+            CHECK(t.value<writable_file_descriptor>().value() == 3);
             break;
         case trigger::tag<error_file_descriptor>():
-            CHECK(t->value<error_file_descriptor>().value() == 3);
+            CHECK(t.value<error_file_descriptor>().value() == 3);
             break;
         case trigger::tag<readable_file_descriptor>():
         case trigger::tag<timeout>():
         case trigger::tag<signal>():
         case trigger::tag<user_provided_trigger>():
-            FAIL("tag=" << t->tag());
+            FAIL("tag=" << t.tag());
             break;
         }
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
@@ -214,22 +212,19 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;
 
-    bool callback1Called = false, callback2Called = false;
-    a.expect(readable_file_descriptor(2)).then(
-            [this, start_time, &callback1Called](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
-        CHECK(t->value<readable_file_descriptor>().value() == 2);
+    expect_result(
+            a.expect(readable_file_descriptor(2)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == 2);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(10));
-        callback1Called = true;
     });
-    a.expect(writable_file_descriptor(3)).then(
-            [this, start_time, &callback2Called](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<writable_file_descriptor>());
-        CHECK(t->value<writable_file_descriptor>().value() == 3);
+    expect_result(
+            a.expect(writable_file_descriptor(3)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<writable_file_descriptor>());
+        CHECK(t.value<writable_file_descriptor>().value() == 3);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(10));
-        callback2Called = true;
     });
 
     implementation() = [this, start_time](
@@ -244,8 +239,6 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     a.await_events();
-    CHECK(callback1Called);
-    CHECK(callback2Called);
 }
 
 TEST_CASE_METHOD(
@@ -254,22 +247,19 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;
 
-    bool callback1Called = false, callback2Called = false;
-    a.expect(writable_file_descriptor(3)).then(
-            [this, start_time, &callback1Called](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<writable_file_descriptor>());
-        CHECK(t->value<writable_file_descriptor>().value() == 3);
+    expect_result(
+            a.expect(writable_file_descriptor(3)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<writable_file_descriptor>());
+        CHECK(t.value<writable_file_descriptor>().value() == 3);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(10));
-        callback1Called = true;
     });
-    a.expect(error_file_descriptor(2)).then(
-            [this, start_time, &callback2Called](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<error_file_descriptor>());
-        CHECK(t->value<error_file_descriptor>().value() == 2);
+    expect_result(
+            a.expect(error_file_descriptor(2)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<error_file_descriptor>());
+        CHECK(t.value<error_file_descriptor>().value() == 2);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(10));
-        callback2Called = true;
     });
 
     implementation() = [this, start_time](
@@ -284,8 +274,6 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     a.await_events();
-    CHECK(callback1Called);
-    CHECK(callback2Called);
 }
 
 TEST_CASE_METHOD(
@@ -294,22 +282,19 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;
 
-    bool callback1Called = false, callback2Called = false;
-    a.expect(readable_file_descriptor(2)).then(
-            [this, start_time, &callback1Called](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
-        CHECK(t->value<readable_file_descriptor>().value() == 2);
+    expect_result(
+            a.expect(readable_file_descriptor(2)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == 2);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(10));
-        callback1Called = true;
     });
-    a.expect(error_file_descriptor(3)).then(
-            [this, start_time, &callback2Called](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<error_file_descriptor>());
-        CHECK(t->value<error_file_descriptor>().value() == 3);
+    expect_result(
+            a.expect(error_file_descriptor(3)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<error_file_descriptor>());
+        CHECK(t.value<error_file_descriptor>().value() == 3);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(10));
-        callback2Called = true;
     });
 
     implementation() = [this, start_time](
@@ -324,21 +309,17 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     a.await_events();
-    CHECK(callback1Called);
-    CHECK(callback2Called);
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: awaiting max readable FD") {
     auto max = file_descriptor_set_impl::max;
-    bool callback_called = false;
-    a.expect(readable_file_descriptor(max)).then(
-            [this, max, &callback_called](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
-        CHECK(t->value<readable_file_descriptor>().value() == max);
-        callback_called = true;
+    expect_result(
+            a.expect(readable_file_descriptor(max)),
+            [this, max](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == max);
     });
 
     implementation() = [](
@@ -352,25 +333,23 @@ TEST_CASE_METHOD(
         return std::error_code();
     };
     a.await_events();
-    CHECK(callback_called);
 }
 
 TEST_CASE_METHOD(
         awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: domain error from FD set") {
     auto max = file_descriptor_set_impl::max;
-    bool callback_called = false;
-    a.expect(readable_file_descriptor(max + 1)).then(
-            [this, &callback_called](trial<trigger> &&t) {
+    expect_trial(
+            a.expect(readable_file_descriptor(max + 1)),
+            [](trial<trigger> &&t) {
         try {
             t.get();
+            FAIL("domain_error should be thrown");
         } catch (std::domain_error &) {
-            callback_called = true;
         }
     });
 
     a.await_events();
-    CHECK(callback_called);
 }
 
 } // namespace

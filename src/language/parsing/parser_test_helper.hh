@@ -23,6 +23,7 @@
 #include <iterator>
 #include <memory>
 #include <utility>
+#include "async/future_test_helper.hh"
 #include "catch.hpp"
 #include "common/copy.hh"
 #include "common/either.hh"
@@ -61,17 +62,7 @@ inline context default_context_stub() {
 
 template<typename P, typename C>
 void check_parser(P &&parse, const state &s, C &&check_result) {
-    using R = typename result_type_of<P>::type;
-    auto r = std::forward<P>(parse)(s);
-
-    bool called = false;
-    std::move(r).then(
-            [&called, &check_result](const common::trial<result<R>> &t) {
-        REQUIRE_NOTHROW(t.get());
-        std::forward<C>(check_result)(*t);
-        called = true;
-    });
-    CHECK(called);
+    expect_result(std::forward<P>(parse)(s), std::forward<C>(check_result));
 }
 
 /**

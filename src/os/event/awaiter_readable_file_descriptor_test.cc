@@ -23,8 +23,8 @@
 #include <system_error>
 #include <utility>
 #include "async/future.hh"
+#include "async/future_test_helper.hh"
 #include "catch.hpp"
-#include "common/either.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter_test_helper.hh"
 #include "os/event/pselect_api.hh"
@@ -38,7 +38,6 @@
 namespace {
 
 using sesh::async::future;
-using sesh::common::trial;
 using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::readable_file_descriptor;
 using sesh::os::event::trigger;
@@ -54,11 +53,11 @@ TEST_CASE_METHOD(
         "Awaiter: awaiting single readable FD") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(readable_file_descriptor(4));
-    std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
-        CHECK(t->value<readable_file_descriptor>().value() == 4);
+    expect_result(
+            a.expect(readable_file_descriptor(4)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == 4);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
@@ -91,12 +90,11 @@ TEST_CASE_METHOD(
         "pselect returning single FD") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(
-            readable_file_descriptor(2), readable_file_descriptor(0));
-    std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
-        CHECK(t->value<readable_file_descriptor>().value() == 0);
+    expect_result(
+            a.expect(readable_file_descriptor(2), readable_file_descriptor(0)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == 0);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
@@ -130,12 +128,11 @@ TEST_CASE_METHOD(
         "pselect returning all FDs") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(
-            readable_file_descriptor(2), readable_file_descriptor(0));
-    std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
-        auto fd = t->value<readable_file_descriptor>().value();
+    expect_result(
+            a.expect(readable_file_descriptor(2), readable_file_descriptor(0)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<readable_file_descriptor>());
+        auto fd = t.value<readable_file_descriptor>().value();
         if (fd != 0)
             CHECK(fd == 2);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(5));
@@ -170,19 +167,19 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;
 
-    a.expect(readable_file_descriptor(1)).then(
-            [this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
-        CHECK(t->value<readable_file_descriptor>().value() == 1);
+    expect_result(
+            a.expect(readable_file_descriptor(1)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == 1);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(9));
         mutable_steady_clock_now() += std::chrono::seconds(1);
     });
-    a.expect(readable_file_descriptor(3)).then(
-            [this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
-        CHECK(t->value<readable_file_descriptor>().value() == 3);
+    expect_result(
+            a.expect(readable_file_descriptor(3)),
+            [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == 3);
         CHECK(steady_clock_now() == start_time + std::chrono::seconds(28));
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
@@ -232,14 +229,13 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(10000));
     mutable_steady_clock_now() = start_time;
 
-    auto callback = [this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == trigger::tag<readable_file_descriptor>());
-        CHECK(t->value<readable_file_descriptor>().value() == 7);
+    auto callback = [this, start_time](trigger &&t) {
+        CHECK(t.tag() == trigger::tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == 7);
         mutable_steady_clock_now() += std::chrono::seconds(1);
     };
-    a.expect(readable_file_descriptor(7)).then(callback);
-    a.expect(readable_file_descriptor(7)).then(callback);
+    expect_result(a.expect(readable_file_descriptor(7)), callback);
+    expect_result(a.expect(readable_file_descriptor(7)), callback);
 
     unsigned count = 0;
     implementation() = [this, &count](
