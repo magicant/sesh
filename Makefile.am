@@ -619,6 +619,7 @@ src_ui_message_format_test_SOURCES = \
 	src/ui/message/format_test.cc
 
 TESTHEADERS = \
+	src/async/future_test_helper.hh \
 	src/common/type_tag_test_helper.hh \
 	src/common/visitor_test_helper.hh \
 	src/language/parsing/parser_test_helper.hh \

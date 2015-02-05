@@ -22,8 +22,8 @@
 #include <utility>
 #include <vector>
 #include "async/future.hh"
+#include "async/future_test_helper.hh"
 #include "catch.hpp"
-#include "common/either.hh"
 #include "common/type_tag_test_helper.hh"
 #include "os/event/awaiter.hh"
 #include "os/event/awaiter_test_helper.hh"
@@ -39,7 +39,6 @@
 namespace {
 
 using sesh::async::future;
-using sesh::common::trial;
 using sesh::os::event::awaiter_test_fixture;
 using sesh::os::event::signal;
 using sesh::os::event::trigger;
@@ -56,11 +55,11 @@ TEST_CASE_METHOD(
         "Awaiter: one signal in one trigger set") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(signal(3));
-    std::move(f).then([this](trial<trigger> &&t) {
-        REQUIRE(t);
-        REQUIRE(t->tag() == trigger::tag<signal>());
-        CHECK(t->value<signal>().number() == 3);
+    expect_result(
+            a.expect(signal(3)),
+            [this](trigger &&t) {
+        REQUIRE(t.tag() == trigger::tag<signal>());
+        CHECK(t.value<signal>().number() == 3);
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
@@ -127,11 +126,11 @@ TEST_CASE_METHOD(
         "Awaiter: two signals in one trigger set") {
     auto start_time = time_point(std::chrono::seconds(100));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(signal(2), signal(6));
-    std::move(f).then([this](trial<trigger> &&t) {
-        REQUIRE(t);
-        REQUIRE(t->tag() == trigger::tag<signal>());
-        CHECK(t->value<signal>().number() == 6);
+    expect_result(
+            a.expect(signal(2), signal(6)),
+            [this](trigger &&t) {
+        REQUIRE(t.tag() == trigger::tag<signal>());
+        CHECK(t.value<signal>().number() == 6);
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
@@ -174,10 +173,11 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
     for (unsigned i = 0; i < 2; ++i) {
-        a.expect(signal(1)).then([this](trial<trigger> &&t) {
-            REQUIRE(t);
-            REQUIRE(t->tag() == trigger::tag<signal>());
-            CHECK(t->value<signal>().number() == 1);
+        expect_result(
+                a.expect(signal(1)),
+                [this](trigger &&t) {
+            REQUIRE(t.tag() == trigger::tag<signal>());
+            CHECK(t.value<signal>().number() == 1);
             mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
@@ -216,10 +216,11 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
     for (signal_number sn : {1, 2}) {
-        a.expect(signal(sn)).then([this, sn](trial<trigger> &&t) {
-            REQUIRE(t);
-            REQUIRE(t->tag() == trigger::tag<signal>());
-            CHECK(t->value<signal>().number() == sn);
+        expect_result(
+                a.expect(signal(sn)),
+                [this, sn](trigger &&t) {
+            REQUIRE(t.tag() == trigger::tag<signal>());
+            CHECK(t.value<signal>().number() == sn);
             mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }
@@ -261,10 +262,11 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
     for (signal_number sn : {1, 2}) {
-        a.expect(signal(sn)).then([this, sn](trial<trigger> &&t) {
-            REQUIRE(t);
-            REQUIRE(t->tag() == trigger::tag<signal>());
-            CHECK(t->value<signal>().number() == sn);
+        expect_result(
+                a.expect(signal(sn)),
+                [this, sn](trigger &&t) {
+            REQUIRE(t.tag() == trigger::tag<signal>());
+            CHECK(t.value<signal>().number() == sn);
             mutable_steady_clock_now() += std::chrono::seconds(1);
         });
     }

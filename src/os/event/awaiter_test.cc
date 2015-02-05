@@ -22,6 +22,7 @@
 #include <system_error>
 #include <utility>
 #include "async/future.hh"
+#include "async/future_test_helper.hh"
 #include "catch.hpp"
 #include "common/either.hh"
 #include "common/type_tag_test_helper.hh"
@@ -92,12 +93,12 @@ TEST_CASE_METHOD(
         "Awaiter: timeout with FD trigger in same set") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(
-            timeout(std::chrono::seconds(5)), readable_file_descriptor(3));
-    std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        REQUIRE(t->tag() == t->tag<timeout>());
-        CHECK(t->value<timeout>().interval() == std::chrono::seconds(5));
+    expect_result(
+            a.expect(
+                timeout(std::chrono::seconds(5)), readable_file_descriptor(3)),
+            [this, start_time](trigger &&t) {
+        REQUIRE(t.tag() == t.tag<timeout>());
+        CHECK(t.value<timeout>().interval() == std::chrono::seconds(5));
         mutable_steady_clock_now() += std::chrono::seconds(2);
     });
 
@@ -129,12 +130,13 @@ TEST_CASE_METHOD(
         "Awaiter: FD trigger with timeout in same set") {
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
-    future<trigger> f = a.expect(
-            timeout(std::chrono::seconds(10)), readable_file_descriptor(3));
-    std::move(f).then([this, start_time](trial<trigger> &&t) {
-        REQUIRE(t);
-        REQUIRE(t->tag() == t->tag<readable_file_descriptor>());
-        CHECK(t->value<readable_file_descriptor>().value() == 3);
+    expect_result(
+            a.expect(
+                timeout(std::chrono::seconds(10)),
+                readable_file_descriptor(3)),
+            [this, start_time](trigger &&t) {
+        REQUIRE(t.tag() == t.tag<readable_file_descriptor>());
+        CHECK(t.value<readable_file_descriptor>().value() == 3);
         mutable_steady_clock_now() += std::chrono::seconds(4);
     });
 
@@ -190,14 +192,12 @@ TEST_CASE_METHOD(
         awaiter_test_fixture<handler_configuration_api_dummy>,
         "Awaiter: setting timeout from domain error") {
     auto fd = readable_file_descriptor(file_descriptor_set_impl::max + 1);
-    bool called = false;
-    a.expect(fd).wrap().recover([this](std::exception_ptr) {
-        return a.expect(timeout(std::chrono::seconds(0)));
-    }).unwrap().then([&](trial<trigger> &&) {
-        called = true;
-    });
+    expect_trial(
+            a.expect(fd).wrap().recover([this](std::exception_ptr) {
+                return a.expect(timeout(std::chrono::seconds(0)));
+            }).unwrap(),
+            [](trial<trigger> &&) { });
     a.await_events();
-    CHECK(called);
 }
 
 TEST_CASE_METHOD(
@@ -206,14 +206,10 @@ TEST_CASE_METHOD(
     auto start_time = time_point(std::chrono::seconds(0));
     mutable_steady_clock_now() = start_time;
 
-    bool called = false;
-    auto f = a.expect(
-            timeout(std::chrono::seconds(1)), readable_file_descriptor(0));
-    std::move(f).then([&called](trial<trigger> &&t) {
-        REQUIRE(t);
-        CHECK(t->tag() == t->tag<timeout>());
-        called = true;
-    });
+    expect_result(
+            a.expect(
+                timeout(std::chrono::seconds(1)), readable_file_descriptor(0)),
+            [](trigger &&t) { CHECK(t.tag() == t.tag<timeout>()); });
 
     a.expect(signal(1));
 
@@ -246,7 +242,6 @@ TEST_CASE_METHOD(
     };
 
     a.await_events();
-    CHECK(called);
 }
 
 } // namespace

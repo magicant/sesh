@@ -24,6 +24,7 @@
 #include <vector>
 #include <utility>
 #include "async/future.hh"
+#include "async/future_test_helper.hh"
 #include "async/promise.hh"
 #include "catch.hpp"
 #include "common/copy.hh"
@@ -90,22 +91,18 @@ TEST_CASE("Write: empty") {
     const file_descriptor::value_type fd = 2;
     uncallable_writer_api api;
     uncallable_proactor p;
-    future<result_pair> f = write(
-            api,
-            p,
-            dummy_non_blocking_file_descriptor(fd),
-            std::vector<char>());
-
-    bool called = false;
-    std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r);
-        CHECK(r->first.is_valid());
-        CHECK(r->first.value() == fd);
-        CHECK(r->second.value() == 0);
-        r->first.release().clear();
-        called = true;
+    expect_result(
+            write(
+                api,
+                p,
+                dummy_non_blocking_file_descriptor(fd),
+                std::vector<char>()),
+            [fd](result_pair &&r) {
+        CHECK(r.first.is_valid());
+        CHECK(r.first.value() == fd);
+        CHECK(r.second.value() == 0);
+        r.first.release().clear();
     });
-    CHECK(called);
 }
 
 } // namespace empty_write
@@ -249,20 +246,15 @@ TEST_CASE("Write: domain error in proactor") {
     const file_descriptor::value_type fd = 2;
     uncallable_writer_api api;
     domain_error_proactor p;
-    future<result_pair> f = write(
-            api, p, dummy_non_blocking_file_descriptor(fd), {'C'});
-
-    bool called = false;
-    std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r);
-        CHECK(r->first.is_valid());
-        CHECK(r->first.value() == fd);
-        CHECK(r->second ==
+    expect_result(
+            write(api, p, dummy_non_blocking_file_descriptor(fd), {'C'}),
+            [fd](result_pair &&r) {
+        CHECK(r.first.is_valid());
+        CHECK(r.first.value() == fd);
+        CHECK(r.second ==
                 std::make_error_code(std::errc::too_many_files_open));
-        r->first.release().clear();
-        called = true;
+        r.first.release().clear();
     });
-    CHECK(called);
 }
 
 } // namespace domain_error
@@ -282,19 +274,15 @@ TEST_CASE("Write: write error") {
     const file_descriptor::value_type fd = 4;
     write_error_api api;
     echoing_proactor proactor;
-    future<result_pair> f = sesh::os::io::write(
-            api, proactor, dummy_non_blocking_file_descriptor(fd), {'A'});
-
-    bool called = false;
-    std::move(f).then([fd, &called](trial<result_pair> &&r) {
-        REQUIRE(r);
-        CHECK(r->first.is_valid());
-        CHECK(r->first.value() == fd);
-        CHECK(r->second == std::make_error_code(std::errc::io_error));
-        r->first.release().clear();
-        called = true;
+    expect_result(
+            sesh::os::io::write(
+                api, proactor, dummy_non_blocking_file_descriptor(fd), {'A'}),
+            [fd](result_pair &&r) {
+        CHECK(r.first.is_valid());
+        CHECK(r.first.value() == fd);
+        CHECK(r.second == std::make_error_code(std::errc::io_error));
+        r.first.release().clear();
     });
-    CHECK(called);
 }
 
 } // namespace write_error
