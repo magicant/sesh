@@ -43,6 +43,7 @@ TESTPROGRAMS = \
 	src/common/variant_test \
 	src/common/visitor_test \
 	src/language/executing/raw_string_test \
+	src/language/executing/word_test \
 	src/language/parsing/and_or_list_test \
 	src/language/parsing/char_test \
 	src/language/parsing/command_test \
@@ -152,6 +153,8 @@ src_sesh_SOURCES_EXECUTOR = \
 	src/language/executing/raw_string.hh \
 	src/language/executing/string.cc \
 	src/language/executing/string.hh \
+	src/language/executing/word.cc \
+	src/language/executing/word.hh \
 	src/language/executing/word_char.hh \
 	src/language/executing/word_component.cc \
 	src/language/executing/word_component.hh
@@ -352,6 +355,10 @@ src_language_executing_raw_string_test_SOURCES = \
 	src/catch_main.cc \
 	$(src_sesh_SOURCES_EXECUTOR) \
 	src/language/executing/raw_string_test.cc
+src_language_executing_word_test_SOURCES = \
+	src/catch_main.cc \
+	$(src_sesh_SOURCES_EXECUTOR) \
+	src/language/executing/word_test.cc
 src_language_parsing_and_or_list_test_SOURCES = \
 	src/catch_main.cc \
 	$(src_sesh_SOURCES_PARSER) \
