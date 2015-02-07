@@ -56,7 +56,7 @@ void join(std::vector<expansion> &to, std::vector<expansion> &&from) {
         return;
     }
 
-    move(std::move(from.back().characters), to.front().characters);
+    move(from.back().characters, to.front().characters);
     // TODO: std::move(++from.begin(), from.end(), std::back_inserter(to));
 }
 
@@ -97,7 +97,7 @@ public:
 
     /** Accepts result of word component expansion. */
     future<expansion_result> operator()(expansion_result &&er) {
-        move(std::move(er.reports), m_result.reports);
+        move(er.reports, m_result.reports);
         if (!er.words) {
             m_result.words.clear();
             return make_future_of(std::move(m_result));
