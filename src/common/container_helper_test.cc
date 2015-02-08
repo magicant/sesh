@@ -116,6 +116,30 @@ TEST_CASE("Container helper: move") {
     CHECK(to[0].value == 3);
 }
 
+TEST_CASE("Container helper: transform") {
+    std::vector<int> from = {1, 2, 5};
+    std::vector<double> to;
+    sesh::common::transform(from, to, [](int v) { return v * 100.0; });
+    REQUIRE(to.size() == 3);
+    CHECK(to[0] == 100.0);
+    CHECK(to[1] == 200.0);
+    CHECK(to[2] == 500.0);
+}
+
+TEST_CASE("Container helper: move_transform") {
+    struct transformer {
+        constexpr double operator()(const int &) const { return 0.0; }
+        constexpr double operator()(int &&v) const { return v * 100.0; }
+    };
+    std::vector<int> from = {1, 2, 5};
+    std::vector<double> to;
+    sesh::common::move_transform(from, to, transformer());
+    REQUIRE(to.size() == 3);
+    CHECK(to[0] == 100.0);
+    CHECK(to[1] == 200.0);
+    CHECK(to[2] == 500.0);
+}
+
 TEST_CASE("Container helper: create vector of {}") {
     std::vector<int> v = make_vector_of<int>();
     CHECK(v.empty());

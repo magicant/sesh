@@ -24,6 +24,8 @@
 #include "common/xchar.hh"
 #include "language/executing/expansion.hh"
 #include "language/executing/expansion_result.hh"
+#include "language/executing/field.hh"
+#include "language/executing/multiple_field_result.hh"
 #include "language/executing/word.hh"
 #include "language/syntax/word.hh"
 #include "language/syntax/word_component_test_helper.hh"
@@ -32,8 +34,11 @@ namespace {
 
 using sesh::common::trial;
 using sesh::language::executing::expand_four;
+using sesh::language::executing::expand_to_multiple_fields;
 using sesh::language::executing::expansion;
 using sesh::language::executing::expansion_result;
+using sesh::language::executing::field;
+using sesh::language::executing::multiple_field_result;
 using sesh::language::syntax::make_word_component_stub;
 using sesh::language::syntax::word;
 
@@ -104,6 +109,24 @@ TEST_CASE("expand_four: Expanding triple raw string component word") {
 
 // TODO: Expansion in quotation
 // TODO: Expansion of $@
+
+TEST_CASE(
+        "expand_to_multiple_fields: "
+        "Expanding single raw string component word") {
+    auto w = std::make_shared<word>();
+    w->components.push_back(make_word_component_stub(L("foo")));
+    expect_result(
+            expand_to_multiple_fields(nullptr, w),
+            [](multiple_field_result &&result) {
+        CHECK(result.reports.empty());
+        REQUIRE(result.fields);
+        CHECK(result.fields->size() == 1);
+
+        const field &f = result.fields->front();
+        CHECK(f.characters.size() == 3);
+        CHECK(f.characters.at(0) == L('f'));
+    });
+}
 
 } // namespace
 

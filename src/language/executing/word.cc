@@ -26,6 +26,9 @@
 #include "common/either.hh"
 #include "common/shared_function.hh"
 #include "environment/world.hh"
+#include "language/executing/expansion.hh"
+#include "language/executing/field.hh"
+#include "language/executing/word_char.hh"
 #include "language/executing/word_component.hh"
 #include "language/syntax/word.hh"
 
@@ -41,7 +44,9 @@ using sesh::async::make_future_of;
 using sesh::async::make_promise_future_pair;
 using sesh::async::promise;
 using sesh::common::move;
+using sesh::common::move_transform;
 using sesh::common::shared_function;
+using sesh::common::transform;
 using sesh::common::trial;
 using sesh::environment::world;
 using sesh::language::syntax::word;
@@ -58,6 +63,15 @@ void join(std::vector<expansion> &to, std::vector<expansion> &&from) {
 
     move(from.back().characters, to.front().characters);
     // TODO: std::move(++from.begin(), from.end(), std::back_inserter(to));
+}
+
+field to_field(expansion &&e) {
+    field f;
+    transform(
+            e.characters,
+            f.characters,
+            [](word_char wc) { return wc.character; });
+    return f;
 }
 
 class four_expansion_state :
@@ -120,6 +134,21 @@ future<expansion_result> expand_four(
             is_quoted,
             std::shared_ptr<const components>(w, &w->components));
     return es->proceed();
+}
+
+future<multiple_field_result> expand_to_multiple_fields(
+        const std::shared_ptr<world> &world,
+        const std::shared_ptr<const word> &w) {
+    return expand_four(world, false, w).map([](expansion_result &&er) {
+        multiple_field_result mfr;
+        // TODO brace expansion, field splitting, pathname expansion
+        move(er.reports, mfr.reports);
+        if (er.words) {
+            mfr.fields.try_emplace();
+            move_transform(*er.words, *mfr.fields, to_field);
+        }
+        return mfr;
+    });
 }
 
 } // namespace executing
