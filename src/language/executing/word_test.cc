@@ -31,16 +31,16 @@
 namespace {
 
 using sesh::common::trial;
-using sesh::language::executing::expand;
+using sesh::language::executing::expand_four;
 using sesh::language::executing::expansion;
 using sesh::language::executing::expansion_result;
 using sesh::language::syntax::make_word_component_stub;
 using sesh::language::syntax::word;
 
-TEST_CASE("Empty word expands to empty result") {
+TEST_CASE("expand_four: Empty word expands to empty result") {
     auto w = std::make_shared<word>();
     expect_result(
-            expand(nullptr, false, w),
+            expand_four(nullptr, false, w),
             [](expansion_result &&result) {
         CHECK(result.reports.empty());
         REQUIRE(result.words);
@@ -48,11 +48,11 @@ TEST_CASE("Empty word expands to empty result") {
     });
 }
 
-TEST_CASE("Expanding single raw string component word") {
+TEST_CASE("expand_four: Expanding single raw string component word") {
     auto w = std::make_shared<word>();
     w->components.push_back(make_word_component_stub(L("foo")));
     expect_result(
-            expand(nullptr, false, w),
+            expand_four(nullptr, false, w),
             [](expansion_result &&result) {
         CHECK(result.reports.empty());
         REQUIRE(result.words);
@@ -64,12 +64,12 @@ TEST_CASE("Expanding single raw string component word") {
     });
 }
 
-TEST_CASE("Expanding double raw string component word") {
+TEST_CASE("expand_four: Expanding double raw string component word") {
     auto w = std::make_shared<word>();
     w->components.push_back(make_word_component_stub(L("foo")));
     w->components.push_back(make_word_component_stub(L("bar")));
     expect_result(
-            expand(nullptr, false, w),
+            expand_four(nullptr, false, w),
             [](expansion_result &&result) {
         CHECK(result.reports.empty());
         REQUIRE(result.words);
@@ -82,13 +82,13 @@ TEST_CASE("Expanding double raw string component word") {
     });
 }
 
-TEST_CASE("Expanding triple raw string component word") {
+TEST_CASE("expand_four: Expanding triple raw string component word") {
     auto w = std::make_shared<word>();
     w->components.push_back(make_word_component_stub(L("A")));
     w->components.push_back(make_word_component_stub(L("B")));
     w->components.push_back(make_word_component_stub(L("C")));
     expect_result(
-            expand(nullptr, false, w),
+            expand_four(nullptr, false, w),
             [](expansion_result &&result) {
         CHECK(result.reports.empty());
         REQUIRE(result.words);

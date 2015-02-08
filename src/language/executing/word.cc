@@ -60,7 +60,8 @@ void join(std::vector<expansion> &to, std::vector<expansion> &&from) {
     // TODO: std::move(++from.begin(), from.end(), std::back_inserter(to));
 }
 
-class expansion_state : public std::enable_shared_from_this<expansion_state> {
+class four_expansion_state :
+        public std::enable_shared_from_this<four_expansion_state> {
 
 private:
 
@@ -72,7 +73,7 @@ private:
 
 public:
 
-    expansion_state(
+    four_expansion_state(
             const std::shared_ptr<world> &w,
             bool is_quoted,
             std::shared_ptr<const components> &&cs) :
@@ -91,7 +92,7 @@ public:
         auto f = expand(m_world, m_is_quoted, *m_next_component);
         ++m_next_component;
         return std::move(f)
-                .map(shared_function<expansion_state>(shared_from_this()))
+                .map(shared_function<four_expansion_state>(shared_from_this()))
                 .unwrap();
     }
 
@@ -106,15 +107,15 @@ public:
         return proceed();
     }
 
-}; // class expansion_state
+}; // class four_expansion_state
 
 } // namespace
 
-future<expansion_result> expand(
+future<expansion_result> expand_four(
         const std::shared_ptr<world> &world,
         bool is_quoted,
         const std::shared_ptr<const word> &w) {
-    auto es = std::make_shared<expansion_state>(
+    auto es = std::make_shared<four_expansion_state>(
             world,
             is_quoted,
             std::shared_ptr<const components>(w, &w->components));

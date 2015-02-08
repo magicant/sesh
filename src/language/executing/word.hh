@@ -30,8 +30,13 @@ namespace sesh {
 namespace language {
 namespace executing {
 
-/** Expands a word component. The argument pointers must not be null. */
-async::future<expansion_result> expand(
+/**
+ * Performs the four expansions, which are tilde expansion, parameter
+ * expansion, command substitution, and arithmetic expansion.
+ *
+ * @pre The argument pointers must not be null.
+ */
+async::future<expansion_result> expand_four(
         const std::shared_ptr<environment::world> &,
         bool is_quoted,
         const std::shared_ptr<const syntax::word> &);
