@@ -149,6 +149,8 @@ src_sesh_SOURCES_PARSER = \
 src_sesh_SOURCES_EXECUTOR = \
 	src/language/executing/expansion.hh \
 	src/language/executing/expansion_result.hh \
+	src/language/executing/field.hh \
+	src/language/executing/multiple_field_result.hh \
 	src/language/executing/raw_string.cc \
 	src/language/executing/raw_string.hh \
 	src/language/executing/string.cc \

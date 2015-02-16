@@ -24,16 +24,33 @@
 #include "async/future.hh"
 #include "environment/world.hh"
 #include "language/executing/expansion_result.hh"
+#include "language/executing/multiple_field_result.hh"
 #include "language/syntax/word.hh"
 
 namespace sesh {
 namespace language {
 namespace executing {
 
-/** Expands a word component. The argument pointers must not be null. */
-async::future<expansion_result> expand(
+/**
+ * Performs the four expansions, which are tilde expansion, parameter
+ * expansion, command substitution, and arithmetic expansion.
+ *
+ * @pre The argument pointers must not be null.
+ */
+async::future<expansion_result> expand_four(
         const std::shared_ptr<environment::world> &,
         bool is_quoted,
+        const std::shared_ptr<const syntax::word> &);
+
+/**
+ * Expands a word. All kinds of expansions are performed: the four expansions,
+ * brace expansions, field splitting, and pathname expansion. The result may be
+ * any number of fields.
+ *
+ * @pre The argument pointers must not be null.
+ */
+async::future<multiple_field_result> expand_to_multiple_fields(
+        const std::shared_ptr<environment::world> &,
         const std::shared_ptr<const syntax::word> &);
 
 } // namespace executing

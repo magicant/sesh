@@ -145,6 +145,35 @@ void move(From &&from, To &to) {
 }
 
 /**
+ * Applies the given transformer function to each element of the input
+ * container and pushes the resultant elements to the end of the output
+ * container.
+ */
+template<typename From, typename To, typename UnaryTransformer>
+void transform(From &&from, To &to, UnaryTransformer &&t) {
+    std::transform(
+            std::begin(from),
+            std::end(from),
+            std::back_inserter(to),
+            std::forward<UnaryTransformer>(t));
+}
+
+/**
+ * Applies the given transformer function to each element of the input
+ * container and pushes the resultant elements to the end of the output
+ * container. The input elements are passed by r-value reference to the
+ * transformer function.
+ */
+template<typename From, typename To, typename UnaryTransformer>
+void move_transform(From &&from, To &to, UnaryTransformer &&t) {
+    std::transform(
+            std::make_move_iterator(std::begin(from)),
+            std::make_move_iterator(std::end(from)),
+            std::back_inserter(to),
+            std::forward<UnaryTransformer>(t));
+}
+
+/**
  * Creates a new vector that contains the arguments. The vector elements are
  * move- or copy-constructed from the arguments.
  */
