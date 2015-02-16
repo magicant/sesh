@@ -23,7 +23,6 @@
 #include <vector>
 #include "common/either.hh"
 #include "language/executing/field.hh"
-#include "ui/message/report.hh"
 
 namespace sesh {
 namespace language {
@@ -40,16 +39,6 @@ public:
      * fields.
      */
     common::maybe<std::vector<field>> fields;
-
-    /**
-     * Reports from the expansion process. If expansion failed, there should be
-     * at least one {@link ui::message::category::error error} report. Reports
-     * of other categories can be included, regardless of whether the expansion
-     * was successful or not. Note that the reports might not be presented to
-     * the human user because the result may be superseded by another expansion
-     * result.
-     */
-    std::vector<ui::message::report> reports;
 
 }; // class multiple_field_result
 

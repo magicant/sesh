@@ -112,7 +112,6 @@ public:
 
     /** Accepts result of word component expansion. */
     future<expansion_result> operator()(expansion_result &&er) {
-        move(er.reports, m_result.reports);
         if (!er.words) {
             m_result.words.clear();
             return make_future_of(std::move(m_result));
@@ -142,7 +141,6 @@ future<multiple_field_result> expand_to_multiple_fields(
     return expand_four(world, false, w).map([](expansion_result &&er) {
         multiple_field_result mfr;
         // TODO brace expansion, field splitting, pathname expansion
-        move(er.reports, mfr.reports);
         if (er.words) {
             mfr.fields.try_emplace();
             move_transform(*er.words, *mfr.fields, to_field);

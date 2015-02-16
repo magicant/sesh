@@ -47,7 +47,6 @@ TEST_CASE("expand_four: Empty word expands to empty result") {
     expect_result(
             expand_four(nullptr, false, w),
             [](expansion_result &&result) {
-        CHECK(result.reports.empty());
         REQUIRE(result.words);
         CHECK(result.words->empty());
     });
@@ -59,7 +58,6 @@ TEST_CASE("expand_four: Expanding single raw string component word") {
     expect_result(
             expand_four(nullptr, false, w),
             [](expansion_result &&result) {
-        CHECK(result.reports.empty());
         REQUIRE(result.words);
         CHECK(result.words->size() == 1);
 
@@ -76,7 +74,6 @@ TEST_CASE("expand_four: Expanding double raw string component word") {
     expect_result(
             expand_four(nullptr, false, w),
             [](expansion_result &&result) {
-        CHECK(result.reports.empty());
         REQUIRE(result.words);
         CHECK(result.words->size() == 1);
 
@@ -95,7 +92,6 @@ TEST_CASE("expand_four: Expanding triple raw string component word") {
     expect_result(
             expand_four(nullptr, false, w),
             [](expansion_result &&result) {
-        CHECK(result.reports.empty());
         REQUIRE(result.words);
         CHECK(result.words->size() == 1);
 
@@ -118,7 +114,6 @@ TEST_CASE(
     expect_result(
             expand_to_multiple_fields(nullptr, w),
             [](multiple_field_result &&result) {
-        CHECK(result.reports.empty());
         REQUIRE(result.fields);
         CHECK(result.fields->size() == 1);
 
