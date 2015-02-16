@@ -15,46 +15,26 @@
  * You should have received a copy of the GNU General Public License along with
  * Sesh.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef INCLUDED_language_executing_expansion_result_hh
-#define INCLUDED_language_executing_expansion_result_hh
+#ifndef INCLUDED_language_executing_result_test_helper_hh
+#define INCLUDED_language_executing_result_test_helper_hh
 
 #include "buildconfig.h"
 
-#include <vector>
-#include "common/either.hh"
-#include "language/executing/expansion.hh"
+#include "catch.hpp"
 #include "language/executing/result.hh"
 
 namespace sesh {
 namespace language {
 namespace executing {
 
-/**
- * Result of word expansion that may possibly have failed.
- *
- * The result parent class subobject contains the results of command
- * substitutions that happened during expansion.
- */
-class expansion_result : public result {
-
-public:
-
-    /**
-     * Optional expansion result. The maybe object is empty if expansion
-     * failed. Otherwise, the vector contains any number (possibly zero) of
-     * expansions.
-     *
-     * Typically, the number of resultant expansions is one, but other number
-     * of expansions may result when an array is expanded.
-     */
-    common::maybe<std::vector<expansion>> words;
-
-}; // class expansion_result
+void check_null(const result &r) {
+    CHECK_FALSE(r.last_process_termination);
+}
 
 } // namespace executing
 } // namespace language
 } // namespace sesh
 
-#endif // #ifndef INCLUDED_language_executing_expansion_result_hh
+#endif // #ifndef INCLUDED_language_executing_result_test_helper_hh
 
 /* vim: set et sw=4 sts=4 tw=79 cino=\:0,g0,N-s,i2s,+2s ft=cpp: */

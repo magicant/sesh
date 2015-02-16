@@ -20,8 +20,9 @@
 #include "catch.hpp"
 #include "common/either.hh"
 #include "common/xchar.hh"
-#include "language/executing/raw_string.hh"
 #include "language/executing/expansion_result.hh"
+#include "language/executing/raw_string.hh"
+#include "language/executing/result_test_helper.hh"
 #include "language/syntax/raw_string.hh"
 
 namespace {
@@ -42,6 +43,7 @@ void test_empty_raw_string(bool is_quoted) {
     expand(nullptr, is_quoted, dummy_shared_ptr(&s)).then(
             [&called](trial<expansion_result> &&result) {
         REQUIRE(result);
+        check_null(*result);
         REQUIRE(result->words);
         REQUIRE(result->words->size() == 1);
         CHECK(result->words->front().characters.empty());
@@ -65,6 +67,7 @@ void test_nonempty_raw_string(bool is_quoted) {
     expand(nullptr, is_quoted, dummy_shared_ptr(&s)).then(
             [is_quoted, &called](trial<expansion_result> &&result) {
         REQUIRE(result);
+        check_null(*result);
         REQUIRE(result->words);
         REQUIRE(result->words->size() == 1);
 

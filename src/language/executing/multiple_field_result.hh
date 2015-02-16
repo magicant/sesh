@@ -23,13 +23,19 @@
 #include <vector>
 #include "common/either.hh"
 #include "language/executing/field.hh"
+#include "language/executing/result.hh"
 
 namespace sesh {
 namespace language {
 namespace executing {
 
-/** Result of field expansion that may possibly have failed. */
-class multiple_field_result {
+/**
+ * Result of field expansion that may possibly have failed.
+ *
+ * The result parent class subobject contains the results of command
+ * substitutions that happened during expansion.
+ */
+class multiple_field_result : public result {
 
 public:
 

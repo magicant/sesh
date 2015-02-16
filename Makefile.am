@@ -153,6 +153,7 @@ src_sesh_SOURCES_EXECUTOR = \
 	src/language/executing/multiple_field_result.hh \
 	src/language/executing/raw_string.cc \
 	src/language/executing/raw_string.hh \
+	src/language/executing/result.hh \
 	src/language/executing/string.cc \
 	src/language/executing/string.hh \
 	src/language/executing/word.cc \
@@ -631,6 +632,7 @@ TESTHEADERS = \
 	src/async/future_test_helper.hh \
 	src/common/type_tag_test_helper.hh \
 	src/common/visitor_test_helper.hh \
+	src/language/executing/result_test_helper.hh \
 	src/language/parsing/parser_test_helper.hh \
 	src/language/source/fragment_test_helper.hh \
 	src/language/syntax/and_or_list_test_helper.hh \
