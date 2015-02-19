@@ -26,6 +26,7 @@
 #include "language/executing/expansion_result.hh"
 #include "language/executing/field.hh"
 #include "language/executing/multiple_field_result.hh"
+#include "language/executing/result_test_helper.hh"
 #include "language/executing/word.hh"
 #include "language/syntax/word.hh"
 #include "language/syntax/word_component_test_helper.hh"
@@ -47,7 +48,7 @@ TEST_CASE("expand_four: Empty word expands to empty result") {
     expect_result(
             expand_four(nullptr, false, w),
             [](expansion_result &&result) {
-        CHECK(result.reports.empty());
+        check_null(result);
         REQUIRE(result.words);
         CHECK(result.words->empty());
     });
@@ -59,7 +60,7 @@ TEST_CASE("expand_four: Expanding single raw string component word") {
     expect_result(
             expand_four(nullptr, false, w),
             [](expansion_result &&result) {
-        CHECK(result.reports.empty());
+        check_null(result);
         REQUIRE(result.words);
         CHECK(result.words->size() == 1);
 
@@ -76,7 +77,7 @@ TEST_CASE("expand_four: Expanding double raw string component word") {
     expect_result(
             expand_four(nullptr, false, w),
             [](expansion_result &&result) {
-        CHECK(result.reports.empty());
+        check_null(result);
         REQUIRE(result.words);
         CHECK(result.words->size() == 1);
 
@@ -95,7 +96,7 @@ TEST_CASE("expand_four: Expanding triple raw string component word") {
     expect_result(
             expand_four(nullptr, false, w),
             [](expansion_result &&result) {
-        CHECK(result.reports.empty());
+        check_null(result);
         REQUIRE(result.words);
         CHECK(result.words->size() == 1);
 
@@ -118,7 +119,7 @@ TEST_CASE(
     expect_result(
             expand_to_multiple_fields(nullptr, w),
             [](multiple_field_result &&result) {
-        CHECK(result.reports.empty());
+        check_null(result);
         REQUIRE(result.fields);
         CHECK(result.fields->size() == 1);
 
